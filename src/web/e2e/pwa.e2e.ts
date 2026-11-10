@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForAppShellCached } from './support/service-worker';
 
 test.describe('PWA', () => {
   test('links a valid web app manifest', async ({ page, request }) => {
@@ -35,35 +36,38 @@ test.describe('PWA', () => {
     expect(new URL(scriptURL).pathname).toBe('/ngsw-worker.js');
   });
 
-  test('serves the app shell offline after the first visit (R10)', async ({
-    page,
-    context,
-    browserName,
-  }) => {
-    test.skip(browserName !== 'chromium', 'Service worker offline checks run in Chromium');
-    await page.goto('/');
-    // `serviceWorker.ready` only means "installed"; the Angular service worker fills its caches
-    // asynchronously afterwards. Wait until the app shell is actually cached.
-    // (expect.poll, not waitForFunction: an async predicate returns a Promise, which is always truthy.)
-    await expect
-      .poll(
-        () =>
-          page.evaluate(async () => {
-            await navigator.serviceWorker.ready;
-            for (const key of await caches.keys()) {
-              if (!key.includes(':assets:app:cache')) continue;
-              if (await (await caches.open(key)).match('/index.html')) return true;
-            }
-            return false;
-          }),
-        { timeout: 20_000, message: 'app shell cached by the service worker' },
-      )
-      .toBe(true);
+  test.describe('offline (R10)', () => {
+    test.use({ locale: 'en-US' });
 
-    await context.setOffline(true);
-    await page.reload();
-    await expect(page.getByRole('heading', { level: 1, name: 'Blinker' })).toBeVisible();
-    await expect(page.getByRole('contentinfo')).toContainText('not a medical device');
-    await context.setOffline(false);
+    test.beforeEach(async ({ page, browserName }) => {
+      test.skip(browserName !== 'chromium', 'Service worker offline checks run in Chromium');
+      await page.goto('/');
+      await waitForAppShellCached(page);
+    });
+
+    test.afterEach(async ({ context }) => context.setOffline(false));
+
+    test('serves the app shell offline after the first visit', async ({ page, context }) => {
+      await context.setOffline(true);
+      await page.reload();
+      await expect(page.getByRole('heading', { level: 1, name: 'Blinker' })).toBeVisible();
+      await expect(page.getByRole('contentinfo')).toContainText('not a medical device');
+    });
+
+    test('serves the not-found page offline (SPA fallback from the service worker)', async ({
+      page,
+      context,
+    }) => {
+      await context.setOffline(true);
+      await page.goto('/does-not-exist');
+      await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
+    });
+
+    test('switches to Polish offline (translations are prefetched)', async ({ page, context }) => {
+      await context.setOffline(true);
+      await page.reload();
+      await page.getByRole('button', { name: 'Polski' }).click();
+      await expect(page.getByText('Tryb komunikacji pojawi się wkrótce.')).toBeVisible();
+    });
   });
 });

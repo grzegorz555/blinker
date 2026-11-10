@@ -59,7 +59,10 @@ The app has no secrets. If one ever appears (for example a deploy token), it liv
 Agents never read `.env*`, the credential manager or `git credential` output.
 
 # Supply chain
-- Commit `package-lock.json` and install with `npm ci`.
+- Commit `package-lock.json` and install with `npm ci`, which installs exactly what the lockfile says.
+- Version ranges in `package.json`:
+  - Angular packages (`@angular/*`) and the tools `ng new`/`ng update` manage (TypeScript, Vitest, jsdom, Prettier) keep the CLI-generated `^`/`~` ranges, so `ng update` can move them together.
+  - Every other dependency is added with `--save-exact`.
 - New dependencies must be maintained and widely used, with a permissive license. Bigger ones need an ADR.
 - `npm audit --audit-level=high` runs in CI. Dependabot covers npm and GitHub Actions.
 - GitHub Actions are pinned to a full commit SHA and use minimal `permissions:` (default `contents: read`).

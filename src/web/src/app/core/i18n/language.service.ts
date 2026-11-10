@@ -25,12 +25,19 @@ export class LanguageService {
     this.apply(lang);
   }
 
-  /** Switches the language at runtime and remembers the choice. */
+  /**
+   * Switches the language at runtime and remembers the choice.
+   * If the user clicks again before the translations load, the latest click wins.
+   */
   async setLanguage(lang: LanguageCode): Promise<void> {
+    const request = ++this.latestRequest;
     await firstValueFrom(this.transloco.load(lang));
+    if (request !== this.latestRequest) return;
     this.apply(lang);
     this.save(lang);
   }
+
+  private latestRequest = 0;
 
   private apply(lang: LanguageCode): void {
     this.transloco.setActiveLang(lang);

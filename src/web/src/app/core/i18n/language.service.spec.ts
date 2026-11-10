@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { TranslocoService } from '@jsverse/transloco';
+import { type Translation, TranslocoService } from '@jsverse/transloco';
+import { Subject } from 'rxjs';
 import { translocoTesting } from '../../../testing/transloco';
 import { LanguageService } from './language.service';
 import { LANGUAGE_STORAGE_KEY } from './languages';
@@ -43,6 +44,24 @@ describe('LanguageService (spec 001, R2–R3)', () => {
     expect(document.documentElement.lang).toBe('pl');
     expect(service.language()).toBe('pl');
     expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('pl');
+  });
+
+  it('applies the last requested language when switches overlap (latest wins)', async () => {
+    const plLoad = new Subject<Translation>();
+    const original = transloco.load.bind(transloco);
+    vi.spyOn(transloco, 'load').mockImplementation((lang) =>
+      lang === 'pl' ? plLoad.asObservable() : original(lang),
+    );
+
+    const slow = service.setLanguage('pl');
+    await service.setLanguage('en');
+    plLoad.next({});
+    plLoad.complete();
+    await slow;
+
+    expect(service.language()).toBe('en');
+    expect(document.documentElement.lang).toBe('en');
+    expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('en');
   });
 
   it('keeps working when localStorage throws', async () => {
