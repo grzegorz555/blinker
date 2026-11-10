@@ -43,4 +43,5 @@ The author also wants to **learn** from every step.
     - Check the docs before using an API.
     - Justify non-trivial choices in 1–2 sentences with a link.
     - Every spec ends with a **References** section.
-12. The person using Blinker relies on it to talk. **Prefer predictable, forgiving behavior over cleverness:** every action can be undone, and nothing is said aloud without confirmation.
+12. **Keep `README.md` current in every task**: status (stage/spec), features, how to run, test and verify, and the tech stack. When a task changes any of these, update the README in the same commit.
+13. The person using Blinker relies on it to talk. **Prefer predictable, forgiving behavior over cleverness:** every action can be undone, and nothing is said aloud without confirmation.

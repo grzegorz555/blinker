@@ -12,6 +12,7 @@ description: Step 2 of the Compound Engineering loop in Blinker. Implements exac
    - follow `docs/conventions/frontend.md`, `accessibility.md`, `security.md`;
    - put new UI strings in both `en.json` and `pl.json`;
    - keep the domain logic in plain TypeScript, with time injected.
+4a. Update `README.md` (status, features, how to run, test and verify) in the same commit if the task changes any of them.
 5. Write the tests in the same change (`docs/conventions/testing.md`):
    - Vitest unit tests for every rule the task touches;
    - Playwright e2e tests with an axe scan for every user-visible path.
