@@ -3,10 +3,13 @@ type: Learning
 title: An active Angular service worker is not yet a cached app
 description: navigator.serviceWorker.ready resolves before ngsw has filled its caches; offline checks must wait for the cached index.html.
 tags: [pwa, service-worker, testing, offline]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-10
+verified:
+  - by: human:Grzegorz Roczniak
+    at: 2026-11-10
 stale_after: 2027-11-10
 ---
 
