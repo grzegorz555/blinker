@@ -9,7 +9,7 @@ description: Step 1 of the Compound Engineering loop in Blinker. Turns a stage o
 2. Ask the author **at most 3–4 questions** about the unclear points. Propose defaults for the rest.
 3. Pick the next number `NNN` (the highest folder in `docs/specs/` + 1) and create `docs/specs/NNN-slug/spec.md`:
    - frontmatter: `type: Spec`, `title`, `description`, `tags`, `status: draft`, `generated: {by: agent:<model>, at: <date>}`;
-   - sections: Goal · Scope · Rules R1…Rn · UI and accessibility notes · Security and privacy notes · Acceptance criteria (testable checklist) · **Test plan** (unit cases per rule, e2e paths + axe) · Out of scope.
+   - sections: Goal · Scope · Rules R1…Rn · UI and accessibility notes · Security and privacy notes · Acceptance criteria (testable checklist) · **Test plan** (unit cases per rule, e2e paths + axe) · Out of scope · **References** (the official docs and best-practice sources behind the rules: WCAG success criteria, APG patterns, angular.dev, MDN, OWASP, vendor docs). Verify the links. Don't write them from memory.
 4. Create `tasks.md` (`type: Task List`). Use 3–8 tasks, and make each task:
    - one commit, with its own unit and e2e tests;
    - followed by a line *"To understand:"* naming the concepts the author will learn.
