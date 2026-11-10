@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { translocoTesting } from '../../../testing/transloco';
 import { NotFound } from './not-found';
 
 describe('NotFound', () => {
   it('renders a heading and a link back to the home page', async () => {
     await TestBed.configureTestingModule({
-      imports: [NotFound],
+      imports: [NotFound, translocoTesting()],
       providers: [provideRouter([])],
     }).compileComponents();
     const fixture = TestBed.createComponent(NotFound);

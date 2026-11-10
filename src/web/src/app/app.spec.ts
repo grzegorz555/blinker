@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { translocoTesting } from '../testing/transloco';
 import { App } from './app';
 
 describe('App shell', () => {
   async function render(): Promise<HTMLElement> {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [App, translocoTesting()],
       providers: [provideRouter([])],
     }).compileComponents();
     const fixture = TestBed.createComponent(App);

@@ -3,7 +3,7 @@
   class="sr-only rounded-md bg-primary px-4 py-3 text-on-primary focus:not-sr-only focus:m-2 focus:inline-block focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus-visible:outline-none"
   (click)="skipToMain($event)"
 >
-  Skip to main content
+  {{ 'app.skipToMain' | transloco }}
 </a>
 
 <div
@@ -15,8 +15,9 @@
         routerLink="/"
         class="inline-flex min-h-11 items-center rounded-md px-2 text-lg font-bold focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
       >
-        Blinker
+        {{ 'app.name' | transloco }}
       </a>
+      <app-language-switch />
     </div>
   </header>
 
@@ -31,7 +32,7 @@
 
   <footer class="border-t border-border bg-surface">
     <p class="mx-auto max-w-5xl px-4 py-3 text-sm text-muted">
-      Blinker is not a medical device. Keep the paper board as a fallback.
+      {{ 'app.disclaimer' | transloco }}
     </p>
   </footer>
 </div>

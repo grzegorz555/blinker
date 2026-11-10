@@ -12,14 +12,15 @@ them into sentences that are shown on screen and read aloud.
 
 ## Status
 **Stage 1: application skeleton** (spec [001](docs/specs/001-app-skeleton/spec.md), in progress).
-There are no user-facing features yet. The stage plan is in [docs/backlog.md](docs/backlog.md).
+The app shell works in English and Polish (language switch, translated titles); there are no communication features yet. The stage plan is in [docs/backlog.md](docs/backlog.md).
 
 ## Tech stack
 - Angular 22 (standalone, zoneless, signals), TypeScript 6, in `src/web`
 - Vitest for unit tests; Playwright + axe-core for e2e and accessibility tests
+- Transloco for UI translations (en, pl) in `src/web/public/i18n/`; the language comes from the saved choice, then the browser, then Polish
 - Tailwind CSS v4 with design tokens in `src/web/src/styles/tokens.css` (light and dark, WCAG contrast checked)
 - Planned:
-  - Transloco (en, pl), PWA service worker;
+  - PWA service worker;
   - MediaPipe Face Landmarker, Web Speech API;
   - hosting on Azure Static Web Apps (Free).
 

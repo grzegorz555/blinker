@@ -1,0 +1,21 @@
+{
+  "app": {
+    "name": "Blinker",
+    "skipToMain": "Skip to main content",
+    "languageSwitch": "Language",
+    "disclaimer": "Blinker is not a medical device. Keep the paper board as a fallback."
+  },
+  "titles": {
+    "home": "Blinker",
+    "notFound": "Page not found · Blinker"
+  },
+  "home": {
+    "description": "Communicate by blinking: the camera follows your face, the app goes through a letter board and turns your signals into sentences that it reads aloud.",
+    "comingSoon": "The communication mode is coming soon."
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "description": "This page doesn't exist.",
+    "backHome": "Go to the home page"
+  }
+}

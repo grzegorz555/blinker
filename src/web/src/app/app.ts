@@ -1,5 +1,7 @@
 import { Component, ElementRef, viewChild } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { LanguageSwitch } from './shared/language-switch/language-switch';
 
 /**
  * Application shell: skip link, header, main and footer landmarks.
@@ -7,7 +9,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
  * Skip link (SC 2.4.1): https://www.w3.org/WAI/WCAG22/Understanding/bypass-blocks.html
  */
 @Component({
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, RouterLink, TranslocoPipe, LanguageSwitch],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
