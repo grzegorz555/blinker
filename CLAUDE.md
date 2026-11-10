@@ -21,6 +21,20 @@ The author also wants to **learn** from every step.
 - Tests: Vitest (unit) and Playwright with axe-core (e2e and accessibility)
 - No backend and no authentication. `src/api` (.NET) stays reserved until there is a real need, which needs an ADR.
 
+## Commands (from `src/web`)
+```
+npm ci                     # install from the lockfile
+npm run lint               # ESLint (TS, template a11y, no-unsanitized)
+npm test                   # Vitest unit tests, single run
+npm run build              # production build (no source maps)
+npm run e2e                # build + Playwright (3 device projects) + axe
+npm run format:check       # Prettier
+node ../../scripts/check-okf.mjs ../../docs   # docs bundle check
+```
+Don't start the dev server (`npm start`) unless the author asks. E2E tests serve the production build themselves.
+Environment: Windows with the Git Bash tool. **There is no Python.** Write multi-line files with the Write tool
+(not bash heredocs containing quotes), and use `node -e` for scripted edits.
+
 ## Where to find things (read only what you need; start at `docs/index.md`)
 - `docs/` is an **OKF v0.2 bundle**: every `.md` except `index.md`/`log.md` has YAML frontmatter with a `type`. Navigate through the `index.md` files.
 - Decisions: `docs/adr/` · conventions: `docs/conventions/` · specs: `docs/specs/NNN-name/{spec,tasks}.md`

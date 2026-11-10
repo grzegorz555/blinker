@@ -26,5 +26,5 @@ Branch: `feat/001-app-skeleton` · One task = one commit (with its tests) · Gat
   *To understand:* Transloco runtime loading, `TitleStrategy`, `aria-pressed`, endonyms, SC 3.1.1.
 - [x] **T6: PWA.** `@angular/pwa` (manifest, ngsw, placeholder icons), registration only in production, a script that serves the production build locally for e2e, and an offline e2e test.
   *To understand:* service worker lifecycle, `ngsw-config.json` asset groups, web manifest, installability criteria.
-- [ ] **T7: Docs and compound.** Update `docs/architecture.md` (actual structure), the commands in `CLAUDE.md`, and the Polish copies. Write the learning summary, capture learnings, and add a `docs/log.md` entry.
+- [x] **T7: Docs and compound.** Update `docs/architecture.md` (actual structure), the commands in `CLAUDE.md`, and the Polish copies. Write the learning summary, capture learnings, and add a `docs/log.md` entry.
   *To understand:* the compound step: what is worth turning into a rule.
