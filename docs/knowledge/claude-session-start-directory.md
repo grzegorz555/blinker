@@ -3,10 +3,13 @@ type: Learning
 title: Start Claude Code in the repo root, or project agents and skills are not loaded
 description: A session started in C:\Repozytorium\Blinker (the parent folder) didn't see .claude/agents/code-reviewer.md from blinker/.
 tags: [ai-workflow, claude-code, tooling]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-10
+verified:
+  - by: human:Grzegorz Roczniak
+    at: 2026-11-10
 stale_after: 2027-05-10
 ---
 

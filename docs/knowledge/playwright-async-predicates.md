@@ -3,10 +3,13 @@ type: Learning
 title: Use expect.poll, not waitForFunction, for async browser checks in Playwright
 description: page.waitForFunction with an async predicate resolves immediately, because the returned Promise is truthy.
 tags: [testing, e2e, playwright]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-10
+verified:
+  - by: human:Grzegorz Roczniak
+    at: 2026-11-10
 ---
 
 # Context

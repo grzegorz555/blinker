@@ -3,10 +3,13 @@ type: Learning
 title: A visible skip link must not overlap other targets (SC 2.5.8)
 description: An absolutely positioned skip link that covers the header link fails axe target-size on small screens; render it in the normal flow.
 tags: [accessibility, wcag, layout]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-10
+verified:
+  - by: human:Grzegorz Roczniak
+    at: 2026-11-10
 ---
 
 # Context
