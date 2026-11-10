@@ -1,15 +1,15 @@
 import { Routes } from '@angular/router';
 
-// Titles are plain strings for now; spec 001 T5 translates them with a TitleStrategy.
+// `title` is a translation key, translated by TranslatedTitleStrategy (spec 001, R3).
 export const routes: Routes = [
   {
     path: '',
-    title: 'Blinker',
+    title: 'titles.home',
     loadComponent: () => import('./features/home/home').then((m) => m.Home),
   },
   {
     path: '**',
-    title: 'Page not found · Blinker',
+    title: 'titles.notFound',
     loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFound),
   },
 ];

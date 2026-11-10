@@ -1,0 +1,13 @@
+<div role="group" [attr.aria-label]="'app.languageSwitch' | transloco" class="flex gap-1">
+  @for (lang of languages; track lang) {
+    <button
+      type="button"
+      [attr.lang]="lang"
+      [attr.aria-pressed]="current() === lang"
+      (click)="select(lang)"
+      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-border px-3 font-medium aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-on-primary aria-pressed:underline aria-pressed:underline-offset-4 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus-visible:outline-none"
+    >
+      {{ endonyms[lang] }}
+    </button>
+  }
+</div>

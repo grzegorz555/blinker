@@ -1,0 +1,21 @@
+{
+  "app": {
+    "name": "Blinker",
+    "skipToMain": "Przejdź do głównej treści",
+    "languageSwitch": "Język",
+    "disclaimer": "Blinker nie jest wyrobem medycznym. Zachowaj papierową tablicę jako zapas."
+  },
+  "titles": {
+    "home": "Blinker",
+    "notFound": "Nie znaleziono strony · Blinker"
+  },
+  "home": {
+    "description": "Komunikuj się mrugnięciami: kamera śledzi twarz, aplikacja przechodzi po tablicy liter i zamienia Twoje sygnały na zdania, które czyta na głos.",
+    "comingSoon": "Tryb komunikacji pojawi się wkrótce."
+  },
+  "notFound": {
+    "heading": "Nie znaleziono strony",
+    "description": "Ta strona nie istnieje.",
+    "backHome": "Przejdź do strony głównej"
+  }
+}
