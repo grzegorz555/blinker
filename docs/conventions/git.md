@@ -1,0 +1,41 @@
+---
+type: Convention
+title: Git conventions
+description: Branching, commits, worktrees (optional), push policy and local repo setup.
+tags: [convention, git]
+status: draft
+generated:
+  by: agent:claude-opus-5-5
+  at: 2026-11-10
+---
+
+- **Conventional Commits** (https://www.conventionalcommits.org): `feat(web): …`, `fix(web): …`, `docs(adr): …`, `test`, `refactor`, `chore`, `ci`. Scopes: `web`, `docs`, `adr`, `ci`, `boards`, `claude`.
+- Commits written by the AI end with ` [gen]`, for example `feat(web): add scan state machine [gen]`.
+- **Never work on `main`.** Branch names follow `<type>/<short-name>`; a spec number is optional (`feat/002-board-scanning`). Changes go into `main` through a PR with green CI. The author merges.
+- **Stages → specs → PRs → commits:**
+  - each stage from `docs/backlog.md` is split into one or more specs;
+  - **each spec gets its own feature branch and its own PR** (`feat/003-scan-state-machine`);
+  - inside the PR, **each task from `tasks.md` is one commit** (or a few logical ones), with its tests;
+  - a PR never mixes stages or unrelated specs;
+  - stage 0 is the exception: it has no spec, so it is a single branch, `chore/000-bootstrap`, with commits split by topic.
+- **Merging needs green CI.** Branch protection is not available for private repos on the free GitHub plan, so this rule is enforced by discipline: agents never merge, and the author merges only when every check is green.
+- Make small, logical commits. **Commits stay local; push and open PRs only when the author asks.**
+- Local repo setup (local config is not part of the repo, so repeat it after a fresh clone):
+  ```
+  git config --local user.name grzegorz555
+  git config --local user.email grzegorz555@users.noreply.github.com
+  git config --local core.hooksPath .git/hooks
+  ```
+
+# One task per session (default)
+- The author usually runs **one task per session**. Work on a branch in the main checkout `C:\Repozytorium\Blinker\blinker`, and `/clear` between tasks.
+- Before committing, check `git branch --show-current` and `git status`. If something doesn't match the task, stop and ask.
+
+# Worktrees (when working in parallel)
+- One task = one worktree, in a short path:
+  ```
+  git worktree add C:/Repozytorium/Blinker/wt/<name> -b <type>/<name> origin/main
+  cd C:/Repozytorium/Blinker/wt/<name>/src/web && npm ci
+  ```
+- A dev server in a second worktree uses a different port (`npx ng serve --port 4201`). Agents start dev servers only when the author asks.
+- Remove a worktree (`git worktree remove`) only after its PR is merged, and with the author's consent.
