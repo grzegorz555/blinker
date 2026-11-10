@@ -9,7 +9,9 @@
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "e2e": "ng build && playwright test",
+    "e2e:only": "playwright test"
   },
   "private": true,
   "packageManager": "npm@11.19.0",
@@ -27,6 +29,8 @@
     "@angular/build": "^22.2.6",
     "@angular/cli": "^22.2.6",
     "@angular/compiler-cli": "^22.2.0",
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.65.0",
     "jsdom": "^30.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
