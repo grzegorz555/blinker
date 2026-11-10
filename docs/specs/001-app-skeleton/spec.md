@@ -42,7 +42,9 @@ every later task depends on. There are no camera, board or scanning features yet
 - A 404 page.
 
 # Rules
-- R1: All visible text comes from Transloco. Every key exists in both `en.json` and `pl.json`.
+- R1: All visible text comes from Transloco. Every key exists in both `en.json` and `pl.json`. Exceptions:
+  - `<noscript>` in `index.html` is shown before Angular runs, so it is bilingual static text;
+  - the web manifest `description` is static English (the manifest has a single `lang`).
 - R2: The language is resolved in this order: saved choice → browser language (`pl*` → pl, `en*` → en) → `pl`. An unknown saved value is ignored.
 - R3: Switching the language updates the visible text, `<html lang>` and the document title, and persists the choice.
 - R4: The language switch shows the endonyms "English" and "Polski". The current language is marked with `aria-pressed="true"` (or `aria-current`), not by color alone.
@@ -67,13 +69,13 @@ every later task depends on. There are no camera, board or scanning features yet
 - CSP and the other response headers are applied in spec 003 (deploy). This spec only avoids patterns that would break them: no inline scripts in `index.html` and no `eval`.
 
 # Acceptance criteria
-- [ ] `npm ci && npm run lint && npm test && npm run build && npm run e2e` pass in `src/web`.
-- [ ] The app opens at 360 px and 1280 px, in portrait and landscape, without horizontal scroll.
-- [ ] axe reports 0 violations (WCAG 2.0/2.1/2.2 A and AA tags) on the home and 404 pages, in light and dark mode and in both languages.
-- [ ] The language switch works by keyboard and touch, persists after a reload, and updates `lang` and the title.
-- [ ] Lighthouse (production build): PWA installable, Accessibility 100.
-- [ ] Offline: after the first visit, a reload with the network offline shows the app shell (e2e on the production build).
-- [ ] `dist/` contains no `.map` files.
+- [x] `npm ci && npm run lint && npm test && npm run build && npm run e2e` pass in `src/web`.
+- [x] The app opens at 360 px and 1280 px, in portrait and landscape, without horizontal scroll.
+- [x] axe reports 0 violations (WCAG 2.0/2.1/2.2 A and AA tags) on the home and 404 pages, in light and dark mode and in both languages.
+- [x] The language switch works by keyboard and touch, persists after a reload, and updates `lang` and the title.
+- [ ] Lighthouse (production build): PWA installable, Accessibility 100. **Not run yet.** It is a manual check by the author, and an automated Lighthouse run is a candidate for spec 002 or 003.
+- [x] Offline: after the first visit, a reload with the network offline shows the app shell (e2e on the production build).
+- [x] `dist/` contains no `.map` files. Checked manually (`find dist -name "*.map"` returns 0). The automated `dist/` check comes in spec 002.
 
 # Test plan
 - **Unit (Vitest):**

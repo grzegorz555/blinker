@@ -11,7 +11,6 @@ import { LanguageSwitch } from './shared/language-switch/language-switch';
 @Component({
   imports: [RouterOutlet, RouterLink, TranslocoPipe, LanguageSwitch],
   selector: 'app-root',
-  styleUrl: './app.css',
   templateUrl: './app.html',
 })
 export class App {
