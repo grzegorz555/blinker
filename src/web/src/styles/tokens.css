@@ -1,0 +1,44 @@
+/*
+ * Design tokens: the only place where colors are defined (docs/conventions/frontend.md).
+ * Neutral placeholders until the mock-ups spec (004) sets the visual direction.
+ * Colors use OKLCH. Light and dark follow prefers-color-scheme.
+ *
+ * Contrast (WCAG 2.x formula, computed 2026-11-10):
+ *   light: fg/bg 17.6:1 · fg/surface 16.1:1 · muted/bg 7.2:1 · primary/bg 7.4:1 · on-primary/primary 7.4:1 · border/bg 4.7:1
+ *   dark:  fg/bg 16.8:1 · fg/surface 14.7:1 · muted/bg 9.4:1 · primary/bg 10.0:1 · on-primary/primary 10.0:1 · border/bg 4.8:1
+ * Required: text >= 4.5:1 (SC 1.4.3), non-text >= 3:1 (SC 1.4.11). Board/AAC text will target >= 7:1.
+ * Recompute when you change a value.
+ */
+:root {
+  color-scheme: light dark;
+  --bg: oklch(99% 0 0);
+  --surface: oklch(96% 0.005 260);
+  --fg: oklch(20% 0.02 260);
+  --muted: oklch(45% 0.02 260);
+  --primary: oklch(45% 0.16 260);
+  --on-primary: oklch(99% 0 0);
+  --border: oklch(55% 0.02 260);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(18% 0.02 260);
+    --surface: oklch(24% 0.02 260);
+    --fg: oklch(96% 0.005 260);
+    --muted: oklch(78% 0.02 260);
+    --primary: oklch(80% 0.11 260);
+    --on-primary: oklch(18% 0.02 260);
+    --border: oklch(60% 0.02 260);
+  }
+}
+
+/* Expose the tokens as Tailwind colors: bg-bg, text-fg, text-muted, ring-primary, ... */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-border: var(--border);
+}

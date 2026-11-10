@@ -17,8 +17,9 @@ There are no user-facing features yet. The stage plan is in [docs/backlog.md](do
 ## Tech stack
 - Angular 22 (standalone, zoneless, signals), TypeScript 6, in `src/web`
 - Vitest for unit tests; Playwright + axe-core for e2e and accessibility tests
+- Tailwind CSS v4 with design tokens in `src/web/src/styles/tokens.css` (light and dark, WCAG contrast checked)
 - Planned:
-  - Tailwind CSS v4, Transloco (en, pl), PWA service worker;
+  - Transloco (en, pl), PWA service worker;
   - MediaPipe Face Landmarker, Web Speech API;
   - hosting on Azure Static Web Apps (Free).
 

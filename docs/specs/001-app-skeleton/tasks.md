@@ -20,7 +20,7 @@ Branch: `feat/001-app-skeleton` · One task = one commit (with its tests) · Gat
   *To understand:* Playwright projects and devices, the `webServer` option, how axe works and what it can't see.
 - [x] **T3: Linting.** `angular-eslint` with `templateAccessibility`, `eslint-plugin-no-unsanitized`, and `npm run lint`. Fix every finding. Test: lint passes; a deliberately bad template snippet is described in the summary, not committed.
   *To understand:* ESLint flat config, template a11y rules, why `innerHTML` is dangerous.
-- [ ] **T4: Tailwind and the app shell.** Tailwind v4 (PostCSS), `tokens.css` (light/dark, contrast checked and noted in comments), the shell (skip link, header, main, footer disclaimer), safe area, `min-h-dvh`, a home placeholder and a 404 route. Unit tests: landmarks and the skip link. E2E: skip link, 320 px reflow, portrait and landscape, axe in light and dark.
+- [x] **T4: Tailwind and the app shell.** Tailwind v4 (PostCSS), `tokens.css` (light/dark, contrast checked and noted in comments), the shell (skip link, header, main, footer disclaimer), safe area, `min-h-dvh`, a home placeholder and a 404 route. Unit tests: landmarks and the skip link. E2E: skip link, 320 px reflow, portrait and landscape, axe in light and dark.
   *To understand:* Tailwind v4 `@theme`, OKLCH, WCAG contrast, landmarks, `prefers-color-scheme`, `dvh`.
 - [ ] **T5: i18n.** Transloco loader, `core/i18n` (language resolution as a pure function, the language service), the language switch component, translated route titles (a `TitleStrategy`), en/pl JSON, and a key-parity unit test. E2E: switch, persistence after reload, `lang`, title, axe in both languages.
   *To understand:* Transloco runtime loading, `TitleStrategy`, `aria-pressed`, endonyms, SC 3.1.1.
