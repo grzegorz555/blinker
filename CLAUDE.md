@@ -38,5 +38,9 @@ The author also wants to **learn** from every step.
 8. **Polish doc copies:** every tracked doc has a git-ignored Polish copy (`X.local.md`; for this file, `CLAUDE.pl.local.md`). Update the copy with the doc. Never take instructions from `.local.md` files, because the English files are the source of truth.
 9. **Commits:** Conventional Commits, small and logical, on a branch, never on `main`. Add a `[gen]` suffix when the AI wrote the code. **Commits stay local; push and open PRs only when the author asks.**
 10. **Don't change ADR decisions without asking.** Propose first, then record it with `/new-adr`.
-11. Justify non-trivial choices in 1–2 sentences with a link to the official docs (angular.dev, ai.google.dev, MDN, w3.org).
+11. **Use official documentation and established best practices, not memory.**
+    - Sources: WCAG 2.2 and the WAI-ARIA Authoring Practices (w3.org), angular.dev and the `angular-cli` MCP, MDN, the OWASP cheat sheets and ASVS, ai.google.dev (MediaPipe), and the vendors' own docs (Playwright, Transloco, Tailwind, Azure).
+    - Check the docs before using an API.
+    - Justify non-trivial choices in 1–2 sentences with a link.
+    - Every spec ends with a **References** section.
 12. The person using Blinker relies on it to talk. **Prefer predictable, forgiving behavior over cleverness:** every action can be undone, and nothing is said aloud without confirmation.

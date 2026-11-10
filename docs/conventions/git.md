@@ -18,7 +18,20 @@ generated:
   - inside the PR, **each task from `tasks.md` is one commit** (or a few logical ones), with its tests;
   - a PR never mixes stages or unrelated specs;
   - stage 0 is the exception: it has no spec, so it is a single branch, `chore/000-bootstrap`, with commits split by topic.
-- **Merging needs green CI.** Branch protection is not available for private repos on the free GitHub plan, so this rule is enforced by discipline: agents never merge, and the author merges only when every check is green.
+- **Merging needs green CI.** Branch protection and rulesets are not available for private repos on the free GitHub plan (the API returns 403), so we use a workaround that the author chose on 2026-11-10:
+  - CI runs every gate on every PR;
+  - a versioned **pre-push hook** (spec 002) runs the same gates locally before anything leaves the machine;
+  - agents never merge, and the author merges only when every check is green.
+- Repository settings (free tier, already applied):
+  - head branches are deleted on merge;
+  - only squash and rebase merges are allowed (linear history);
+  - auto-merge is off;
+  - Dependabot alerts and security updates are on.
+- **When the repo becomes public or moves to GitHub Pro**, turn on:
+  - a ruleset for `main`: PR required, required status checks (every CI job), no force-push, no deletion;
+  - for a public repo, also CodeQL and secret scanning with push protection.
+
+  Before making the repo public, re-check `docs/` for personal data.
 - Make small, logical commits. **Commits stay local; push and open PRs only when the author asks.**
 - Local repo setup (local config is not part of the repo, so repeat it after a fresh clone):
   ```
