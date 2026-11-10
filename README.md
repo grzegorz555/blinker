@@ -17,10 +17,10 @@ The app shell works in English and Polish (language switch, translated titles); 
 ## Tech stack
 - Angular 22 (standalone, zoneless, signals), TypeScript 6, in `src/web`
 - Vitest for unit tests; Playwright + axe-core for e2e and accessibility tests
+- Installable PWA (web manifest, Angular service worker): the app shell works offline after the first visit
 - Transloco for UI translations (en, pl) in `src/web/public/i18n/`; the language comes from the saved choice, then the browser, then Polish
 - Tailwind CSS v4 with design tokens in `src/web/src/styles/tokens.css` (light and dark, WCAG contrast checked)
 - Planned:
-  - PWA service worker;
   - MediaPipe Face Landmarker, Web Speech API;
   - hosting on Azure Static Web Apps (Free).
 
@@ -42,6 +42,7 @@ Run these from `src/web`:
 | `npm test` | Vitest unit tests (single run). `npm run test:watch` runs them in watch mode. |
 | `npm run build` | Production build into `dist/` (no source maps) |
 | `npm run e2e` | Builds the app, then runs Playwright e2e tests with axe-core accessibility checks on desktop Chrome, Pixel 7 (Chromium) and iPhone 15 (WebKit). The first time, run `npx playwright install chromium webkit`. |
+| `npm run icons` | Regenerates the placeholder app icons in `public/icons/` (pure Node, no dependencies) |
 | `npm run format:check` | Prettier check. `npm run format` fixes formatting. |
 
 From the repo root, `node scripts/check-okf.mjs` checks the documentation bundle.

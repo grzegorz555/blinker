@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "e2e": "ng build && playwright test",
     "e2e:only": "playwright test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "private": true,
   "packageManager": "npm@11.19.0",
@@ -23,6 +24,7 @@
     "@angular/forms": "^22.2.0",
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
+    "@angular/service-worker": "^22.2.0",
     "@jsverse/transloco": "8.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
