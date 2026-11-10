@@ -16,7 +16,7 @@ Branch: `feat/001-app-skeleton` · One task = one commit (with its tests) · Gat
 
 - [x] **T1: Scaffold the Angular workspace.** `ng new` in `src/web` (standalone, zoneless, no SSR, CSS, routing, Vitest), strict TS, Prettier, npm scripts, a `.nvmrc`/`engines` Node pin, no source maps in production. Test: the root component renders.
   *To understand:* Angular CLI workspace, zoneless change detection, Vitest + TestBed, the package-lock and `npm ci`.
-- [ ] **T2: E2E infrastructure.** Playwright (3 projects), `@axe-core/playwright`, a shared `expectNoA11yViolations(page)` helper, the `webServer` setting in the config, and a smoke test (the page loads, axe passes, only same-origin requests).
+- [x] **T2: E2E infrastructure.** Playwright (3 projects), `@axe-core/playwright`, a shared `expectNoA11yViolations(page)` helper, the `webServer` setting in the config, and a smoke test (the page loads, axe passes, only same-origin requests).
   *To understand:* Playwright projects and devices, the `webServer` option, how axe works and what it can't see.
 - [ ] **T3: Linting.** `angular-eslint` with `templateAccessibility`, `eslint-plugin-no-unsanitized`, and `npm run lint`. Fix every finding. Test: lint passes; a deliberately bad template snippet is described in the summary, not committed.
   *To understand:* ESLint flat config, template a11y rules, why `innerHTML` is dangerous.
