@@ -11,6 +11,6 @@ description: Creates a new Architecture Decision Record in docs/adr/ (OKF type D
    - `status: draft` while it is Proposed, `stable` once Accepted;
    - `generated`.
 3. Present 2–3 options with pros and cons and a recommendation. **The author decides.** Never mark the ADR Accepted without them.
-4. Once it is accepted, add `verified: [{by: human:grzegorz555, at: <date>}]`. If it supersedes an older ADR, set the old one to `status: deprecated` and "Superseded by ADR-NNNN".
+4. Once it is accepted, add `verified: [{by: human:Grzegorz Roczniak, at: <date>}]`. If it supersedes an older ADR, set the old one to `status: deprecated` and "Superseded by ADR-NNNN".
 5. Add it to `docs/adr/index.md`. If the architecture changes, update `docs/architecture.md`.
 6. Keep it on one screen. Fill in "Revisit when" and "Learning resources" (official docs).

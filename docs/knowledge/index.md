@@ -12,7 +12,7 @@ description: <when it applies>
 tags: [<area>]
 status: draft | stable | deprecated
 generated: { by: agent:<model>, at: YYYY-MM-DD }
-verified: [{ by: human:grzegorz555, at: YYYY-MM-DD }]   # added only after the author approves
+verified: [{ by: human:Grzegorz Roczniak, at: YYYY-MM-DD }]   # added only after the author approves
 stale_after: YYYY-MM-DD                                 # for facts that age (devices, versions)
 ---
 ```
