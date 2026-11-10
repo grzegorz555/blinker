@@ -1,0 +1,28 @@
+# Local, never committed: Polish doc copies, learning summaries, personal notes
+*.local.md
+.local/
+
+# Secrets (this app has none, keep it that way)
+.env
+.env.*
+!.env.example
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Claude Code local settings
+.claude/settings.local.json
+CLAUDE.local.md
