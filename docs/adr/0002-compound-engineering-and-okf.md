@@ -35,7 +35,7 @@ learns from it. Knowledge must survive between sessions (`/clear` after each tas
   - Every concept file has frontmatter with `type`.
   - The trust fields are used deliberately:
     - `generated` when an agent wrote the file;
-    - `verified: [{by: "human:grzegorz555", at: …}]` only after the author approves it;
+    - `verified: [{by: "human:Grzegorz Roczniak", at: …}]` only after the author approves it;
     - `status: draft | stable | deprecated`;
     - `stale_after` for facts that age (device measurements, library versions).
 - Learnings go to `docs/knowledge/` as `type: Learning`.

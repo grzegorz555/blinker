@@ -35,7 +35,7 @@ generated:
 - Make small, logical commits. **Commits stay local; push and open PRs only when the author asks.**
 - Local repo setup (local config is not part of the repo, so repeat it after a fresh clone):
   ```
-  git config --local user.name grzegorz555
+  git config --local user.name "Grzegorz Roczniak"
   git config --local user.email grzegorz555@users.noreply.github.com
   git config --local core.hooksPath .git/hooks
   ```

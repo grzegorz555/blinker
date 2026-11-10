@@ -6,7 +6,7 @@ tags: [adr, template]
 ---
 
 <!-- In a new ADR, use: type: Decision, status: draft (Proposed) | stable (Accepted) | deprecated (Superseded),
-     generated: {by, at} if an agent wrote it, and verified: [{by: "human:grzegorz555", at}] once the author accepts it. -->
+     generated: {by, at} if an agent wrote it, and verified: [{by: "human:Grzegorz Roczniak", at}] once the author accepts it. -->
 
 # ADR-NNNN: <decision title>
 
