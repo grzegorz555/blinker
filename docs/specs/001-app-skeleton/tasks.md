@@ -18,7 +18,7 @@ Branch: `feat/001-app-skeleton` · One task = one commit (with its tests) · Gat
   *To understand:* Angular CLI workspace, zoneless change detection, Vitest + TestBed, the package-lock and `npm ci`.
 - [x] **T2: E2E infrastructure.** Playwright (3 projects), `@axe-core/playwright`, a shared `expectNoA11yViolations(page)` helper, the `webServer` setting in the config, and a smoke test (the page loads, axe passes, only same-origin requests).
   *To understand:* Playwright projects and devices, the `webServer` option, how axe works and what it can't see.
-- [ ] **T3: Linting.** `angular-eslint` with `templateAccessibility`, `eslint-plugin-no-unsanitized`, and `npm run lint`. Fix every finding. Test: lint passes; a deliberately bad template snippet is described in the summary, not committed.
+- [x] **T3: Linting.** `angular-eslint` with `templateAccessibility`, `eslint-plugin-no-unsanitized`, and `npm run lint`. Fix every finding. Test: lint passes; a deliberately bad template snippet is described in the summary, not committed.
   *To understand:* ESLint flat config, template a11y rules, why `innerHTML` is dangerous.
 - [ ] **T4: Tailwind and the app shell.** Tailwind v4 (PostCSS), `tokens.css` (light/dark, contrast checked and noted in comments), the shell (skip link, header, main, footer disclaimer), safe area, `min-h-dvh`, a home placeholder and a 404 route. Unit tests: landmarks and the skip link. E2E: skip link, 320 px reflow, portrait and landscape, axe in light and dark.
   *To understand:* Tailwind v4 `@theme`, OKLCH, WCAG contrast, landmarks, `prefers-color-scheme`, `dvh`.

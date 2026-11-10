@@ -36,6 +36,7 @@ Run these from `src/web`:
 
 | Command | What it does |
 |---|---|
+| `npm run lint` | ESLint: TypeScript rules, Angular template accessibility rules, and security rules (no `innerHTML`/`eval`) |
 | `npm test` | Vitest unit tests (single run). `npm run test:watch` runs them in watch mode. |
 | `npm run build` | Production build into `dist/` (no source maps) |
 | `npm run e2e` | Builds the app, then runs Playwright e2e tests with axe-core accessibility checks on desktop Chrome, Pixel 7 (Chromium) and iPhone 15 (WebKit). The first time, run `npx playwright install chromium webkit`. |
