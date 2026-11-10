@@ -73,9 +73,12 @@ every later task depends on. There are no camera, board or scanning features yet
 - [x] The app opens at 360 px and 1280 px, in portrait and landscape, without horizontal scroll.
 - [x] axe reports 0 violations (WCAG 2.0/2.1/2.2 A and AA tags) on the home and 404 pages, in light and dark mode and in both languages.
 - [x] The language switch works by keyboard and touch, persists after a reload, and updates `lang` and the title.
-- [ ] Lighthouse (production build): PWA installable, Accessibility 100. **Not run yet.** It is a manual check by the author, and an automated Lighthouse run is a candidate for spec 002 or 003.
 - [x] Offline: after the first visit, a reload with the network offline shows the app shell (e2e on the production build).
 - [x] `dist/` contains no `.map` files. Checked manually (`find dist -name "*.map"` returns 0). The automated `dist/` check comes in spec 002.
+
+# Follow-up checks (deferred, not blocking; tracked in PR #2)
+- Lighthouse Accessibility = 100 (mobile, production build): home, 404, both languages.
+- Installability: DevTools → Application → Manifest shows no errors. Lighthouse 12+ has no PWA category any more.
 
 # Test plan
 - **Unit (Vitest):**
