@@ -22,6 +22,26 @@ camera (getUserMedia)
 Keyboard and switch input join the flow at the level of the `SignalDetector` output, as `SWITCH` signals and test
 signals. That way all the logic can be tested without a camera.
 
+# Current structure (`src/web`, spec 001)
+```
+src/web/
+  src/app/
+    app.ts|html            shell: skip link, header (name + language switch), main, footer disclaimer
+    app.config.ts          router, HttpClient, Transloco, TranslatedTitleStrategy, language initializer, service worker
+    app.routes.ts          lazy routes; `title` is a translation key
+    core/i18n/             languages.ts (pure resolveLanguage), LanguageService, TranslocoHttpLoader, TranslatedTitleStrategy
+    features/home/, features/not-found/
+    shared/language-switch/
+  src/styles/tokens.css    design tokens (OKLCH, light/dark, contrast noted)
+  src/testing/             test helpers (translocoTesting with the real en/pl files)
+  public/i18n/{en,pl}.json, public/manifest.webmanifest, public/icons/
+  e2e/                     Playwright specs (*.e2e.ts), support/ (axe helper, third-party request check), serve-dist.mjs
+  scripts/generate-icons.mjs
+  ngsw-config.json, eslint.config.js, playwright.config.ts
+```
+E2E tests run against the **production build** served by `e2e/serve-dist.mjs`, not against the dev server.
+This way the service worker, hashing and the absence of source maps are tested as they will be deployed.
+
 # Modules (planned, `src/web/src/app`)
 - `core/vision/`: camera access, the worker, and the MediaPipe wrapper. The model (`.task`) and the wasm files are served from `public/models/`, never from a CDN.
 - `core/signals/`: the signal detector, the calibration profile and the thresholds.
