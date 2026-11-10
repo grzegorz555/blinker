@@ -3,10 +3,13 @@ type: Spec
 title: "001: Application skeleton"
 description: Angular 22 PWA skeleton in src/web with Tailwind tokens, Transloco en/pl, ESLint with a11y rules, Vitest and Playwright + axe; an accessible app shell and a placeholder home page.
 tags: [stage-1, web, setup, accessibility, i18n, pwa, testing]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-10
+verified:
+  - by: human:grzegorz555
+    at: 2026-11-10
 ---
 
 # Goal

@@ -3,10 +3,13 @@ type: Task List
 title: "001: Application skeleton tasks"
 description: Seven tasks, one commit each, each with its own tests.
 tags: [stage-1, web]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-10
+verified:
+  - by: human:grzegorz555
+    at: 2026-11-10
 ---
 
 Branch: `feat/001-app-skeleton` · One task = one commit (with its tests) · Gates: `npm run lint` (from T3), `npm test`, `npm run build`, `npm run e2e` (from T2).
