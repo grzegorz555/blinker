@@ -7,6 +7,7 @@ import {
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { TitleStrategy, provideRouter } from '@angular/router';
+import { provideServiceWorker } from '@angular/service-worker';
 import { provideTransloco } from '@jsverse/transloco';
 import { routes } from './app.routes';
 import { LanguageService } from './core/i18n/language.service';
@@ -33,5 +34,10 @@ export const appConfig: ApplicationConfig = {
     { provide: TitleStrategy, useClass: TranslatedTitleStrategy },
     // Load the start language before the first render, so no untranslated text flashes.
     provideAppInitializer(() => inject(LanguageService).init()),
+    // PWA: production builds only (spec 001, R10). https://angular.dev/ecosystem/service-workers
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };

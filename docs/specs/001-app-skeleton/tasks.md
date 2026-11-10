@@ -24,7 +24,7 @@ Branch: `feat/001-app-skeleton` · One task = one commit (with its tests) · Gat
   *To understand:* Tailwind v4 `@theme`, OKLCH, WCAG contrast, landmarks, `prefers-color-scheme`, `dvh`.
 - [x] **T5: i18n.** Transloco loader, `core/i18n` (language resolution as a pure function, the language service), the language switch component, translated route titles (a `TitleStrategy`), en/pl JSON, and a key-parity unit test. E2E: switch, persistence after reload, `lang`, title, axe in both languages.
   *To understand:* Transloco runtime loading, `TitleStrategy`, `aria-pressed`, endonyms, SC 3.1.1.
-- [ ] **T6: PWA.** `@angular/pwa` (manifest, ngsw, placeholder icons), registration only in production, a script that serves the production build locally for e2e, and an offline e2e test.
+- [x] **T6: PWA.** `@angular/pwa` (manifest, ngsw, placeholder icons), registration only in production, a script that serves the production build locally for e2e, and an offline e2e test.
   *To understand:* service worker lifecycle, `ngsw-config.json` asset groups, web manifest, installability criteria.
 - [ ] **T7: Docs and compound.** Update `docs/architecture.md` (actual structure), the commands in `CLAUDE.md`, and the Polish copies. Write the learning summary, capture learnings, and add a `docs/log.md` entry.
   *To understand:* the compound step: what is worth turning into a rule.
