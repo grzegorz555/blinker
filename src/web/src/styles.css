@@ -1,1 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
+/* Tailwind CSS v4: https://tailwindcss.com/docs/installation/framework-guides/angular */
+@import 'tailwindcss';
+@import './styles/tokens.css';
+
+@layer base {
+  html {
+    /* System font stack: no third-party font requests (security.md). */
+    font-family:
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+  }
+}
