@@ -43,15 +43,16 @@ Run these from `src/web`. **`npm run verify` runs every gate below in the same o
 | `npm run lint` | ESLint: TypeScript rules, Angular template accessibility rules, and security rules (no `innerHTML`/`eval`) |
 | `npm test` | Vitest unit tests (single run). `npm run test:watch` runs them in watch mode. |
 | `npm run build` | Production build into `dist/` (no source maps) |
-| `npm run e2e` | Builds the app, then runs Playwright e2e tests with axe-core accessibility checks on desktop Chrome, Pixel 7 (Chromium) and iPhone 15 (WebKit). The first time, run `npx playwright install chromium webkit`. |
+| `npm run e2e` | Builds the app, then runs Playwright e2e tests with axe-core accessibility checks on desktop Chrome, Pixel 7 (Chromium) and iPhone 15 (WebKit), including a manifest check over the DevTools Protocol. The first time, run `npx playwright install chromium webkit`. |
 | `npm run test:scripts` | Tests of the Node helper scripts (built-in `node --test`) |
 | `npm run check:dist` | Fails if the production build contains `.map` or `.md` files or `sourceMappingURL` comments |
+| `npm run lighthouse` | Lighthouse CI on the production build (home and 404, English and Polish); fails unless Accessibility = 100. Needs `npm run build` first and Google Chrome. Reports: `.lighthouseci/reports-en`, `reports-pl`. `npm run verify -- --lighthouse` includes it. |
 | `npm run icons` | Regenerates the placeholder app icons in `public/icons/` (pure Node, no dependencies) |
 | `npm run format:check` | Prettier check. `npm run format` fixes formatting. |
 
 From the repo root, `node scripts/check-okf.mjs` checks the documentation bundle.
 
-**CI** (`.github/workflows/ci.yml`) runs on every pull request and on `main`: the docs check, a gitleaks secret scan, and `npm run verify`, the same gates as above. Dependabot proposes weekly updates for npm (minor and patch grouped) and GitHub Actions.
+**CI** (`.github/workflows/ci.yml`) runs on every pull request and on `main`: the docs check, a gitleaks secret scan, `npm run verify` (the same gates as above), and Lighthouse in a separate job (reports kept as a workflow artifact for 7 days). Dependabot proposes weekly updates for npm (minor and patch grouped) and GitHub Actions.
 
 ## Documentation
 - [docs/index.md](docs/index.md): vision, interaction model, architecture, decisions (ADR), conventions, specs.
