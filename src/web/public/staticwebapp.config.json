@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json.schemastore.org/staticwebapp.config.json",
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/*.{js,css,json,webmanifest,png,ico,svg,wasm,task,txt,map,md}",
+      "/icons/*",
+      "/i18n/*"
+    ]
+  },
+  "routes": [
+    {
+      "route": "/main-*",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
+    },
+    {
+      "route": "/chunk-*",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
+    },
+    {
+      "route": "/polyfills-*",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
+    },
+    {
+      "route": "/styles-*",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
+    }
+  ],
+  "globalHeaders": {
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types angular angular#bundler default",
+    "Permissions-Policy": "camera=(self), microphone=(), geolocation=(), usb=(), payment=()",
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Cache-Control": "no-cache"
+  },
+  "mimeTypes": {
+    ".webmanifest": "application/manifest+json",
+    ".wasm": "application/wasm",
+    ".task": "application/octet-stream"
+  }
+}
