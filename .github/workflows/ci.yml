@@ -36,6 +36,21 @@ jobs:
       - name: Run gitleaks over the full history
         run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact --no-banner
 
+  # A second vulnerability database next to `npm audit` (GitHub Advisory DB): OSV.dev also
+  # merges NVD and other sources. It reads the lockfile only; nothing is installed or run.
+  # The image is pinned by digest, like the actions are pinned by SHA.
+  vulnerabilities:
+    name: Vulnerability scan (OSV-Scanner)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Scan package-lock.json against OSV.dev
+        run: >-
+          docker run --rm -v "$PWD:/repo:ro"
+          ghcr.io/google/osv-scanner:v2.7.1@sha256:a70ffffc2bfd33482953e5d6b64c6fcdb30239717a07b0f0d3ab2859ce3e4cde
+          scan source --lockfile /repo/src/web/package-lock.json
+
   # Spec 002: every gate of `npm run verify` (src/web/scripts/verify.mjs), so CI and the
   # pre-push hook share one definition: docs, Prettier, ESLint, unit, script tests, npm audit,
   # production build, dist/ check (no .map/.md), Playwright + axe on three device projects.

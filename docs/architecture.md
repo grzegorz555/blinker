@@ -40,7 +40,7 @@ src/web/
                            lighthouse-lang.mjs (Lighthouse CI en/pl + language guard); *.test.mjs (node --test)
   ngsw-config.json, eslint.config.js, playwright.config.ts, lighthouserc.cjs
 .githooks/pre-push         runs npm run verify -- --quick (enable with npm run hooks:install)
-.github/workflows/ci.yml   docs, secrets (gitleaks), web (npm run verify), lighthouse
+.github/workflows/ci.yml   docs, secrets (gitleaks), vulnerabilities (OSV-Scanner), web (npm run verify), lighthouse
 ```
 E2E tests run against the **production build** served by `e2e/serve-dist.mjs`, not against the dev server.
 This way the service worker, hashing and the absence of source maps are tested as they will be deployed.

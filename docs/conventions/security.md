@@ -64,7 +64,12 @@ Agents never read `.env*`, the credential manager or `git credential` output.
   - Angular packages (`@angular/*`) and the tools `ng new`/`ng update` manage (TypeScript, Vitest, jsdom, Prettier) keep the CLI-generated `^`/`~` ranges, so `ng update` can move them together.
   - Every other dependency is added with `--save-exact`.
 - New dependencies must be maintained and widely used, with a permissive license. Bigger ones need an ADR.
-- `npm audit --audit-level=high` runs in CI. Dependabot covers npm and GitHub Actions.
+- Known vulnerabilities, three layers:
+  - `npm audit` in CI (`npm run verify`): any high or critical advisory, or any advisory in production dependencies, blocks.
+  - OSV-Scanner in CI reads `package-lock.json` against OSV.dev, a second database that also merges NVD and other sources. Any finding blocks; a justified exception goes into `src/web/osv-scanner.toml` with a reason and an expiry date.
+  - Dependabot alerts and security updates are on: a vulnerable dependency opens a fix PR by itself.
+- Dependabot version updates cover npm and GitHub Actions, weekly. Majors of `@angular/*` and TypeScript are ignored, because they move together through `ng update`.
+- Malicious packages (a hijacked maintainer account, typosquatting) are not in any vulnerability database yet when they are published. Socket.dev (a GitHub app the author installs) checks every dependency change in a PR for that.
 - GitHub Actions are pinned to a full commit SHA and use minimal `permissions:` (default `contents: read`).
 - gitleaks scans for committed secrets in CI.
 - MCP servers in `.mcp.json` are pinned to exact versions.
