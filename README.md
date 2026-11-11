@@ -11,7 +11,7 @@ them into sentences that are shown on screen and read aloud.
 > Blinker is not a medical device. Keep the paper board as a fallback.
 
 ## Status
-**Stage 1: application skeleton** (spec [001](docs/specs/001-app-skeleton/spec.md), in progress).
+**Stage 1: CI and local verification** (spec [002](docs/specs/002-ci-verify/spec.md), in progress; spec [001](docs/specs/001-app-skeleton/spec.md), the application skeleton, is done).
 The app shell works in English and Polish (language switch, translated titles); there are no communication features yet. The stage plan is in [docs/backlog.md](docs/backlog.md).
 
 ## Tech stack
@@ -34,14 +34,17 @@ npm start         # dev server at http://localhost:4200
 ```
 
 ## Tests and verification
-Run these from `src/web`:
+Run these from `src/web`. **`npm run verify` runs every gate below in the same order as CI** and prints which passed, which failed and which were not run.
 
 | Command | What it does |
 |---|---|
+| `npm run verify` | All gates: docs check, Prettier, ESLint, unit tests, script tests, `npm audit` (high in any dependency, any in production), build, `dist/` check, e2e. Stops at the first failure. |
 | `npm run lint` | ESLint: TypeScript rules, Angular template accessibility rules, and security rules (no `innerHTML`/`eval`) |
 | `npm test` | Vitest unit tests (single run). `npm run test:watch` runs them in watch mode. |
 | `npm run build` | Production build into `dist/` (no source maps) |
 | `npm run e2e` | Builds the app, then runs Playwright e2e tests with axe-core accessibility checks on desktop Chrome, Pixel 7 (Chromium) and iPhone 15 (WebKit). The first time, run `npx playwright install chromium webkit`. |
+| `npm run test:scripts` | Tests of the Node helper scripts (built-in `node --test`) |
+| `npm run check:dist` | Fails if the production build contains `.map` or `.md` files or `sourceMappingURL` comments |
 | `npm run icons` | Regenerates the placeholder app icons in `public/icons/` (pure Node, no dependencies) |
 | `npm run format:check` | Prettier check. `npm run format` fixes formatting. |
 

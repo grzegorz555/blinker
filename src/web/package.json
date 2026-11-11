@@ -13,6 +13,9 @@
     "e2e": "ng build && playwright test",
     "e2e:only": "playwright test",
     "lint": "ng lint",
+    "test:scripts": "node --test \"scripts/*.test.mjs\"",
+    "check:dist": "node scripts/check-dist.mjs",
+    "verify": "node scripts/verify.mjs",
     "icons": "node scripts/generate-icons.mjs"
   },
   "private": true,
