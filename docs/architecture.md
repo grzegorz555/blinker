@@ -40,7 +40,9 @@ src/web/
                            lighthouse-lang.mjs (Lighthouse CI en/pl + language guard); *.test.mjs (node --test)
   ngsw-config.json, eslint.config.js, playwright.config.ts, lighthouserc.cjs
 .githooks/pre-push         runs npm run verify -- --quick (enable with npm run hooks:install)
-.github/workflows/ci.yml   docs, secrets (gitleaks), vulnerabilities (OSV-Scanner), web (npm run verify), lighthouse
+.github/workflows/ci.yml   docs, secrets (gitleaks), vulnerabilities (OSV-Scanner), web (npm run verify), lighthouse,
+                           deploy-preview (PR) / deploy-production (main), both after every gate (spec 003)
+.github/workflows/preview-close.yml   removes the PR preview on Azure when the PR closes
 ```
 E2E tests run against the **production build** served by `e2e/serve-dist.mjs`, not against the dev server.
 This way the service worker, hashing and the absence of source maps are tested as they will be deployed.

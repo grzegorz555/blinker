@@ -81,6 +81,13 @@ jobs:
           name: playwright-report
           path: src/web/playwright-report/
           retention-days: 7
+      # Spec 003, R8: the build that passed e2e is the build that is deployed (no second build).
+      - name: Upload the tested build for deployment
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: src/web/dist/blinker-web/browser/
+          retention-days: 1
 
   # Spec 002 (R6, R7): Lighthouse CI, accessibility = 100 for home and 404 in English and Polish.
   # A separate job, so a slow audit doesn't hide the results of the other gates.
@@ -113,3 +120,115 @@ jobs:
           path: src/web/.lighthouseci/reports-*/
           include-hidden-files: true
           retention-days: 7
+
+  # Spec 003 (R6, R7, R9): a preview environment per PR on Azure Static Web Apps (ADR-0003), then the `deployed`
+  # Playwright project against its URL. Skipped, not failed, when the deploy token is not available: before the
+  # author's Azure setup, and on Dependabot and fork PRs, which get no secrets.
+  deploy-preview:
+    name: Deploy preview (Azure)
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: [docs, secrets, vulnerabilities, web, lighthouse]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write # the deploy action comments the preview URL on the PR
+    steps:
+      - name: Check the deploy token
+        id: token
+        env:
+          TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then echo "available=true" >> "$GITHUB_OUTPUT"; else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Deploy skipped: AZURE_STATIC_WEB_APPS_API_TOKEN is not available (not set up yet, or a Dependabot/fork PR)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - if: ${{ steps.token.outputs.available == 'true' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - if: ${{ steps.token.outputs.available == 'true' }}
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: deploy/
+      - name: Upload the preview
+        id: deploy
+        if: ${{ steps.token.outputs.available == 'true' }}
+        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: deploy
+          output_location: ''
+          skip_app_build: true
+      - if: ${{ steps.token.outputs.available == 'true' }}
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: src/web/.nvmrc
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - name: Test the preview (headers, HTTPS, smoke + axe)
+        if: ${{ steps.token.outputs.available == 'true' }}
+        working-directory: src/web
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.static_web_app_url }}
+        run: |
+          echo "Preview: $DEPLOY_URL" >> "$GITHUB_STEP_SUMMARY"
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test
+
+  # Spec 003 (R8, R9): production only on main, only after every gate passed, then the same remote tests.
+  # Never cancelled halfway: a newer push waits for the running deploy.
+  deploy-production:
+    name: Deploy production (Azure)
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: [docs, secrets, vulnerabilities, web, lighthouse]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - name: Check the deploy token
+        id: token
+        env:
+          TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then echo "available=true" >> "$GITHUB_OUTPUT"; else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Deploy skipped: AZURE_STATIC_WEB_APPS_API_TOKEN is not set up yet." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - if: ${{ steps.token.outputs.available == 'true' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - if: ${{ steps.token.outputs.available == 'true' }}
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: deploy/
+      - name: Upload to production
+        id: deploy
+        if: ${{ steps.token.outputs.available == 'true' }}
+        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: deploy
+          output_location: ''
+          skip_app_build: true
+      - if: ${{ steps.token.outputs.available == 'true' }}
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: src/web/.nvmrc
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - name: Test production (headers, HTTPS, smoke + axe)
+        if: ${{ steps.token.outputs.available == 'true' }}
+        working-directory: src/web
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.static_web_app_url }}
+        run: |
+          echo "Production: $DEPLOY_URL" >> "$GITHUB_STEP_SUMMARY"
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test

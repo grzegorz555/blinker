@@ -23,7 +23,8 @@ and a CSP mistake breaks a test, not the production app.
   CSS inlining (Beasties) adds to swap the stylesheet's `media`. `script-src 'self'` blocks it, so the app would lose
   its styles in production. We turn critical CSS inlining off. Trusted Types (`require-trusted-types-for 'script'`)
   is checked the same way.
-- **Deploy workflow** (`.github/workflows/deploy.yml`, `Azure/static-web-apps-deploy@v1` pinned to a SHA):
+- **Deploy jobs** in `.github/workflows/ci.yml` (so they can `need` the gate jobs) plus `.github/workflows/preview-close.yml`
+  for closed PRs; `Azure/static-web-apps-deploy@v1` pinned to a SHA:
   - on every PR: build, upload `dist/` as a preview environment; the action comments the URL on the PR;
   - on PR close: remove the preview environment;
   - on push to `main`: deploy production only after every CI gate has passed.
