@@ -28,7 +28,7 @@ generated:
 # Rules
 - Cells are addressed as `cells[row][column]`. Scanning goes column first, then row; counting uses the same order.
 - Cell types:
-  - `char`: a single character;
+  - `char`: a single letter or a digraph that sits in one cell on the paper board (`SZ`, `CZ`), at most 2 characters;
   - `word`: appended with a trailing space;
   - `action`: one of `space | delete | speak | clear | undo`.
 - An empty cell is `null`. Scanning skips it.
@@ -37,4 +37,4 @@ generated:
   - size-limited (for example 64 KB);
   - values are plain text with a length limit;
   - rendered as text, never as HTML.
-- The friend's own board will be transcribed into this format in stage 2.
+- The friend's own board is transcribed in [The friend's paper letter board](boards/friend-board.md) (7 columns × 5 rows). It becomes the default board in this format in stage 2.

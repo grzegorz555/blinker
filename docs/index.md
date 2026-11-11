@@ -12,6 +12,7 @@ only what the task needs.
 * [Vision](vision.md) - Who Blinker is for, the problem, goals and non-goals.
 * [Interaction model](interaction-model.md) - Signals (blink, head, gaze), input modes (scanning, counting) and their default actions.
 * [Board format](board-format.md) - The JSON format of a swappable letter board (draft).
+* [The friend's paper board](boards/friend-board.md) - Transcription and photo of the board he uses today (7×5, Polish, SZ/CZ).
 
 # Engineering
 * [Architecture](architecture.md) - Modules, data flow from camera to speech, where data is stored.

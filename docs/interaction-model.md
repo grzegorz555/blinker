@@ -17,10 +17,10 @@ Blendshape names come from MediaPipe Face Landmarker (https://ai.google.dev/edge
 |---|---|---|
 | `LONG_BLINK` | both `eyeBlinkLeft/Right` above the threshold for at least ~0.6 s (calibrated). Shorter closures are **ignored as involuntary**. | confirmed |
 | `VERY_LONG_CLOSE` | eyes closed for at least ~3 s | to confirm with him |
-| `HEAD_NOD` | head pitch down and back up within a time window (facial transformation matrix) | **confirmed: he uses it today** |
+| `HEAD_NOD` | head pitch down and back up within a time window (facial transformation matrix) | **confirmed: he uses it today to confirm ("yes")** |
 | `HEAD_LEFT` / `HEAD_RIGHT` | head yaw past the threshold, then back to neutral | possible |
-| `HEAD_SHAKE` | yaw left-right-left | possible |
-| `LOOK_AT_HAND` | gaze held in the direction of his hand (`eyeLook*` blendshapes, direction calibrated) | **confirmed: he uses it today, it means "5"** |
+| `HEAD_SHAKE` | yaw left-right-left | **confirmed: he uses it today for "no"** |
+| `LOOK_AT_HAND` | gaze held down towards his hand, usually to his left, sometimes to his right (`eyeLook*` blendshapes, both directions calibrated) | **confirmed: he uses it today, it means "5" (counting only)** |
 | `GAZE_UP` | `eyeLookUp*` held | possible |
 | `SWITCH` | Space key, on-screen button or Bluetooth switch | always available (caregiver, tests, accessibility) |
 
@@ -31,28 +31,36 @@ The board is the same in both modes. The mode decides **how a column or a row nu
 The app highlights the columns one by one at a configurable pace (optionally with an audio cue).
 `LONG_BLINK` selects the highlighted column. The app then scans the rows inside that column, and `LONG_BLINK` selects the cell.
 
-## Mode B: counting (how he partly works today; to confirm)
-He gives a **number** for the column and then for the row:
-- each `LONG_BLINK` adds **1**;
-- `LOOK_AT_HAND` adds **5**, so he doesn't have to blink five times (7 = hand + 2 blinks);
-- the number is committed after a pause with no signal (configurable, for example 1.5 s) or with an explicit "done" signal (to decide).
+## Mode B: counting (how he works today; confirmed by the author on 2026-11-11)
+This mode copies the way a caregiver works with him today: he gives a **number**, the caregiver says it aloud, and he
+confirms it with a nod or rejects it by shaking his head. Blinker takes the caregiver's role.
 
-The app always shows, and can speak aloud, the running number ("column 7"), so a wrong count can be undone.
+1. **Column first, then row.** The column numbers (1–7) are printed above the paper board and the row numbers (1–5) on its left.
+2. While he gives a number:
+   - each `LONG_BLINK` adds **1**;
+   - `LOOK_AT_HAND` adds **5**, so he doesn't have to blink five times (7 = hand + 2 blinks). He looks **down at his hand, usually to his left, sometimes to his right**, so calibration must accept either side.
+3. When no signal comes for a short while (configurable), Blinker **asks**, on screen and aloud: "Column 4?".
+4. **Every number is confirmed separately:**
+   - `HEAD_NOD` = yes: the column is fixed, and he gives the row number the same way ("Row 2?");
+   - `HEAD_SHAKE` = no: the number is discarded and he gives it again.
+5. After the row is confirmed, Blinker says the letter ("K") and appends it to the text. Undo is still one signal away.
 
-**Open questions for the author:**
-1. What does `HEAD_NOD` mean today: "yes / confirm", "next", or a number?
-2. Is "5" from `LOOK_AT_HAND` only for counting, or is it also a shortcut in scanning ("jump 5 columns ahead")?
-3. How does he say "that's the end of the number" today: a pause, or a nod?
-4. Which hand or direction does he look at (left, right or down)? This matters for calibration.
+`LOOK_AT_HAND` = 5 is used **only in counting**. In scanning it means nothing (decided on 2026-11-11), so a glance at
+his hand can never make the scan jump.
+
+**Still open:**
+- The exact way he gives numbers (pace, pauses between signals, what happens after a miscount) will be settled later with the author (2026-11-11).
+- How long the pause before "Column 4?" should be: we tune it during the trial with him (stage 6).
+- Whether, once he is fluent, he would rather confirm only the letter instead of each number: a setting to consider after the trial.
 
 # Default actions (all remappable in settings)
 
 | Signal | While scanning or counting | In a yes/no question |
 |---|---|---|
 | `LONG_BLINK` | select (scanning) / +1 (counting) | — |
-| `LOOK_AT_HAND` | +5 (counting) | — |
-| `HEAD_NOD` | confirm (to confirm with him) | **yes** |
-| `HEAD_SHAKE` or `HEAD_LEFT` | **back one step (−1)**: from rows back to columns; at columns, delete the last character | **no** |
+| `LOOK_AT_HAND` | +5 (counting only; ignored in scanning) | — |
+| `HEAD_NOD` | confirm the number or letter Blinker asked about | **yes** |
+| `HEAD_SHAKE` or `HEAD_LEFT` | **no / back one step (−1)**: in counting, discard the number Blinker asked about; otherwise from rows back to columns, and at columns delete the last character | **no** |
 | `HEAD_RIGHT` | finish the sentence and ask "Read it aloud?" | — |
 | `VERY_LONG_CLOSE` | pause or resume input (rest mode) | — |
 
