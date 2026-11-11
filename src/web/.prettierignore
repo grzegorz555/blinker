@@ -3,3 +3,6 @@ coverage
 node_modules
 .angular
 package-lock.json
+.lighthouseci
+test-results
+playwright-report
