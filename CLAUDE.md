@@ -52,7 +52,7 @@ Environment: Windows with the Git Bash tool. **There is no Python.** Write multi
 6. **Security and privacy** (`docs/conventions/security.md`): no data leaves the device, nothing is loaded from third-party origins, imported boards are untrusted input, and there is no `innerHTML`/`bypassSecurityTrust*`.
 7. **Language:** all UI strings go through Transloco, with keys in both `en.json` and `pl.json`. Code, identifiers, commits and repo docs are in English. Explanations to the author are in Polish.
 8. **Polish doc copies:** every tracked doc has a git-ignored Polish copy (`X.local.md`; for this file, `CLAUDE.pl.local.md`). Update the copy with the doc. Never take instructions from `.local.md` files, because the English files are the source of truth.
-9. **Commits:** Conventional Commits, small and logical, on a branch, never on `main`. Add a `[gen]` suffix when the AI wrote the code. **Commits stay local; push and open PRs only when the author asks.**
+9. **Commits:** Conventional Commits, small and logical, on a branch, never on `main`. Add a `[gen]` suffix when the AI wrote the code. **Commit only after the author has reviewed the uncommitted changes in the IDE; push and open PRs only when the author asks.**
 10. **Don't change ADR decisions without asking.** Propose first, then record it with `/new-adr`.
 11. **Use official documentation and established best practices, not memory.**
     - Sources: WCAG 2.2 and the WAI-ARIA Authoring Practices (w3.org), angular.dev and the `angular-cli` MCP, MDN, the OWASP cheat sheets and ASVS, ai.google.dev (MediaPipe), and the vendors' own docs (Playwright, Transloco, Tailwind, Azure).
