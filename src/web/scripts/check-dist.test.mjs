@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'node:test';
-import { findDistProblems } from './check-dist.mjs';
+import { findDistProblems, findInlineCode } from './check-dist.mjs';
 
 describe('findDistProblems', () => {
   let dir;
@@ -21,6 +21,25 @@ describe('findDistProblems', () => {
 
   it('passes a clean build', () => {
     assert.deepEqual(findDistProblems(dir), []);
+  });
+
+  it('reports an inline script and an inline event handler in HTML (spec 003, R4)', () => {
+    writeFileSync(
+      join(dir, 'index.html'),
+      '<script src="main-ABC.js" type="module"></script><script>document.x=1</script>' +
+        '<link rel="stylesheet" href="s.css" media="print" onload="this.media=\'all\'">',
+    );
+    assert.deepEqual(findDistProblems(dir), [
+      'inline <script>: index.html',
+      'inline event handler (on...=): index.html',
+    ]);
+  });
+
+  it('accepts external scripts and words like "online" in text', () => {
+    assert.deepEqual(
+      findInlineCode('<script src="a.js" type="module"></script><p data-x="1">Go online=yes</p>'),
+      [],
+    );
   });
 
   it('reports a source map file, also in a subfolder', () => {

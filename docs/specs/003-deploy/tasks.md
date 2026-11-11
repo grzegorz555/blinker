@@ -12,15 +12,16 @@ generated:
 Branch: `feat/003-deploy` (from `main`, worktree `C:/Repozytorium/Blinker/wt/003-deploy`) · Gates: `npm run verify -- --quick`
 locally, full gates in CI.
 
-- [ ] **T1 [sonnet]: One header config, served locally.** `staticwebapp.config.json` (headers, fallback, cache,
+- [x] **T1 [sonnet]: One header config, served locally.** `staticwebapp.config.json` (headers, fallback, cache,
   MIME) copied to `dist/`; `serve-dist.mjs` applies it (R1, R2, R5). Tests: config vs. `security.md`, serve-dist
   mapping, cache patterns (unit); a local header e2e.
   *To understand:* response headers, what each header blocks, SPA fallback, why `ngsw.json` must not be cached.
-- [ ] **T2 [opus]: The build passes the production CSP.** `inlineCritical: false`; `check-dist` rejects inline
+- [x] **T2 [opus]: The build passes the production CSP.** `inlineCritical: false`; `check-dist` rejects inline
   scripts and handlers (R4); a shared e2e fixture fails on any CSP or Trusted Types violation, with a negative test
   (R3). Fix whatever the CSP breaks (likely suspects: the service worker registration and Transloco loading under
   Trusted Types). Tests: `check-dist` cases (unit); the fixture across all e2e.
   *To understand:* CSP directives, Trusted Types, why inline scripts are the main XSS vector, critical CSS.
+  *Done together with T1 in one commit: serving the headers (T1) fails e2e until the build passes the CSP (T2). ADR-0004 came out of it.*
 - [ ] **T3 [sonnet]: Remote test project.** Playwright project `deployed` driven by `DEPLOY_URL`: headers on `/`, a
   deep link and a 404, HTTPS, smoke + axe (R9); skipped when `DEPLOY_URL` is not set. Tests: run it against the local
   server with `DEPLOY_URL=http://127.0.0.1:4300` (headers only, HTTPS check skipped on http).
