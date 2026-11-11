@@ -6,4 +6,14 @@ updates:
       interval: weekly
     commit-message:
       prefix: ci
-  # Stage 1: add npm for /src/web (grouped minor/patch updates).
+  - package-ecosystem: npm
+    directory: /src/web
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
