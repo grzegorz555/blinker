@@ -32,7 +32,7 @@ generated:
   - for a public repo, also CodeQL and secret scanning with push protection.
 
   Before making the repo public, re-check `docs/` for personal data.
-- Make small, logical commits. **Commits stay local; push and open PRs only when the author asks.**
+- Make small, logical commits. **Commit only after the author has reviewed the uncommitted changes in the IDE**; push and open PRs only when the author asks.
 - Local repo setup (local config is not part of the repo, so repeat it after a fresh clone):
   ```
   git config --local user.name "Grzegorz Roczniak"

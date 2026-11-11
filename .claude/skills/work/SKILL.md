@@ -24,5 +24,6 @@ effort: medium
    - Vitest unit tests for every rule the task touches;
    - Playwright e2e tests with an axe scan for every user-visible path.
 6. Run the gates and report honestly what passed, what failed, and what was not run: `cd src/web && npm run verify -- --quick`, and for app changes also `npm run build && npm run e2e:only`. CI runs the full `npm run verify` on the PR.
-7. Commit locally: one Conventional Commit for the task, with the ` [gen]` suffix. **Don't push.**
-8. Tick the task in `tasks.md`. Show the author a short diff summary and ask them to review it. Then suggest `/review`.
+7. Tick the task in `tasks.md`. **Don't commit yet:** leave the changes uncommitted, so the author sees them in the IDE.
+   Show a short diff summary and the proposed commit message (Conventional Commit, ` [gen]` suffix).
+8. **Commit only after the author's OK**, one commit per task. Push and open a PR only when the author asks. Then suggest `/review`.
