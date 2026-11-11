@@ -22,10 +22,12 @@ Body: **Context** (what happened), **Lesson** (the rule), **How to apply** (wher
 
 ## Testing
 * [Use expect.poll, not waitForFunction, for async checks](playwright-async-predicates.md) - An async predicate in waitForFunction always passes.
-* [An active Angular service worker is not yet a cached app](angular-sw-ready-is-not-cached.md) - Wait for the cached index.html before going offline.
+* [An active Angular service worker is not yet a cached app](angular-sw-ready-is-not-cached.md) - Wait for every file of the app group (from ngsw.json) before going offline.
+* [Page.getInstallabilityErrors is always empty; use Page.getAppManifest](cdp-installability-errors-always-empty.md) - Every automated check needs a negative test that proves it can fail.
 
 ## Accessibility
 * [A visible skip link must not overlap other targets](skip-link-must-not-overlap.md) - SC 2.5.8; render focus-revealed controls in flow; scan focused states with axe.
 
 ## Tooling
 * [Start Claude Code in the repo root](claude-session-start-directory.md) - Otherwise project agents (code-reviewer) are not loaded.
+* [`node -e` template strings eat backslashes](node-e-template-eats-backslashes.md) - Use Write/Edit or String.raw for regexes and paths.

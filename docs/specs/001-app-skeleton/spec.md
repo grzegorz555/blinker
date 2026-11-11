@@ -76,9 +76,9 @@ every later task depends on. There are no camera, board or scanning features yet
 - [x] Offline: after the first visit, a reload with the network offline shows the app shell (e2e on the production build).
 - [x] `dist/` contains no `.map` files. Checked manually (`find dist -name "*.map"` returns 0). The automated `dist/` check comes in spec 002.
 
-# Follow-up checks (deferred, not blocking; tracked in PR #2)
-- Lighthouse Accessibility = 100 (mobile, production build): home, 404, both languages.
-- Installability: DevTools → Application → Manifest shows no errors. Lighthouse 12+ has no PWA category any more.
+# Follow-up checks (deferred, not blocking; tracked in PR #2; automated in spec 002)
+- [x] Lighthouse Accessibility = 100 (mobile, production build): home, 404, both languages. Automated by `npm run lighthouse` and the CI `lighthouse` job; 100 on all four on 2026-11-11.
+- [x] Installability: the manifest parses with no errors or warnings (`e2e/installability.e2e.ts`, the DevTools list over CDP), and the install criteria fields are checked in `pwa.e2e.ts`. Lighthouse 12+ has no PWA category any more.
 
 # Test plan
 - **Unit (Vitest):**

@@ -36,11 +36,15 @@ src/web/
   src/testing/             test helpers (translocoTesting with the real en/pl files)
   public/i18n/{en,pl}.json, public/manifest.webmanifest, public/icons/
   e2e/                     Playwright specs (*.e2e.ts), support/ (axe helper, third-party request check), serve-dist.mjs
-  scripts/generate-icons.mjs
-  ngsw-config.json, eslint.config.js, playwright.config.ts
+  scripts/                 generate-icons.mjs; verify.mjs (every gate, CI order); check-dist.mjs; lighthouse.mjs +
+                           lighthouse-lang.mjs (Lighthouse CI en/pl + language guard); *.test.mjs (node --test)
+  ngsw-config.json, eslint.config.js, playwright.config.ts, lighthouserc.cjs
+.githooks/pre-push         runs npm run verify (enable with npm run hooks:install)
+.github/workflows/ci.yml   docs, secrets (gitleaks), web (npm run verify), lighthouse
 ```
 E2E tests run against the **production build** served by `e2e/serve-dist.mjs`, not against the dev server.
 This way the service worker, hashing and the absence of source maps are tested as they will be deployed.
+`npm run verify` is the single definition of "green": the pre-push hook and the CI `web` job both run it (spec 002).
 
 # Modules (planned, `src/web/src/app`)
 - `core/vision/`: camera access, the worker, and the MediaPipe wrapper. The model (`.task`) and the wasm files are served from `public/models/`, never from a CDN.
