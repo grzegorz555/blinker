@@ -9,7 +9,7 @@ generated:
   at: 2026-11-11
 ---
 
-Branch: `chore/005-model-routing` (from `feat/002-ci-verify`) · Gates: `npm run verify -- --quick`, full gates in CI.
+Branch: `chore/005-model-routing-v2` (from `main`) · Gates: `npm run verify -- --quick`, full gates in CI.
 
 - [x] **T1 [sonnet]: Quick verify for the pre-push hook.** `planGates` in `verify.mjs` with `--quick` (R1), the hook (R2), and git.md, README, CLAUDE.md. Tests: `verify.test.mjs`.
   *To understand:* why a local hook and CI have different jobs.
