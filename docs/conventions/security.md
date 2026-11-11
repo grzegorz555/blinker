@@ -34,16 +34,18 @@ There are no accounts, no server and no shared data. The main risks are:
 ```
 Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:;
   connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline';
-  font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none';
-  require-trusted-types-for 'script'; trusted-types angular angular#bundler
+  font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';
+  require-trusted-types-for 'script'; trusted-types angular angular#bundler default
 Permissions-Policy: camera=(self), microphone=(), geolocation=(), usb=(), payment=()
 Strict-Transport-Security: max-age=63072000; includeSubDomains
 X-Content-Type-Options: nosniff
 Referrer-Policy: no-referrer
 Cross-Origin-Opener-Policy: same-origin
 ```
-`'wasm-unsafe-eval'` is required by MediaPipe wasm. `style-src 'unsafe-inline'` is kept until stage 1 checks
-whether Angular's critical CSS inlining can be replaced with a nonce. Any change to this list needs an ADR.
+`'wasm-unsafe-eval'` is required by MediaPipe wasm. `base-uri 'self'` and the `default` Trusted Types policy (only `/ngsw-worker.js`) are explained in ADR-0004. `style-src 'unsafe-inline'` stays: Angular adds component styles at runtime, and a static host can't issue a nonce.
+Critical CSS inlining is off (`inlineCritical: false`), because it adds an inline script that `script-src 'self'` blocks. Any change to this list needs an ADR.
+The headers are written only in `src/web/public/staticwebapp.config.json`; a unit test keeps it equal to this list, and
+the local e2e server sends the same headers, so every e2e run fails on a CSP or Trusted Types violation (spec 003).
 
 # Untrusted input: board files
 - Validate against the JSON Schema before use: reject unknown keys, limit the file size (64 KB) and string lengths.
