@@ -31,6 +31,7 @@ Requirements: Node.js 26 (see `src/web/.nvmrc`) and npm.
 cd src/web
 npm ci            # install exact versions from package-lock.json
 npm start         # dev server at http://localhost:4200
+npm run hooks:install   # once per clone: the pre-push hook runs npm run verify
 ```
 
 ## Tests and verification

@@ -20,7 +20,7 @@ generated:
   - stage 0 is the exception: it has no spec, so it is a single branch, `chore/000-bootstrap`, with commits split by topic.
 - **Merging needs green CI.** Branch protection and rulesets are not available for private repos on the free GitHub plan (the API returns 403), so we use a workaround that the author chose on 2026-11-10:
   - CI runs every gate on every PR;
-  - a versioned **pre-push hook** (spec 002) runs the same gates locally before anything leaves the machine;
+  - a versioned **pre-push hook** (`.githooks/pre-push`, spec 002) runs `npm run verify`, the same gates as CI, before anything leaves the machine. Agents never bypass it with `--no-verify`;
   - agents never merge, and the author merges only when every check is green.
 - Repository settings (free tier, already applied):
   - head branches are deleted on merge;
@@ -37,8 +37,9 @@ generated:
   ```
   git config --local user.name "Grzegorz Roczniak"
   git config --local user.email grzegorz555@users.noreply.github.com
-  git config --local core.hooksPath .git/hooks
+  git config --local core.hooksPath .githooks   # or: cd src/web && npm run hooks:install
   ```
+  `.githooks` holds the repo's own hooks (pre-push runs `npm run verify`). Setting it locally also keeps the author's global work hooks out of this repo.
 
 # One task per session (default)
 - The author usually runs **one task per session**. Work on a branch in the main checkout `C:\Repozytorium\Blinker\blinker`, and `/clear` between tasks.
