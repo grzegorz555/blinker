@@ -72,13 +72,13 @@ definition. The two checks deferred from spec 001 (Lighthouse accessibility = 10
   `overrides` entry pins the patched `basic-ftp` 6.2.6.
 
 # Acceptance criteria
-- [ ] `npm run verify` passes locally and prints the summary. `npm run verify -- --lighthouse` also passes.
-- [ ] A push with a failing gate is blocked by the hook (shown with a deliberate lint error, not committed).
+- [x] `npm run verify` passes locally and prints the summary. `npm run verify -- --lighthouse` also passes.
+- [x] A push with a failing gate is blocked by the hook (shown on 2026-11-11 by running the hook with a deliberately unformatted file, not committed).
 - [ ] CI on the PR is green: `docs`, `secrets`, `web` and `lighthouse` jobs.
-- [ ] Lighthouse Accessibility = 100 for home and 404, in English and Polish.
-- [ ] The installability e2e passes, and its negative case shows that the check can fail.
-- [ ] The offline e2e tests pass 8 runs in a row (`--repeat-each=8`).
-- [ ] Dependabot has an `npm` entry for `/src/web`.
+- [x] Lighthouse Accessibility = 100 for home and 404, in English and Polish.
+- [x] The installability e2e passes, and its negative case shows that the check can fail.
+- [x] The offline e2e tests pass 8 runs in a row (`--repeat-each=8`).
+- [x] Dependabot has an `npm` entry for `/src/web`.
 
 # Test plan
 - **Script tests (`node --test`):** `check-dist` finds `.map`, `.md` and `sourceMappingURL`, passes a clean tree and

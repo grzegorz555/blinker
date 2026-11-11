@@ -24,6 +24,6 @@ fails. The `/ngsw/state` URL is a quick way to inspect the driver
 (https://angular.dev/ecosystem/service-workers/devops#debugging-the-angular-service-worker).
 
 # How to apply
-- In tests, poll Cache Storage for `/index.html` in the `:assets:app:cache` cache before going offline (see `e2e/pwa.e2e.ts`).
-- In the UI (later), show "ready for offline use" only after the same condition, not after registration.
+- In tests, poll Cache Storage until **every URL of the `app` group listed in `/ngsw.json`** is in the `:assets:app:cache` cache, then go offline (`e2e/support/service-worker.ts`). Checking only `/index.html` was flaky (about 1 run in 4 on pixel-chromium, found in spec 002): ngsw caches the group file by file, so the JS bundles could still be missing.
+- In the UI (later), show "ready for offline use" only after the same condition (all `app` files cached), not after registration.
 - Everything the app needs offline (translations, later the MediaPipe model and wasm files) belongs in a `prefetch` asset group.
