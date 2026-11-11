@@ -1,0 +1,33 @@
+#!/bin/sh
+# Blinker pre-push hook (spec 002, R5): runs every quality gate before anything leaves the machine.
+# Branch protection is not available on the free GitHub plan, so this hook and CI are the safety net
+# (docs/conventions/git.md). Enable it once per clone: cd src/web && npm run hooks:install
+# Agents never bypass it with --no-verify.
+# Git passes "<local ref> <local oid> <remote ref> <remote oid>" lines on stdin:
+# https://git-scm.com/docs/githooks#_pre_push
+
+root=$(git rev-parse --show-toplevel) || exit 1
+web="$root/src/web"
+
+# A push that only deletes remote branches (local oid is all zeros) doesn't need the gates.
+only_deletes=1
+while read -r local_ref local_oid remote_ref remote_oid; do
+  case "$local_oid" in
+    *[!0]*) only_deletes=0 ;;
+  esac
+done
+if [ "$only_deletes" = 1 ]; then
+  exit 0
+fi
+
+if [ ! -d "$web/node_modules" ]; then
+  echo "pre-push: $web/node_modules is missing. Run: cd src/web && npm ci" >&2
+  exit 1
+fi
+
+echo "pre-push: running npm run verify in src/web (summary at the end)..."
+cd "$web" || exit 1
+if ! npm run verify; then
+  echo "pre-push: push blocked because a gate failed. Fix it, commit, and push again." >&2
+  exit 1
+fi

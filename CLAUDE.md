@@ -2,8 +2,8 @@
 
 > **Isolation:** this is a private project. Its rules apply **only here**. Don't bring in rules from the author's
 > work repositories, and don't carry these rules out (general security rules still apply). Work tooling is off here:
-> the `kup-archiwum` skill is denied in `.claude/settings.json`, and global git hooks are disabled with
-> `git config --local core.hooksPath .git/hooks`. Never archive anything from this repo to SVN KUP.
+> the `kup-archiwum` skill is denied in `.claude/settings.json`, and global git hooks are replaced by the repo's own hooks with
+> `git config --local core.hooksPath .githooks` (`npm run hooks:install`). Never archive anything from this repo to SVN KUP.
 
 **What it is:** an AAC (augmentative and alternative communication) PWA for a person who communicates with blinks
 and head and eye movements. The camera follows the face on the device, the app scans a letter board
@@ -29,6 +29,8 @@ npm test                   # Vitest unit tests, single run
 npm run build              # production build (no source maps)
 npm run e2e                # build + Playwright (3 device projects) + axe
 npm run format:check       # Prettier
+npm run verify             # every gate in CI order (the pre-push hook runs it); --lighthouse adds Lighthouse
+npm run hooks:install      # once per clone: core.hooksPath = .githooks (pre-push runs verify)
 node ../../scripts/check-okf.mjs ../../docs   # docs bundle check
 ```
 Don't start the dev server (`npm start`) unless the author asks. E2E tests serve the production build themselves.
