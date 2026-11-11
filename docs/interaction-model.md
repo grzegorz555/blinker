@@ -27,11 +27,15 @@ Blendshape names come from MediaPipe Face Landmarker (https://ai.google.dev/edge
 # Input modes
 The board is the same in both modes. The mode decides **how a column or a row number is chosen**.
 
-## Mode A: scanning (default)
+**Decided by the author on 2026-11-11:**
+- **Counting (mode B) is the default mode**, because it is how he communicates today.
+- **The proof of concept (PoC) is counting only:** `LONG_BLINK` (+1), `LOOK_AT_HAND` (+5), and `HEAD_NOD` / `HEAD_SHAKE` to confirm or reject each number. Scanning (mode A) is built and tested **after** the PoC.
+
+## Mode A: scanning (after the PoC)
 The app highlights the columns one by one at a configurable pace (optionally with an audio cue).
 `LONG_BLINK` selects the highlighted column. The app then scans the rows inside that column, and `LONG_BLINK` selects the cell.
 
-## Mode B: counting (how he works today; confirmed by the author on 2026-11-11)
+## Mode B: counting (default, and the PoC; how he works today; confirmed by the author on 2026-11-11)
 This mode copies the way a caregiver works with him today: he gives a **number**, the caregiver says it aloud, and he
 confirms it with a nod or rejects it by shaking his head. Blinker takes the caregiver's role.
 
