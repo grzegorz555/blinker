@@ -29,8 +29,8 @@ npm test                   # Vitest unit tests, single run
 npm run build              # production build (no source maps)
 npm run e2e                # build + Playwright (3 device projects) + axe
 npm run format:check       # Prettier
-npm run verify             # every gate in CI order (the pre-push hook runs it); --lighthouse adds Lighthouse
-npm run hooks:install      # once per clone: core.hooksPath = .githooks (pre-push runs verify)
+npm run verify             # every gate in CI order; --lighthouse adds Lighthouse; --quick = fast gates only
+npm run hooks:install      # once per clone: core.hooksPath = .githooks (pre-push runs verify --quick)
 node ../../scripts/check-okf.mjs ../../docs   # docs bundle check
 ```
 Don't start the dev server (`npm start`) unless the author asks. E2E tests serve the production build themselves.

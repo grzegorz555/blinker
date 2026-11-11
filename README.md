@@ -31,7 +31,7 @@ Requirements: Node.js 26 (see `src/web/.nvmrc`) and npm.
 cd src/web
 npm ci            # install exact versions from package-lock.json
 npm start         # dev server at http://localhost:4200
-npm run hooks:install   # once per clone: the pre-push hook runs npm run verify
+npm run hooks:install   # once per clone: the pre-push hook runs the fast gates (npm run verify -- --quick)
 ```
 
 ## Tests and verification
@@ -39,7 +39,7 @@ Run these from `src/web`. **`npm run verify` runs every gate below in the same o
 
 | Command | What it does |
 |---|---|
-| `npm run verify` | All gates: docs check, Prettier, ESLint, unit tests, script tests, `npm audit` (high in any dependency, any in production), build, `dist/` check, e2e. Stops at the first failure. |
+| `npm run verify` | All gates: docs check, Prettier, ESLint, unit tests, script tests, `npm audit` (high in any dependency, any in production), build, `dist/` check, e2e. Stops at the first failure. `-- --quick` runs only docs, Prettier, ESLint, unit and script tests (about 20–30 s; the pre-push hook uses it). |
 | `npm run lint` | ESLint: TypeScript rules, Angular template accessibility rules, and security rules (no `innerHTML`/`eval`) |
 | `npm test` | Vitest unit tests (single run). `npm run test:watch` runs them in watch mode. |
 | `npm run build` | Production build into `dist/` (no source maps) |
