@@ -53,7 +53,7 @@ Run these from `src/web`. **`npm run verify` runs every gate below in the same o
 
 From the repo root, `node scripts/check-okf.mjs` checks the documentation bundle.
 
-**CI** (`.github/workflows/ci.yml`) runs on every pull request and on `main`: the docs check, a gitleaks secret scan, an OSV-Scanner vulnerability scan, `npm run verify` (the same gates as above), and Lighthouse in a separate job (reports kept as a workflow artifact for 7 days). Dependabot proposes weekly updates for npm (minor and patch grouped) and GitHub Actions.
+**CI** (`.github/workflows/ci.yml`) runs on every pull request and on `main`: the docs check, a gitleaks secret scan, an OSV-Scanner vulnerability scan, `npm run verify` (the same gates as above), and Lighthouse in a separate job (reports kept as a workflow artifact for 7 days). After every gate passes, the tested build is deployed to Azure Static Web Apps: a preview per PR (its URL is commented on the PR) or production on `main`, followed by the `deployed` e2e tests on that URL. Without the `AZURE_STATIC_WEB_APPS_API_TOKEN` secret (and on Dependabot PRs) the deploy is skipped, not failed. Dependabot proposes weekly updates for npm (minor and patch grouped) and GitHub Actions.
 
 ## Documentation
 - [docs/index.md](docs/index.md): vision, interaction model, architecture, decisions (ADR), conventions, specs.

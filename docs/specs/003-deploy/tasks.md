@@ -26,10 +26,12 @@ locally, full gates in CI.
   deep link and a 404, HTTPS, smoke + axe (R9); skipped when `DEPLOY_URL` is not set. Tests: run it against the local
   server with `DEPLOY_URL=http://127.0.0.1:4300` (headers only, HTTPS check skipped on http).
   *To understand:* testing a deployed environment vs. a local build, Playwright projects and `baseURL`.
-- [ ] **T4 [opus]: Deploy workflow.** `deploy.yml`: preview per PR with the URL comment, close on PR close, production
+- [x] **T4 [opus]: Deploy workflow.** `ci.yml` deploy jobs + `preview-close.yml`: preview per PR with the URL comment, close on PR close, production
   on `main` after all CI jobs (R6, R7, R8); one build artifact reused; the remote test after each deploy. Needs the
   author's secret (setup guide). Tests: the first PR gets a preview and passes the remote test; a Dependabot PR skips.
   *To understand:* GitHub Actions events, `needs`, secrets and why Dependabot/forks don't get them, artifacts.
+  *Merged before the author's Azure setup: the skip path (R7) is verified in CI; the first real preview and production
+  deploy are verified after the secret is added.*
 - [ ] **T5 [haiku]: Docs and compound.** `security.md` (headers now live in the config, the test keeps them equal),
   `architecture.md`, README (production URL), specs index, log, Polish copies, summary.
   *To understand:* the compound step.
