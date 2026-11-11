@@ -1,7 +1,8 @@
 #!/bin/sh
-# Blinker pre-push hook (spec 002, R5): runs every quality gate before anything leaves the machine.
-# Branch protection is not available on the free GitHub plan, so this hook and CI are the safety net
-# (docs/conventions/git.md). Enable it once per clone: cd src/web && npm run hooks:install
+# Blinker pre-push hook (spec 002 R5, spec 005): runs the FAST gates (docs, Prettier, ESLint, unit and
+# script tests, about 30 s) so obvious mistakes never reach GitHub. The full gates (audit, build, e2e,
+# Lighthouse) run in CI on every PR, which is the real check (docs/conventions/git.md).
+# Enable it once per clone: cd src/web && npm run hooks:install
 # Agents never bypass it with --no-verify.
 # Git passes "<local ref> <local oid> <remote ref> <remote oid>" lines on stdin:
 # https://git-scm.com/docs/githooks#_pre_push
@@ -25,9 +26,9 @@ if [ ! -d "$web/node_modules" ]; then
   exit 1
 fi
 
-echo "pre-push: running npm run verify in src/web (summary at the end)..."
+echo "pre-push: running npm run verify -- --quick in src/web (full gates run in CI)..."
 cd "$web" || exit 1
-if ! npm run verify; then
+if ! npm run verify -- --quick; then
   echo "pre-push: push blocked because a gate failed. Fix it, commit, and push again." >&2
   exit 1
 fi

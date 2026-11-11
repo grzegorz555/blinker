@@ -39,12 +39,12 @@ src/web/
   scripts/                 generate-icons.mjs; verify.mjs (every gate, CI order); check-dist.mjs; lighthouse.mjs +
                            lighthouse-lang.mjs (Lighthouse CI en/pl + language guard); *.test.mjs (node --test)
   ngsw-config.json, eslint.config.js, playwright.config.ts, lighthouserc.cjs
-.githooks/pre-push         runs npm run verify (enable with npm run hooks:install)
+.githooks/pre-push         runs npm run verify -- --quick (enable with npm run hooks:install)
 .github/workflows/ci.yml   docs, secrets (gitleaks), web (npm run verify), lighthouse
 ```
 E2E tests run against the **production build** served by `e2e/serve-dist.mjs`, not against the dev server.
 This way the service worker, hashing and the absence of source maps are tested as they will be deployed.
-`npm run verify` is the single definition of "green": the pre-push hook and the CI `web` job both run it (spec 002).
+`npm run verify` is the single definition of "green": the CI `web` job runs all of it, and the pre-push hook runs its fast part (`--quick`, spec 005).
 
 # Modules (planned, `src/web/src/app`)
 - `core/vision/`: camera access, the worker, and the MediaPipe wrapper. The model (`.task`) and the wasm files are served from `public/models/`, never from a CDN.
