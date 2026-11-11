@@ -16,4 +16,14 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    # Majors of Angular and of the tools it pins (TypeScript) move together through `ng update`,
+    # never one by one: Angular 22 requires TypeScript >=6.0 <6.1. Security updates still come
+    # through, because Dependabot security updates ignore this list.
+    ignore:
+      - dependency-name: '@angular/*'
+        update-types: [version-update:semver-major]
+      - dependency-name: '@angular-devkit/*'
+        update-types: [version-update:semver-major]
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
     open-pull-requests-limit: 5
