@@ -22,7 +22,7 @@ locally, full gates in CI.
   Trusted Types). Tests: `check-dist` cases (unit); the fixture across all e2e.
   *To understand:* CSP directives, Trusted Types, why inline scripts are the main XSS vector, critical CSS.
   *Done together with T1 in one commit: serving the headers (T1) fails e2e until the build passes the CSP (T2). ADR-0004 came out of it.*
-- [ ] **T3 [sonnet]: Remote test project.** Playwright project `deployed` driven by `DEPLOY_URL`: headers on `/`, a
+- [x] **T3 [sonnet]: Remote test project.** Playwright project `deployed` driven by `DEPLOY_URL`: headers on `/`, a
   deep link and a 404, HTTPS, smoke + axe (R9); skipped when `DEPLOY_URL` is not set. Tests: run it against the local
   server with `DEPLOY_URL=http://127.0.0.1:4300` (headers only, HTTPS check skipped on http).
   *To understand:* testing a deployed environment vs. a local build, Playwright projects and `baseURL`.
