@@ -1,6 +1,8 @@
 ---
 name: new-adr
 description: Creates a new Architecture Decision Record in docs/adr/ (OKF type Decision) from the template. Use when a technology or architecture decision is being made or proposed.
+model: sonnet
+effort: medium
 ---
 
 # New ADR

@@ -32,8 +32,7 @@ The number 005 is used because 003 (deploy) and 004 (mock-ups) are already reser
   | `/new-adr` | main session | `sonnet` | `medium` | Filling a template. |
 - **Difficulty labels in `tasks.md`**: every task starts with `**T1 [sonnet]: …**`. `/plan` picks the label using the
   criteria in `docs/conventions/ai-workflow.md`.
-- **A config test** (`node --test`): every skill and agent sets a valid `model`, and every task in a `tasks.md` with
-  `status: draft` has a label.
+- **A config test** (`node --test`): every skill and agent sets a valid `model`, and every task in specs 005+ has a label.
 
 # Rules
 - R1: `verify --quick` runs only the five fast gates and lists the others as "skipped (--quick; CI runs it)".
@@ -41,8 +40,8 @@ The number 005 is used because 003 (deploy) and 004 (mock-ups) are already reser
 - R2: The pre-push hook runs `npm run verify -- --quick`. Agents still never bypass it.
 - R3: Every skill in `.claude/skills/` and every agent in `.claude/agents/` sets `model` to one of `haiku`, `sonnet`,
   `opus` or `inherit`, and sets `effort` to one of `low`, `medium`, `high`, `xhigh` or `max`.
-- R4: Every task line in a `tasks.md` with `status: draft` carries one label: `[haiku]`, `[sonnet]` or `[opus]`.
-  Approved specs from before this rule are exempt.
+- R4: Every task line in the `tasks.md` of spec 005 and later carries one label: `[haiku]`, `[sonnet]` or `[opus]`.
+  Specs 001–004 are exempt (they were planned before the labels).
 - R5: Escalation: if a `[haiku]` or `[sonnet]` task fails its gates twice, `/work` stops and proposes moving the
   task up one level. It never switches silently.
 - R6: A skill's `model` applies only to the current turn and is not saved
@@ -60,7 +59,7 @@ No change: the agents keep their tool lists, and project permissions are unchang
 # Test plan
 - **Script tests (`node --test`):** gate selection (`planGates`): default, `--lighthouse`, `--quick`, the rejected
   combination; the config check: valid frontmatter, a missing or unknown model, a task without a label, an exempt
-  approved spec.
+  older spec, and the real repository.
 - **No app code changes**, so the unit and e2e suites stay as they are (CI).
 
 # Out of scope

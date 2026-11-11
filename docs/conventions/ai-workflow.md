@@ -22,6 +22,34 @@ Review → Compound, and 80% of the effort goes into planning and review (ADR-00
 
 After step 4: `/clear`, then the next task.
 
+# Model routing (spec 005)
+Goal: as few tokens as possible without lowering quality where it matters. Hooks can't choose a model; skills and
+agents can (`model` and `effort` in their frontmatter, https://code.claude.com/docs/en/skills). A skill's model
+applies only to the current turn, so the author's `/model` choice for the session stays.
+
+| Step | Runs | Model | Effort |
+|---|---|---|---|
+| `/plan` | inline | opus | high |
+| `/work`, task `[sonnet]` | inline | sonnet | medium |
+| `/work`, task `[haiku]` | `implementer-haiku` agent | haiku | low |
+| `/work`, task `[opus]` | `implementer-opus` agent | opus | high |
+| `/review` | `code-reviewer` agent | haiku | medium |
+| `/compound` | inline (it must see the conversation) | haiku | low |
+| `/new-adr` | inline | sonnet | medium |
+
+**Labels.** `/plan` gives every task one label, once:
+- `[haiku]`: mechanical and local. Docs or text only, config values, renames, a few lines in one or two files with an
+  obvious test. No new logic.
+- `[sonnet]`: the default. A typical feature or fix with its unit and e2e tests, following existing patterns.
+- `[opus]`: hard or risky. A new architecture or pattern; state machines, signal detection or calibration;
+  security or privacy-sensitive code; changes across many modules; a bug whose cause is unknown; or a task that already
+  failed twice at a lower level.
+
+When in doubt, choose `[sonnet]`. Agents start with a fresh context and re-read files, so for small tasks an agent
+can cost more than doing it inline; that is why `[sonnet]`, the most common label, runs inline.
+A config test (`src/web/scripts/check-claude-config.test.mjs`) checks that every skill and agent sets a model and
+effort, and that every task in specs 005 and later has a label.
+
 # Learning summaries (for the author, Polish, not in git)
 Every step ends with `.local/summaries/YYYY-MM-DD-NN-topic.md` (template: `.local/summaries/_TEMPLATE.md`). It covers:
 - what was done and why;
@@ -32,7 +60,7 @@ Every step ends with `.local/summaries/YYYY-MM-DD-NN-topic.md` (template: `.loca
 
 # Repo tooling
 - Skills (`.claude/skills/`): `/plan`, `/work`, `/review`, `/compound`, `/new-adr`.
-- Agents (`.claude/agents/`): `code-reviewer`.
+- Agents (`.claude/agents/`): `code-reviewer`, `implementer-haiku`, `implementer-opus`.
 - MCP (`.mcp.json`, pinned versions): `angular-cli` (Angular docs and best practices) and `spartan-ui`.
 
 # Rules of thumb

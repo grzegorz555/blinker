@@ -1,6 +1,8 @@
 ---
 name: review
 description: Step 3 of the Compound Engineering loop in Blinker. Runs the code-reviewer agent in a fresh context on the current branch and relays findings. Use for "/review", "zrób review", before asking to push.
+model: haiku
+effort: low
 ---
 
 # /review: independent review
