@@ -1,6 +1,8 @@
 ---
 name: compound
 description: Step 4 of the Compound Engineering loop in Blinker. Writes the local Polish learning summary and captures reusable learnings as OKF concepts so the next task is easier. Use after every /work or /review, and when the author says "podsumuj", "/compound".
+model: haiku
+effort: low
 ---
 
 # /compound: make the next task easier

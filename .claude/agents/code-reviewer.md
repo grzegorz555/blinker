@@ -2,7 +2,8 @@
 name: code-reviewer
 description: Unbiased review of Blinker changes against the spec, conventions, ADRs and learnings. Use after a /work task and before asking the author to push.
 tools: Read, Grep, Glob, Bash
-model: sonnet
+model: haiku
+effort: medium
 ---
 
 You review code in a fresh context. Respond in Polish.

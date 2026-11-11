@@ -1,6 +1,8 @@
 ---
 name: plan
 description: Step 1 of the Compound Engineering loop in Blinker. Turns a stage or feature into docs/specs/NNN-slug/{spec,tasks}.md for the author to approve. Use when the author says "zaplanuj", "nowy etap", "nowa funkcja", "/plan <topic>".
+model: opus
+effort: high
 ---
 
 # /plan: write a spec and tasks (no code)
@@ -10,7 +12,7 @@ description: Step 1 of the Compound Engineering loop in Blinker. Turns a stage o
 3. Pick the next number `NNN` (the highest folder in `docs/specs/` + 1) and create `docs/specs/NNN-slug/spec.md`:
    - frontmatter: `type: Spec`, `title`, `description`, `tags`, `status: draft`, `generated: {by: agent:<model>, at: <date>}`;
    - sections: Goal · Scope · Rules R1…Rn · UI and accessibility notes · Security and privacy notes · Acceptance criteria (testable checklist) · **Test plan** (unit cases per rule, e2e paths + axe) · Out of scope · **References** (the official docs and best-practice sources behind the rules: WCAG success criteria, APG patterns, angular.dev, MDN, OWASP, vendor docs). Verify the links. Don't write them from memory.
-4. Create `tasks.md` (`type: Task List`). Use 3–8 tasks, and make each task:
+4. Create `tasks.md` (`type: Task List`). Use 3–8 tasks. Start each task line with a **difficulty label**, `**T1 [sonnet]: …**`, chosen by the criteria in `docs/conventions/ai-workflow.md` (Model routing). `/work` picks the model from it. Make each task:
    - one commit, with its own unit and e2e tests;
    - followed by a line *"To understand:"* naming the concepts the author will learn.
 5. If an architectural decision comes up, use `/new-adr` (status Proposed) and let the author decide.
