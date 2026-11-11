@@ -1,5 +1,10 @@
 # Log
 
+## 2026-11-11 (spec 005)
+- Pre-push hook runs only the fast gates (`verify --quick`, about 20 s); CI does the full check.
+- Model routing: a model and effort per loop step in skill/agent frontmatter, difficulty labels `[haiku|sonnet|opus]` per task from `/plan`, `implementer-haiku`/`implementer-opus` agents, `code-reviewer` on Haiku, and a config test.
+- Counting is the default mode and the PoC scope; scanning comes after the PoC.
+
 ## 2026-11-11 (spec 002)
 - Counting mode confirmed with the author: column then row, blinks +1, look at hand +5 (counting only), every number asked aloud and confirmed by a nod or rejected by a head shake. The exact way he gives numbers is still open.
 - The friend's paper board transcribed (7×5, no Ł/Ó/Q/V, SZ and CZ as cells; copied 1:1).
