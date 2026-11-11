@@ -15,6 +15,7 @@
     "lint": "ng lint",
     "test:scripts": "node --test \"scripts/*.test.mjs\"",
     "check:dist": "node scripts/check-dist.mjs",
+    "lighthouse": "node scripts/lighthouse.mjs",
     "verify": "node scripts/verify.mjs",
     "hooks:install": "git config --local core.hooksPath .githooks",
     "icons": "node scripts/generate-icons.mjs"
@@ -39,6 +40,7 @@
     "@angular/compiler-cli": "^22.2.0",
     "@axe-core/playwright": "4.14.0",
     "@eslint/js": "^10.0.1",
+    "@lhci/cli": "0.16.0",
     "@playwright/test": "1.65.0",
     "@tailwindcss/postcss": "4.3.5",
     "angular-eslint": "22.6.0",
@@ -54,5 +56,8 @@
   },
   "engines": {
     "node": ">=26"
+  },
+  "overrides": {
+    "basic-ftp": "6.2.6"
   }
 }

@@ -26,8 +26,9 @@ definition. The two checks deferred from spec 001 (Lighthouse accessibility = 10
 - **Lighthouse CI** (`@lhci/cli`): home and 404 pages, in English and in Polish, mobile emulation (the default).
   It asserts that the Accessibility score is 1.0. Reports stay on disk or in CI artifacts. They are never uploaded to
   public storage.
-- **Installability e2e:** Chromium reports no installability errors (`Page.getInstallabilityErrors` over CDP). A
-  negative test with a broken manifest proves that the check can fail.
+- **Installability e2e:** Chromium's manifest parser reports no errors or warnings (`Page.getAppManifest` over CDP,
+  the list DevTools shows in Application → Manifest). A negative test with a broken manifest proves that the check
+  can fail. The install criteria fields are already checked in `pwa.e2e.ts`.
 - **Dependabot for npm** in `/src/web`: weekly, minor and patch updates grouped.
 - **Fix of a flaky e2e helper** found while measuring the gates: the offline tests went offline before every file of
   the service worker's `app` group was cached.
@@ -59,8 +60,9 @@ definition. The two checks deferred from spec 001 (Lighthouse accessibility = 10
   report that the page was rendered in the expected language, because a browser could ignore the language flag.
 - R7: Lighthouse reports are written to `src/web/.lighthouseci/` (git-ignored) and, in CI, uploaded as a workflow
   artifact. `temporary-public-storage` is never used.
-- R8: Installability: Chromium's `Page.getInstallabilityErrors` returns an empty list for the production build. With
-  the manifest request replaced by an invalid manifest, the list is not empty.
+- R8: Installability: Chromium's `Page.getAppManifest` reports no errors or warnings for the production manifest. With
+  the manifest replaced by one with wrong types, it reports them. `Page.getInstallabilityErrors` is not used: in
+  Chromium 1254 it returned an empty list even for a missing manifest.
 
 # Security and privacy notes
 - CI keeps `permissions: contents: read`, and actions are pinned to a full commit SHA, as in stage 0.
@@ -91,7 +93,7 @@ Deploys and response headers (spec 003), the real visual design (spec 004), perf
 
 # References (verified 2026-11-11)
 - Lighthouse CI: [Configuration](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/configuration.md) · [Getting started](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/getting-started.md)
-- Chrome DevTools Protocol: [Page.getInstallabilityErrors](https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-getInstallabilityErrors) · Playwright [CDPSession](https://playwright.dev/docs/api/class-cdpsession)
+- Chrome DevTools Protocol: [Page.getAppManifest](https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-getAppManifest) · Playwright [CDPSession](https://playwright.dev/docs/api/class-cdpsession)
 - PWA install criteria: [web.dev](https://web.dev/articles/install-criteria)
 - Playwright on CI: [Continuous Integration](https://playwright.dev/docs/ci) · [GitHub Actions](https://playwright.dev/docs/ci-intro)
 - GitHub Actions: [Security hardening (pin to SHA, least privilege)](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions) · [setup-node caching](https://github.com/actions/setup-node#caching-global-packages-data)
