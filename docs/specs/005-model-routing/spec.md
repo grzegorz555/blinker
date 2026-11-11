@@ -51,10 +51,10 @@ The number 005 is used because 003 (deploy) and 004 (mock-ups) are already reser
 No change: the agents keep their tool lists, and project permissions are unchanged.
 
 # Acceptance criteria
-- [ ] `npm run verify -- --quick` passes in under a minute and prints the skipped gates.
-- [ ] The pre-push hook runs the quick gates.
-- [ ] The config test passes, and fails when a skill loses its `model` (checked by hand, not committed).
-- [ ] `/plan`, `/work`, `/review` and `/compound` describe the routing, and `ai-workflow.md` lists the labeling criteria.
+- [x] `npm run verify -- --quick` passes in under a minute and prints the skipped gates.
+- [x] The pre-push hook runs the quick gates.
+- [x] The config test passes, and fails when a skill loses its `model` (checked by hand, not committed).
+- [x] `/plan`, `/work`, `/review` and `/compound` describe the routing, and `ai-workflow.md` lists the labeling criteria.
 
 # Test plan
 - **Script tests (`node --test`):** gate selection (`planGates`): default, `--lighthouse`, `--quick`, the rejected
