@@ -1,5 +1,5 @@
 // Builds the mock-ups (spec 004) from design/ into dist/design/:
-// - copies the pages and scripts as they are;
+// - copies the pages and scripts; pages get their shared parts from design/partials/ (renderPage);
 // - compiles design/design.css with PostCSS + @tailwindcss/postcss (the same tools the app build uses, no new
 //   dependency): https://tailwindcss.com/docs/installation/using-postcss
 // - fails on a raw color in the markup (R3: colors come only from the tokens) and on inline scripts or handlers
@@ -24,6 +24,29 @@ const webDir = resolve(import.meta.dirname, '..');
 export const DESIGN_SRC = join(webDir, 'design');
 export const DESIGN_OUT = join(webDir, 'dist', 'design');
 const CSS_ENTRY = 'design.css';
+const PARTIALS = 'partials';
+const INCLUDE = /<!--\s*include\s+([\w./-]+)\s*-->/g;
+
+/**
+ * Puts shared markup into a page and marks the current navigation link, so the caregiver panel pages share one
+ * navigation (spec 004, R12) without a framework:
+ * - `<!-- include nav.html -->` is replaced by design/partials/nav.html;
+ * - in a page with `<html data-page="start">`, the link with `data-nav="start"` gets aria-current="page".
+ * @param {string} html the page
+ * @param {(name: string) => string} readPartial returns a partial by its file name
+ */
+export function renderPage(html, readPartial) {
+  const out = html.replace(INCLUDE, (_, name) => {
+    if (name.includes('..')) throw new Error(`partial outside design/${PARTIALS}/: ${name}`);
+    return readPartial(name);
+  });
+  const page = /<html\b[^>]*\sdata-page="([\w-]+)"/.exec(out)?.[1];
+  if (!page) return out;
+  return out.replace(
+    new RegExp(`(<a\\b[^>]*\\sdata-nav="${page}")`, 'g'),
+    '$1 aria-current="page"',
+  );
+}
 
 const PALETTE =
   'red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|' +
@@ -66,13 +89,18 @@ export async function buildDesign({ src = DESIGN_SRC, out = DESIGN_OUT } = {}) {
 
   for (const file of walk(src)) {
     const name = relative(src, file).split(sep).join('/');
-    if (name === CSS_ENTRY) continue;
+    if (name === CSS_ENTRY || name.startsWith(`${PARTIALS}/`)) continue;
     const target = join(out, name);
     mkdirSync(dirname(target), { recursive: true });
-    cpSync(file, target);
-    if (name.endsWith('.html')) {
-      for (const p of findRawColors(readFileSync(file, 'utf8'))) problems.push(`${p}: ${name}`);
+    if (!name.endsWith('.html')) {
+      cpSync(file, target);
+      continue;
     }
+    const html = renderPage(readFileSync(file, 'utf8'), (partial) =>
+      readFileSync(join(src, PARTIALS, partial), 'utf8'),
+    );
+    writeFileSync(target, html);
+    for (const p of findRawColors(html)) problems.push(`${p}: ${name}`);
   }
 
   const from = join(src, CSS_ENTRY);

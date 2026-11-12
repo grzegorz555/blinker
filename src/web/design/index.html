@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pl">
+<html lang="pl" data-style="base">
   <head>
     <meta charset="utf-8" />
     <title>Blinker: makiety</title>
@@ -13,39 +13,55 @@
       <h1 class="text-3xl font-bold">Blinker: makiety</h1>
       <p class="mt-2 text-muted">
         Klikalne makiety ekranów (spec 004). To tylko HTML i CSS z fikcyjnymi danymi, bez kamery i
-        bez mowy.
+        bez mowy. Na telefonie menu jest na dole, na dużym ekranie z boku.
       </p>
 
-      <h2 class="mt-8 text-xl font-semibold">Kierunki wizualne</h2>
-      <p class="mt-2 text-muted">
-        Ekran komunikacji w chwili, gdy Blinker pyta „Kolumna 7?” (ręka i dwa mrugnięcia). Obróć
-        telefon, żeby zobaczyć układ poziomy. Pod ekranem możesz przełączyć kierunek i tryb jasny
-        lub ciemny.
-      </p>
-      <ul class="mt-4 grid gap-3">
+      <h2 class="mt-8 text-xl font-semibold">Panel opiekuna</h2>
+      <ul class="mt-3 grid gap-3">
         <li>
-          <a class="switch-link w-full" href="directions.html?direction=a">
-            <span><strong>A: spokojny jasny.</strong> Szaroniebieski, jeden wyraźny akcent.</span>
+          <a class="switch-link w-full" href="start.html">
+            <span><strong>Start.</strong> Karty: rozmowa, gotowość, tablica, ostatnie zdania.</span>
           </a>
         </li>
         <li>
-          <a class="switch-link w-full" href="directions.html?direction=b">
-            <span><strong>B: wysoki kontrast.</strong> Czerń i biel, najlepszy z daleka.</span>
+          <a class="switch-link w-full" href="calibrate.html">
+            <span><strong>Kalibracja.</strong> Wkrótce.</span>
           </a>
         </li>
         <li>
-          <a class="switch-link w-full" href="directions.html?direction=c">
-            <span><strong>C: ciepły.</strong> Kremowy i ceglasty, bardziej zaokrąglony.</span>
+          <a class="switch-link w-full" href="boards.html">
+            <span><strong>Tablice.</strong> Wkrótce.</span>
+          </a>
+        </li>
+        <li>
+          <a class="switch-link w-full" href="settings.html">
+            <span><strong>Ustawienia.</strong> Wkrótce.</span>
           </a>
         </li>
       </ul>
 
-      <h2 class="mt-8 text-xl font-semibold">Ekrany</h2>
-      <ul class="mt-2 list-disc ps-6 text-muted">
-        <li data-planned="T3">Komunikacja (liczenie): wkrótce</li>
-        <li data-planned="T4">Kalibracja: wkrótce</li>
-        <li data-planned="T4">Tablice: wkrótce</li>
-        <li data-planned="T4">Ustawienia: wkrótce</li>
+      <h2 class="mt-8 text-xl font-semibold">Tryb rozmowy</h2>
+      <ul class="mt-3 grid gap-3">
+        <li>
+          <a class="switch-link w-full" href="communicate.html">
+            <span>
+              <strong>„Kolumna 7?”</strong> Pełny ekran, tablica zawsze widoczna. Obróć telefon,
+              żeby zobaczyć układ poziomy.
+            </span>
+          </a>
+        </li>
+      </ul>
+
+      <h2 class="mt-8 text-xl font-semibold" id="scheme-label">Tryb jasny lub ciemny</h2>
+      <p class="mt-1 text-muted">
+        Wybór obowiązuje na wszystkich makietach, do których stąd przejdziesz.
+      </p>
+      <ul class="mt-3 flex flex-wrap gap-2" aria-labelledby="scheme-label">
+        <li>
+          <a class="switch-link" data-set="scheme=auto" href="?scheme=auto">Jak w systemie</a>
+        </li>
+        <li><a class="switch-link" data-set="scheme=light" href="?scheme=light">Jasny</a></li>
+        <li><a class="switch-link" data-set="scheme=dark" href="?scheme=dark">Ciemny</a></li>
       </ul>
     </main>
   </body>

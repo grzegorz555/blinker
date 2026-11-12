@@ -1,37 +1,53 @@
-// Mock-up behaviour (spec 004, R7). Plain DOM code only: textContent, attributes and `hidden`, never innerHTML,
-// so the pages run under the production CSP and Trusted Types (R2). T3 adds the state switcher and the signal
-// simulator.
+// Mock-up behaviour (spec 004). Plain DOM code only: textContent, attributes and `hidden`, never innerHTML,
+// so the pages run under the production CSP and Trusted Types (R2). T4 adds the communicate states and the signal
+// simulator (R7).
 (function () {
   'use strict';
   const root = document.documentElement;
   const params = new URLSearchParams(location.search);
-  const ALLOWED = { direction: ['a', 'b', 'c'], scheme: ['auto', 'light', 'dark'] };
+  const SCHEMES = ['auto', 'light', 'dark'];
 
-  /** A URL parameter, only if it is one of the allowed values (the URL is untrusted input). */
-  function pick(key, fallback) {
-    const value = params.get(key);
-    return ALLOWED[key].includes(value) ? value : fallback;
+  // ?scheme=light|dark forces a color scheme; the URL is untrusted input, so only known values count.
+  const scheme = SCHEMES.includes(params.get('scheme')) ? params.get('scheme') : 'auto';
+  if (scheme === 'auto') delete root.dataset['scheme'];
+  else root.dataset['scheme'] = scheme;
+
+  // Links to other mock-ups keep the forced scheme; the switcher links mark the current one.
+  for (const link of document.querySelectorAll('a[href]')) {
+    const url = new URL(link.href);
+    if (url.origin !== location.origin) continue;
+    const set = link.dataset['set'];
+    if (set) {
+      const value = set.split('=')[1];
+      url.search = `?scheme=${value}`;
+      if (value === scheme) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    } else if (scheme !== 'auto') {
+      url.searchParams.set('scheme', scheme);
+    }
+    link.href = url.href;
   }
 
-  // Pages with a visual direction (T2) can switch it with ?direction= and the color scheme with ?scheme=.
-  const current = {
-    direction: root.dataset['direction'] ? pick('direction', root.dataset['direction']) : null,
-    scheme: pick('scheme', 'auto'),
-  };
-  if (current.direction) root.dataset['direction'] = current.direction;
-  if (current.scheme === 'auto') delete root.dataset['scheme'];
-  else root.dataset['scheme'] = current.scheme;
-
-  // Switcher links keep the other setting and mark the current one.
-  for (const link of document.querySelectorAll('a[data-set]')) {
-    const [key, value] = link.dataset['set'].split('=');
-    const next = new URLSearchParams();
-    if (current.direction) next.set('direction', current.direction);
-    next.set('scheme', current.scheme);
-    next.set(key, value);
-    link.search = next.toString();
-    if (current[key] === value) link.setAttribute('aria-current', 'true');
-    else link.removeAttribute('aria-current');
+  // Disclosure buttons (the caregiver menu, R12): aria-expanded on the button, `hidden` on the panel.
+  // https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/
+  const screen = document.querySelector('.screen');
+  for (const button of document.querySelectorAll('[data-disclosure]')) {
+    const panel = document.getElementById(button.getAttribute('aria-controls'));
+    if (!panel) continue;
+    const setOpen = (open) => {
+      button.setAttribute('aria-expanded', String(open));
+      panel.hidden = !open;
+      if (screen) screen.dataset['menu'] = open ? 'open' : 'closed';
+    };
+    button.addEventListener('click', () =>
+      setOpen(button.getAttribute('aria-expanded') !== 'true'),
+    );
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        button.focus();
+      }
+    });
   }
 
   root.dataset['js'] = 'ready';

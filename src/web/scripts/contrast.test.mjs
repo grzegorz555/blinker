@@ -67,7 +67,14 @@ describe('readTokenSets', () => {
     });
   });
 
-  it('splits light-dark() of a direction into its two schemes', () => {
+  it('splits light-dark() of a style (or a T2 direction) into its two schemes', () => {
+    const style = readTokenSets(
+      "[data-style='base'] { --bg: light-dark(oklch(99% 0 0), oklch(15% 0 0)); }",
+    );
+    assert.deepEqual(style.base, {
+      light: { bg: 'oklch(99% 0 0)' },
+      dark: { bg: 'oklch(15% 0 0)' },
+    });
     const sets = readTokenSets(
       "[data-direction='b'] { --fg: light-dark(oklch(0% 0 0), oklch(100% 0 0)); }",
     );
@@ -109,8 +116,8 @@ describe('checkTokenSets', () => {
 });
 
 describe('the project tokens (R3, R4)', () => {
-  it('has the app set and directions a, b and c', () => {
-    assert.deepEqual(Object.keys(readProjectTokenSets()).sort(), ['a', 'app', 'b', 'c']);
+  it('has the app set and the base mock-up style', () => {
+    assert.deepEqual(Object.keys(readProjectTokenSets()).sort(), ['app', 'base']);
   });
 
   it('meets every contrast threshold in light and dark', () => {

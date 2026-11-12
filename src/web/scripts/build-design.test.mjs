@@ -3,7 +3,44 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'node:test';
-import { buildDesign, findRawColors } from './build-design.mjs';
+import { buildDesign, findRawColors, renderPage } from './build-design.mjs';
+
+describe('renderPage (R12: one navigation for every caregiver page)', () => {
+  const nav =
+    '<nav><a data-nav="start" href="start.html">Start</a><a data-nav="boards" href="b.html">B</a></nav>';
+  const read = (name) => {
+    if (name !== 'nav.html') throw new Error(`no partial ${name}`);
+    return nav;
+  };
+
+  it('puts the partial in place of the include comment', () => {
+    assert.equal(renderPage('<body><!-- include nav.html --></body>', read), `<body>${nav}</body>`);
+  });
+
+  it('marks only the link of the current page with aria-current="page"', () => {
+    const html = renderPage(
+      '<html lang="pl" data-page="boards"><!-- include nav.html --></html>',
+      read,
+    );
+    assert.match(html, /<a data-nav="boards" aria-current="page" href="b.html">/);
+    assert.equal(html.match(/aria-current/g).length, 1);
+  });
+
+  it('leaves pages without data-page and without includes as they are', () => {
+    assert.equal(
+      renderPage('<html lang="pl"><p>x</p></html>', read),
+      '<html lang="pl"><p>x</p></html>',
+    );
+  });
+
+  it('refuses a partial outside the partials folder and reports a missing one', () => {
+    assert.throws(
+      () => renderPage('<!-- include ../secret.html -->', read),
+      /outside design\/partials/,
+    );
+    assert.throws(() => renderPage('<!-- include other.html -->', read), /no partial other.html/);
+  });
+});
 
 describe('findRawColors (R3)', () => {
   it('accepts token classes, fragment links and text that looks like a color', () => {
@@ -50,6 +87,22 @@ describe('buildDesign', () => {
     );
     writeFileSync(join(src, 'design.js'), 'document.title = "x";');
     writeFileSync(join(src, 'directions', 'a.html'), '<p class="italic">a</p>');
+    mkdirSync(join(src, 'partials'));
+    writeFileSync(join(src, 'partials', 'nav.html'), '<nav class="tracking-wide">nav</nav>');
+  });
+
+  it('renders includes into pages and does not copy the partials folder', async () => {
+    writeFileSync(join(src, 'start.html'), '<body><!-- include nav.html --></body>');
+    assert.deepEqual(await buildDesign({ src, out }), []);
+    assert.equal(
+      readFileSync(join(out, 'start.html'), 'utf8'),
+      '<body><nav class="tracking-wide">nav</nav></body>',
+    );
+    assert.ok(!existsSync(join(out, 'partials')));
+    assert.ok(
+      readFileSync(join(out, 'design.css'), 'utf8').includes('.tracking-wide'),
+      'partials are scanned',
+    );
   });
 
   afterEach(() => rmSync(root, { recursive: true, force: true }));
