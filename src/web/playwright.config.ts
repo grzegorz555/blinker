@@ -2,6 +2,9 @@ import { defineConfig, devices } from '@playwright/test';
 
 const port = 4300;
 const localURL = `http://127.0.0.1:${port}`;
+/** Spec 004: the mock-ups (dist/design/, built by npm run design:build) on their own server and port. */
+const designPort = 4310;
+const designURL = `http://127.0.0.1:${designPort}`;
 
 /**
  * Spec 003, R9: with DEPLOY_URL set, only the `deployed` project runs, against that URL (a preview or production
@@ -10,6 +13,21 @@ const localURL = `http://127.0.0.1:${port}`;
  */
 const deployURL = process.env['DEPLOY_URL']?.replace(/\/+$/, '');
 const deployedTests = ['headers.e2e.ts', 'smoke.e2e.ts', 'deployed/**/*.e2e.ts'];
+
+const appServer = {
+  command: 'node e2e/serve-dist.mjs',
+  url: localURL,
+  env: { PORT: String(port) },
+  reuseExistingServer: !process.env['CI'],
+};
+
+/** Bound to 127.0.0.1: tests never open the mock-ups to the network (spec 004, R10). */
+const designServer = {
+  command: 'node scripts/serve-design.mjs',
+  url: designURL,
+  env: { PORT: String(designPort), HOST: '127.0.0.1' },
+  reuseExistingServer: !process.env['CI'],
+};
 
 /**
  * E2E tests run against the production build served by e2e/serve-dist.mjs.
@@ -32,20 +50,30 @@ export default defineConfig({
     : [
         {
           name: 'desktop-chromium',
-          testIgnore: 'deployed/**',
+          testIgnore: ['deployed/**', 'design/**'],
           use: { ...devices['Desktop Chrome'] },
         },
-        { name: 'pixel-chromium', testIgnore: 'deployed/**', use: { ...devices['Pixel 7'] } },
-        { name: 'iphone-webkit', testIgnore: 'deployed/**', use: { ...devices['iPhone 15'] } },
+        {
+          name: 'pixel-chromium',
+          testIgnore: ['deployed/**', 'design/**'],
+          use: { ...devices['Pixel 7'] },
+        },
+        {
+          name: 'iphone-webkit',
+          testIgnore: ['deployed/**', 'design/**'],
+          use: { ...devices['iPhone 15'] },
+        },
+        {
+          name: 'design',
+          testMatch: 'design/**/*.e2e.ts',
+          use: { ...devices['Desktop Chrome'], baseURL: designURL },
+        },
       ],
   // A remote deploy needs no local server; the local URL (for trying the deployed tests) still does.
-  webServer:
-    deployURL && deployURL !== localURL
-      ? undefined
-      : {
-          command: 'node e2e/serve-dist.mjs',
-          url: localURL,
-          env: { PORT: String(port) },
-          reuseExistingServer: !process.env['CI'],
-        },
+  // The mock-up server runs only with the device projects.
+  webServer: deployURL
+    ? deployURL === localURL
+      ? [appServer]
+      : undefined
+    : [appServer, designServer],
 });

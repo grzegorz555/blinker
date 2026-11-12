@@ -2,6 +2,9 @@
 @import 'tailwindcss';
 @import './styles/tokens.css';
 
+/* The mock-ups (design/, spec 004) have their own CSS; keep their classes out of the app bundle. */
+@source not '../design';
+
 @layer base {
   html {
     /* System font stack: no third-party font requests (security.md). */

@@ -12,6 +12,7 @@ them into sentences that are shown on screen and read aloud.
 
 ## Status
 **Stage 1: deploy** (spec [003](docs/specs/003-deploy/spec.md), in progress: security headers and a CSP-clean build are done, the Azure deploy follows; specs [001](docs/specs/001-app-skeleton/spec.md) and [002](docs/specs/002-ci-verify/spec.md) are done).
+**Stage 1.5: mock-ups** (spec [004](docs/specs/004-mockups/spec.md), in progress: the mock-up toolchain is done; the visual directions follow).
 The app shell works in English and Polish (language switch, translated titles); there are no communication features yet. The stage plan is in [docs/backlog.md](docs/backlog.md).
 
 ## Tech stack
@@ -39,15 +40,17 @@ Run these from `src/web`. **`npm run verify` runs every gate below in the same o
 
 | Command | What it does |
 |---|---|
-| `npm run verify` | All gates: docs check, Prettier, ESLint, unit tests, script tests, `npm audit` (high in any dependency, any in production), build, `dist/` check, e2e. Stops at the first failure. `-- --quick` runs only docs, Prettier, ESLint, unit and script tests (about 20–30 s; the pre-push hook uses it). |
+| `npm run verify` | All gates: docs check, Prettier, ESLint, unit tests, script tests, `npm audit` (high in any dependency, any in production), build, `dist/` check, mock-ups build, e2e. Stops at the first failure. `-- --quick` runs only docs, Prettier, ESLint, unit and script tests (about 20–30 s; the pre-push hook uses it). |
 | `npm run lint` | ESLint: TypeScript rules, Angular template accessibility rules, and security rules (no `innerHTML`/`eval`) |
 | `npm test` | Vitest unit tests (single run). `npm run test:watch` runs them in watch mode. |
 | `npm run build` | Production build into `dist/` (no source maps) |
-| `npm run e2e` | Builds the app, then runs Playwright e2e tests with axe-core accessibility checks on desktop Chrome, Pixel 7 (Chromium) and iPhone 15 (WebKit), including a manifest check over the DevTools Protocol. The local server sends the production security headers, and every test fails on a CSP or Trusted Types violation. The first time, run `npx playwright install chromium webkit`. |
+| `npm run e2e` | Builds the app, then runs Playwright e2e tests with axe-core accessibility checks on desktop Chrome, Pixel 7 (Chromium) and iPhone 15 (WebKit), including a manifest check over the DevTools Protocol. It also builds the mock-ups and runs the `design` project (Chromium) against them. The local server sends the production security headers, and every test fails on a CSP or Trusted Types violation. The first time, run `npx playwright install chromium webkit`. |
 | `DEPLOY_URL=<url> npx playwright test` | Runs only the `deployed` project against a deployed copy (preview or production): headers, HTTPS, smoke + axe. In PowerShell: `$env:DEPLOY_URL='<url>'; npx playwright test`. |
 | `npm run test:scripts` | Tests of the Node helper scripts (built-in `node --test`) |
-| `npm run check:dist` | Fails if the production build contains `.map` or `.md` files, `sourceMappingURL` comments, or inline scripts and `on…=` handlers in HTML |
+| `npm run check:dist` | Fails if the production build contains a `design/` folder (mock-ups),  `.map` or `.md` files, `sourceMappingURL` comments, or inline scripts and `on…=` handlers in HTML |
 | `npm run lighthouse` | Lighthouse CI on the production build (home and 404, English and Polish); fails unless Accessibility = 100. Needs `npm run build` first and Google Chrome. Reports: `.lighthouseci/reports-en`, `reports-pl`. `npm run verify -- --lighthouse` includes it. |
+| `npm run design:build` | Builds the clickable mock-ups (spec 004) from `design/` into `dist/design/` (Tailwind via PostCSS); fails on raw colors in the markup and on inline scripts. They never ship in the app build. |
+| `npm run design:serve` | Builds the mock-ups and serves them on port 4310 with the production headers, **for viewing on a phone over the home Wi-Fi**: it prints the address to open (`http://192.168.x.x:4310/`). If Windows asks about the firewall, allow private networks only; don't run it on public Wi-Fi. Stop with Ctrl+C. |
 | `npm run icons` | Regenerates the placeholder app icons in `public/icons/` (pure Node, no dependencies) |
 | `npm run format:check` | Prettier check. `npm run format` fixes formatting. |
 

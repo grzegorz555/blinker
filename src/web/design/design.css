@@ -1,0 +1,24 @@
+/*
+ * Mock-ups (spec 004). Compiled by scripts/build-design.mjs into dist/design/design.css.
+ * Tailwind scans only this folder: source(none) turns off automatic detection, @source adds the mock-up pages.
+ * https://tailwindcss.com/docs/detecting-classes-in-source-files
+ * Colors come only from the app tokens (R3); visual directions override token values in T2.
+ */
+@import 'tailwindcss' source(none);
+@import '../src/styles/tokens.css';
+
+@source './';
+
+@layer base {
+  html {
+    /* The same system font stack as the app (security.md: no third-party fonts). */
+    font-family:
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+  }
+}

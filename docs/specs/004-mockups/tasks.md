@@ -12,7 +12,7 @@ generated:
 Branch: `feat/004-mockups` (from `main`, worktree `C:/Repozytorium/Blinker/wt/004-mockups`) · Gates:
 `npm run verify -- --quick` locally, full gates in CI.
 
-- [ ] **T1 [sonnet]: Mock-up toolchain.** `src/web/design/` with the catalog page, `design.css`, `design.js` stub;
+- [x] **T1 [sonnet]: Mock-up toolchain.** `src/web/design/` with the catalog page, `design.css`, `design.js` stub;
   `design:build` (PostCSS + Tailwind to `dist/design/`), `design:serve` (LAN, port 4310, production headers, prints
   the address), `check-dist` rule against `design/` in the app build and the inline-script rule on `dist/design/`
   (R1, R2, R10). Tests: build, serve (traversal, no listing, headers, LAN address list) and check-dist cases (unit);
