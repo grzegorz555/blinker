@@ -1,4 +1,4 @@
-// Spec 004, T3: communicate mode ("Kolumna 7?"), full screen (R4, R6, R12). CSP guard active (R2).
+// Spec 004: Liczenie, the main screen ("Kolumna 7?"): the M3 supporting-pane layout (R4, R6, R12). CSP guard active (R2).
 import { expect, test, type Page } from '../support/test';
 import { expectNoA11yViolations } from '../support/a11y';
 
@@ -16,61 +16,65 @@ async function open(page: Page, query = '') {
   await expect(page.locator('html')).toHaveAttribute('data-js', 'ready');
 }
 
-const menuButton = (page: Page) => page.getByRole('button', { name: 'Menu' });
+const sentence = (page: Page) => page.locator('[data-sentence]');
 
-/** How far each part reaches beyond the viewport, and whether the board overlaps another part (0 = fine). */
+/**
+ * Layout problems (0 = fine): how far a part reaches beyond the viewport, any overlap between the question, the
+ * board, the sentence and the navigation, and horizontal scrolling.
+ */
 function layoutProblems(page: Page) {
   return page.evaluate(() => {
     const vh = window.innerHeight;
     const vw = document.documentElement.clientWidth;
-    const visible = (el: Element) => (el as HTMLElement).offsetParent !== null;
-    const parts = [...document.querySelectorAll('.screen > *')].filter(visible);
+    const parts = [
+      ['question', '.count-question'],
+      ['board', '.count-board .board'],
+      ['sentence', '.count-sentence'],
+      ['nav', '.shell-nav'],
+    ].map(([name, selector]) => [name, document.querySelector(selector)!.getBoundingClientRect()]);
     const result: Record<string, number> = {};
-    for (const el of parts) {
-      const box = el.getBoundingClientRect();
-      const name = el.className.split(' ')[0] || el.tagName;
-      result[name] = Math.max(0, Math.ceil(box.bottom - vh), Math.ceil(box.right - vw));
+    for (const [name, box] of parts as [string, DOMRect][]) {
+      result[`${name} outside`] = Math.max(
+        0,
+        Math.ceil(box.bottom - vh),
+        Math.ceil(box.right - vw),
+      );
     }
-    const board = document.querySelector('.screen-board')!.getBoundingClientRect();
-    for (const el of parts.filter((el) => !el.classList.contains('screen-board'))) {
-      const b = el.getBoundingClientRect();
-      const overlaps =
-        b.left < board.right - 1 &&
-        b.right > board.left + 1 &&
-        b.top < board.bottom - 1 &&
-        b.bottom > board.top + 1;
-      if (overlaps) result[`board covered by ${el.className.split(' ')[0]}`] = 1;
+    for (let i = 0; i < parts.length; i++) {
+      for (let j = i + 1; j < parts.length; j++) {
+        const [an, a] = parts[i] as [string, DOMRect];
+        const [bn, b] = parts[j] as [string, DOMRect];
+        const overlaps =
+          a.left < b.right - 1 &&
+          a.right > b.left + 1 &&
+          a.top < b.bottom - 1 &&
+          a.bottom > b.top + 1;
+        result[`${an} overlaps ${bn}`] = overlaps ? 1 : 0;
+      }
     }
+    result['vertical scroll'] = Math.max(0, document.documentElement.scrollHeight - vh);
     result['horizontal scroll'] = Math.max(0, document.documentElement.scrollWidth - vw);
     return result;
   });
 }
 
-test.describe('communicate mode', () => {
+test.describe('Liczenie', () => {
   for (const scheme of ['light', 'dark']) {
-    test(`${scheme}: has no WCAG A/AA violations, with the menu closed and open`, async ({
-      page,
-    }) => {
+    test(`${scheme}: has no WCAG A/AA violations detectable by axe`, async ({ page }) => {
       await open(page, `?scheme=${scheme}`);
-      await expectNoA11yViolations(page);
-      await menuButton(page).click();
       await expectNoA11yViolations(page);
     });
   }
 
-  test('fits every target viewport, the board never covered, menu closed and open (R6)', async ({
+  test('fits every target viewport: no scrolling, nothing covers the board (R6)', async ({
     page,
   }) => {
     await open(page);
     for (const viewport of VIEWPORTS) {
       await page.setViewportSize(viewport);
-      for (const menu of ['closed', 'open']) {
-        if (menu === 'open') await menuButton(page).click();
-        const problems = await layoutProblems(page);
-        const fine = Object.fromEntries(Object.keys(problems).map((k) => [k, 0]));
-        expect(problems, `${viewport.name}, menu ${menu}`).toEqual(fine);
-        if (menu === 'open') await menuButton(page).click();
-      }
+      const problems = await layoutProblems(page);
+      const fine = Object.fromEntries(Object.keys(problems).map((k) => [k, 0]));
+      expect(problems, viewport.name).toEqual(fine);
     }
   });
 
@@ -87,46 +91,101 @@ test.describe('communicate mode', () => {
     }
   });
 
-  test('has no app navigation, but a visible way back to the start page (R12)', async ({
+  test('board cells are squares in every viewport (R6)', async ({ page }) => {
+    await open(page);
+    for (const viewport of VIEWPORTS) {
+      await page.setViewportSize(viewport);
+      const sizes = await page
+        .locator('.board-cell')
+        .evaluateAll((cells) =>
+          cells.map((c) => [c.getBoundingClientRect().width, c.getBoundingClientRect().height]),
+        );
+      for (const [width, height] of sizes) {
+        expect(Math.abs(width - height), viewport.name).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+
+  test('empty cells show nothing and have no button', async ({ page }) => {
+    await open(page);
+    const empty = page.locator('.board-cell:not(:has(button))');
+    await expect(empty).toHaveCount(2);
+    for (const text of await empty.allTextContents()) expect(text.trim()).toBe('');
+  });
+
+  test('is the first destination of the app navigation, marked as current (R12)', async ({
     page,
   }) => {
     await open(page);
-    await expect(page.getByRole('navigation')).toHaveCount(0);
-    await page.getByRole('link', { name: 'Zakończ' }).click();
-    await expect(page).toHaveURL(/start\.html/);
+    const nav = page.getByRole('navigation', { name: 'Menu główne' });
+    await expect(nav.getByRole('link').first()).toHaveText('Liczenie');
+    await expect(nav.getByRole('link', { name: 'Liczenie' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   });
 
-  test('the caregiver menu is a disclosure: it opens in place of the question and closes with Escape', async ({
+  test('the sentence actions are always visible, labelled and big enough (SC 2.5.8)', async ({
     page,
   }) => {
     await open(page);
-    const menu = page.getByRole('region', { name: 'Menu opiekuna' });
-    await expect(menuButton(page)).toHaveAttribute('aria-expanded', 'false');
-    await expect(menu).toBeHidden();
-
-    await menuButton(page).click();
-    await expect(menuButton(page)).toHaveAttribute('aria-expanded', 'true');
-    await expect(menu.getByRole('button')).toHaveText([
-      'Cofnij literę',
-      'Pauza',
-      'Przeczytaj',
-      'Wyczyść',
-    ]);
-    await expect(page.getByText('Kolumna 7?')).toBeHidden();
-    await expect(page.getByRole('table')).toBeVisible();
-
-    await page.keyboard.press('Escape');
-    await expect(menu).toBeHidden();
-    await expect(menuButton(page)).toBeFocused();
-    await expect(page.getByText('Kolumna 7?')).toBeVisible();
+    for (const viewport of VIEWPORTS) {
+      await page.setViewportSize(viewport);
+      const actions = page.getByRole('region', { name: 'Zdanie' }).getByRole('button');
+      await expect(actions, viewport.name).toHaveText(['Cofnij literę', 'Wyczyść', 'Przeczytaj']);
+      for (const box of await actions.evaluateAll((els) =>
+        els.map((el) => el.getBoundingClientRect().toJSON()),
+      )) {
+        expect(box.width, viewport.name).toBeGreaterThanOrEqual(44);
+        expect(box.height, viewport.name).toBeGreaterThanOrEqual(44);
+      }
+    }
   });
 
-  test('the active column is marked by a 4 px outline and bold text, not by color alone (R4)', async ({
+  test('a tap on a letter adds it, and "Cofnij literę" removes it, both announced', async ({
+    page,
+  }) => {
+    await open(page);
+    const announce = page.locator('[data-announce]');
+    await expect(announce).toHaveAttribute('aria-live', 'polite');
+
+    await page.getByRole('button', { name: 'W', exact: true }).click();
+    await page.getByRole('button', { name: 'SZ', exact: true }).click();
+    await expect(sentence(page)).toHaveText('CHCĘ SIĘ NAPIĆ WSZ');
+    await expect(announce).toHaveText('Dodano SZ');
+
+    await page.getByRole('button', { name: 'Cofnij literę' }).click();
+    await expect(sentence(page)).toHaveText('CHCĘ SIĘ NAPIĆ W');
+    await expect(announce).toHaveText('Usunięto SZ');
+    await page.getByRole('button', { name: 'Cofnij literę' }).click();
+    await expect(sentence(page)).toHaveText('CHCĘ SIĘ NAPIĆ ');
+  });
+
+  test('the letters work from the keyboard too', async ({ page }) => {
+    await open(page);
+    await page.getByRole('button', { name: 'A', exact: true }).focus();
+    await page.keyboard.press('Enter');
+    await expect(sentence(page)).toHaveText('CHCĘ SIĘ NAPIĆ A');
+  });
+
+  test('"Pauza" is a toggle button and the status says the mode in words', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await open(page);
+    const pause = page.getByRole('button', { name: 'Pauza' });
+    await expect(pause).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByText('Automat: widzę twarz')).toBeVisible();
+    await pause.click();
+    await expect(pause).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('Wstrzymane')).toBeVisible();
+  });
+
+  test('the pointer marks the column number and one letter by a 4 px outline and bold text, not by color alone (R4)', async ({
     page,
   }) => {
     await open(page);
     const active = page.locator('.board .is-active');
-    await expect(active).toHaveCount(6); // the column header and its five cells
+    await expect(active).toHaveText(['7', 'G']); // the column number and the cell the count has got to
+    await expect(active.nth(1)).toHaveAttribute('aria-current', 'true');
     for (const style of await active.evaluateAll((els) =>
       els.map((el) => {
         const s = getComputedStyle(el);
@@ -200,9 +259,9 @@ test.describe('catalog and scheme', () => {
       'aria-current',
       'true',
     );
-    await expect(page.getByRole('link', { name: /Start\./ })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /Liczenie/ })).toHaveAttribute(
       'href',
-      /start\.html\?scheme=dark/,
+      /communicate\.html\?scheme=dark/,
     );
   });
 });

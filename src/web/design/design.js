@@ -28,27 +28,40 @@
     link.href = url.href;
   }
 
-  // Disclosure buttons (the caregiver menu, R12): aria-expanded on the button, `hidden` on the panel.
-  // https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/
-  const screen = document.querySelector('.screen');
-  for (const button of document.querySelectorAll('[data-disclosure]')) {
-    const panel = document.getElementById(button.getAttribute('aria-controls'));
-    if (!panel) continue;
-    const setOpen = (open) => {
-      button.setAttribute('aria-expanded', String(open));
-      panel.hidden = !open;
-      if (screen) screen.dataset['menu'] = open ? 'open' : 'closed';
-    };
-    button.addEventListener('click', () =>
-      setOpen(button.getAttribute('aria-expanded') !== 'true'),
-    );
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
-        setOpen(false);
-        button.focus();
-      }
+  // Liczenie: a tap on a letter adds it to the sentence, "Cofnij literę" removes the last one added (a board cell
+  // can hold two letters, e.g. SZ). The polite live region announces both (SC 4.1.3).
+  const sentence = document.querySelector('[data-sentence]');
+  const announce = document.querySelector('[data-announce]');
+  const added = [];
+  const say = (text) => {
+    if (announce) announce.textContent = text;
+  };
+  for (const cell of document.querySelectorAll('.cell-btn')) {
+    cell.addEventListener('click', () => {
+      const letter = cell.textContent.trim();
+      added.push(letter);
+      sentence.textContent += letter;
+      say(`Dodano ${letter}`);
     });
   }
+  document.querySelector('[data-undo]')?.addEventListener('click', () => {
+    // A trailing space (after a word) stays, so the next letter starts the next word.
+    const text = sentence.textContent.trimEnd();
+    const trailing = sentence.textContent.slice(text.length);
+    const last = added.pop() ?? text.slice(-1);
+    if (!last || !text.endsWith(last)) return;
+    sentence.textContent = text.slice(0, -last.length) + trailing;
+    say(`Usunięto ${last}`);
+  });
+
+  // Pause: a toggle button (aria-pressed); the mode status says what is happening in words.
+  const pause = document.querySelector('[data-pause]');
+  const modeText = document.querySelector('[data-mode-text]');
+  pause?.addEventListener('click', () => {
+    const paused = pause.getAttribute('aria-pressed') !== 'true';
+    pause.setAttribute('aria-pressed', String(paused));
+    if (modeText) modeText.textContent = paused ? 'Wstrzymane' : 'Automat: widzę twarz';
+  });
 
   root.dataset['js'] = 'ready';
 })();

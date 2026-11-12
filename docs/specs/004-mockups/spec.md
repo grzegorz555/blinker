@@ -1,7 +1,7 @@
 ---
 type: Spec
 title: "004: Clickable mock-ups and the visual direction"
-description: Static HTML/Tailwind mock-ups viewed on a computer and on a real phone over the home Wi-Fi; a caregiver dashboard (sidebar on large screens, bottom navigation on phones) and a full-screen communicate mode, in the shadcn/ui style that spartan-ng ports; final tokens and icon after visual polish.
+description: Static HTML/Tailwind mock-ups viewed on a computer and on a real phone over the home Wi-Fi; Material 3 style; Liczenie (the board) is the main screen in the M3 supporting-pane layout, with a navigation bar on phones and a navigation rail from 600 px; final tokens and icon after visual polish.
 tags: [stage-1.5, design, accessibility, mockups]
 status: draft
 generated:
@@ -10,19 +10,22 @@ generated:
 ---
 
 # Goal
+
 Before stage 2 builds the real screens, the author (and, if possible, the friend) sees and clicks through how Blinker
 will look and behave, on the devices it will really run on: the whole app, not only the board. The result is a
 visual language, the app structure (navigation on phones and large screens), and then the final design tokens,
 `theme-color` and the app icon. Changing a mock-up is cheap; changing Angular components later is not.
 
 # Decisions (author, 2026-11-12)
+
 - **The mock-ups live in the project** (`src/web/design/`). The author opens them on the computer (browser, DevTools
   device mode) and **on the phone over the home Wi-Fi** with `npm run design:serve`. No hosting is needed, so this
   spec does not depend on spec 003 (Azure).
 - **Setups:** all of them are considered. The target is **a caregiver holding the phone in front of him**, and at home
   **a stationary device** (phone on a stand or a laptop). The rear-camera case (he doesn't see the screen) gets a
   simplified, audio-first variant.
-- **Screens:** start (dashboard), communicate (counting), calibrate, boards, settings.
+- **Screens:** Liczenie (counting, the main screen), Zdania (sentences), boards, calibrate, settings. Until polish
+  round 1 there was also a start dashboard.
 - **Counting** follows [the interaction model](../../interaction-model.md): he gives a number by blinking (+1) and
   looking at his hand (+5); Blinker asks "Kolumna 4?" and he confirms with a nod or rejects with a head shake.
 - **Revised after T2:** three bespoke directions (T2) did not convince the author. Instead:
@@ -38,12 +41,30 @@ visual language, the app structure (navigation on phones and large screens), and
     Square UI is React and its license forbids publishing its templates in a repository.
   - **Phones get a bottom navigation bar**, within thumb reach; the communicate mode is full screen.
   - **Visual polish comes later**, in rounds with the author, before the final tokens (T6).
+- **Revised in polish round 1 (author, 2026-11-12).** The shadcn look and the dashboard felt random: one thing under
+  another, black and white, no clear split of responsibilities, an odd menu, and an unclear sentence and undo area.
+  Instead:
+  - **Material Design 3** ([M3](https://m3.material.io)), the system [Angular Material](https://material.angular.dev)
+    implements. [ADR-0005](../../adr/0005-angular-material-m3.md) proposes Angular Material as the UI library
+    instead of spartan-ng. The community Figma kit the author pointed to is a reference for the feel only: despite
+    its name it is Material 2 (indigo app bar, uppercase buttons, shadows, an icon web font).
+  - **Ready-made layouts, not ad hoc stacks:** the M3
+    [canonical layouts](https://m3.material.io/foundations/layout/canonical-layouts/overview) and
+    [window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes).
+  - **Color with restraint:** near-neutral surfaces and one indigo hue in tonal roles. Color marks what is active or
+    important, not decoration.
+  - **Liczenie is the main screen**; there is no start dashboard. It runs by itself on his signals, and every letter
+    and action can also be tapped (by the caregiver, or by him if he can).
+  - **One job per destination:** Liczenie (talk), Zdania (what he said, repeat aloud), Tablice (boards), Kalibracja
+    (readiness and his signals), Ustawienia (timings, voice, theme).
 
 # Scope
+
 - **`src/web/design/`**: plain HTML pages, one CSS entry and one small script file:
   - `index.html`: a catalog with links to every mock-up and every state;
   - `directions.html`: the three T2 directions, kept for reference until T3 replaces them, then removed;
-  - `start.html` (dashboard), `communicate.html`, `calibrate.html`, `boards.html`, `settings.html`;
+  - `communicate.html` (Liczenie, the main screen), `sentences.html` (Zdania), `boards.html`, `calibrate.html`,
+    `settings.html`; `start.html` (the T3 dashboard) was removed in polish round 1;
   - `design.css`: Tailwind + `../src/styles/tokens.css` + the mock-up style's token values + layout components;
   - `design.js`: the scheme switch, the communicate states and a keyboard simulator of the signals (see R7).
 - **`npm run design:build`**: compiles `design.css` with the PostCSS + `@tailwindcss/postcss` already installed, and
@@ -56,6 +77,7 @@ visual language, the app structure (navigation on phones and large screens), and
   the app structure, the screen and state inventory, and what we learned from the phone test.
 
 # Rules
+
 - **R1. Mock-ups never ship in the app.** They are not in `public/` and not in the Angular build; `dist/blinker-web/`
   is unchanged. `check-dist` already rejects `.md`; it is extended to fail if a `design/` folder appears in the app
   build.
@@ -66,11 +88,13 @@ visual language, the app structure (navigation on phones and large screens), and
   `aria-hidden="true"` next to a visible text label.
 - **R3. Tokens are the only source of colors.** Mock-ups use token classes (`bg-bg`, `text-fg`, …); markup never
   contains a raw color. A style overrides **token values only**, scoped by an attribute on `<html>`
-  (`data-direction="a|b|c"` in T2, `data-style="base"` from T3), as `light-dark(light, dark)` pairs. The chosen values
-  move into `tokens.css` unchanged (T6).
+  (`data-direction="a|b|c"` in T2, `data-style="base"` in T3, `data-style="m3"` from polish round 1), as
+  `light-dark(light, dark)` pairs. Token names map to M3 color roles (see `design.css`). The chosen values move into
+  `tokens.css` unchanged (T6).
 - **R4. AAC rules for what he looks at** (board, counter, question, sentence): cell text at least 32 px, contrast at
-  least **7:1** (SC 1.4.6) in light and dark; the active column/row is marked by a **4 px outline plus weight or size**,
-  never by color alone (SC 1.4.1); the current state is always written out in text ("Podaj kolumnę", "Kolumna 4?");
+  least **7:1** (SC 1.4.6) in light and dark; the **pointer** (polish round 1: the number of the column or row being
+  counted and the one cell the count has got to, not the whole column) is marked by a **4 px outline plus weight or
+  size**, never by color alone (SC 1.4.1); board cells are squares; empty cells show nothing; the current state is always written out in text ("Podaj kolumnę", "Kolumna 4?");
   nothing flashes (SC 2.3.1) and transitions respect `prefers-reduced-motion`.
 - **R5. WCAG 2.2 AA for the caregiver parts:** text 4.5:1, non-text 3:1 (SC 1.4.3, 1.4.11), targets at least 24 px
   and main actions 44 px (SC 2.5.8), visible focus, keyboard-only use, reflow at 320 px (SC 1.4.10), both
@@ -78,7 +102,8 @@ visual language, the app structure (navigation on phones and large screens), and
   borders, dividers) may be subtle; borders that identify a control (inputs, toggles) need 3:1.
 - **R6. The communicate screen fits without scrolling** in every target viewport: phone portrait 360×740 and
   390×844, phone landscape 740×360, tablet 768×1024, laptop 1280×800. The board, the counter or question and the
-  sentence are visible at once. **The board never scrolls and is never covered** by navigation or panels.
+  sentence are visible at once. **The board never scrolls and is never covered** by navigation or panels, and no two
+  parts overlap. Board cells stay close to square (at most 1.4 times taller than wide), never tall narrow strips.
 - **R7. Clickable states and a signal simulator.** Every state from the interaction model can be reached from the
   catalog by a link (`communicate.html#asking-column`), and the page can be driven from the keyboard: **Space** =
   `LONG_BLINK` (+1), **H** = `LOOK_AT_HAND` (+5), **N** = `HEAD_NOD`, **S** = `HEAD_SHAKE`, **P** = pause. The
@@ -96,22 +121,36 @@ visual language, the app structure (navigation on phones and large screens), and
   agent); it prints a warning to allow it on **private networks only** when the Windows firewall asks.
 - **R11. Polish text.** The mock-ups are in Polish (`lang="pl"`), the language he and the caregivers use. They are
   throwaway, so they don't go through Transloco; stage 2 adds the real keys in `en.json` and `pl.json`.
-- **R12. App structure: two modes.**
-  - **Caregiver panel** (start, calibrate, boards, settings): an app shell with a top bar and the same navigation on
-    every page, in the same order (SC 3.2.3). Below 1024 px wide: a **bottom navigation bar** (icons with visible
-    labels, targets at least 44×44 px, safe-area padding). From 1024 px: a **sidebar**. The current page has
-    `aria-current="page"`. Landmarks: `header`, `nav` with a name, `main`.
-  - **Communicate mode**: full screen, no app navigation; always a visible way out ("Zakończ") and a caregiver menu
-    (a disclosure, [APG](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/)) with undo, pause, read aloud and clear.
-    The menu opens over the question area, never over the board (R6).
-- **R13. The start page is a dashboard of cards:** start a conversation (the main action), readiness (camera,
-  calibration, voice), the active board, recent sentences (repeat aloud), and a legend of his signals for new
-  caregivers. On a phone the cards stack in one column, the main action first.
+- **R12. App structure (revised in polish round 1): one shell, Liczenie first.**
+  - **Destinations**, in this order, with one job each: **Liczenie** (the main screen), **Zdania**, **Tablice**,
+    **Kalibracja**, **Ustawienia**. The same navigation on every page, in the same order (SC 3.2.3); the current page
+    has `aria-current="page"`. Landmarks: `header`, `nav` with a name, `main`.
+  - **Navigation by M3 window size class:** below 600 px, a
+    [navigation bar](https://m3.material.io/components/navigation-bar/specs) at the bottom (icons with visible labels,
+    an active indicator, targets at least 44×44 px, safe-area padding); from 600 px, a
+    [navigation rail](https://m3.material.io/components/navigation-rail/specs) on the left (at most 96 px wide), so the
+    board keeps the width.
+  - **Liczenie** uses the M3 [supporting-pane layout](https://m3.material.io/foundations/layout/canonical-layouts/supporting-pane):
+    the board is the main pane; the question (with the counter) and the sentence are the supporting pane. Portrait:
+    question, board, sentence from top to bottom. Landscape: the board on the left, the pane on the right.
+  - **Automatic, but tappable:** it runs on his signals; every letter is a button that adds it to the sentence. The
+    sentence card always shows its actions with labels: **Cofnij literę** (tonal), **Wyczyść** (outlined) and
+    **Przeczytaj** (filled, the main action). **Pauza** is a toggle in the top bar next to a status in words
+    ("Automat: widzę twarz"). There is no hidden menu.
+- **R13. Kalibracja holds readiness and his signals** (the content of the removed start dashboard): calibration,
+  camera and voice status, with "Kalibruj ponownie"; and a legend of his signals for new caregivers. One column on a
+  phone, two from 840 px (M3 expanded). Recent sentences live in **Zdania**, grouped by day, each with a repeat
+  button.
 
 # UI and accessibility notes
-- **Visual language (from T3):** shadcn/ui style. Neutral background, white (dark: near-black) cards with a subtle
-  border and small radius, one blue accent for the active column, focus rings and links; primary buttons dark on
-  light (light on dark). System font stack (Roboto on Android, San Francisco on iOS, Segoe UI on Windows).
+
+- **Visual language (from polish round 1):** Material Design 3. Tonal "filled" cards without borders or shadows,
+  pill-shaped buttons with sentence-case labels (filled, tonal, outlined), the M3 type scale, near-neutral surfaces
+  and one indigo hue: primary-container for the question and the active column, secondary-container for tonal
+  buttons and the navigation indicator. System font stack (Roboto on Android, San Francisco on iOS, Segoe UI on
+  Windows); icons are our own inline SVG, not the Material Symbols web font (R2).
+- **T3, for the record:** a shadcn/ui style (white cards, thin borders, a near-black primary) with a start
+  dashboard; it read as black and white and the layout as random.
 - **T2, for the record:** three directions (calm light, high contrast, warm) on the communicate screen; they showed
   the layout works in both orientations but not a convincing look.
 - **Layouts:**
@@ -127,6 +166,7 @@ visual language, the app structure (navigation on phones and large screens), and
   adjustable.
 
 # Security and privacy notes
+
 - `design:serve` binds to all interfaces so the phone can reach it. Anyone on the same Wi-Fi can open the mock-ups
   while it runs. They hold no personal data (R9), so this is acceptable on a home network. Don't run it on public
   Wi-Fi; stop it with Ctrl+C.
@@ -136,22 +176,26 @@ visual language, the app structure (navigation on phones and large screens), and
   sanitizer bypasses or license terms we can't meet.
 
 # Acceptance criteria
+
 - [ ] `npm run design:build` produces `dist/design/` with the catalog and every screen; the app build has no
       `design/` folder (R1).
 - [ ] `npm run design:serve` prints a LAN URL; the author opens the mock-ups on a phone in portrait and landscape.
 - [ ] Every page and every state passes axe with zero violations and raises no CSP or Trusted Types violation (R2, R5).
 - [ ] The token contrast test passes: AAC pairs at least 7:1, other text 4.5:1, non-text 3:1, for every style in
       light and dark (R3, R4).
-- [ ] The communicate screen fits without scrolling in all five viewports, with the caregiver menu closed and open (R6).
-- [ ] The caregiver panel shows a bottom bar below 1024 px and a sidebar from 1024 px, with the current page marked;
+- [ ] Liczenie fits without scrolling in all five viewports, no part overlaps another, and the cells stay near-square (R6).
+- [ ] The shell shows a navigation bar below 600 px and a navigation rail from 600 px, with the current page marked;
       no horizontal scroll at 320 px (R12).
-- [ ] The start page has the cards from R13, stacked on a phone with the main action first.
+- [ ] A tap on a letter adds it and "Cofnij literę" removes it, both announced; the sentence actions are labelled and
+      at least 44 px (R12).
+- [ ] Kalibracja and Zdania have the content from R13.
 - [ ] Every state in R8 is reachable by a link and by the simulator keys and buttons (R7).
 - [ ] The author has approved the look after the polish rounds (recorded in `docs/design/index.md`).
 - [ ] The final tokens are in `tokens.css`, `theme-color` matches them, and the icon has separate `any` and `maskable`
       files; the existing manifest and installability tests pass; Lighthouse accessibility stays 100.
 
 # Test plan
+
 - **Unit (`node --test`, `scripts/*.test.mjs`):**
   - `contrast.mjs`: OKLCH → sRGB → relative luminance → ratio, checked against known pairs (white/black 21:1, a
     WCAG example); then every token pair of every style and of `tokens.css` against its threshold (R3, R4), with a
@@ -175,6 +219,7 @@ visual language, the app structure (navigation on phones and large screens), and
   in the evening; if possible, shown to the friend. Findings go into `docs/design/index.md`.
 
 # Out of scope
+
 - Real camera, face tracking, speech and the real counting state machine (stages 2–4).
 - Scanning mode (after the PoC) and shortcuts for frequent words (backlog idea, after the PoC).
 - Serving the mock-ups from Azure previews. Possible later by adding `dist/design/` to the preview upload, if the author
@@ -183,6 +228,7 @@ visual language, the app structure (navigation on phones and large screens), and
 - Using a dashboard template's code (decision above).
 
 # References
+
 - WCAG 2.2 Understanding: [1.4.6 Contrast (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html),
   [1.4.3 Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html),
   [1.4.11 Non-text Contrast](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html),
@@ -198,7 +244,17 @@ visual language, the app structure (navigation on phones and large screens), and
 - WAI-ARIA APG: [radio group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/), [switch](https://www.w3.org/WAI/ARIA/apg/patterns/switch/),
   [disclosure](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/),
   [landmark regions](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/)
-- shadcn/ui theming (token names and the neutral palette): https://ui.shadcn.com/docs/theming · sidebar pattern:
+- Material Design 3: [color roles](https://m3.material.io/styles/color/roles),
+  [type scale](https://m3.material.io/styles/typography/type-scale-tokens),
+  [canonical layouts](https://m3.material.io/foundations/layout/canonical-layouts/overview),
+  [window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes),
+  [navigation bar](https://m3.material.io/components/navigation-bar/specs),
+  [navigation rail](https://m3.material.io/components/navigation-rail/specs),
+  [buttons](https://m3.material.io/components/buttons/specs), [cards](https://m3.material.io/components/cards/specs);
+  Angular Material theming: https://material.angular.dev/guide/theming
+- MDN: [container query units](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_size_and_style_queries),
+  [cascade layers (`@layer`)](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer)
+- T3, for the record: shadcn/ui theming (token names and the neutral palette): https://ui.shadcn.com/docs/theming · sidebar pattern:
   https://ui.shadcn.com/docs/components/sidebar · spartan-ng (the Angular port, MIT): https://www.spartan.ng
 - Layout references (patterns only): TailAdmin free Angular dashboard (MIT):
   https://github.com/TailAdmin/free-angular-tailwind-dashboard · Square UI (custom license, no redistribution):

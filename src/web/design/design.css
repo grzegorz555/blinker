@@ -17,6 +17,10 @@
   --color-highlight: var(--highlight);
   --color-line: var(--line);
   --color-subtle: var(--subtle);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
   --radius-card: var(--radius-card);
 }
 
@@ -24,6 +28,10 @@
   --highlight: var(--primary);
   --line: var(--border);
   --subtle: var(--surface);
+  --primary-container: var(--surface);
+  --on-primary-container: var(--fg);
+  --secondary-container: var(--surface);
+  --on-secondary-container: var(--fg);
   --radius-card: 0.75rem;
 }
 
@@ -36,25 +44,34 @@ html[data-scheme='dark'] {
 }
 
 /*
- * The "base" style (T3): neutral, in the manner of shadcn/ui (https://ui.shadcn.com/docs/theming), which spartan-ng
- * ports to Angular. A light grey page, white cards (dark: near-black page, dark grey cards), near-black primary
- * buttons, one blue accent for the active column and focus.
- * - border: borders that identify a control (3:1, SC 1.4.11);
- * - line: decorative card borders and dividers (no contrast requirement);
- * - subtle: the background of the current navigation item.
+ * The "m3" style (polish round 1): Material Design 3 (https://m3.material.io/styles/color/roles), the system that
+ * Angular Material implements (https://material.angular.dev/guide/theming). Our tokens map to M3 color roles:
+ * - bg = surface (the page); surface = surface-container (cards, navigation, board cells);
+ * - fg = on-surface; muted = on-surface-variant;
+ * - primary / on-primary: the one main action of a view (read aloud);
+ * - primary-container / on-primary-container: the question and the active column;
+ * - secondary-container / on-secondary-container: tonal buttons and the current navigation item;
+ * - border = outline (3:1, SC 1.4.11, identifies controls); line = outline-variant (decorative dividers);
+ * - highlight = the active outline and the focus ring; subtle = the navigation active indicator.
+ * One hue (indigo, close to the Angular Material Figma kit) on near-neutral surfaces: color marks what is active
+ * or important, not decoration.
  */
-[data-style='base'] {
-  --bg: light-dark(oklch(98.5% 0 0), oklch(14.5% 0 0));
-  --surface: light-dark(oklch(100% 0 0), oklch(20.5% 0 0));
-  --fg: light-dark(oklch(14.5% 0 0), oklch(98.5% 0 0));
-  --muted: light-dark(oklch(46% 0 0), oklch(72% 0 0));
-  --primary: light-dark(oklch(20.5% 0 0), oklch(92.2% 0 0));
-  --on-primary: light-dark(oklch(98.5% 0 0), oklch(20.5% 0 0));
-  --border: light-dark(oklch(58% 0 0), oklch(55% 0 0));
-  --highlight: light-dark(oklch(53% 0.19 262), oklch(72% 0.14 255));
-  --line: light-dark(oklch(92% 0 0), oklch(30% 0 0));
-  --subtle: light-dark(oklch(95.5% 0 0), oklch(26.9% 0 0));
-  --radius-card: 0.75rem;
+[data-style='m3'] {
+  --bg: light-dark(oklch(98.6% 0.005 265), oklch(16.5% 0.012 265));
+  --surface: light-dark(oklch(94.6% 0.013 265), oklch(22.5% 0.016 265));
+  --fg: light-dark(oklch(21% 0.02 265), oklch(92.5% 0.01 265));
+  --muted: light-dark(oklch(43% 0.03 265), oklch(80% 0.02 265));
+  --primary: light-dark(oklch(45% 0.17 268), oklch(80% 0.1 268));
+  --on-primary: light-dark(oklch(100% 0 0), oklch(27% 0.1 268));
+  --primary-container: light-dark(oklch(91.5% 0.04 268), oklch(35% 0.11 268));
+  --on-primary-container: light-dark(oklch(25% 0.1 268), oklch(94% 0.025 268));
+  --secondary-container: light-dark(oklch(89.5% 0.03 265), oklch(34% 0.035 265));
+  --on-secondary-container: light-dark(oklch(24% 0.04 265), oklch(92% 0.02 265));
+  --border: light-dark(oklch(54% 0.02 265), oklch(63% 0.02 265));
+  --highlight: light-dark(oklch(45% 0.17 268), oklch(80% 0.1 268));
+  --line: light-dark(oklch(86% 0.012 265), oklch(33% 0.015 265));
+  --subtle: light-dark(oklch(89.5% 0.03 265), oklch(34% 0.035 265));
+  --radius-card: 1rem;
 }
 
 @layer base {
@@ -79,15 +96,49 @@ html[data-scheme='dark'] {
 }
 
 @layer components {
-  /* A card: the main building block of the caregiver panel (R13). */
+  /*
+   * M3 type scale (https://m3.material.io/styles/typography/type-scale-tokens), on the system font.
+   * Sentence case everywhere; no uppercase button labels (that was Material 2).
+   */
+  .title-large {
+    font-size: 1.375rem;
+    line-height: 1.75rem;
+    font-weight: 500;
+  }
+
+  .title-medium {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .label-large {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  /*
+   * Cards: M3 "filled" cards (https://m3.material.io/components/cards/specs): a tonal container, no border, no
+   * shadow. Hierarchy comes from the container color, not from lines.
+   */
   .card {
-    border: 1px solid var(--line);
     border-radius: var(--radius-card);
     background-color: var(--surface);
     padding: 1.25rem;
-    box-shadow: 0 1px 2px 0 oklch(0% 0 0 / 0.05);
   }
 
+  .card-primary {
+    background-color: var(--primary-container);
+    color: var(--on-primary-container);
+  }
+
+  /*
+   * Buttons (https://m3.material.io/components/buttons/specs): full pill shape, label-large, sentence case.
+   * M3 buttons are 40 px high; we keep 44 px (SC 2.5.8, main actions).
+   */
   .btn {
     display: inline-flex;
     min-height: 2.75rem;
@@ -95,20 +146,42 @@ html[data-scheme='dark'] {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: 0.5rem;
-    padding-inline: 1rem;
+    border-radius: 9999px;
+    padding-inline: 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
     font-weight: 600;
+    letter-spacing: 0.01em;
   }
 
+  /* An icon before the label; not for icon buttons, which stay round with the icon in the middle. */
+  .btn:not(.btn-icon):has(> svg:first-child) {
+    padding-inline-start: 1rem;
+  }
+
+  /* Filled: the one main action of a view. */
   .btn-primary {
     background-color: var(--primary);
     color: var(--on-primary);
   }
 
+  /* Filled tonal: important, but not the main action. */
+  .btn-tonal {
+    background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
+  }
+
+  /* Outlined: secondary actions. The outline identifies the control, so it uses border (3:1). */
   .btn-outline {
     border: 1px solid var(--border);
-    background-color: var(--surface);
-    color: var(--fg);
+    color: var(--primary);
+  }
+
+  /* Icon button: round, 48 px target. */
+  .btn-icon {
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
   }
 
   .btn svg,
@@ -118,9 +191,68 @@ html[data-scheme='dark'] {
     flex-shrink: 0;
   }
 
+  .btn-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
   /*
-   * The caregiver panel shell (R12): top bar, content and navigation.
-   * Below 1024 px the navigation is a bar at the bottom, within thumb reach; from 1024 px it is a sidebar.
+   * An action with the icon above the label (the actions under the sentence): three fit side by side on a phone,
+   * each at least 56 px high, so the caregiver hits the right one without reading small text.
+   */
+  .action {
+    display: flex;
+    min-height: 3.5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.125rem;
+    border-radius: 1rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .action svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* Lists (https://m3.material.io/components/lists/specs): headline + supporting text, a trailing action. */
+  /* Not .list-item: that is a Tailwind utility (display: list-item), and utilities win over components. */
+  .row-item {
+    display: flex;
+    min-height: 4.5rem;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 0.5rem;
+  }
+
+  .row-item + .row-item {
+    border-top: 1px solid var(--line);
+  }
+
+  /* A status in a card (not interactive, so no outline that would make it look like a button). */
+  .status {
+    display: inline-flex;
+    min-height: 2rem;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 0.5rem;
+    background-color: var(--bg);
+    padding-inline: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  /*
+   * The app shell (R12). Navigation follows the M3 window size classes
+   * (https://m3.material.io/foundations/layout/applying-layout/window-size-classes):
+   * - compact, below 600 px: a navigation bar at the bottom, within thumb reach
+   *   (https://m3.material.io/components/navigation-bar/specs);
+   * - from 600 px: a navigation rail on the left (https://m3.material.io/components/navigation-rail/specs),
+   *   80 px wide, so the board keeps the rest of the width.
    */
   .shell {
     display: grid;
@@ -130,25 +262,42 @@ html[data-scheme='dark'] {
     grid-template-areas: 'top' 'main' 'nav';
   }
 
+  /* A screen that must fit the viewport without scrolling (Liczenie, R6). */
+  .shell-fit {
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  /* Small top app bar: the page color, no border (https://m3.material.io/components/top-app-bar/specs). */
   .shell-top {
     grid-area: top;
     position: sticky;
     top: 0;
     z-index: 10;
     display: flex;
-    min-height: 3.5rem;
+    min-height: 4rem;
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    border-bottom: 1px solid var(--line);
-    background-color: var(--surface);
+    background-color: var(--bg);
     padding: 0.5rem max(1rem, env(safe-area-inset-right)) 0.5rem
       max(1rem, env(safe-area-inset-left));
   }
 
+  .shell-fit .shell-top {
+    min-height: 3.5rem;
+    padding-block: 0.25rem;
+  }
+
   .shell-main {
     grid-area: main;
-    padding: 1rem max(1rem, env(safe-area-inset-right)) 1.5rem max(1rem, env(safe-area-inset-left));
+    min-height: 0;
+    padding: 0.5rem max(1rem, env(safe-area-inset-right)) 1.5rem
+      max(1rem, env(safe-area-inset-left));
+  }
+
+  .shell-fit .shell-main {
+    padding: 0 max(0.5rem, env(safe-area-inset-right)) 0.5rem max(0.5rem, env(safe-area-inset-left));
   }
 
   .shell-nav {
@@ -156,13 +305,8 @@ html[data-scheme='dark'] {
     position: sticky;
     bottom: 0;
     z-index: 10;
-    border-top: 1px solid var(--line);
     background-color: var(--surface);
     padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .shell-nav-brand {
-    display: none;
   }
 
   .shell-nav ul {
@@ -170,24 +314,62 @@ html[data-scheme='dark'] {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
+  /* Navigation item: an icon in a pill (the active indicator) and a label below. */
   .nav-link {
     display: flex;
-    min-height: 3.5rem;
+    min-height: 4.5rem;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.125rem;
-    border-top: 3px solid transparent;
+    gap: 0.25rem;
     color: var(--muted);
     font-size: 0.75rem;
     font-weight: 500;
+    letter-spacing: 0.02em;
   }
 
-  /* The current page: bold, a bar and the accent, never color alone. */
+  /*
+   * The label never makes the bar wider than the screen: fonts differ per system (Segoe UI on Windows, Roboto on
+   * Android, DejaVu Sans on a Linux CI), so a long label like "Ustawienia" is cut with an ellipsis rather than
+   * pushing the page sideways at 320 px (SC 1.4.10).
+   */
+  .nav-link {
+    min-width: 0;
+    padding-inline: 0.125rem;
+  }
+
+  .nav-link > span:last-child {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 359px) {
+    .nav-link {
+      font-size: 0.6875rem;
+      letter-spacing: 0;
+    }
+  }
+
+  .nav-indicator {
+    display: flex;
+    width: 3.5rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+  }
+
+  /* The current page: the indicator pill, a bolder label and on-surface color, never color alone. */
   .nav-link[aria-current='page'] {
-    border-top-color: var(--highlight);
     color: var(--fg);
     font-weight: 700;
+  }
+
+  .nav-link[aria-current='page'] .nav-indicator {
+    background-color: var(--subtle);
+    color: var(--on-secondary-container);
   }
 
   .nav-link svg {
@@ -195,33 +377,18 @@ html[data-scheme='dark'] {
     height: 1.5rem;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 600px) {
     .shell {
-      grid-template-columns: 16rem minmax(0, 1fr);
+      grid-template-columns: 5.5rem minmax(0, 1fr);
       grid-template-rows: auto 1fr;
       grid-template-areas: 'nav top' 'nav main';
-    }
-
-    .shell-main {
-      padding: 1.5rem 2rem 2rem;
     }
 
     .shell-nav {
       top: 0;
       bottom: auto;
       height: 100dvh;
-      border-top: 0;
-      border-right: 1px solid var(--line);
-      padding: 1rem 0.75rem;
-    }
-
-    .shell-nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.25rem 0.75rem 1.25rem;
-      font-size: 1.25rem;
-      font-weight: 700;
+      padding: 0.75rem 0 env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
     .shell-nav ul {
@@ -230,81 +397,76 @@ html[data-scheme='dark'] {
     }
 
     .nav-link {
-      min-height: 2.75rem;
-      flex-direction: row;
-      justify-content: flex-start;
-      gap: 0.75rem;
-      border-top: 0;
-      border-left: 3px solid transparent;
-      border-radius: 0.5rem;
-      padding-inline: 0.75rem;
-      font-size: 0.9375rem;
-    }
-
-    .nav-link[aria-current='page'] {
-      border-left-color: var(--highlight);
-      background-color: var(--subtle);
-    }
-
-    .nav-link svg {
-      width: 1.25rem;
-      height: 1.25rem;
+      min-height: 3.75rem;
     }
   }
 
   /*
-   * Communicate mode (R6, R12): full screen, no app navigation.
-   * Portrait (phone held in front of him): top bar, question, board, sentence from top to bottom.
-   * Landscape (stand, laptop): the board on the left; the question and the sentence on the right.
-   * The caregiver menu takes the place of the question, so the board is never covered.
+   * Liczenie (counting, the main screen): the M3 "supporting pane" canonical layout
+   * (https://m3.material.io/foundations/layout/canonical-layouts/supporting-pane).
+   * - main pane: the board, always visible and never covered (R6);
+   * - supporting pane: the question with the counter above, the sentence with its actions below.
+   * Portrait: question, board, sentence from top to bottom. Landscape: the board on the left, the pane on the right.
    */
-  .screen {
+  .count {
     display: grid;
-    height: 100dvh;
+    height: 100%;
     gap: 0.5rem;
-    padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right))
-      max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
-    grid-template-areas: 'top' 'question' 'board' 'sentence';
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'question' 'board' 'sentence';
   }
 
   @media (orientation: landscape) {
-    .screen {
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      grid-template-rows: auto minmax(0, 1fr) auto;
-      grid-template-areas: 'top top' 'board question' 'board sentence';
+    .count {
+      gap: 0.75rem;
+      grid-template-columns: minmax(0, 3fr) minmax(16rem, 2fr);
+      grid-template-rows: minmax(0, 1fr) auto;
+      grid-template-areas: 'board question' 'board sentence';
     }
   }
 
-  .screen-top {
-    grid-area: top;
-  }
-  .screen-question,
-  .screen-menu {
+  /*
+   * The question card. In landscape it fills the pane above the sentence, its text centered: it is what he reads
+   * after the board. The question scales with the card width (container query units), so it never gets cut off.
+   */
+  .count-question {
     grid-area: question;
-    align-self: start;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
-  .screen-board {
+
+  .question {
+    font-size: clamp(2rem, 15cqi, 4.5rem);
+    line-height: 1.1;
+  }
+
+  .count-board {
     grid-area: board;
+    /* A size container, so the board can size its cells from the space it really has. */
+    container-type: size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .screen-sentence {
+
+  .count-sentence {
     grid-area: sentence;
     align-self: end;
   }
 
-  .screen[data-menu='open'] .screen-question {
-    display: none;
-  }
-
-  /* The counter: how the number was built, as text chips (R4: readable without color). */
-  .chip {
+  /* The counter: how the number was built (R4: readable without color), tonal tokens, not buttons. */
+  .tally {
     display: inline-flex;
+    min-height: 2rem;
     align-items: center;
-    border: 1px solid var(--border);
-    border-radius: 9999px;
-    padding: 0.125rem 0.625rem;
-    font-weight: 600;
+    border-radius: 0.5rem;
+    background-color: var(--bg);
+    padding-inline: 0.625rem;
+    color: var(--fg);
+    font-weight: 700;
   }
 
   /* The newest letters matter most: a long sentence is clipped at the start, not at the end. */
@@ -315,17 +477,23 @@ html[data-scheme='dark'] {
     white-space: nowrap;
   }
 
-  /* The letter board: equal cells that share the space left by the other parts. */
+  /*
+   * The letter board with square cells. --cell is the largest square that fits: 7 columns across the width and
+   * 5 rows down the height, after the number headers (1.5rem column, 1.75rem row) and the 8 gaps of 0.25rem
+   * (7 * cell + 3.5rem wide, 5 * cell + 3.5rem high). Container query units:
+   * https://developer.mozilla.org/docs/Web/CSS/CSS_containment/Container_size_and_style_queries
+   */
   .board {
-    width: 100%;
-    height: 100%;
+    --cell: min(calc((100cqw - 3.5rem) / 7), calc((100cqh - 3.5rem) / 5));
+    width: calc(7 * var(--cell) + 3.5rem);
+    height: calc(5 * var(--cell) + 3.5rem);
     table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0.25rem;
   }
 
   .board th {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--muted);
   }
@@ -334,39 +502,84 @@ html[data-scheme='dark'] {
     height: 1.75rem;
   }
 
-  .board tbody th {
-    width: 1.75rem;
+  /*
+   * With table-layout: fixed the first row sets the column widths, so the empty corner cell must be as narrow as the
+   * row numbers; otherwise all 8 columns share the width equally and the letter cells turn into rectangles.
+   */
+  .board tr > :first-child {
+    width: 1.5rem;
   }
 
   /* .board th sets weight 600 with a higher specificity than .is-active, so repeat the bold here. */
   .board th.is-active {
-    border-radius: 0.5rem;
-    color: var(--fg);
+    border-radius: 9999px;
+    background-color: var(--primary-container);
+    color: var(--on-primary-container);
     font-weight: 800;
   }
 
   .board-cell {
-    border: 1px solid var(--line);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     background-color: var(--surface);
+    padding: 0;
     text-align: center;
     vertical-align: middle;
     line-height: 1;
+    height: var(--cell);
     /* At least 32 px for every letter (R4), larger when there is room. */
-    font-size: max(2rem, min(7vh, 7vw));
+    font-size: max(2rem, calc(var(--cell) * 0.5));
     font-weight: 600;
   }
 
-  /* The active column or row: a 4 px outline plus bold text, never color alone (R4, SC 1.4.1). */
+  /* A tap on a letter adds it: the caregiver (or he, by touch) can always pick by hand. */
+  .cell-btn {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
+    font: inherit;
+  }
+
+  @media (hover: hover) {
+    .cell-btn:hover {
+      background-color: var(--subtle);
+    }
+  }
+
+  /*
+   * The pointer: the number of the column (or row) being counted and one cell, where the count has got to. A 4 px
+   * outline plus bold text and a tonal fill, never color alone (R4, SC 1.4.1).
+   */
   .is-active {
     outline: 4px solid var(--highlight);
     outline-offset: -4px;
     font-weight: 800;
   }
 
+  .board-cell.is-active {
+    background-color: var(--primary-container);
+    color: var(--fg);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .is-active {
       transition: outline-color 150ms ease-out;
+    }
+  }
+
+  /* Dashboard-like pages: one column on a phone, two equal columns from 840 px (M3 expanded). */
+  .two-up {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @media (min-width: 840px) {
+    .two-up {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
@@ -376,14 +589,66 @@ html[data-scheme='dark'] {
     min-height: 2.75rem;
     align-items: center;
     border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    background-color: var(--surface);
-    padding-inline: 1rem;
+    border-radius: 9999px;
+    padding-inline: 1.25rem;
+    font-weight: 500;
   }
 
   .switch-link[aria-current='true'] {
-    border-color: var(--highlight);
-    box-shadow: inset 0 0 0 2px var(--highlight);
+    border-color: transparent;
+    background-color: var(--subtle);
+    color: var(--on-secondary-container);
     font-weight: 700;
+  }
+
+  /* A catalog entry: a tonal card that is a link. */
+  .catalog-link {
+    display: flex;
+    min-height: 3.5rem;
+    width: 100%;
+    align-items: center;
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+/*
+ * Layout overrides of the Liczenie panes. They sit in the utilities layer with a higher specificity, because they
+ * must beat utility classes in the markup (text-4xl, mt-2, p-4): later cascade layers win over earlier ones
+ * (https://developer.mozilla.org/docs/Web/CSS/@layer).
+ */
+@layer utilities {
+  /* Short screens (a phone on its side): a compact question, so the pane fits without overlapping. */
+  @media (max-height: 520px) {
+    .count-question {
+      padding: 0.75rem;
+    }
+
+    .count-question .question {
+      font-size: 1.75rem;
+      line-height: 2.25rem;
+    }
+
+    .count-hint,
+    .count-step {
+      display: none;
+    }
+
+    .count-sentence .sentence-text {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
+
+    .count-sentence .action {
+      min-height: 3rem;
+      flex-direction: row;
+      gap: 0.375rem;
+      padding-inline: 0.375rem;
+    }
+
+    .count-sentence .action svg {
+      display: none;
+    }
   }
 }

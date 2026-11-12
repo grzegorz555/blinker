@@ -1,5 +1,10 @@
 # Log
 
+## 2026-11-12 (spec 004, polish round 1)
+- The author rejected the shadcn look and the start dashboard. The mock-ups move to Material 3: Liczenie (the board) is the main screen in the supporting-pane layout, with tappable letters, visible sentence actions and a Pauza toggle; a navigation bar below 600 px and a rail from 600 px; Zdania and Kalibracja take the dashboard's content. ADR-0005 (Angular Material instead of spartan-ng) proposed.
+- The contrast script merged token sets wrongly (the `design.css` `:root` replaced the app set), which hid an out-of-gamut dark `--primary` in `tokens.css`; fixed, with `var()` aliases resolved.
+- Learnings: `list-item` is a Tailwind utility (`display: list-item`), and utilities beat component classes because of the cascade layer order.
+
 ## 2026-11-11 (spec 005)
 - Pre-push hook runs only the fast gates (`verify --quick`, about 20 s); CI does the full check.
 - Model routing: a model and effort per loop step in skill/agent frontmatter, difficulty labels `[haiku|sonnet|opus]` per task from `/plan`, `implementer-haiku`/`implementer-opus` agents, `code-reviewer` on Haiku, and a config test.
