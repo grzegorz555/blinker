@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pl" data-style="base">
+<html lang="pl" data-style="m3">
   <head>
     <meta charset="utf-8" />
     <title>Blinker: makiety</title>
@@ -12,47 +12,47 @@
     <main class="mx-auto max-w-2xl px-4 py-8">
       <h1 class="text-3xl font-bold">Blinker: makiety</h1>
       <p class="mt-2 text-muted">
-        Klikalne makiety ekranów (spec 004). To tylko HTML i CSS z fikcyjnymi danymi, bez kamery i
-        bez mowy. Na telefonie menu jest na dole, na dużym ekranie z boku.
+        Klikalne makiety ekranów (spec 004) w stylu Material 3. To tylko HTML i CSS z fikcyjnymi
+        danymi, bez kamery i bez mowy. Na telefonie menu jest na dole, na większym ekranie po lewej.
       </p>
 
-      <h2 class="mt-8 text-xl font-semibold">Panel opiekuna</h2>
-      <ul class="mt-3 grid gap-3">
+      <h2 class="title-medium mt-8">Ekran główny</h2>
+      <ul class="mt-3 grid gap-2">
         <li>
-          <a class="switch-link w-full" href="start.html">
-            <span><strong>Start.</strong> Karty: rozmowa, gotowość, tablica, ostatnie zdania.</span>
-          </a>
-        </li>
-        <li>
-          <a class="switch-link w-full" href="calibrate.html">
-            <span><strong>Kalibracja.</strong> Wkrótce.</span>
-          </a>
-        </li>
-        <li>
-          <a class="switch-link w-full" href="boards.html">
-            <span><strong>Tablice.</strong> Wkrótce.</span>
-          </a>
-        </li>
-        <li>
-          <a class="switch-link w-full" href="settings.html">
-            <span><strong>Ustawienia.</strong> Wkrótce.</span>
-          </a>
-        </li>
-      </ul>
-
-      <h2 class="mt-8 text-xl font-semibold">Tryb rozmowy</h2>
-      <ul class="mt-3 grid gap-3">
-        <li>
-          <a class="switch-link w-full" href="communicate.html">
+          <a class="catalog-link" href="communicate.html">
             <span>
-              <strong>„Kolumna 7?”</strong> Pełny ekran, tablica zawsze widoczna. Obróć telefon,
-              żeby zobaczyć układ poziomy.
+              <strong>Liczenie: „Kolumna 7?”</strong> Tablica, pytanie i zdanie. Działa samo, ale
+              litery i akcje można dotknąć. Obróć telefon, żeby zobaczyć układ poziomy.
             </span>
           </a>
         </li>
       </ul>
 
-      <h2 class="mt-8 text-xl font-semibold" id="scheme-label">Tryb jasny lub ciemny</h2>
+      <h2 class="title-medium mt-8">Pozostałe miejsca w aplikacji</h2>
+      <ul class="mt-3 grid gap-2">
+        <li>
+          <a class="catalog-link" href="sentences.html">
+            <span><strong>Zdania.</strong> Co powiedział, z powtórzeniem na głos.</span>
+          </a>
+        </li>
+        <li>
+          <a class="catalog-link" href="boards.html">
+            <span><strong>Tablice.</strong> Wkrótce.</span>
+          </a>
+        </li>
+        <li>
+          <a class="catalog-link" href="calibrate.html">
+            <span><strong>Kalibracja.</strong> Gotowość i jego sygnały.</span>
+          </a>
+        </li>
+        <li>
+          <a class="catalog-link" href="settings.html">
+            <span><strong>Ustawienia.</strong> Wkrótce.</span>
+          </a>
+        </li>
+      </ul>
+
+      <h2 class="title-medium mt-8" id="scheme-label">Tryb jasny lub ciemny</h2>
       <p class="mt-1 text-muted">
         Wybór obowiązuje na wszystkich makietach, do których stąd przejdziesz.
       </p>

@@ -26,7 +26,7 @@
     --surface: oklch(24% 0.02 260);
     --fg: oklch(96% 0.005 260);
     --muted: oklch(78% 0.02 260);
-    --primary: oklch(80% 0.11 260);
+    --primary: oklch(80% 0.1 260);
     --on-primary: oklch(18% 0.02 260);
     --border: oklch(60% 0.02 260);
   }

@@ -29,6 +29,11 @@ export const PAIRS = [
   ['border', 'surface', 3, 'control borders on panels'],
   ['highlight', 'bg', 3, 'active column/row outline'],
   ['highlight', 'surface', 3, 'active outline next to a cell'],
+  ['on-primary-container', 'primary-container', 7, 'the question he reads'],
+  ['fg', 'primary-container', 7, 'letters in the active column'],
+  ['highlight', 'primary-container', 3, 'active outline inside the active cell'],
+  ['on-secondary-container', 'secondary-container', 4.5, 'tonal buttons, current navigation item'],
+  ['primary', 'surface', 4.5, 'outlined button text on a card'],
 ];
 export const TOKENS = [...new Set(PAIRS.flatMap(([a, b]) => [a, b]))];
 
@@ -103,7 +108,7 @@ export function readTokenSets(css) {
   postcss.parse(css).walkDecls(/^--/, (decl) => {
     const rule = decl.parent;
     if (rule?.type !== 'rule') return;
-    const direction = /^\[data-(?:direction|style)=['"]?([a-z-]+)['"]?\]$/.exec(
+    const direction = /^\[data-(?:direction|style)=['"]?([a-z0-9-]+)['"]?\]$/.exec(
       rule.selector.trim(),
     )?.[1];
     const name = direction ?? (rule.selector.trim() === ':root' ? 'app' : null);
@@ -132,7 +137,7 @@ export function checkTokenSets(sets, pairs = PAIRS) {
   const problems = [];
   for (const [set, schemes] of Object.entries(sets)) {
     for (const scheme of ['light', 'dark']) {
-      const tokens = schemes[scheme];
+      const tokens = resolveVars(schemes[scheme]);
       const present = pairs.filter(([a, b]) => tokens[a] && tokens[b]);
       // The app tokens may lack tokens that only the mock-ups use yet; a direction must define all of them.
       if (set !== 'app') {
@@ -166,12 +171,43 @@ export function checkTokenSets(sets, pairs = PAIRS) {
   return { rows, problems };
 }
 
-/** The app tokens and the mock-up directions together. */
+/**
+ * Replaces "var(--name)" with the value of that token in the same set and scheme (an alias such as
+ * --highlight: var(--primary)); an unknown name leaves the token out, so its pairs are not checked.
+ */
+export function resolveVars(tokens) {
+  const out = {};
+  for (const name of Object.keys(tokens)) {
+    let value = tokens[name];
+    for (let i = 0; i < 10 && value; i++) {
+      const ref = /^var\(--([\w-]+)\)$/.exec(value.trim())?.[1];
+      if (!ref) break;
+      value = tokens[ref];
+    }
+    if (value) out[name] = value;
+  }
+  return out;
+}
+
+/** Merges token sets: the same set in a later file adds to (and overrides) the earlier one per scheme. */
+export function mergeTokenSets(...all) {
+  const out = {};
+  for (const sets of all) {
+    for (const [name, { light, dark }] of Object.entries(sets)) {
+      const set = (out[name] ??= { light: {}, dark: {} });
+      Object.assign(set.light, light);
+      Object.assign(set.dark, dark);
+    }
+  }
+  return out;
+}
+
+/** The app tokens (tokens.css, plus the aliases design.css adds to :root) and the mock-up styles together. */
 export function readProjectTokenSets() {
-  return {
-    ...readTokenSets(readFileSync(TOKENS_CSS, 'utf8')),
-    ...readTokenSets(readFileSync(DESIGN_CSS, 'utf8')),
-  };
+  return mergeTokenSets(
+    readTokenSets(readFileSync(TOKENS_CSS, 'utf8')),
+    readTokenSets(readFileSync(DESIGN_CSS, 'utf8')),
+  );
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

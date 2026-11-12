@@ -6,8 +6,10 @@ import {
   checkTokenSets,
   contrastRatio,
   inSrgbGamut,
+  mergeTokenSets,
   readProjectTokenSets,
   readTokenSets,
+  resolveVars,
   toLinearSrgb,
 } from './contrast.mjs';
 
@@ -92,6 +94,10 @@ describe('checkTokenSets', () => {
     'on-primary': 'oklch(100% 0 0)',
     border: 'oklch(45% 0 0)',
     highlight: 'oklch(40% 0.15 260)',
+    'primary-container': 'oklch(94% 0.02 260)',
+    'on-primary-container': 'oklch(20% 0.08 260)',
+    'secondary-container': 'oklch(92% 0.02 260)',
+    'on-secondary-container': 'oklch(20% 0.03 260)',
   };
 
   it('passes a set where every pair meets its threshold', () => {
@@ -101,7 +107,7 @@ describe('checkTokenSets', () => {
   it('fails a pair below its threshold and names it (negative test)', () => {
     const weak = { ...good, fg: 'oklch(50% 0 0)' }; // about 4.5:1 on white, below the 7:1 AAC level
     const { problems } = checkTokenSets({ x: { light: weak, dark: good } });
-    assert.equal(problems.length, 2);
+    assert.equal(problems.length, 3); // fg on bg, on surface and on primary-container
     assert.match(problems[0], /^x\/light: fg\/bg = \d\.\d\d:1, needs 7:1/);
   });
 
@@ -115,9 +121,37 @@ describe('checkTokenSets', () => {
   });
 });
 
+describe('resolveVars and mergeTokenSets', () => {
+  it('follows var() aliases, also through two steps, and drops unknown references', () => {
+    assert.deepEqual(
+      resolveVars({
+        primary: 'oklch(45% 0.16 260)',
+        highlight: 'var(--primary)',
+        ring: 'var(--highlight)',
+        ghost: 'var(--missing)',
+      }),
+      {
+        primary: 'oklch(45% 0.16 260)',
+        highlight: 'oklch(45% 0.16 260)',
+        ring: 'oklch(45% 0.16 260)',
+      },
+    );
+  });
+
+  it('merges the same set from two files instead of replacing it', () => {
+    const merged = mergeTokenSets(
+      { app: { light: { bg: 'a', fg: 'b' }, dark: { bg: 'c' } } },
+      { app: { light: { highlight: 'var(--fg)' }, dark: {} }, m3: { light: {}, dark: {} } },
+    );
+    assert.deepEqual(merged.app.light, { bg: 'a', fg: 'b', highlight: 'var(--fg)' });
+    assert.deepEqual(merged.app.dark, { bg: 'c' });
+    assert.ok(merged.m3);
+  });
+});
+
 describe('the project tokens (R3, R4)', () => {
-  it('has the app set and the base mock-up style', () => {
-    assert.deepEqual(Object.keys(readProjectTokenSets()).sort(), ['app', 'base']);
+  it('has the app set and the m3 mock-up style', () => {
+    assert.deepEqual(Object.keys(readProjectTokenSets()).sort(), ['app', 'm3']);
   });
 
   it('meets every contrast threshold in light and dark', () => {
@@ -125,7 +159,12 @@ describe('the project tokens (R3, R4)', () => {
   });
 
   it('checks the AAC pairs at 7:1', () => {
-    for (const pair of ['fg/bg', 'fg/surface']) {
+    for (const pair of [
+      'fg/bg',
+      'fg/surface',
+      'on-primary-container/primary-container',
+      'fg/primary-container',
+    ]) {
       assert.equal(PAIRS.find(([a, b]) => `${a}/${b}` === pair)?.[2], 7, pair);
     }
   });
