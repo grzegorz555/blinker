@@ -46,6 +46,7 @@ module.exports = defineConfig([
         window: 'readonly',
         location: 'readonly',
         URLSearchParams: 'readonly',
+        URL: 'readonly',
       },
     },
     rules: { 'no-eval': 'error', 'no-implied-eval': 'error', 'no-new-func': 'error' },

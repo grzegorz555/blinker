@@ -12,7 +12,7 @@ them into sentences that are shown on screen and read aloud.
 
 ## Status
 **Stage 1: deploy** (spec [003](docs/specs/003-deploy/spec.md), in progress: security headers and a CSP-clean build are done, the Azure deploy follows; specs [001](docs/specs/001-app-skeleton/spec.md) and [002](docs/specs/002-ci-verify/spec.md) are done).
-**Stage 1.5: mock-ups** (spec [004](docs/specs/004-mockups/spec.md), in progress: the mock-up toolchain and three visual directions of the communicate screen are done; the author picks one next).
+**Stage 1.5: mock-ups** (spec [004](docs/specs/004-mockups/spec.md), in progress: the mock-up toolchain, a shadcn-style caregiver dashboard (bottom navigation on phones, sidebar on large screens) and the full-screen communicate mode are done; visual polish, the communicate states, the other screens and the final tokens follow).
 The app shell works in English and Polish (language switch, translated titles); there are no communication features yet. The stage plan is in [docs/backlog.md](docs/backlog.md).
 
 ## Tech stack

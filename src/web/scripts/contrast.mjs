@@ -95,7 +95,7 @@ function splitLightDark(value) {
 /**
  * Reads the token sets from CSS:
  * - ":root" outside a media query = set "app", light; inside "(prefers-color-scheme: dark)" = "app", dark;
- * - "[data-direction='x']" = set "x"; its values are light-dark(light, dark).
+ * - "[data-style='x']" (or T2's "[data-direction='x']") = set "x"; its values are light-dark(light, dark).
  * @returns {Record<string, { light: Record<string,string>, dark: Record<string,string> }>}
  */
 export function readTokenSets(css) {
@@ -103,7 +103,9 @@ export function readTokenSets(css) {
   postcss.parse(css).walkDecls(/^--/, (decl) => {
     const rule = decl.parent;
     if (rule?.type !== 'rule') return;
-    const direction = /^\[data-direction=['"]?([a-z])['"]?\]$/.exec(rule.selector.trim())?.[1];
+    const direction = /^\[data-(?:direction|style)=['"]?([a-z-]+)['"]?\]$/.exec(
+      rule.selector.trim(),
+    )?.[1];
     const name = direction ?? (rule.selector.trim() === ':root' ? 'app' : null);
     if (!name) return;
     const token = decl.prop.slice(2);

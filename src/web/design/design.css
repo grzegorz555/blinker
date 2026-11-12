@@ -2,9 +2,9 @@
  * Mock-ups (spec 004). Compiled by scripts/build-design.mjs into dist/design/design.css.
  * Tailwind scans only this folder: source(none) turns off automatic detection, @source adds the mock-up pages.
  * https://tailwindcss.com/docs/detecting-classes-in-source-files
- * Colors come only from tokens (R3). A visual direction overrides token VALUES only, scoped by
- * data-direction on <html>. Values are light-dark(light, dark): the browser picks one by color-scheme, which follows
- * the system, or data-scheme="light|dark" on <html> forces one (https://developer.mozilla.org/docs/Web/CSS/color_value/light-dark).
+ * Colors come only from tokens (R3). The mock-up style overrides token VALUES only, scoped by data-style on <html>.
+ * Values are light-dark(light, dark): the browser picks one by color-scheme, which follows the system, or
+ * data-scheme="light|dark" on <html> forces one (https://developer.mozilla.org/docs/Web/CSS/color_value/light-dark).
  * scripts/contrast.mjs checks every pair (7:1 for what he reads, 4.5:1 other text, 3:1 outlines); run it after a change.
  */
 @import 'tailwindcss' source(none);
@@ -12,15 +12,19 @@
 
 @source './';
 
-/* Tokens the app doesn't have yet; T5 moves the chosen values into tokens.css. */
+/* Tokens the app doesn't have yet; T6 moves the chosen values into tokens.css. */
 @theme inline {
   --color-highlight: var(--highlight);
-  --radius-cell: var(--radius-cell);
+  --color-line: var(--line);
+  --color-subtle: var(--subtle);
+  --radius-card: var(--radius-card);
 }
 
 :root {
   --highlight: var(--primary);
-  --radius-cell: 0.5rem;
+  --line: var(--border);
+  --subtle: var(--surface);
+  --radius-card: 0.75rem;
 }
 
 html[data-scheme='light'] {
@@ -31,48 +35,31 @@ html[data-scheme='dark'] {
   color-scheme: dark;
 }
 
-/* A: calm light. Soft blue-grey, one clear blue accent; good in daylight. */
-[data-direction='a'] {
-  --bg: light-dark(oklch(98.5% 0.004 240), oklch(20% 0.02 250));
-  --surface: light-dark(oklch(95% 0.01 240), oklch(26% 0.025 250));
-  --fg: light-dark(oklch(22% 0.03 250), oklch(96% 0.008 250));
-  --muted: light-dark(oklch(43% 0.03 250), oklch(80% 0.03 250));
-  --primary: light-dark(oklch(46% 0.15 255), oklch(80% 0.1 250));
-  --on-primary: light-dark(oklch(99% 0 0), oklch(20% 0.02 250));
-  --border: light-dark(oklch(56% 0.03 250), oklch(62% 0.03 250));
-  --highlight: light-dark(oklch(50% 0.16 255), oklch(78% 0.11 240));
-  --radius-cell: 0.75rem;
-}
-
-/* B: high contrast. Pure black and white, a strong blue (light) or yellow (dark) outline; best from a distance. */
-[data-direction='b'] {
-  --bg: light-dark(oklch(100% 0 0), oklch(12% 0 0));
-  --surface: light-dark(oklch(95% 0 0), oklch(20% 0 0));
-  --fg: light-dark(oklch(0% 0 0), oklch(100% 0 0));
-  --muted: light-dark(oklch(35% 0 0), oklch(85% 0 0));
-  --primary: light-dark(oklch(38% 0.18 265), oklch(90% 0.16 100));
-  --on-primary: light-dark(oklch(100% 0 0), oklch(12% 0 0));
-  --border: light-dark(oklch(30% 0 0), oklch(78% 0 0));
-  --highlight: light-dark(oklch(42% 0.2 265), oklch(90% 0.17 100));
-  --radius-cell: 0.25rem;
-}
-
-/* C: warm and soft. Cream and terracotta, rounder cells; friendlier, still 7:1 for the letters. */
-[data-direction='c'] {
-  --bg: light-dark(oklch(97% 0.015 80), oklch(22% 0.02 50));
-  --surface: light-dark(oklch(93% 0.025 75), oklch(28% 0.03 50));
-  --fg: light-dark(oklch(25% 0.04 45), oklch(95% 0.02 80));
-  --muted: light-dark(oklch(43% 0.05 45), oklch(80% 0.04 70));
-  --primary: light-dark(oklch(48% 0.13 40), oklch(80% 0.1 60));
-  --on-primary: light-dark(oklch(99% 0.005 80), oklch(22% 0.02 50));
-  --border: light-dark(oklch(55% 0.05 55), oklch(62% 0.04 60));
-  --highlight: light-dark(oklch(52% 0.15 35), oklch(80% 0.12 65));
-  --radius-cell: 1.25rem;
+/*
+ * The "base" style (T3): neutral, in the manner of shadcn/ui (https://ui.shadcn.com/docs/theming), which spartan-ng
+ * ports to Angular. A light grey page, white cards (dark: near-black page, dark grey cards), near-black primary
+ * buttons, one blue accent for the active column and focus.
+ * - border: borders that identify a control (3:1, SC 1.4.11);
+ * - line: decorative card borders and dividers (no contrast requirement);
+ * - subtle: the background of the current navigation item.
+ */
+[data-style='base'] {
+  --bg: light-dark(oklch(98.5% 0 0), oklch(14.5% 0 0));
+  --surface: light-dark(oklch(100% 0 0), oklch(20.5% 0 0));
+  --fg: light-dark(oklch(14.5% 0 0), oklch(98.5% 0 0));
+  --muted: light-dark(oklch(46% 0 0), oklch(72% 0 0));
+  --primary: light-dark(oklch(20.5% 0 0), oklch(92.2% 0 0));
+  --on-primary: light-dark(oklch(98.5% 0 0), oklch(20.5% 0 0));
+  --border: light-dark(oklch(58% 0 0), oklch(55% 0 0));
+  --highlight: light-dark(oklch(53% 0.19 262), oklch(72% 0.14 255));
+  --line: light-dark(oklch(92% 0 0), oklch(30% 0 0));
+  --subtle: light-dark(oklch(95.5% 0 0), oklch(26.9% 0 0));
+  --radius-card: 0.75rem;
 }
 
 @layer base {
   html {
-    /* The same system font stack as the app (security.md: no third-party fonts). */
+    /* System font stack (security.md: no third-party fonts): Roboto on Android, San Francisco on iOS. */
     font-family:
       system-ui,
       -apple-system,
@@ -81,14 +68,195 @@ html[data-scheme='dark'] {
       sans-serif;
     background-color: var(--bg);
     color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid var(--highlight);
+    outline-offset: 2px;
   }
 }
 
 @layer components {
+  /* A card: the main building block of the caregiver panel (R13). */
+  .card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+    padding: 1.25rem;
+    box-shadow: 0 1px 2px 0 oklch(0% 0 0 / 0.05);
+  }
+
+  .btn {
+    display: inline-flex;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    padding-inline: 1rem;
+    font-weight: 600;
+  }
+
+  .btn-primary {
+    background-color: var(--primary);
+    color: var(--on-primary);
+  }
+
+  .btn-outline {
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--fg);
+  }
+
+  .btn svg,
+  .icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
   /*
-   * The communicate screen fills the viewport without scrolling (R6).
-   * Portrait (phone held in front of him): status, question, board, sentence from top to bottom.
+   * The caregiver panel shell (R12): top bar, content and navigation.
+   * Below 1024 px the navigation is a bar at the bottom, within thumb reach; from 1024 px it is a sidebar.
+   */
+  .shell {
+    display: grid;
+    min-height: 100dvh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: 'top' 'main' 'nav';
+  }
+
+  .shell-top {
+    grid-area: top;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    min-height: 3.5rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--line);
+    background-color: var(--surface);
+    padding: 0.5rem max(1rem, env(safe-area-inset-right)) 0.5rem
+      max(1rem, env(safe-area-inset-left));
+  }
+
+  .shell-main {
+    grid-area: main;
+    padding: 1rem max(1rem, env(safe-area-inset-right)) 1.5rem max(1rem, env(safe-area-inset-left));
+  }
+
+  .shell-nav {
+    grid-area: nav;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    border-top: 1px solid var(--line);
+    background-color: var(--surface);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .shell-nav-brand {
+    display: none;
+  }
+
+  .shell-nav ul {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .nav-link {
+    display: flex;
+    min-height: 3.5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.125rem;
+    border-top: 3px solid transparent;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  /* The current page: bold, a bar and the accent, never color alone. */
+  .nav-link[aria-current='page'] {
+    border-top-color: var(--highlight);
+    color: var(--fg);
+    font-weight: 700;
+  }
+
+  .nav-link svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .shell {
+      grid-template-columns: 16rem minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas: 'nav top' 'nav main';
+    }
+
+    .shell-main {
+      padding: 1.5rem 2rem 2rem;
+    }
+
+    .shell-nav {
+      top: 0;
+      bottom: auto;
+      height: 100dvh;
+      border-top: 0;
+      border-right: 1px solid var(--line);
+      padding: 1rem 0.75rem;
+    }
+
+    .shell-nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem 1.25rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .shell-nav ul {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.25rem;
+    }
+
+    .nav-link {
+      min-height: 2.75rem;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 0.75rem;
+      border-top: 0;
+      border-left: 3px solid transparent;
+      border-radius: 0.5rem;
+      padding-inline: 0.75rem;
+      font-size: 0.9375rem;
+    }
+
+    .nav-link[aria-current='page'] {
+      border-left-color: var(--highlight);
+      background-color: var(--subtle);
+    }
+
+    .nav-link svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  /*
+   * Communicate mode (R6, R12): full screen, no app navigation.
+   * Portrait (phone held in front of him): top bar, question, board, sentence from top to bottom.
    * Landscape (stand, laptop): the board on the left; the question and the sentence on the right.
+   * The caregiver menu takes the place of the question, so the board is never covered.
    */
   .screen {
     display: grid;
@@ -98,21 +266,22 @@ html[data-scheme='dark'] {
       max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr) auto;
-    grid-template-areas: 'status' 'question' 'board' 'sentence';
+    grid-template-areas: 'top' 'question' 'board' 'sentence';
   }
 
   @media (orientation: landscape) {
     .screen {
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
       grid-template-rows: auto minmax(0, 1fr) auto;
-      grid-template-areas: 'status status' 'board question' 'board sentence';
+      grid-template-areas: 'top top' 'board question' 'board sentence';
     }
   }
 
-  .screen-status {
-    grid-area: status;
+  .screen-top {
+    grid-area: top;
   }
-  .screen-question {
+  .screen-question,
+  .screen-menu {
     grid-area: question;
     align-self: start;
   }
@@ -124,6 +293,21 @@ html[data-scheme='dark'] {
     align-self: end;
   }
 
+  .screen[data-menu='open'] .screen-question {
+    display: none;
+  }
+
+  /* The counter: how the number was built, as text chips (R4: readable without color). */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    font-weight: 600;
+  }
+
+  /* The newest letters matter most: a long sentence is clipped at the start, not at the end. */
   .sentence {
     display: flex;
     justify-content: flex-end;
@@ -141,7 +325,7 @@ html[data-scheme='dark'] {
   }
 
   .board th {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     color: var(--muted);
   }
@@ -150,19 +334,20 @@ html[data-scheme='dark'] {
     height: 1.75rem;
   }
 
-  /* .board th sets weight 600 with a higher specificity than .is-active, so repeat the bold here. */
-  .board th.is-active {
-    border-radius: var(--radius-cell);
-    color: var(--fg);
-    font-weight: 800;
-  }
-
   .board tbody th {
     width: 1.75rem;
   }
 
+  /* .board th sets weight 600 with a higher specificity than .is-active, so repeat the bold here. */
+  .board th.is-active {
+    border-radius: 0.5rem;
+    color: var(--fg);
+    font-weight: 800;
+  }
+
   .board-cell {
-    border-radius: var(--radius-cell);
+    border: 1px solid var(--line);
+    border-radius: 0.5rem;
     background-color: var(--surface);
     text-align: center;
     vertical-align: middle;
@@ -172,28 +357,6 @@ html[data-scheme='dark'] {
     font-weight: 600;
   }
 
-  /* The mock-up switcher (not part of the app). */
-  .switch-link {
-    display: inline-flex;
-    min-height: 2.75rem;
-    align-items: center;
-    border: 2px solid var(--border);
-    border-radius: var(--radius-cell);
-    padding-inline: 1rem;
-  }
-
-  .switch-link[aria-current='true'] {
-    border-color: var(--highlight);
-    border-width: 4px;
-    font-weight: 700;
-  }
-
-  a:focus-visible,
-  button:focus-visible {
-    outline: 4px solid var(--highlight);
-    outline-offset: 2px;
-  }
-
   /* The active column or row: a 4 px outline plus bold text, never color alone (R4, SC 1.4.1). */
   .is-active {
     outline: 4px solid var(--highlight);
@@ -201,13 +364,26 @@ html[data-scheme='dark'] {
     font-weight: 800;
   }
 
-  [data-direction='b'] .board-cell {
-    font-weight: 700;
-  }
-
   @media (prefers-reduced-motion: no-preference) {
     .is-active {
       transition: outline-color 150ms ease-out;
     }
+  }
+
+  /* The mock-up switcher on the catalog page (not part of the app). */
+  .switch-link {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background-color: var(--surface);
+    padding-inline: 1rem;
+  }
+
+  .switch-link[aria-current='true'] {
+    border-color: var(--highlight);
+    box-shadow: inset 0 0 0 2px var(--highlight);
+    font-weight: 700;
   }
 }
