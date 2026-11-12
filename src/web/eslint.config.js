@@ -41,7 +41,12 @@ module.exports = defineConfig([
     extends: [eslint.configs.recommended, noUnsanitized.configs.recommended],
     languageOptions: {
       sourceType: 'script',
-      globals: { document: 'readonly', window: 'readonly', location: 'readonly' },
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        location: 'readonly',
+        URLSearchParams: 'readonly',
+      },
     },
     rules: { 'no-eval': 'error', 'no-implied-eval': 'error', 'no-new-func': 'error' },
   },
