@@ -31,7 +31,8 @@ components later is not.
 # Scope
 - **`src/web/design/`**: plain HTML pages, one CSS entry and one small script file:
   - `index.html`: a catalog with links to every mock-up and every state;
-  - `directions/a.html`, `b.html`, `c.html`: the communicate screen in three directions (T2);
+  - `directions.html?direction=a|b|c&scheme=auto|light|dark`: the communicate screen in three directions (T2); one
+    page, so the markup can't drift between them, and a switcher below the screen;
   - `communicate.html`, `calibrate.html`, `boards.html`, `settings.html` in the chosen direction (T3, T4);
   - `design.css`: Tailwind + `../src/styles/tokens.css` + per-direction token overrides;
   - `design.js`: switches between states and runs a keyboard simulator of the signals (see R7).

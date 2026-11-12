@@ -2,12 +2,73 @@
  * Mock-ups (spec 004). Compiled by scripts/build-design.mjs into dist/design/design.css.
  * Tailwind scans only this folder: source(none) turns off automatic detection, @source adds the mock-up pages.
  * https://tailwindcss.com/docs/detecting-classes-in-source-files
- * Colors come only from the app tokens (R3); visual directions override token values in T2.
+ * Colors come only from tokens (R3). A visual direction overrides token VALUES only, scoped by
+ * data-direction on <html>. Values are light-dark(light, dark): the browser picks one by color-scheme, which follows
+ * the system, or data-scheme="light|dark" on <html> forces one (https://developer.mozilla.org/docs/Web/CSS/color_value/light-dark).
+ * scripts/contrast.mjs checks every pair (7:1 for what he reads, 4.5:1 other text, 3:1 outlines); run it after a change.
  */
 @import 'tailwindcss' source(none);
 @import '../src/styles/tokens.css';
 
 @source './';
+
+/* Tokens the app doesn't have yet; T5 moves the chosen values into tokens.css. */
+@theme inline {
+  --color-highlight: var(--highlight);
+  --radius-cell: var(--radius-cell);
+}
+
+:root {
+  --highlight: var(--primary);
+  --radius-cell: 0.5rem;
+}
+
+html[data-scheme='light'] {
+  color-scheme: light;
+}
+
+html[data-scheme='dark'] {
+  color-scheme: dark;
+}
+
+/* A: calm light. Soft blue-grey, one clear blue accent; good in daylight. */
+[data-direction='a'] {
+  --bg: light-dark(oklch(98.5% 0.004 240), oklch(20% 0.02 250));
+  --surface: light-dark(oklch(95% 0.01 240), oklch(26% 0.025 250));
+  --fg: light-dark(oklch(22% 0.03 250), oklch(96% 0.008 250));
+  --muted: light-dark(oklch(43% 0.03 250), oklch(80% 0.03 250));
+  --primary: light-dark(oklch(46% 0.15 255), oklch(80% 0.1 250));
+  --on-primary: light-dark(oklch(99% 0 0), oklch(20% 0.02 250));
+  --border: light-dark(oklch(56% 0.03 250), oklch(62% 0.03 250));
+  --highlight: light-dark(oklch(50% 0.16 255), oklch(78% 0.11 240));
+  --radius-cell: 0.75rem;
+}
+
+/* B: high contrast. Pure black and white, a strong blue (light) or yellow (dark) outline; best from a distance. */
+[data-direction='b'] {
+  --bg: light-dark(oklch(100% 0 0), oklch(12% 0 0));
+  --surface: light-dark(oklch(95% 0 0), oklch(20% 0 0));
+  --fg: light-dark(oklch(0% 0 0), oklch(100% 0 0));
+  --muted: light-dark(oklch(35% 0 0), oklch(85% 0 0));
+  --primary: light-dark(oklch(38% 0.18 265), oklch(90% 0.16 100));
+  --on-primary: light-dark(oklch(100% 0 0), oklch(12% 0 0));
+  --border: light-dark(oklch(30% 0 0), oklch(78% 0 0));
+  --highlight: light-dark(oklch(42% 0.2 265), oklch(90% 0.17 100));
+  --radius-cell: 0.25rem;
+}
+
+/* C: warm and soft. Cream and terracotta, rounder cells; friendlier, still 7:1 for the letters. */
+[data-direction='c'] {
+  --bg: light-dark(oklch(97% 0.015 80), oklch(22% 0.02 50));
+  --surface: light-dark(oklch(93% 0.025 75), oklch(28% 0.03 50));
+  --fg: light-dark(oklch(25% 0.04 45), oklch(95% 0.02 80));
+  --muted: light-dark(oklch(43% 0.05 45), oklch(80% 0.04 70));
+  --primary: light-dark(oklch(48% 0.13 40), oklch(80% 0.1 60));
+  --on-primary: light-dark(oklch(99% 0.005 80), oklch(22% 0.02 50));
+  --border: light-dark(oklch(55% 0.05 55), oklch(62% 0.04 60));
+  --highlight: light-dark(oklch(52% 0.15 35), oklch(80% 0.12 65));
+  --radius-cell: 1.25rem;
+}
 
 @layer base {
   html {
@@ -20,5 +81,133 @@
       sans-serif;
     background-color: var(--bg);
     color: var(--fg);
+  }
+}
+
+@layer components {
+  /*
+   * The communicate screen fills the viewport without scrolling (R6).
+   * Portrait (phone held in front of him): status, question, board, sentence from top to bottom.
+   * Landscape (stand, laptop): the board on the left; the question and the sentence on the right.
+   */
+  .screen {
+    display: grid;
+    height: 100dvh;
+    gap: 0.5rem;
+    padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right))
+      max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas: 'status' 'question' 'board' 'sentence';
+  }
+
+  @media (orientation: landscape) {
+    .screen {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      grid-template-areas: 'status status' 'board question' 'board sentence';
+    }
+  }
+
+  .screen-status {
+    grid-area: status;
+  }
+  .screen-question {
+    grid-area: question;
+    align-self: start;
+  }
+  .screen-board {
+    grid-area: board;
+  }
+  .screen-sentence {
+    grid-area: sentence;
+    align-self: end;
+  }
+
+  .sentence {
+    display: flex;
+    justify-content: flex-end;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* The letter board: equal cells that share the space left by the other parts. */
+  .board {
+    width: 100%;
+    height: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0.25rem;
+  }
+
+  .board th {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  .board thead th {
+    height: 1.75rem;
+  }
+
+  /* .board th sets weight 600 with a higher specificity than .is-active, so repeat the bold here. */
+  .board th.is-active {
+    border-radius: var(--radius-cell);
+    color: var(--fg);
+    font-weight: 800;
+  }
+
+  .board tbody th {
+    width: 1.75rem;
+  }
+
+  .board-cell {
+    border-radius: var(--radius-cell);
+    background-color: var(--surface);
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1;
+    /* At least 32 px for every letter (R4), larger when there is room. */
+    font-size: max(2rem, min(7vh, 7vw));
+    font-weight: 600;
+  }
+
+  /* The mock-up switcher (not part of the app). */
+  .switch-link {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-cell);
+    padding-inline: 1rem;
+  }
+
+  .switch-link[aria-current='true'] {
+    border-color: var(--highlight);
+    border-width: 4px;
+    font-weight: 700;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 4px solid var(--highlight);
+    outline-offset: 2px;
+  }
+
+  /* The active column or row: a 4 px outline plus bold text, never color alone (R4, SC 1.4.1). */
+  .is-active {
+    outline: 4px solid var(--highlight);
+    outline-offset: -4px;
+    font-weight: 800;
+  }
+
+  [data-direction='b'] .board-cell {
+    font-weight: 700;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .is-active {
+      transition: outline-color 150ms ease-out;
+    }
   }
 }

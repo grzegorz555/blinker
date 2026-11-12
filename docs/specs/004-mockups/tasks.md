@@ -19,7 +19,7 @@ Branch: `feat/004-mockups` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
   a `design` Playwright project with the CSP guard and axe on the catalog (e2e).
   *To understand:* what PostCSS and Tailwind do at build time, `0.0.0.0` vs. `127.0.0.1`, a LAN IP address, why
   the firewall asks, path traversal.
-- [ ] **T2 [sonnet]: Three directions and a contrast test.** `scripts/contrast.mjs` (OKLCH → contrast ratio) with
+- [x] **T2 [sonnet]: Three directions and a contrast test.** `scripts/contrast.mjs` (OKLCH → contrast ratio) with
   thresholds per token pair; directions A, B, C as token overrides (R3, R4); the communicate screen in the "asking
   Kolumna 7?" state, portrait and landscape, light and dark (R6). Tests: contrast unit cases incl. a failing pair; e2e
   axe + no overflow in the five viewports for each direction.

@@ -12,7 +12,7 @@ them into sentences that are shown on screen and read aloud.
 
 ## Status
 **Stage 1: deploy** (spec [003](docs/specs/003-deploy/spec.md), in progress: security headers and a CSP-clean build are done, the Azure deploy follows; specs [001](docs/specs/001-app-skeleton/spec.md) and [002](docs/specs/002-ci-verify/spec.md) are done).
-**Stage 1.5: mock-ups** (spec [004](docs/specs/004-mockups/spec.md), in progress: the mock-up toolchain is done; the visual directions follow).
+**Stage 1.5: mock-ups** (spec [004](docs/specs/004-mockups/spec.md), in progress: the mock-up toolchain and three visual directions of the communicate screen are done; the author picks one next).
 The app shell works in English and Polish (language switch, translated titles); there are no communication features yet. The stage plan is in [docs/backlog.md](docs/backlog.md).
 
 ## Tech stack
@@ -49,7 +49,8 @@ Run these from `src/web`. **`npm run verify` runs every gate below in the same o
 | `npm run test:scripts` | Tests of the Node helper scripts (built-in `node --test`) |
 | `npm run check:dist` | Fails if the production build contains a `design/` folder (mock-ups),  `.map` or `.md` files, `sourceMappingURL` comments, or inline scripts and `on…=` handlers in HTML |
 | `npm run lighthouse` | Lighthouse CI on the production build (home and 404, English and Polish); fails unless Accessibility = 100. Needs `npm run build` first and Google Chrome. Reports: `.lighthouseci/reports-en`, `reports-pl`. `npm run verify -- --lighthouse` includes it. |
-| `npm run design:build` | Builds the clickable mock-ups (spec 004) from `design/` into `dist/design/` (Tailwind via PostCSS); fails on raw colors in the markup and on inline scripts. They never ship in the app build. |
+| `npm run design:build` | Builds the clickable mock-ups (spec 004) from `design/` into `dist/design/` (Tailwind via PostCSS); fails on raw colors in the markup and on inline scripts. They never ship in the app build. Without a server, open `dist/design/index.html` in a browser. |
+| `node scripts/contrast.mjs` | Prints the contrast ratio of every token pair (app tokens and the mock-up directions, light and dark) and fails below the threshold: 7:1 for what he reads, 4.5:1 for other text, 3:1 for outlines. Also part of `npm run test:scripts`. |
 | `npm run design:serve` | Builds the mock-ups and serves them on port 4310 with the production headers, **for viewing on a phone over the home Wi-Fi**: it prints the address to open (`http://192.168.x.x:4310/`). If Windows asks about the firewall, allow private networks only; don't run it on public Wi-Fi. Stop with Ctrl+C. |
 | `npm run icons` | Regenerates the placeholder app icons in `public/icons/` (pure Node, no dependencies) |
 | `npm run format:check` | Prettier check. `npm run format` fixes formatting. |
