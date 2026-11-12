@@ -67,6 +67,12 @@ describe('findDistProblems', () => {
     assert.deepEqual(findDistProblems(dir), []);
   });
 
+  it('reports mock-ups that ended up in the app build (spec 004, R1)', () => {
+    mkdirSync(join(dir, 'design'));
+    writeFileSync(join(dir, 'design', 'index.html'), '<!doctype html>');
+    assert.deepEqual(findDistProblems(dir), ['mock-ups in the app build: design/ (spec 004, R1)']);
+  });
+
   it('fails when the build folder is missing', () => {
     const problems = findDistProblems(join(dir, 'missing'));
     assert.equal(problems.length, 1);

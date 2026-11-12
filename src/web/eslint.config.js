@@ -36,6 +36,16 @@ module.exports = defineConfig([
     },
   },
   {
+    // Mock-up scripts (spec 004): plain browser JS, the same security rules as the app (no innerHTML, no eval).
+    files: ['design/**/*.js'],
+    extends: [eslint.configs.recommended, noUnsanitized.configs.recommended],
+    languageOptions: {
+      sourceType: 'script',
+      globals: { document: 'readonly', window: 'readonly', location: 'readonly' },
+    },
+    rules: { 'no-eval': 'error', 'no-implied-eval': 'error', 'no-new-func': 'error' },
+  },
+  {
     files: ['**/*.html'],
     // templateAccessibility: alt text, labels, valid ARIA, no positive tabindex, keyboard
     // handlers for click events, etc. https://angular.dev/best-practices/a11y

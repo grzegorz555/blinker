@@ -11,10 +11,18 @@ const running = (args) =>
 describe('planGates', () => {
   it('runs every gate except Lighthouse by default, in CI order', () => {
     const names = running([]);
-    assert.equal(names.length, 10);
+    assert.equal(names.length, 11);
     assert.equal(names[0], 'docs (OKF)');
     assert.equal(names.at(-1), 'e2e (Playwright + axe)');
     assert.ok(!names.includes('Lighthouse (a11y = 100)'));
+  });
+
+  it('builds the mock-ups before e2e, which serves them (spec 004)', () => {
+    const names = running([]);
+    assert.equal(
+      names.indexOf('mock-ups build (spec 004)'),
+      names.indexOf('e2e (Playwright + axe)') - 1,
+    );
   });
 
   it('adds Lighthouse last with --lighthouse', () => {

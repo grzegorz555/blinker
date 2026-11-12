@@ -23,6 +23,7 @@ export const GATES = [
   { name: 'audit (any, production)', command: 'npm audit --omit=dev' },
   { name: 'build (production)', command: 'npm run build' },
   { name: 'dist check', command: 'npm run check:dist' },
+  { name: 'mock-ups build (spec 004)', command: 'npm run design:build' },
   { name: 'e2e (Playwright + axe)', command: 'npm run e2e:only' },
   { name: 'Lighthouse (a11y = 100)', command: 'npm run lighthouse', lighthouse: true },
 ];

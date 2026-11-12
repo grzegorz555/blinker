@@ -2,7 +2,8 @@
 // - source maps (*.map) and `sourceMappingURL` comments: they expose the original source;
 // - Markdown files (*.md): docs and notes belong in the repo, not on the web server;
 // - (spec 003, R4) inline <script> elements and inline event handlers (on...=) in HTML: the production CSP
-//   (script-src 'self') blocks them, so the app would silently lose behaviour or styles.
+//   (script-src 'self') blocks them, so the app would silently lose behaviour or styles;
+// - (spec 004, R1) a design/ folder: the mock-ups are built separately into dist/design/ and never ship in the app.
 // No dependencies on purpose. Usage: node scripts/check-dist.mjs [dir]
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve, sep } from 'node:path';
@@ -43,6 +44,8 @@ export function findDistProblems(dir) {
     return [`build folder not found: ${dir} (run "npm run build" first)`];
   }
   const problems = [];
+  if (existsSync(join(dir, 'design')))
+    problems.push('mock-ups in the app build: design/ (spec 004, R1)');
   for (const file of walk(dir)) {
     const name = relative(dir, file).split(sep).join('/');
     const ext = extname(file).toLowerCase();
