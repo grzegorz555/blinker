@@ -52,8 +52,12 @@ confirms it with a nod or rejects it by shaking his head. Blinker takes the care
 `LOOK_AT_HAND` = 5 is used **only in counting**. In scanning it means nothing (decided on 2026-11-11), so a glance at
 his hand can never make the scan jump.
 
+**How he gives numbers (author, 2026-11-12):** he gives a number by **blinking**, and today **the caregiver
+confirms it** (says it aloud and waits for his answer). In Blinker the confirmation should be done **with his head**
+(`HEAD_NOD` / `HEAD_SHAKE`, steps 3–4 above), so no caregiver is needed.
+
 **Still open:**
-- The exact way he gives numbers (pace, pauses between signals, what happens after a miscount) will be settled later with the author (2026-11-11).
+- The pace and the pauses between signals, and what happens after a miscount: tuned during the trial (stage 6).
 - How long the pause before "Column 4?" should be: we tune it during the trial with him (stage 6).
 - Whether, once he is fluent, he would rather confirm only the letter instead of each number: a setting to consider after the trial.
 
