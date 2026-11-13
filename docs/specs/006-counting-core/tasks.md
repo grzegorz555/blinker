@@ -27,7 +27,7 @@ Branch: `feat/006-counting-core` (from `main`, worktree `C:/Repozytorium/Blinker
 - [x] **T4 [sonnet]: Signal input and the keyboard mapping.** `core/input/signals.ts` (`Signal`), `keyboard.ts`
       (R7, off by default). Tests: the keyboard cases of the test plan.
       _To understand:_ SC 2.1.4, one input type for every source (buttons, keys, later the face).
-- [ ] **T5 [sonnet]: Speech on the device.** `core/speech/speaker.ts` (interface), `web-speaker.ts` (local voices
+- [x] **T5 [sonnet]: Speech on the device.** `core/speech/speaker.ts` (interface), `web-speaker.ts` (local voices
       only, cancel, `no-local-voice`), `fake-speaker.ts` (R8). Tests: voice choice with fake `speechSynthesis`,
       cancel, no local voice.
       _To understand:_ the Web Speech API, `localService`, why a network voice is a privacy risk.
