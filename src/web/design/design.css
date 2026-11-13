@@ -481,14 +481,23 @@ html[data-scheme='dark'] {
     display: none;
   }
 
+  /* Large, but one word ("Kolumna") always fits the card width, also in a wide font (SC 1.4.10). */
   [data-layout='caregiver'] .question {
-    font-size: clamp(3rem, 22cqi, 9rem);
+    font-size: clamp(3rem, 18cqi, 9rem);
   }
 
   /* What Blinker says aloud, in words (the audio state is visible, not only heard). */
   .count-audio {
     align-self: flex-start;
+    max-width: 100%;
     background-color: var(--bg);
+  }
+
+  /* One line: the whole sentence is in the sentence card below, and screen readers get the full text. */
+  .count-audio > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* The signal simulator (mock-up only, ?sim=1): his signals as buttons, under the panes, never over the board. */
@@ -552,13 +561,14 @@ html[data-scheme='dark'] {
   /*
    * The letter board with square cells. --cell is the largest square that fits: 7 columns across the width and
    * 5 rows down the height, after the number headers (1.5rem column, 1.75rem row) and the 8 gaps of 0.25rem
-   * (7 * cell + 3.5rem wide, 5 * cell + 3.5rem high). Container query units:
+   * (7 * cell + 3.5rem wide, 5 * cell + 3.75rem high: the height keeps 0.25rem spare, because with 3.5rem the board
+   * reached 4 px past its pane whenever the height was the limit). Container query units:
    * https://developer.mozilla.org/docs/Web/CSS/CSS_containment/Container_size_and_style_queries
    */
   .board {
-    --cell: min(calc((100cqw - 3.5rem) / 7), calc((100cqh - 3.5rem) / 5));
+    --cell: min(calc((100cqw - 3.5rem) / 7), calc((100cqh - 3.75rem) / 5));
     width: calc(7 * var(--cell) + 3.5rem);
-    height: calc(5 * var(--cell) + 3.5rem);
+    height: calc(5 * var(--cell) + 3.75rem);
     table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0.25rem;
@@ -884,6 +894,26 @@ html[data-scheme='dark'] {
  * (https://developer.mozilla.org/docs/Web/CSS/@layer).
  */
 @layer utilities {
+  /*
+   * A narrow phone held upright: the board gets the height. The step label goes (the question and the pointer already
+   * say the step), the hint is smaller and the card tighter. Fonts differ per system (DejaVu Sans on a Linux CI is
+   * wider than Segoe UI), so the panes keep a margin rather than fitting to the pixel.
+   */
+  @media (max-width: 599px) and (orientation: portrait) {
+    .count-question {
+      padding: 0.75rem;
+    }
+
+    .count-step {
+      display: none;
+    }
+
+    .count-hint {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+  }
+
   /* With the simulator on a phone, the hint gives way to the board: the simulator buttons say the same. */
   @media (max-width: 599px) {
     [data-sim='on'] .count-hint {

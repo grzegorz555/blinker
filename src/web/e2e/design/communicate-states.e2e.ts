@@ -15,7 +15,7 @@ const STATES = [
   ['asking-row', 'Wiersz 3?'],
   ['letter-added', 'Dodano W'],
   ['confirm-speak', 'Przeczytać na głos?'],
-  ['speaking', 'Czytam na głos'],
+  ['speaking', 'Czytam'],
   ['paused', 'Pauza'],
   ['no-face', 'Nie widzę twarzy'],
   ['caregiver', 'Kolumna 7?'],
@@ -52,6 +52,22 @@ test.describe('Liczenie states (R8)', () => {
       }
     });
   }
+
+  test('every state still fits a 360 px phone with a wider font (fonts differ per system, e.g. DejaVu Sans on the CI)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    for (const sim of ['', '?sim=1']) {
+      for (const [name] of STATES) {
+        await open(page, `${sim}#${name}`);
+        // Verdana is wide on Windows and macOS; where it is missing the system font is used, which is the plain check.
+        await page.addStyleTag({
+          content: 'html { font-family: Verdana, sans-serif !important; }',
+        });
+        await expectFits(page, `${name}${sim}, wide font`);
+      }
+    }
+  });
 
   test('an unknown fragment falls back to the default state', async ({ page }) => {
     await open(page, '#%3Cimg%20src%3Dx%3E');
@@ -205,7 +221,7 @@ test.describe('signal simulator by keys (R7)', () => {
     await page.getByRole('button', { name: 'Przeczytaj' }).click();
     await expect(question(page)).toHaveText('Przeczytać na głos?');
     await press(page, 'n');
-    await expect(question(page)).toHaveText('Czytam na głos');
+    await expect(question(page)).toHaveText('Czytam');
     await expect(announce(page)).toHaveText('Czytam zdanie na głos');
   });
 
