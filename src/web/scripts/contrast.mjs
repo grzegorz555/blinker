@@ -34,6 +34,9 @@ export const PAIRS = [
   ['highlight', 'primary-container', 3, 'active outline inside the active cell'],
   ['on-secondary-container', 'secondary-container', 4.5, 'tonal buttons, current navigation item'],
   ['primary', 'surface', 4.5, 'outlined button text on a card'],
+  ['error', 'bg', 4.5, 'form error text'],
+  ['error', 'surface', 4.5, 'form error text on a card'],
+  ['error', 'bg', 3, 'invalid field border'],
 ];
 export const TOKENS = [...new Set(PAIRS.flatMap(([a, b]) => [a, b]))];
 

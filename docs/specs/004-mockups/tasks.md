@@ -56,11 +56,15 @@ Branch: `feat/004-mockups` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       "Przeczytać na głos?") and F (face lost); on-screen buttons with `?sim=1`, short labels on phones, where the hint
       gives way to the board. A shake at the columns undoes the last letter. The author said the friend should manage
       the board **without a caregiver**, so the caregiver-held layout stays a minimal extra.
-- [ ] **T5 [sonnet]: Calibrate, boards and settings.** In the shell: calibration wizard (camera explanation before the
+- [x] **T5 [sonnet]: Calibrate, boards and settings.** In the shell: calibration wizard (camera explanation before the
       prompt, blink, hand left/right, nod, shake, result); boards (list, preview of the friend's layout, JSON import with
       validation errors shown in text); settings (mode, timings, signal mapping, voice, language, theme). Tests: e2e axe
       on every page and step, keyboard-only pass through the wizard, form errors linked with `aria-describedby`.
       _To understand:_ wizard patterns, error messages that meet SC 3.3.1, radio vs. switch.
+      _Outcome:_ `calibrate-wizard.html` with eight steps as fragments (Back works, focus on the step heading, the step
+      in the title); the board import checks size, JSON and every field and shows the errors in text; settings add a
+      "Podpowiedzi w Liczeniu" switch (the author may hide the hints, since he should manage without a caregiver). New
+      `--error` token (M3 error role) with contrast pairs.
 - [ ] **T6 [sonnet]: Final tokens, theme-color and icon.** After the polish rounds: the `base` values into
       `tokens.css` (R3); `theme-color` in `index.html` and the manifest from the tokens; icon with separate `any` and
       `maskable` files (`npm run icons`). Tests: the contrast test also runs on `tokens.css`; unit test that `theme-color`

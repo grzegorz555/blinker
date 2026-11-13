@@ -9,18 +9,219 @@
     <script src="design.js" defer></script>
   </head>
   <body class="bg-bg text-fg">
+    <!--
+      Spec 004, T5: settings with native controls: radio groups, number fields, selects, a range, and switches where
+      on/off reads better (https://www.w3.org/WAI/ARIA/apg/patterns/switch/). The timings are shown and adjustable
+      (SC 2.2.1). Changes apply at once; the mock-up saves nothing.
+    -->
     <div class="shell">
       <header class="shell-top">
         <h1 class="title-large">Ustawienia</h1>
       </header>
+
       <main class="shell-main">
-        <section class="card max-w-2xl" aria-labelledby="soon-title">
-          <h2 id="soon-title" class="title-medium">Wkrótce</h2>
-          <p class="mt-1 text-muted">
-            Tryb, czasy i pauzy, przypisanie sygnałów, głos, język i motyw (spec 004, T5).
-          </p>
-        </section>
+        <p class="mx-auto mb-4 max-w-5xl text-muted">
+          Zmiany działają od razu. W makiecie nic się nie zapisuje.
+        </p>
+        <div class="two-up mx-auto max-w-5xl">
+          <div class="grid gap-4">
+            <section class="card" aria-labelledby="mode-title">
+              <h2 id="mode-title" class="title-medium">Tryb</h2>
+              <fieldset class="mt-2">
+                <legend class="sr-only">Jak wybiera litery</legend>
+                <label class="choice">
+                  <input type="radio" name="mode" value="counting" checked />
+                  <span>Liczenie: kolumna, potem wiersz</span>
+                </label>
+                <label class="choice">
+                  <input type="radio" name="mode" value="scanning" disabled />
+                  <span>Skanowanie: podświetlenie przesuwa się samo (po próbie)</span>
+                </label>
+              </fieldset>
+            </section>
+
+            <section class="card" aria-labelledby="timing-title">
+              <h2 id="timing-title" class="title-medium">Czasy</h2>
+              <div class="field mt-2">
+                <label class="field-label" for="ask-after">Przerwa przed pytaniem (sekundy)</label>
+                <p id="ask-after-hint" class="field-hint">
+                  Od 0,5 do 5. Tyle Blinker czeka po ostatnim sygnale, zanim zapyta.
+                </p>
+                <input
+                  id="ask-after"
+                  class="input"
+                  type="number"
+                  inputmode="decimal"
+                  min="0.5"
+                  max="5"
+                  step="0.1"
+                  value="1.2"
+                  aria-describedby="ask-after-hint ask-after-error"
+                  data-range-field
+                />
+                <p id="ask-after-error" class="field-error" data-field-error hidden></p>
+              </div>
+              <div class="field">
+                <label class="field-label" for="blink-ms">Długie mrugnięcie (milisekundy)</label>
+                <p id="blink-ms-hint" class="field-hint">
+                  Od 200 do 1500. Krótsze mrugnięcia nie liczą się, żeby zwykłe mruganie nie
+                  dodawało.
+                </p>
+                <input
+                  id="blink-ms"
+                  class="input"
+                  type="number"
+                  inputmode="numeric"
+                  min="200"
+                  max="1500"
+                  step="50"
+                  value="400"
+                  aria-describedby="blink-ms-hint blink-ms-error"
+                  data-range-field
+                />
+                <p id="blink-ms-error" class="field-error" data-field-error hidden></p>
+              </div>
+            </section>
+
+            <section class="card" aria-labelledby="signals-title">
+              <h2 id="signals-title" class="title-medium">Sygnały</h2>
+              <p class="mt-1 text-sm text-muted">Co robi każdy jego sygnał.</p>
+              <div class="field mt-2">
+                <label class="field-label" for="map-blink">Długie mrugnięcie</label>
+                <select id="map-blink" class="input">
+                  <option selected>+1</option>
+                  <option>+5</option>
+                  <option>nic</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="map-hand">Spojrzenie na rękę</label>
+                <select id="map-hand" class="input">
+                  <option>+1</option>
+                  <option selected>+5</option>
+                  <option>nic</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="map-nod">Kiwnięcie głową</label>
+                <select id="map-nod" class="input">
+                  <option selected>tak</option>
+                  <option>nic</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="map-shake">Kręcenie głową</label>
+                <select id="map-shake" class="input">
+                  <option selected>nie, cofnij</option>
+                  <option>nic</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="map-right">Głowa w prawo</label>
+                <select id="map-right" class="input">
+                  <option selected>przeczytaj zdanie (po pytaniu)</option>
+                  <option>nic</option>
+                </select>
+              </div>
+            </section>
+          </div>
+
+          <div class="grid gap-4">
+            <section class="card" aria-labelledby="voice-title">
+              <h2 id="voice-title" class="title-medium">Głos</h2>
+              <div class="field mt-2">
+                <label class="field-label" for="voice">Głos</label>
+                <select id="voice" class="input">
+                  <option selected>Polski: głos systemu</option>
+                  <option>Polski: głos 2</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="rate">Tempo mowy</label>
+                <input
+                  id="rate"
+                  class="w-full max-w-80 accent-primary"
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.1"
+                  value="1"
+                  aria-describedby="rate-value"
+                  data-rate
+                />
+                <p id="rate-value" class="field-hint" data-rate-value>1,0 ×, zwykłe tempo</p>
+              </div>
+              <div class="row-item min-h-12">
+                <span id="speak-questions" class="flex-1"
+                  >Czytaj pytania na głos („Kolumna 7?”)</span
+                >
+                <button
+                  type="button"
+                  class="switch-btn"
+                  role="switch"
+                  aria-checked="true"
+                  aria-labelledby="speak-questions"
+                  data-switch
+                >
+                  <span class="text-sm text-muted" data-switch-word>Wł.</span
+                  ><span class="switch" aria-hidden="true"></span>
+                </button>
+              </div>
+            </section>
+
+            <section class="card" aria-labelledby="screen-title">
+              <h2 id="screen-title" class="title-medium">Ekran</h2>
+              <div class="row-item min-h-12">
+                <span class="flex-1">
+                  <span id="hints">Podpowiedzi w Liczeniu</span>
+                  <span id="hints-hint" class="field-hint block">
+                    Na przykład „Kiwnij głową = tak”. Wyłącz, gdy już ich nie potrzebuje.
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  class="switch-btn"
+                  role="switch"
+                  aria-checked="true"
+                  aria-labelledby="hints"
+                  aria-describedby="hints-hint"
+                  data-switch
+                >
+                  <span class="text-sm text-muted" data-switch-word>Wł.</span
+                  ><span class="switch" aria-hidden="true"></span>
+                </button>
+              </div>
+              <fieldset class="mt-3">
+                <legend>Język</legend>
+                <label class="choice">
+                  <input type="radio" name="lang" value="pl" checked />
+                  <span>Polski</span>
+                </label>
+                <label class="choice">
+                  <input type="radio" name="lang" value="en" lang="en" />
+                  <span lang="en">English</span>
+                </label>
+              </fieldset>
+              <fieldset class="mt-3">
+                <legend>Motyw</legend>
+                <label class="choice">
+                  <input type="radio" name="theme" value="auto" checked data-theme />
+                  <span>Jak w systemie</span>
+                </label>
+                <label class="choice">
+                  <input type="radio" name="theme" value="light" data-theme />
+                  <span>Jasny</span>
+                </label>
+                <label class="choice">
+                  <input type="radio" name="theme" value="dark" data-theme />
+                  <span>Ciemny</span>
+                </label>
+              </fieldset>
+            </section>
+          </div>
+        </div>
       </main>
+
       <!-- include nav.html -->
     </div>
   </body>
