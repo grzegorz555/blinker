@@ -228,7 +228,8 @@
         return ['Kamera', 'Nie widzę twarzy', 'Ustaw telefon na wprost twarzy. Liczenie czeka.'];
       if (s.step === 'speak') {
         if (s.phase === 'speaking')
-          return ['Zdanie', 'Czytam na głos', 'Potem możesz pisać dalej.'];
+          // Short: the audio line below says what is being read.
+          return ['Zdanie', 'Czytam', ''];
         return [
           'Zdanie',
           'Przeczytać na głos?',
@@ -331,6 +332,7 @@
       step.textContent = label;
       question.textContent = text;
       hint.textContent = help;
+      hint.hidden = !help;
       renderTally();
       renderPointer();
 
