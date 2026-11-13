@@ -198,7 +198,7 @@
       }
     }
 
-    /** Head right, or the "Przeczytaj" button: finish the sentence and ask first; nothing is read without a yes. */
+    /** Head right, or the "Przeczytaj" (Read aloud) button: finish the sentence and ask first; nothing is read without a yes. */
     function finish() {
       clearTimeout(timer);
       s = { ...s, step: 'speak', phase: 'asking', parts: [], note: '' };

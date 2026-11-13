@@ -282,7 +282,7 @@ html[data-scheme='dark'] {
 
   /*
    * The label never makes the bar wider than the screen: fonts differ per system (Segoe UI on Windows, Roboto on
-   * Android, DejaVu Sans on a Linux CI), so a long label like "Ustawienia" is cut with an ellipsis rather than
+   * Android, DejaVu Sans on a Linux CI), so a long label like "Ustawienia" (Settings) is cut with an ellipsis rather than
    * pushing the page sideways at 320 px (SC 1.4.10).
    */
   .nav-link {
@@ -691,7 +691,7 @@ html[data-scheme='dark'] {
 
   /*
    * A switch (https://www.w3.org/WAI/ARIA/apg/patterns/switch/): a button with role="switch" and aria-checked. The
-   * state shows by the knob position and fill, plus the words "Wł." / "Wył." next to it, not by color alone.
+   * state shows by the knob position and fill, plus the words "Wł." (On) / "Wył." (Off) next to it, not by color alone.
    */
   .switch-btn {
     display: inline-flex;
@@ -832,7 +832,7 @@ html[data-scheme='dark'] {
 }
 
 /*
- * Layout overrides of the Liczenie panes. They sit in the utilities layer with a higher specificity, because they
+ * Layout overrides of the Liczenie (Counting) panes. They sit in the utilities layer with a higher specificity, because they
  * must beat utility classes in the markup (text-4xl, mt-2, p-4): later cascade layers win over earlier ones
  * (https://developer.mozilla.org/docs/Web/CSS/@layer).
  */

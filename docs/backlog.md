@@ -23,7 +23,7 @@ generated:
 
 # Ideas (not specified)
 - Board editor; importing a board from a photo.
-- **Shortcuts for frequent words** (author, 2026-11-12: "do rozważenia"): a word picked with one number instead of
+- **Shortcuts for frequent words** (author, 2026-11-12: "do rozważenia" (to consider)): a word picked with one number instead of
   letter by letter. To design after the PoC, together with him.
 - Word prediction for Polish; favorite phrases; sentence history.
 - Capacitor build for Android and iOS.

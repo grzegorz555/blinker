@@ -184,7 +184,7 @@ describe('counting paths (R5)', () => {
     expect(state.notice).toEqual({ key: 'counting.emptyCell', params: { column: 7, row: 5 } });
   });
 
-  it('a double shake after "Kolumna 7?" keeps the sentence (review of T4)', () => {
+  it('a double shake after "Kolumna 7?" (Column 7?) keeps the sentence (review of T4)', () => {
     const from = { ...fixture('column.asking') };
     const { state } = run([X, X, X], from);
     expect(state.name).toBe('column.rejected');
@@ -208,7 +208,7 @@ describe('counting paths (R5)', () => {
 });
 
 describe('the space: a nod without a number (author, 2026-11-13)', () => {
-  it('adds a space, says "Spacja", and a shake removes it', () => {
+  it('adds a space, says "Spacja" (Space), and a shake removes it', () => {
     const first = run([N], fixture('column.waiting'));
     let { state } = first;
     const { effects } = first;
@@ -252,7 +252,7 @@ describe('reading aloud: never without a nod (R5)', () => {
     expect(state.notice).toEqual({ key: 'counting.nothingToSpeak' });
   });
 
-  it('only a nod or a shake answers "Przeczytać na głos?"; blinks are ignored', () => {
+  it('only a nod or a shake answers "Przeczytać na głos?" (Read it aloud?); blinks are ignored', () => {
     const { state } = run([R, B, H, T(9000)], fixture('column.waiting'));
     expect(state.name).toBe('speak.asking');
   });

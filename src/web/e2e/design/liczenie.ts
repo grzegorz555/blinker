@@ -1,4 +1,4 @@
-// Spec 004: shared helpers for the Liczenie mock-up tests (communicate.html).
+// Spec 004: shared helpers for the Liczenie (Counting) mock-up tests (communicate.html).
 import { expect, type Page } from '../support/test';
 
 /** R6: phone portrait (2), phone landscape, tablet, laptop. */

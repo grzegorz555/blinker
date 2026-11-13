@@ -12,8 +12,8 @@ generated:
 # Goal
 
 The logic Blinker needs to let him talk, without a camera and without screens: a board, a sentence, the counting
-machine that plays the caregiver's role ("Kolumna 7?"), the signals as input, and speech. Spec 007 builds the
-Liczenie screen and the shell on top of it; stages 3–4 replace the on-screen buttons with his face signals, without
+machine that plays the caregiver's role ("Kolumna 7?" (Column 7?)), the signals as input, and speech. Spec 007 builds the
+Liczenie (Counting) screen and the shell on top of it; stages 3–4 replace the on-screen buttons with his face signals, without
 changing this core.
 
 # Scope
@@ -60,11 +60,11 @@ changing this core.
   - a number past the board, or an empty cell, is rejected with a reason;
   - `NOD` on a question confirms it; on the row question it appends the cell and says the letter;
   - **`NOD` without a number while waiting for a column adds a space** (the end of a word; author, 2026-11-13): shown
-    and said as "Spacja", undone by a `SHAKE` like any letter; on an empty sentence, or one that already ends with a
+    and said as "Spacja" (Space), undone by a `SHAKE` like any letter; on an empty sentence, or one that already ends with a
     space, it adds nothing and says so;
   - `SHAKE` on a question rejects the number; **a second `SHAKE` right after a rejection changes nothing**; `SHAKE`
     while waiting for a row goes back to the columns; `SHAKE` while waiting for a column undoes the last letter added;
-  - `RIGHT` asks "Przeczytać na głos?"; only `NOD` then says the sentence; `SHAKE` goes back to writing;
+  - `RIGHT` asks "Przeczytać na głos?" (Read it aloud?); only `NOD` then says the sentence; `SHAKE` goes back to writing;
   - **nothing is said aloud and nothing is cleared without a `NOD`**; `PAUSE` stops every signal except `PAUSE`.
 - **R6. Time is injected.** The machine never reads the clock or sets timers. The Angular service passes
   `TICK(now)` from one scheduler, so tests drive time by hand (no fake timers needed for the machine).
@@ -86,7 +86,7 @@ changing this core.
 - No screen in this spec. Everything a screen will show is produced as data: the question text, the counter parts
   (`[5, 1, 1]`), the pointer (column, row), the reason of a rejection, announcements for a polite live region
   (SC 4.1.3).
-- Texts are Transloco keys with parameters (`counting.askColumn`: "Kolumna {{n}}?"), in `en.json` and `pl.json`;
+- Texts are Transloco keys with parameters (`counting.askColumn`: "Kolumna {{n}}?" (Column {{n}}?)), in `en.json` and `pl.json`;
   the machine returns keys and parameters, not strings, so it has no language.
 - The keyboard mapping is off by default (R7). He uses his head; the keys are for tests and caregivers.
 

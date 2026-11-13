@@ -54,7 +54,7 @@ stage 2 on a library that implements another design system would mean restyling 
   toggles (the switches), sliders, dialogs, menus, snack bars, lists, and the CDK a11y helpers (focus, live
   announcer).
 - **Custom components on our tokens and Tailwind**, following the spec 004 mock-ups, where Angular Material has no
-  component: the M3 **navigation bar** and **navigation rail**, the **letter board**, and the Liczenie
+  component: the M3 **navigation bar** and **navigation rail**, the **letter board**, and the Liczenie (Counting)
   supporting-pane layout.
 - Our design tokens (`tokens.css`) map onto the M3 system tokens, so the mock-up colors carry over; the mock-ups
   are the visual reference, not code to copy.

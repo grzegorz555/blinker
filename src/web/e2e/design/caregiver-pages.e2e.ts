@@ -43,7 +43,7 @@ test.describe('calibration wizard', () => {
     });
   }
 
-  test('"Kalibruj ponownie" on Kalibracja opens the wizard, and Kalibracja stays current', async ({
+  test('"Kalibruj ponownie" (Calibrate again) on Kalibracja (Calibration) opens the wizard, and Kalibracja (Calibration) stays current', async ({
     page,
   }) => {
     await open(page, '/calibrate.html');
@@ -109,7 +109,7 @@ test.describe('calibration wizard', () => {
   });
 });
 
-test.describe('Tablice', () => {
+test.describe('Tablice (Boards)', () => {
   const file = (page: Page) => page.getByLabel('Plik tablicy');
   const upload = (page: Page, text: string | Buffer) =>
     file(page).setInputFiles({
@@ -174,7 +174,7 @@ test.describe('Tablice', () => {
   });
 });
 
-test.describe('Ustawienia', () => {
+test.describe('Ustawienia (Settings)', () => {
   test('a timing out of range shows an error linked to the field; a valid value clears it', async ({
     page,
   }) => {

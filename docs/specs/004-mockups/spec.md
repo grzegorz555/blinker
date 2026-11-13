@@ -1,7 +1,7 @@
 ---
 type: Spec
 title: "004: Clickable mock-ups and the visual direction"
-description: Static HTML/Tailwind mock-ups viewed on a computer and on a real phone over the home Wi-Fi; Material 3 style; Liczenie (the board) is the main screen in the M3 supporting-pane layout, with a navigation bar on phones and a navigation rail from 600 px; final tokens and icon after visual polish.
+description: Static HTML/Tailwind mock-ups viewed on a computer and on a real phone over the home Wi-Fi; Material 3 style; Liczenie (Counting: the board) is the main screen in the M3 supporting-pane layout, with a navigation bar on phones and a navigation rail from 600 px; final tokens and icon after visual polish.
 tags: [stage-1.5, design, accessibility, mockups]
 status: draft
 generated:
@@ -27,7 +27,7 @@ visual language, the app structure (navigation on phones and large screens), and
 - **Screens:** Liczenie (counting, the main screen), Zdania (sentences), boards, calibrate, settings. Until polish
   round 1 there was also a start dashboard.
 - **Counting** follows [the interaction model](../../interaction-model.md): he gives a number by blinking (+1) and
-  looking at his hand (+5); Blinker asks "Kolumna 4?" and he confirms with a nod or rejects with a head shake.
+  looking at his hand (+5); Blinker asks "Kolumna 4?" (Column 4?) and he confirms with a nod or rejects with a head shake.
 - **Revised after T2:** three bespoke directions (T2) did not convince the author. Instead:
   - **One visual language in the style of [shadcn/ui](https://ui.shadcn.com/docs/theming)**, the style that
     [spartan-ng](https://www.spartan.ng) (MIT, our UI library from ADR-0001) ports to Angular: neutral colors, cards
@@ -53,7 +53,7 @@ visual language, the app structure (navigation on phones and large screens), and
     [window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes).
   - **Color with restraint:** near-neutral surfaces and one indigo hue in tonal roles. Color marks what is active or
     important, not decoration.
-  - **Liczenie is the main screen**; there is no start dashboard. It runs by itself on his signals, and every letter
+  - **Liczenie (Counting) is the main screen**; there is no start dashboard. It runs by itself on his signals, and every letter
     and action can also be tapped (by the caregiver, or by him if he can).
   - **One job per destination:** Liczenie (talk), Zdania (what he said, repeat aloud), Tablice (boards), Kalibracja
     (readiness and his signals), Ustawienia (timings, voice, theme).
@@ -63,7 +63,7 @@ visual language, the app structure (navigation on phones and large screens), and
 - **`src/web/design/`**: plain HTML pages, one CSS entry and one small script file:
   - `index.html`: a catalog with links to every mock-up and every state;
   - `directions.html`: the three T2 directions, kept for reference until T3 replaces them, then removed;
-  - `communicate.html` (Liczenie, the main screen), `sentences.html` (Zdania), `boards.html`, `calibrate.html`,
+  - `communicate.html` (Liczenie: Counting, the main screen), `sentences.html` (Zdania: Sentences), `boards.html`, `calibrate.html`,
     `settings.html`; `start.html` (the T3 dashboard) was removed in polish round 1;
   - `design.css`: Tailwind + `../src/styles/tokens.css` + the mock-up style's token values + layout components;
   - `design.js`: the scheme switch, the communicate states and a keyboard simulator of the signals (see R7).
@@ -94,7 +94,7 @@ visual language, the app structure (navigation on phones and large screens), and
 - **R4. AAC rules for what he looks at** (board, counter, question, sentence): cell text at least 32 px, contrast at
   least **7:1** (SC 1.4.6) in light and dark; the **pointer** (polish round 1: the number of the column or row being
   counted and the one cell the count has got to, not the whole column) is marked by a **4 px outline plus weight or
-  size**, never by color alone (SC 1.4.1); board cells are squares; empty cells show nothing; the current state is always written out in text ("Podaj kolumnę", "Kolumna 4?");
+  size**, never by color alone (SC 1.4.1); board cells are squares; empty cells show nothing; the current state is always written out in text ("Podaj kolumnę" (Give the column), "Kolumna 4?" (Column 4?));
   nothing flashes (SC 2.3.1) and transitions respect `prefers-reduced-motion`.
 - **R5. WCAG 2.2 AA for the caregiver parts:** text 4.5:1, non-text 3:1 (SC 1.4.3, 1.4.11), targets at least 24 px
   and main actions 44 px (SC 2.5.8), visible focus, keyboard-only use, reflow at 320 px (SC 1.4.10), both
@@ -113,8 +113,8 @@ visual language, the app structure (navigation on phones and large screens), and
   They exist only in the mock-up simulator, as a stand-in for his face signals; he controls Blinker with his head, and
   the keyboard is not a way he uses it. The real app gets no single-key shortcuts unless they can be turned off.
 - **R8. Communicate states covered:** waiting for a column; counting (with the running number and how it was built,
-  e.g. hand + 2 blinks = 7); asking "Kolumna 7?"; rejected (head shake, give it again); waiting for a row in column 7;
-  asking "Wiersz 3?"; letter added ("W") and spoken; the sentence with undo; "Przeczytać na głos?"; paused; face not
+  e.g. hand + 2 blinks = 7); asking "Kolumna 7?" (Column 7?); rejected (head shake, give it again); waiting for a row in column 7;
+  asking "Wiersz 3?" (Row 3?); letter added ("W") and spoken; the sentence with undo; "Przeczytać na głos?" (Read it aloud?); paused; face not
   visible. Plus the **caregiver-held** layout (screen faces the caregiver, rear camera, large question for the
   caregiver, audio state shown).
 - **R9. Fake data only.** The board is the letter layout of [the friend's board](../../boards/friend-board.md)
@@ -124,25 +124,25 @@ visual language, the app structure (navigation on phones and large screens), and
   agent); it prints a warning to allow it on **private networks only** when the Windows firewall asks.
 - **R11. Polish text.** The mock-ups are in Polish (`lang="pl"`), the language he and the caregivers use. They are
   throwaway, so they don't go through Transloco; stage 2 adds the real keys in `en.json` and `pl.json`.
-- **R12. App structure (revised in polish round 1): one shell, Liczenie first.**
-  - **Destinations**, in this order, with one job each: **Liczenie** (the main screen), **Zdania**, **Tablice**,
-    **Kalibracja**, **Ustawienia**. The same navigation on every page, in the same order (SC 3.2.3); the current page
+- **R12. App structure (revised in polish round 1): one shell, Liczenie (Counting) first.**
+  - **Destinations**, in this order, with one job each: **Liczenie** (Counting, the main screen), **Zdania** (Sentences), **Tablice** (Boards),
+    **Kalibracja** (Calibration), **Ustawienia** (Settings). The same navigation on every page, in the same order (SC 3.2.3); the current page
     has `aria-current="page"`. Landmarks: `header`, `nav` with a name, `main`.
   - **Navigation by M3 window size class:** below 600 px, a
     [navigation bar](https://m3.material.io/components/navigation-bar/specs) at the bottom (icons with visible labels,
     an active indicator, targets at least 44×44 px, safe-area padding); from 600 px, a
     [navigation rail](https://m3.material.io/components/navigation-rail/specs) on the left (at most 96 px wide), so the
     board keeps the width.
-  - **Liczenie** uses the M3 [supporting-pane layout](https://m3.material.io/foundations/layout/canonical-layouts/supporting-pane):
+  - **Liczenie** (Counting) uses the M3 [supporting-pane layout](https://m3.material.io/foundations/layout/canonical-layouts/supporting-pane):
     the board is the main pane; the question (with the counter) and the sentence are the supporting pane. Portrait:
     question, board, sentence from top to bottom. Landscape: the board on the left, the pane on the right.
   - **Automatic, but tappable:** it runs on his signals; every letter is a button that adds it to the sentence. The
     sentence card always shows its actions with labels: **Cofnij literę** (tonal), **Wyczyść** (outlined) and
-    **Przeczytaj** (filled, the main action). **Pauza** is a toggle in the top bar next to a status in words
-    ("Automat: widzę twarz"). There is no hidden menu.
-- **R13. Kalibracja holds readiness and his signals** (the content of the removed start dashboard): calibration,
-  camera and voice status, with "Kalibruj ponownie"; and a legend of his signals for new caregivers. One column on a
-  phone, two from 840 px (M3 expanded). Recent sentences live in **Zdania**, grouped by day, each with a repeat
+    **Przeczytaj** (Read aloud; filled, the main action). **Pauza** (Pause) is a toggle in the top bar next to a status in words
+    ("Automat: widzę twarz" (Automatic: I see the face)). There is no hidden menu.
+- **R13. Kalibracja (Calibration) holds readiness and his signals** (the content of the removed start dashboard): calibration,
+  camera and voice status, with "Kalibruj ponownie" (Calibrate again); and a legend of his signals for new caregivers. One column on a
+  phone, two from 840 px (M3 expanded). Recent sentences live in **Zdania** (Sentences), grouped by day, each with a repeat
   button.
 
 # UI and accessibility notes
@@ -160,7 +160,7 @@ visual language, the app structure (navigation on phones and large screens), and
   - Portrait (phone held in front of him): question and counter on top, board in the middle, sentence at the bottom.
   - Landscape (stand, laptop): board on the left, question, counter and sentence on the right.
   - Caregiver-held (rear camera): no board in focus; a huge question and counter for the caregiver and a "Mówię na
-    głos" indicator.
+    głos" (I am speaking aloud) indicator.
 - The counter shows how the number was built (✋ = 5, • = 1) as text plus symbols, so it is readable without color.
 - Live regions: the question and an added letter are announced with `aria-live="polite"` (SC 4.1.3).
 - Settings use native controls: radio groups and checkboxes, or `role="switch"` where on/off reads better
@@ -186,12 +186,12 @@ visual language, the app structure (navigation on phones and large screens), and
 - [x] Every page and every state passes axe with zero violations and raises no CSP or Trusted Types violation (R2, R5).
 - [x] The token contrast test passes: AAC pairs at least 7:1, other text 4.5:1, non-text 3:1, for every style in
       light and dark (R3, R4).
-- [x] Liczenie fits without scrolling in all five viewports, no part overlaps another, and the cells stay near-square (R6).
+- [x] Liczenie (Counting) fits without scrolling in all five viewports, no part overlaps another, and the cells stay near-square (R6).
 - [x] The shell shows a navigation bar below 600 px and a navigation rail from 600 px, with the current page marked;
       no horizontal scroll at 320 px (R12).
-- [x] A tap on a letter adds it and "Cofnij literę" removes it, both announced; the sentence actions are labelled and
+- [x] A tap on a letter adds it and "Cofnij literę" (Undo letter) removes it, both announced; the sentence actions are labelled and
       at least 44 px (R12).
-- [x] Kalibracja and Zdania have the content from R13.
+- [x] Kalibracja (Calibration) and Zdania (Sentences) have the content from R13.
 - [x] Every state in R8 is reachable by a link and by the simulator keys and buttons (R7).
 - [x] The author has approved the look after the polish rounds (recorded in `docs/design/index.md`).
 - [x] The final tokens are in `tokens.css`, `theme-color` matches them, and the icon has separate `any` and `maskable`

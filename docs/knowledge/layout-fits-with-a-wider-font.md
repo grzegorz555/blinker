@@ -13,7 +13,7 @@ verified:
 ---
 
 # Context
-In spec 004 (T4) Liczenie fitted a 360×740 phone on Windows, and every e2e layout check passed locally. In CI
+In spec 004 (T4) Liczenie (Counting) fitted a 360×740 phone on Windows, and every e2e layout check passed locally. In CI
 the hints wrapped to one more line, the question card grew, and the board overlapped the question and the
 sentence in four states. The same thing had happened before with a navigation label at 320 px (polish round 1).
 A probe also showed a hidden 4 px error in the board height formula: within the test's tolerance on Windows, past
