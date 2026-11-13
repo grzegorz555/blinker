@@ -180,21 +180,21 @@ visual language, the app structure (navigation on phones and large screens), and
 
 # Acceptance criteria
 
-- [ ] `npm run design:build` produces `dist/design/` with the catalog and every screen; the app build has no
+- [x] `npm run design:build` produces `dist/design/` with the catalog and every screen; the app build has no
       `design/` folder (R1).
-- [ ] `npm run design:serve` prints a LAN URL; the author opens the mock-ups on a phone in portrait and landscape.
-- [ ] Every page and every state passes axe with zero violations and raises no CSP or Trusted Types violation (R2, R5).
-- [ ] The token contrast test passes: AAC pairs at least 7:1, other text 4.5:1, non-text 3:1, for every style in
+- [x] `npm run design:serve` prints a LAN URL; the author opens the mock-ups on a phone in portrait and landscape.
+- [x] Every page and every state passes axe with zero violations and raises no CSP or Trusted Types violation (R2, R5).
+- [x] The token contrast test passes: AAC pairs at least 7:1, other text 4.5:1, non-text 3:1, for every style in
       light and dark (R3, R4).
-- [ ] Liczenie fits without scrolling in all five viewports, no part overlaps another, and the cells stay near-square (R6).
-- [ ] The shell shows a navigation bar below 600 px and a navigation rail from 600 px, with the current page marked;
+- [x] Liczenie fits without scrolling in all five viewports, no part overlaps another, and the cells stay near-square (R6).
+- [x] The shell shows a navigation bar below 600 px and a navigation rail from 600 px, with the current page marked;
       no horizontal scroll at 320 px (R12).
-- [ ] A tap on a letter adds it and "Cofnij literę" removes it, both announced; the sentence actions are labelled and
+- [x] A tap on a letter adds it and "Cofnij literę" removes it, both announced; the sentence actions are labelled and
       at least 44 px (R12).
-- [ ] Kalibracja and Zdania have the content from R13.
-- [ ] Every state in R8 is reachable by a link and by the simulator keys and buttons (R7).
-- [ ] The author has approved the look after the polish rounds (recorded in `docs/design/index.md`).
-- [ ] The final tokens are in `tokens.css`, `theme-color` matches them, and the icon has separate `any` and `maskable`
+- [x] Kalibracja and Zdania have the content from R13.
+- [x] Every state in R8 is reachable by a link and by the simulator keys and buttons (R7).
+- [x] The author has approved the look after the polish rounds (recorded in `docs/design/index.md`).
+- [x] The final tokens are in `tokens.css`, `theme-color` matches them, and the icon has separate `any` and `maskable`
       files; the existing manifest and installability tests pass; Lighthouse accessibility stays 100.
 
 # Test plan
