@@ -24,7 +24,7 @@ Branch: `feat/006-counting-core` (from `main`, worktree `C:/Repozytorium/Blinker
       function with an explicit transition table, effects as data, Transloco keys with parameters (R4–R6). Tests: the
       77-row table test and every path of the test plan; a test that the module uses no clock or timers.
       _To understand:_ finite state machines, a transition table, effects as data, why time is injected.
-- [ ] **T4 [sonnet]: Signal input and the keyboard mapping.** `core/input/signals.ts` (`Signal`), `keyboard.ts`
+- [x] **T4 [sonnet]: Signal input and the keyboard mapping.** `core/input/signals.ts` (`Signal`), `keyboard.ts`
       (R7, off by default). Tests: the keyboard cases of the test plan.
       _To understand:_ SC 2.1.4, one input type for every source (buttons, keys, later the face).
 - [ ] **T5 [sonnet]: Speech on the device.** `core/speech/speaker.ts` (interface), `web-speaker.ts` (local voices
