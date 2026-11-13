@@ -29,6 +29,8 @@ A task is done only when **in the same commit** as the code there are:
   - Most flows inject signals directly through a **test-only signal source**: in development and test builds, the `SWITCH` adapter and a `window.__blinkerTest.emit('LONG_BLINK')` hook. The hook is compiled out of production builds, and a test checks that it is absent in the production build.
 - Accessibility: `new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze()` must return no violations (https://playwright.dev/docs/accessibility-testing).
 - For each page, also check the 390 px portrait viewport and the landscape viewport.
+- A screen that must fit without scrolling is also checked with a wider font (`html { font-family: Verdana, sans-serif }`),
+  because the CI font (DejaVu Sans on Linux) is wider than the one on Windows ([learning](../knowledge/layout-fits-with-a-wider-font.md)).
 
 # Manual testing on real devices
 - Required from stage 3: Android Chrome and iPhone Safari, in the stand, hand-held and tablet setups. Record the results as a `type: Learning` concept with `stale_after`.
