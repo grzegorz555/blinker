@@ -3,10 +3,13 @@ type: Design
 title: "Blinker design: visual language, tokens, app structure and screens"
 description: The outcome of spec 004 - Material 3 on our own tokens, Liczenie (the board) as the main screen, the shell, every screen and state of the mock-ups, the token table with contrast ratios, and what the author decided after viewing them.
 tags: [design, accessibility, tokens, mockups]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-13
+verified:
+  - by: human:Grzegorz Roczniak
+    at: 2026-11-13
 ---
 
 # Who it is for
