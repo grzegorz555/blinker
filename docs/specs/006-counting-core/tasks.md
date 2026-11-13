@@ -17,7 +17,7 @@ Branch: `feat/006-counting-core` (from `main`, worktree `C:/Repozytorium/Blinker
       JSON Schema for people and the reason for our own validator. Tests: every invalid case of the test plan; the
       friend board equals the table in `friend-board.md`.
       _To understand:_ validating untrusted JSON, why `__proto__` is dangerous, why Ajv clashes with a strict CSP.
-- [ ] **T2 [sonnet]: Sentence with undo.** `core/sentence/sentence.ts` (R3): append char, word, actions; undo of
+- [x] **T2 [sonnet]: Sentence with undo.** `core/sentence/sentence.ts` (R3): append char, word, actions; undo of
       what this session added; history cap. Tests: the sentence cases of the test plan.
       _To understand:_ an undo stack, immutable updates.
 - [ ] **T3 [opus]: Counting state machine.** `core/counting/counting.ts`: states, signals, `next()` as a pure
