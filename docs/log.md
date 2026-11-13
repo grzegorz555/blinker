@@ -1,5 +1,9 @@
 # Log
 
+## 2026-11-13 (spec 006, T1–T6)
+- The counting core without UI: board format v1 and validator, his board as the default, the sentence with undo, the counting state machine (77 explicit state × signal pairs, time only from TICK, a lint rule against clocks in the core), one input type and a keyboard mapping that is off by default, on-device speech, CountingService.
+- The author: a nod without a number while Blinker waits for a column is a space (he does not signal the end of a word today).
+
 ## 2026-11-13 (stage 2 plan)
 - Spec 006 (counting core, no UI) planned; stage 2 split into 006 and 007 (the screens).
 - ADR-0005 accepted: Angular Material for every component it provides, custom navigation bar and rail, board and Liczenie layout.

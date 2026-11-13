@@ -99,16 +99,16 @@ changing this core.
 
 # Acceptance criteria
 
-- [ ] `friend-pl.json` validates and equals the table in `friend-board.md`; the validator rejects every invalid case
+- [x] `friend-pl.json` validates and equals the table in `friend-board.md`; the validator rejects every invalid case
       in the test plan with the right path and code (R1, R2).
-- [ ] The machine's table test lists every (state, signal) pair and its result; there is no untested pair (R4).
-- [ ] The behavior cases of R5 pass, including a double shake after a rejection, and "no speech or clear without a
+- [x] The machine's table test lists every (state, signal) pair and its result; there is no untested pair (R4).
+- [x] The behavior cases of R5 pass, including a double shake after a rejection, and "no speech or clear without a
       nod" (R5).
-- [ ] Time only enters through `TICK`; the machine module has no `Date`, `setTimeout` or `performance` (a lint rule or
+- [x] Time only enters through `TICK`; the machine module has no `Date`, `setTimeout` or `performance` (a lint rule or
       a test checks it) (R6).
-- [ ] The keyboard mapping is off by default and follows R7 (R7).
-- [ ] Only local voices are used; with none, nothing is spoken and the reason is reported (R8).
-- [ ] `npm run verify` passes; the existing e2e suite passes unchanged (no UI change).
+- [x] The keyboard mapping is off by default and follows R7 (R7).
+- [x] Only local voices are used; with none, nothing is spoken and the reason is reported (R8).
+- [x] `npm run verify` passes; the existing e2e suite passes unchanged (no UI change).
 
 # Test plan
 
