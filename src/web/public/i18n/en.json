@@ -17,5 +17,32 @@
     "heading": "Page not found",
     "description": "This page doesn't exist.",
     "backHome": "Go to the home page"
+  },
+  "counting": {
+    "giveColumn": "Give the column",
+    "giveRow": "Column {{column}}. Give the row",
+    "counting": "Counting: {{n}}",
+    "askColumn": "Column {{n}}?",
+    "askRow": "Row {{n}}?",
+    "rejectedNo": "No, not {{n}}. Again",
+    "noColumn": "There is no column {{n}}. Again",
+    "noRow": "There is no row {{n}}. Again",
+    "emptyCell": "Row {{row}} in column {{column}} is empty. Again",
+    "added": "Added {{letter}}",
+    "letter": "{{letter}}",
+    "space": "Space",
+    "spaceNotAdded": "No space: the sentence is empty or already ends with a space",
+    "undone": "Undone: {{text}}",
+    "undoneSpace": "Space undone",
+    "nothingToUndo": "Nothing to undo",
+    "deleted": "Deleted {{text}}",
+    "cleared": "Sentence cleared",
+    "backToColumns": "Back to the columns",
+    "askSpeak": "Read it aloud?",
+    "nothingToSpeak": "The sentence is empty",
+    "speaking": "Reading aloud",
+    "backToWriting": "Back to writing",
+    "paused": "Paused",
+    "resumed": "Resumed"
   }
 }

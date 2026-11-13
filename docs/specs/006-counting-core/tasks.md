@@ -20,7 +20,7 @@ Branch: `feat/006-counting-core` (from `main`, worktree `C:/Repozytorium/Blinker
 - [x] **T2 [sonnet]: Sentence with undo.** `core/sentence/sentence.ts` (R3): append char, word, actions; undo of
       what this session added; history cap. Tests: the sentence cases of the test plan.
       _To understand:_ an undo stack, immutable updates.
-- [ ] **T3 [opus]: Counting state machine.** `core/counting/counting.ts`: states, signals, `next()` as a pure
+- [x] **T3 [opus]: Counting state machine.** `core/counting/counting.ts`: states, signals, `next()` as a pure
       function with an explicit transition table, effects as data, Transloco keys with parameters (R4–R6). Tests: the
       77-row table test and every path of the test plan; a test that the module uses no clock or timers.
       _To understand:_ finite state machines, a transition table, effects as data, why time is injected.

@@ -36,6 +36,20 @@ module.exports = defineConfig([
     },
   },
   {
+    // Domain logic is pure (spec 006, R6): no clock and no timers, so time enters only as the TICK signal and tests
+    // drive it by hand. Angular services (*.service.ts) own the one scheduler.
+    files: ['src/app/core/{boards,sentence,counting,input}/**/*.ts'],
+    ignores: ['**/*.spec.ts', '**/*.service.ts'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        ...['Date', 'setTimeout', 'setInterval', 'performance', 'requestAnimationFrame'].map(
+          (name) => ({ name, message: 'Pure core logic: pass time in (TICK), do not read it.' }),
+        ),
+      ],
+    },
+  },
+  {
     // Mock-up scripts (spec 004): plain browser JS, the same security rules as the app (no innerHTML, no eval).
     files: ['design/**/*.js'],
     extends: [eslint.configs.recommended, noUnsanitized.configs.recommended],

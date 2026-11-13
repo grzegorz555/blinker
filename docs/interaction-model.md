@@ -67,7 +67,7 @@ confirms it** (says it aloud and waits for his answer). In Blinker the confirmat
 |---|---|---|
 | `LONG_BLINK` | select (scanning) / +1 (counting) | — |
 | `LOOK_AT_HAND` | +5 (counting only; ignored in scanning) | — |
-| `HEAD_NOD` | confirm the number or letter Blinker asked about | **yes** |
+| `HEAD_NOD` | confirm the number or letter Blinker asked about; **without a number, while Blinker waits for a column: a space** (the end of a word; author, 2026-11-13) | **yes** |
 | `HEAD_SHAKE` or `HEAD_LEFT` | **no / back one step (−1)**: in counting, discard the number Blinker asked about; otherwise from rows back to columns, and at columns delete the last character | **no** |
 | `HEAD_RIGHT` | finish the sentence and ask "Read it aloud?" | — |
 | `VERY_LONG_CLOSE` | pause or resume input (rest mode) | — |

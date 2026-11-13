@@ -17,5 +17,32 @@
     "heading": "Nie znaleziono strony",
     "description": "Ta strona nie istnieje.",
     "backHome": "Przejdź do strony głównej"
+  },
+  "counting": {
+    "giveColumn": "Podaj kolumnę",
+    "giveRow": "Kolumna {{column}}. Podaj wiersz",
+    "counting": "Liczę: {{n}}",
+    "askColumn": "Kolumna {{n}}?",
+    "askRow": "Wiersz {{n}}?",
+    "rejectedNo": "Nie, to nie {{n}}. Jeszcze raz",
+    "noColumn": "Nie ma kolumny {{n}}. Jeszcze raz",
+    "noRow": "Nie ma wiersza {{n}}. Jeszcze raz",
+    "emptyCell": "Wiersz {{row}} w kolumnie {{column}} jest pusty. Jeszcze raz",
+    "added": "Dodano {{letter}}",
+    "letter": "{{letter}}",
+    "space": "Spacja",
+    "spaceNotAdded": "Bez spacji: zdanie jest puste albo kończy się spacją",
+    "undone": "Cofnięto {{text}}",
+    "undoneSpace": "Cofnięto spację",
+    "nothingToUndo": "Nie ma czego cofnąć",
+    "deleted": "Usunięto {{text}}",
+    "cleared": "Wyczyszczono zdanie",
+    "backToColumns": "Wracam do kolumn",
+    "askSpeak": "Przeczytać na głos?",
+    "nothingToSpeak": "Zdanie jest puste",
+    "speaking": "Czytam na głos",
+    "backToWriting": "Piszemy dalej",
+    "paused": "Pauza",
+    "resumed": "Wracamy"
   }
 }

@@ -50,14 +50,18 @@ changing this core.
   `paused`. Signals: `BLINK` (+1), `HAND` (+5), `NOD`, `SHAKE`, `RIGHT` (finish), `PAUSE` (toggle), and `TICK(now)`
   for time. The machine is a pure function `next(state, signal, config) → { state, effects }`; **every (state, signal)
   pair has an explicit entry**, no default branch for signals that change the text
-  ([learning](../../knowledge/no-depends-on-context.md)). Effects: `ask(text)`, `say(text)`, `append(cell)`,
-  `undo`, `announce(text)`.
+  ([learning](../../knowledge/no-depends-on-context.md)). The state holds the sentence (T2), so the machine decides
+  every change of the text itself. Effects, as data for the service: `ask`, `say`, `announce` (Transloco keys with
+  parameters) and `speak(text)` (read the sentence aloud).
 - **R5. Counting behavior** (interaction model, mode B):
   - `BLINK` adds 1, `HAND` adds 5 while giving a number; after `config.askAfterMs` without a signal (default 1200 ms,
     from 500 to 5000, SC 2.2.1) the machine asks "Kolumna N?" / "Wiersz N?" (effects `ask`, and `say` if
     `config.speakQuestions`);
   - a number past the board, or an empty cell, is rejected with a reason;
   - `NOD` on a question confirms it; on the row question it appends the cell and says the letter;
+  - **`NOD` without a number while waiting for a column adds a space** (the end of a word; author, 2026-11-13): shown
+    and said as "Spacja", undone by a `SHAKE` like any letter; on an empty sentence, or one that already ends with a
+    space, it adds nothing and says so;
   - `SHAKE` on a question rejects the number; **a second `SHAKE` right after a rejection changes nothing**; `SHAKE`
     while waiting for a row goes back to the columns; `SHAKE` while waiting for a column undoes the last letter added;
   - `RIGHT` asks "Przeczytać na głos?"; only `NOD` then says the sentence; `SHAKE` goes back to writing;
@@ -117,7 +121,8 @@ changing this core.
   - machine, **table test**: every state × every signal → expected state and effects (11 × 7 = 77 rows);
   - machine, paths: hand + 2 blinks = 7 → ask after `askAfterMs` (and not before) → nod → row 3 → nod → "W"
     appended and said; 10 → rejected with the reason; empty cell → rejected; double shake; undo at the columns;
-    finish → no → back; finish → yes → speak; pause ignores signals; `askAfterMs` from config;
+    finish → no → back; finish → yes → speak; pause ignores signals; `askAfterMs` from config; a nod without a
+    number adds a space, a shake removes it, a nod after a space or on an empty sentence adds nothing;
   - keyboard mapping: off by default; on → each key → its signal; repeat, modifiers, Space on a button ignored;
   - speaker: picks a local Polish voice; ignores network voices; none → `no-local-voice`; a new `say` cancels;
   - `CountingService` with a fake scheduler and speaker: a full path drives the sentence and the speaker.
