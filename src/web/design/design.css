@@ -297,6 +297,9 @@ html[data-scheme='dark'] {
   }
 
   .shell-fit .shell-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     padding: 0 max(0.5rem, env(safe-area-inset-right)) 0.5rem max(0.5rem, env(safe-area-inset-left));
   }
 
@@ -410,7 +413,8 @@ html[data-scheme='dark'] {
    */
   .count {
     display: grid;
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     gap: 0.5rem;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr) auto;
@@ -455,6 +459,68 @@ html[data-scheme='dark'] {
   .count-sentence {
     grid-area: sentence;
     align-self: end;
+  }
+
+  /*
+   * Caregiver-held (R8): the screen faces the caregiver and the rear camera faces him, so the board is not in focus.
+   * A huge question and counter for the caregiver, the sentence below, and what Blinker is saying aloud.
+   */
+  [data-layout='caregiver'] .count {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: 'question' 'sentence';
+  }
+
+  [data-layout='caregiver'] .count-board {
+    display: none;
+  }
+
+  [data-layout='caregiver'] .question {
+    font-size: clamp(3rem, 22cqi, 9rem);
+  }
+
+  /* What Blinker says aloud, in words (the audio state is visible, not only heard). */
+  .count-audio {
+    align-self: flex-start;
+    background-color: var(--bg);
+  }
+
+  /* The signal simulator (mock-up only, ?sim=1): his signals as buttons, under the panes, never over the board. */
+  /* One row of six; on a phone the labels are short (+1, +5, tak, nie) and the full name stays for screen readers. */
+  .sim-list {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+
+  .sim-btn {
+    display: flex;
+    width: 100%;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 0.25rem 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .sim-btn kbd {
+    border-radius: 0.25rem;
+    background-color: var(--surface);
+    padding-inline: 0.25rem;
+    font-family: inherit;
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 599px) {
+    .sim-btn kbd {
+      display: none;
+    }
   }
 
   /* The counter: how the number was built (R4: readable without color), tonal tokens, not buttons. */
@@ -619,6 +685,13 @@ html[data-scheme='dark'] {
  * (https://developer.mozilla.org/docs/Web/CSS/@layer).
  */
 @layer utilities {
+  /* With the simulator on a phone, the hint gives way to the board: the simulator buttons say the same. */
+  @media (max-width: 599px) {
+    [data-sim='on'] .count-hint {
+      display: none;
+    }
+  }
+
   /* Short screens (a phone on its side): a compact question, so the pane fits without overlapping. */
   @media (max-height: 520px) {
     .count-question {
