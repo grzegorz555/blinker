@@ -48,10 +48,14 @@ Branch: `feat/004-mockups` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
         content.
         _To understand:_ M3 color roles and tonal palettes, canonical layouts and window size classes, container query
         units, cascade layers (why a Tailwind utility beats a component class).
-- [ ] **T4 [sonnet]: Communicate states and the simulator.** Every state from R8 reachable by `#state` links;
+- [x] **T4 [sonnet]: Communicate states and the simulator.** Every state from R8 reachable by `#state` links;
       keyboard and on-screen simulator (R7); the caregiver-held layout. Tests: e2e simulator path by keys and by buttons,
       live region announcements, axe on every state, reduced motion.
       _To understand:_ `aria-live`, URL fragments as state, why the simulator is not the real state machine.
+      _Outcome:_ twelve states by `#fragment` (linked from the catalog); keys Space, H, N, S, P plus R (head right:
+      "Przeczytać na głos?") and F (face lost); on-screen buttons with `?sim=1`, short labels on phones, where the hint
+      gives way to the board. A shake at the columns undoes the last letter. The author said the friend should manage
+      the board **without a caregiver**, so the caregiver-held layout stays a minimal extra.
 - [ ] **T5 [sonnet]: Calibrate, boards and settings.** In the shell: calibration wizard (camera explanation before the
       prompt, blink, hand left/right, nod, shake, result); boards (list, preview of the friend's layout, JSON import with
       validation errors shown in text); settings (mode, timings, signal mapping, voice, language, theme). Tests: e2e axe

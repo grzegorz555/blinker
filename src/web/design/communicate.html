@@ -54,21 +54,37 @@
       <main class="shell-main">
         <div class="count">
           <section class="count-question card card-primary p-4" aria-labelledby="question">
-            <p class="count-step label-large">Krok 1 z 2 · kolumna</p>
+            <p class="count-step label-large" data-step>Krok 1 z 2 · kolumna</p>
             <p id="question" class="question mt-1 font-extrabold" aria-live="polite">Kolumna 7?</p>
-            <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-lg">
-              <span class="sr-only">Policzone: ręka i dwa mrugnięcia, razem 7.</span>
+            <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-lg" data-tally>
+              <span class="sr-only">Policzone: ręka, mrugnięcie, mrugnięcie, razem 7.</span>
               <span class="tally" aria-hidden="true">ręka +5</span>
               <span class="tally" aria-hidden="true">+1</span>
               <span class="tally" aria-hidden="true">+1</span>
               <span class="font-bold" aria-hidden="true">= 7</span>
             </p>
-            <p class="count-hint mt-2">Kiwnij głową = tak · Pokręć głową = nie</p>
+            <p class="count-hint mt-2" data-hint>Kiwnij głową = tak · Pokręć głową = nie</p>
+            <p class="count-audio status mt-2" data-audio hidden>
+              <svg
+                class="icon"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M11 5 6 9H3v6h3l5 4z" />
+                <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+              </svg>
+              <span data-audio-text>Mówię na głos</span>
+            </p>
           </section>
 
           <div class="count-board">
             <table class="board">
-              <caption class="sr-only">
+              <caption class="sr-only" data-caption>
                 Tablica liter: kolumny od 1 do 7, wiersze od 1 do 5. Wskaźnik: kolumna 7, litera G.
                 Dotknij litery, żeby dodać ją do zdania.
               </caption>
@@ -182,7 +198,7 @@
                 </svg>
                 Wyczyść
               </button>
-              <button type="button" class="action btn-primary">
+              <button type="button" class="action btn-primary" data-read>
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
@@ -201,6 +217,47 @@
             </div>
           </section>
         </div>
+
+        <!--
+          The signal simulator (R7), only in the mock-up: shown with ?sim=1, so a phone without a keyboard can play
+          his signals. The keys work without it: Space = blink (+1), H = hand (+5), N = nod, S = shake,
+          R = head right (read aloud?), P = pause, F = face lost or back.
+        -->
+        <section class="sim" aria-labelledby="sim-title" data-sim hidden>
+          <h2 id="sim-title" class="sr-only">Symulator sygnałów (tylko makieta)</h2>
+          <ul class="sim-list">
+            <li>
+              <button type="button" class="sim-btn" data-signal="blink">
+                <span class="max-sm:sr-only">Mrugnięcie </span>+1 <kbd>Spacja</kbd>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="sim-btn" data-signal="hand">
+                <span class="max-sm:sr-only">Ręka </span>+5 <kbd>H</kbd>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="sim-btn" data-signal="nod">
+                <span class="max-sm:sr-only">Kiwnięcie: </span>tak <kbd>N</kbd>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="sim-btn" data-signal="shake">
+                <span class="max-sm:sr-only">Pokręcenie: </span>nie <kbd>S</kbd>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="sim-btn" data-signal="right">
+                <span class="max-sm:sr-only">Głowa </span>w prawo <kbd>R</kbd>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="sim-btn" data-signal="face">
+                Twarz <span class="max-sm:sr-only" data-face-label>znika</span> <kbd>F</kbd>
+              </button>
+            </li>
+          </ul>
+        </section>
       </main>
 
       <!-- include nav.html -->

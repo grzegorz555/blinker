@@ -1,62 +1,7 @@
 // Spec 004: Liczenie, the main screen ("Kolumna 7?"): the M3 supporting-pane layout (R4, R6, R12). CSP guard active (R2).
-import { expect, test, type Page } from '../support/test';
+import { expect, test } from '../support/test';
 import { expectNoA11yViolations } from '../support/a11y';
-
-/** R6: phone portrait (2), phone landscape, tablet, laptop. */
-const VIEWPORTS = [
-  { name: 'phone portrait 360', width: 360, height: 740 },
-  { name: 'phone portrait 390', width: 390, height: 844 },
-  { name: 'phone landscape', width: 740, height: 360 },
-  { name: 'tablet', width: 768, height: 1024 },
-  { name: 'laptop', width: 1280, height: 800 },
-];
-
-async function open(page: Page, query = '') {
-  await page.goto(`/communicate.html${query}`);
-  await expect(page.locator('html')).toHaveAttribute('data-js', 'ready');
-}
-
-const sentence = (page: Page) => page.locator('[data-sentence]');
-
-/**
- * Layout problems (0 = fine): how far a part reaches beyond the viewport, any overlap between the question, the
- * board, the sentence and the navigation, and horizontal scrolling.
- */
-function layoutProblems(page: Page) {
-  return page.evaluate(() => {
-    const vh = window.innerHeight;
-    const vw = document.documentElement.clientWidth;
-    const parts = [
-      ['question', '.count-question'],
-      ['board', '.count-board .board'],
-      ['sentence', '.count-sentence'],
-      ['nav', '.shell-nav'],
-    ].map(([name, selector]) => [name, document.querySelector(selector)!.getBoundingClientRect()]);
-    const result: Record<string, number> = {};
-    for (const [name, box] of parts as [string, DOMRect][]) {
-      result[`${name} outside`] = Math.max(
-        0,
-        Math.ceil(box.bottom - vh),
-        Math.ceil(box.right - vw),
-      );
-    }
-    for (let i = 0; i < parts.length; i++) {
-      for (let j = i + 1; j < parts.length; j++) {
-        const [an, a] = parts[i] as [string, DOMRect];
-        const [bn, b] = parts[j] as [string, DOMRect];
-        const overlaps =
-          a.left < b.right - 1 &&
-          a.right > b.left + 1 &&
-          a.top < b.bottom - 1 &&
-          a.bottom > b.top + 1;
-        result[`${an} overlaps ${bn}`] = overlaps ? 1 : 0;
-      }
-    }
-    result['vertical scroll'] = Math.max(0, document.documentElement.scrollHeight - vh);
-    result['horizontal scroll'] = Math.max(0, document.documentElement.scrollWidth - vw);
-    return result;
-  });
-}
+import { VIEWPORTS, expectFits, open, sentence } from './liczenie';
 
 test.describe('Liczenie', () => {
   for (const scheme of ['light', 'dark']) {
@@ -72,9 +17,7 @@ test.describe('Liczenie', () => {
     await open(page);
     for (const viewport of VIEWPORTS) {
       await page.setViewportSize(viewport);
-      const problems = await layoutProblems(page);
-      const fine = Object.fromEntries(Object.keys(problems).map((k) => [k, 0]));
-      expect(problems, viewport.name).toEqual(fine);
+      await expectFits(page, viewport.name);
     }
   });
 
@@ -259,7 +202,7 @@ test.describe('catalog and scheme', () => {
       'aria-current',
       'true',
     );
-    await expect(page.getByRole('link', { name: /Liczenie/ })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Liczenie: „Kolumna/ })).toHaveAttribute(
       'href',
       /communicate\.html\?scheme=dark/,
     );
