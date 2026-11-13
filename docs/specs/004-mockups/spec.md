@@ -109,6 +109,9 @@ visual language, the app structure (navigation on phones and large screens), and
   `LONG_BLINK` (+1), **H** = `LOOK_AT_HAND` (+5), **N** = `HEAD_NOD`, **S** = `HEAD_SHAKE`, **P** = pause. The
   simulator is a few lines of plain DOM code (`textContent`, attributes, `hidden`), not the real state machine,
   which stage 2 builds and tests properly. On-screen buttons do the same, so a phone without a keyboard works too.
+  **Known exception (review of T4):** the single-key shortcuts can't be turned off, which SC 2.1.4 would require.
+  They exist only in the mock-up simulator, as a stand-in for his face signals; he controls Blinker with his head, and
+  the keyboard is not a way he uses it. The real app gets no single-key shortcuts unless they can be turned off.
 - **R8. Communicate states covered:** waiting for a column; counting (with the running number and how it was built,
   e.g. hand + 2 blinks = 7); asking "Kolumna 7?"; rejected (head shake, give it again); waiting for a row in column 7;
   asking "Wiersz 3?"; letter added ("W") and spoken; the sentence with undo; "Przeczytać na głos?"; paused; face not
