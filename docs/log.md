@@ -1,5 +1,9 @@
 # Log
 
+## 2026-11-13 (stage 2 plan)
+- Spec 006 (counting core, no UI) planned; stage 2 split into 006 and 007 (the screens).
+- ADR-0005 accepted: Angular Material for every component it provides, custom navigation bar and rail, board and Liczenie layout.
+
 ## 2026-11-13 (spec 004, T6 and T7)
 - Final tokens: the M3 values moved unchanged into tokens.css as light-dark() pairs, with every role the mock-ups use; the mock-ups no longer override colors; the contrast check requires every token of the app.
 - theme-color is --bg (the top app bar), checked by scripts/theme-color.mjs; separate any and maskable icons generated from the tokens and checked byte for byte.
