@@ -3,7 +3,7 @@ type: Decision
 title: "ADR-0005: Angular Material (Material 3) as the UI library instead of spartan-ng"
 description: Proposed after polish round 1 of spec 004; the mock-ups move to Material Design 3, so stage 2 would build the screens with Angular Material, keeping our tokens, icons and security rules.
 tags: [adr, ui, design, accessibility]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-12
@@ -11,7 +11,7 @@ generated:
 
 # ADR-0005: Angular Material (Material 3) as the UI library instead of spartan-ng
 
-- Status: Proposed
+- Status: Accepted (by the author, 2026-11-13)
 - Date: 2026-11-12
 
 ## Context
@@ -48,9 +48,19 @@ stage 2 on a library that implements another design system would mean restyling 
 
 ## Decision
 
-Proposed: option 1. Angular Material implements the visual language the author chose, it comes from the Angular
-team, and the CDK covers the accessibility primitives. Our design tokens (spec 004, `tokens.css`) map onto the M3
-system tokens, so the mock-up colors carry over. Accepted only after the author reviews this ADR.
+**Accepted by the author on 2026-11-13: Angular Material for everything it provides, the rest custom.**
+
+- **Angular Material + the CDK** for the components it has: buttons, form fields, selects, radio groups, slide
+  toggles (the switches), sliders, dialogs, menus, snack bars, lists, and the CDK a11y helpers (focus, live
+  announcer).
+- **Custom components on our tokens and Tailwind**, following the spec 004 mock-ups, where Angular Material has no
+  component: the M3 **navigation bar** and **navigation rail**, the **letter board**, and the Liczenie
+  supporting-pane layout.
+- Our design tokens (`tokens.css`) map onto the M3 system tokens, so the mock-up colors carry over; the mock-ups
+  are the visual reference, not code to copy.
+
+Why not option 3 alone: the author prefers tested, maintained components where they exist; the mock-ups are not
+built on Angular Material, so the screens are written as Angular components either way.
 
 ## Consequences
 
