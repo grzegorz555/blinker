@@ -1,5 +1,10 @@
 # Log
 
+## 2026-11-13 (spec 004, T6 and T7)
+- Final tokens: the M3 values moved unchanged into tokens.css as light-dark() pairs, with every role the mock-ups use; the mock-ups no longer override colors; the contrast check requires every token of the app.
+- theme-color is --bg (the top app bar), checked by scripts/theme-color.mjs; separate any and maskable icons generated from the tokens and checked byte for byte.
+- docs/design/index.md records the visual language, the token table, the app structure, the screens and states, and the author's decisions (the look approved; he should manage alone; he controls Blinker with his head). Spec 004 done.
+
 ## 2026-11-13 (spec 004, T4 and T5, PR #13)
 - Liczenie: twelve states by URL fragment and a signal simulator (keys, and buttons with ?sim=1); a shake right after a rejected number no longer deletes a letter; undo removes only letters added in the session.
 - Kalibracja wizard (eight steps by fragment), Tablice with a JSON import checked as untrusted input and errors in text, Ustawienia with native controls and a hints switch; new --error token.

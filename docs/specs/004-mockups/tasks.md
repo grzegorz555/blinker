@@ -75,7 +75,7 @@ Branch: `feat/004-mockups` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       is `--bg` (the top app bar color), checked by `scripts/theme-color.mjs`. Icons: `icon-any-*` (rounded square,
       transparent corners) and `icon-maskable-*` (full bleed, the eye inside the 40% safe zone), generated from the
       tokens and checked byte for byte.
-- [ ] **T7 [haiku]: Docs and compound.** `docs/design/index.md` (visual language, token table with ratios, app
+- [x] **T7 [haiku]: Docs and compound.** `docs/design/index.md` (visual language, token table with ratios, app
       structure, screen inventory, phone-test findings), `docs/index.md`, README (how to view the mock-ups), specs index,
       log, Polish copies, summary.
       _To understand:_ the compound step.
