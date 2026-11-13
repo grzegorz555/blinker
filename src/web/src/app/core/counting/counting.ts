@@ -1,7 +1,7 @@
 // The counting machine (spec 006, R4–R6; docs/interaction-model.md, mode B). Plain TypeScript, no Angular imports.
 //
 // Blinker plays the caregiver's role: he gives a number (a long blink = 1, a look at his hand = 5), Blinker asks
-// "Kolumna 7?", he nods (yes) or shakes his head (no); then the row the same way, and the letter is added and said.
+// "Kolumna 7?" (Column 7?), he nods (yes) or shakes his head (no); then the row the same way, and the letter is added and said.
 //
 // - `next(state, signal, config)` is a pure function: the same input always gives the same output, and it never reads
 //   the clock or sets a timer. Time comes in only as the TICK signal (R6).
@@ -51,11 +51,11 @@ export interface Message {
 export type Effect =
   /** A new question: show it and announce it (polite live region). */
   | { readonly type: 'ask'; readonly message: Message }
-  /** Say a short text aloud (a question when speakQuestions is on, an added letter, "Spacja"). */
+  /** Say a short text aloud (a question when speakQuestions is on, an added letter, "Spacja" (Space)). */
   | { readonly type: 'say'; readonly message: Message }
   /** Announce a change to screen readers, and show it as the notice. */
   | { readonly type: 'announce'; readonly message: Message }
-  /** Read the sentence aloud: only after a nod on "Przeczytać na głos?". */
+  /** Read the sentence aloud: only after a nod on "Przeczytać na głos?" (Read it aloud?). */
   | { readonly type: 'speak'; readonly text: string }
   /** Stop reading aloud. */
   | { readonly type: 'stopSpeaking' };
@@ -64,7 +64,7 @@ export interface CountingConfig {
   readonly board: Board;
   /** How long Blinker waits after the last blink before it asks; 500–5000 ms (SC 2.2.1). */
   readonly askAfterMs: number;
-  /** Say the questions aloud ("Kolumna 7?"), not only show them. */
+  /** Say the questions aloud ("Kolumna 7?" (Column 7?)), not only show them. */
   readonly speakQuestions: boolean;
 }
 
@@ -295,7 +295,7 @@ const shakeNumber =
 
 // ---- row step --------------------------------------------------------------------------------------------------
 
-/** A nod on "Wiersz N?": the cell is chosen. A letter or word is added and said; an action is carried out. */
+/** A nod on "Wiersz N?" (Row N?): the cell is chosen. A letter or word is added and said; an action is carried out. */
 const confirmRow: Handler = (state, config) => {
   const column = state.column ?? 0;
   const cell = cellAt(config.board, column, total(state));

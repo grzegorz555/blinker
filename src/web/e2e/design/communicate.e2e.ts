@@ -1,9 +1,9 @@
-// Spec 004: Liczenie, the main screen ("Kolumna 7?"): the M3 supporting-pane layout (R4, R6, R12). CSP guard active (R2).
+// Spec 004: Liczenie (Counting), the main screen ("Kolumna 7?" (Column 7?)): the M3 supporting-pane layout (R4, R6, R12). CSP guard active (R2).
 import { expect, test } from '../support/test';
 import { expectNoA11yViolations } from '../support/a11y';
 import { VIEWPORTS, expectFits, open, sentence } from './liczenie';
 
-test.describe('Liczenie', () => {
+test.describe('Liczenie (Counting)', () => {
   for (const scheme of ['light', 'dark']) {
     test(`${scheme}: has no WCAG A/AA violations detectable by axe`, async ({ page }) => {
       await open(page, `?scheme=${scheme}`);
@@ -85,7 +85,7 @@ test.describe('Liczenie', () => {
     }
   });
 
-  test('a tap on a letter adds it, and "Cofnij literę" removes it, both announced', async ({
+  test('a tap on a letter adds it, and "Cofnij literę" (Undo letter) removes it, both announced', async ({
     page,
   }) => {
     await open(page);
@@ -111,7 +111,9 @@ test.describe('Liczenie', () => {
     await expect(sentence(page)).toHaveText('CHCĘ SIĘ NAPIĆ A');
   });
 
-  test('"Pauza" is a toggle button and the status says the mode in words', async ({ page }) => {
+  test('"Pauza" (Pause) is a toggle button and the status says the mode in words', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await open(page);
     const pause = page.getByRole('button', { name: 'Pauza' });

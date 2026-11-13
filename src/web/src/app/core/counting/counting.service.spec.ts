@@ -57,7 +57,7 @@ describe('CountingService', () => {
     expect(scheduler.running).toBe(false);
   });
 
-  it('a full path: hand + 2 blinks, "Kolumna 7?", yes, 3 blinks, "Wiersz 3?", yes: W is added and said', () => {
+  it('a full path: hand + 2 blinks, "Kolumna 7?" (Column 7?), yes, 3 blinks, "Wiersz 3?" (Row 3?), yes: W is added and said', () => {
     const { service, speaker, scheduler } = setup();
     scheduler.at(0);
     service.send({ type: 'HAND' });

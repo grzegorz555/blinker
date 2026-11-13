@@ -1,4 +1,4 @@
-// Spec 004, T4: every Liczenie state from R8 by a #fragment, and the signal simulator by keys and by buttons (R7).
+// Spec 004, T4: every Liczenie (Counting) state from R8 by a #fragment, and the signal simulator by keys and by buttons (R7).
 // CSP guard active (R2). The simulator is throwaway mock-up code, not the real state machine (stage 2).
 import { devices } from '@playwright/test';
 import { expect, test, type Page } from '../support/test';
@@ -27,7 +27,7 @@ const press = async (page: Page, ...keys: string[]) => {
   for (const key of keys) await page.keyboard.press(key);
 };
 
-test.describe('Liczenie states (R8)', () => {
+test.describe('Liczenie (Counting) states (R8)', () => {
   test('the catalog links to every state', async ({ page }) => {
     await page.goto('/');
     const hashes = await page
