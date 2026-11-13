@@ -31,7 +31,7 @@ Branch: `feat/006-counting-core` (from `main`, worktree `C:/Repozytorium/Blinker
       only, cancel, `no-local-voice`), `fake-speaker.ts` (R8). Tests: voice choice with fake `speechSynthesis`,
       cancel, no local voice.
       _To understand:_ the Web Speech API, `localService`, why a network voice is a privacy risk.
-- [ ] **T6 [sonnet]: CountingService, docs and compound.** `core/counting/counting.service.ts` (R9: state in a
+- [x] **T6 [sonnet]: CountingService, docs and compound.** `core/counting/counting.service.ts` (R9: state in a
       signal, one `TICK` scheduler, effects to the sentence and the speaker), Transloco keys in `en.json` and
       `pl.json`; `docs/architecture.md` (the core modules), README status, specs index, log, Polish copies, summary.
       Tests: the service with a fake scheduler and speaker, a full path.

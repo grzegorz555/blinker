@@ -33,11 +33,17 @@ src/web/
     app.config.ts          router, HttpClient, Transloco, TranslatedTitleStrategy, language initializer, service worker
     app.routes.ts          lazy routes; `title` is a translation key
     core/i18n/             languages.ts (pure resolveLanguage), LanguageService, TranslocoHttpLoader, TranslatedTitleStrategy
+    core/boards/           board.ts (format v1), validate-board.ts (imported files are untrusted input)  (spec 006)
+    core/sentence/         sentence.ts (the text with undo of every step this session made)
+    core/counting/         counting.ts (the counting state machine: pure, every state × signal explicit, time from TICK),
+                           counting.service.ts (Angular: state in a signal, one TICK scheduler, effects to the speaker)
+    core/input/            signals.ts (one input type for every source), keyboard.ts (off by default, SC 2.1.4)
+    core/speech/           speaker.ts (interface), web-speaker.ts (on-device voices only), fake-speaker.ts (tests)
     features/home/, features/not-found/
     shared/language-switch/
   src/styles/tokens.css    design tokens (OKLCH, light/dark, contrast noted)
   src/testing/             test helpers (translocoTesting with the real en/pl files)
-  public/i18n/{en,pl}.json, public/manifest.webmanifest, public/icons/
+  public/i18n/{en,pl}.json, public/boards/friend-pl.json, public/manifest.webmanifest, public/icons/
   e2e/                     Playwright specs (*.e2e.ts), support/ (axe helper, third-party request check), serve-dist.mjs
   scripts/                 generate-icons.mjs (icons from the tokens); theme-color.mjs (theme-color = --bg); verify.mjs (every gate, CI order); check-dist.mjs; lighthouse.mjs +
                            lighthouse-lang.mjs (Lighthouse CI en/pl + language guard); *.test.mjs (node --test)
@@ -52,14 +58,19 @@ E2E tests run against the **production build** served by `e2e/serve-dist.mjs`, n
 This way the service worker, hashing and the absence of source maps are tested as they will be deployed.
 `npm run verify` is the single definition of "green": the CI `web` job runs all of it, and the pre-push hook runs its fast part (`--quick`, spec 005).
 
-# Modules (planned, `src/web/src/app`)
+# Modules (`src/web/src/app`; boards, sentence, counting, input and speech exist since spec 006)
+
+The core is plain TypeScript with no Angular imports and no clock (a lint rule enforces it); a thin Angular service
+wraps it. Data flow without a camera: a button or a key → `InputSignal` → `CountingService.send()` → `next(state,
+signal)` → effects (the text for the screen and the live region, `Speaker.say()`). Stage 4 adds his face signals as
+one more source of `InputSignal`.
 
 - `core/vision/`: camera access, the worker, and the MediaPipe wrapper. The model (`.task`) and the wasm files are served from `public/models/`, never from a CDN.
 - `core/signals/`: the signal detector, the calibration profile and the thresholds.
 - `core/input/`: the signal-to-action mapping and the input modes.
-- `core/scanning/`: the state machines (pure TypeScript, 100% unit-test coverage).
-- `core/boards/`: the board model, the JSON Schema, the import validator and IndexedDB storage.
-- `core/speech/`: the TTS wrapper.
+- `core/counting/`: the counting state machine (mode B); `core/scanning/` (mode A) after the PoC.
+- `core/boards/`: the board model, the import validator; IndexedDB storage later.
+- `core/speech/`: the Speaker interface and the Web Speech implementation (on-device voices only).
 - `core/i18n/`: Transloco (en, pl).
 - `features/communicate`, `features/calibrate`, `features/boards`, `features/settings`.
 
