@@ -72,7 +72,8 @@ changing this core.
   S = `SHAKE`, R = `RIGHT`, P = `PAUSE`) is **off by default** and can be turned on in settings (SC 2.1.4); it ignores
   key repeats, modifier keys, and Space or Enter on a focused control. The on-screen buttons of spec 007 call the
   same function.
-- **R8. Speech, on the device.** A `Speaker` interface (`say(text, lang)`, `cancel()`, `speaking` signal) with a
+- **R8. Speech, on the device.** A `Speaker` interface (`say(text, { lang, rate })`, `cancel()`, `speaking` with `subscribe()`; the Angular
+  service exposes it as a signal, so the core stays free of Angular) with a
   Web Speech implementation: only voices with `localService === true` for the board locale, so no text leaves the
   device; if there is none, `say` does nothing and reports `no-local-voice` (shown in spec 007 in text). A new `say`
   cancels the previous one. A fake `Speaker` for tests.
