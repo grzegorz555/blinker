@@ -102,7 +102,8 @@ function splitLightDark(value) {
 
 /**
  * Reads the token sets from CSS:
- * - ":root" outside a media query = set "app", light; inside "(prefers-color-scheme: dark)" = "app", dark;
+ * - ":root" = set "app": a light-dark(light, dark) value gives both schemes; a plain value outside a media query is
+ *   light, inside "(prefers-color-scheme: dark)" dark;
  * - "[data-style='x']" (or T2's "[data-direction='x']") = set "x"; its values are light-dark(light, dark).
  * @returns {Record<string, { light: Record<string,string>, dark: Record<string,string> }>}
  */
@@ -120,7 +121,7 @@ export function readTokenSets(css) {
     const set = (sets[name] ??= { light: {}, dark: {} });
     const inDark =
       rule.parent?.type === 'atrule' && /prefers-color-scheme:\s*dark/.test(rule.parent.params);
-    if (direction) {
+    if (direction || /^light-dark\(/.test(decl.value.trim())) {
       const [light, dark] = splitLightDark(decl.value);
       set.light[token] = light;
       set.dark[token] = dark;
@@ -142,11 +143,9 @@ export function checkTokenSets(sets, pairs = PAIRS) {
     for (const scheme of ['light', 'dark']) {
       const tokens = resolveVars(schemes[scheme]);
       const present = pairs.filter(([a, b]) => tokens[a] && tokens[b]);
-      // The app tokens may lack tokens that only the mock-ups use yet; a direction must define all of them.
-      if (set !== 'app') {
-        for (const t of new Set(pairs.flatMap(([a, b]) => [a, b]))) {
-          if (!tokens[t]) problems.push(`${set}/${scheme}: missing --${t}`);
-        }
+      // Every set, the app tokens included (final since spec 004 T6), defines every token of every pair.
+      for (const t of new Set(pairs.flatMap(([a, b]) => [a, b]))) {
+        if (!tokens[t]) problems.push(`${set}/${scheme}: missing --${t}`);
       }
       for (const t of Object.keys(tokens)) {
         if (/^(oklch|#)/.test(tokens[t]) && !inSrgbGamut(tokens[t])) {

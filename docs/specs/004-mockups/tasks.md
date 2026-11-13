@@ -65,11 +65,16 @@ Branch: `feat/004-mockups` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       in the title); the board import checks size, JSON and every field and shows the errors in text; settings add a
       "Podpowiedzi w Liczeniu" switch (the author may hide the hints, since he should manage without a caregiver). New
       `--error` token (M3 error role) with contrast pairs.
-- [ ] **T6 [sonnet]: Final tokens, theme-color and icon.** After the polish rounds: the `base` values into
+- [x] **T6 [sonnet]: Final tokens, theme-color and icon.** After the polish rounds: the `base` values into
       `tokens.css` (R3); `theme-color` in `index.html` and the manifest from the tokens; icon with separate `any` and
       `maskable` files (`npm run icons`). Tests: the contrast test also runs on `tokens.css`; unit test that `theme-color`
       equals the token; the existing manifest, installability and Lighthouse checks pass.
       _To understand:_ maskable icons and the safe zone, `theme-color` in light and dark.
+      _Outcome:_ the `m3` values (not `base`, replaced in polish round 1) moved unchanged into `tokens.css` as
+      `light-dark()` pairs, with every M3 role the mock-ups use; `design.css` no longer overrides tokens. `theme-color`
+      is `--bg` (the top app bar color), checked by `scripts/theme-color.mjs`. Icons: `icon-any-*` (rounded square,
+      transparent corners) and `icon-maskable-*` (full bleed, the eye inside the 40% safe zone), generated from the
+      tokens and checked byte for byte.
 - [ ] **T7 [haiku]: Docs and compound.** `docs/design/index.md` (visual language, token table with ratios, app
       structure, screen inventory, phone-test findings), `docs/index.md`, README (how to view the mock-ups), specs index,
       log, Polish copies, summary.
