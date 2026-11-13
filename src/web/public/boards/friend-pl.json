@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "id": "friend-pl",
+  "name": "Tablica przyjaciela",
+  "locale": "pl",
+  "columns": ["1", "2", "3", "4", "5", "6", "7"],
+  "rows": ["1", "2", "3", "4", "5"],
+  "cells": [
+    [
+      {
+        "type": "char",
+        "value": "A"
+      },
+      {
+        "type": "char",
+        "value": "B"
+      },
+      {
+        "type": "char",
+        "value": "C"
+      },
+      {
+        "type": "char",
+        "value": "D"
+      },
+      {
+        "type": "char",
+        "value": "E"
+      },
+      {
+        "type": "char",
+        "value": "F"
+      },
+      {
+        "type": "char",
+        "value": "G"
+      }
+    ],
+    [
+      {
+        "type": "char",
+        "value": "H"
+      },
+      {
+        "type": "char",
+        "value": "I"
+      },
+      {
+        "type": "char",
+        "value": "J"
+      },
+      {
+        "type": "char",
+        "value": "K"
+      },
+      {
+        "type": "char",
+        "value": "L"
+      },
+      {
+        "type": "char",
+        "value": "M"
+      },
+      {
+        "type": "char",
+        "value": "N"
+      }
+    ],
+    [
+      {
+        "type": "char",
+        "value": "O"
+      },
+      {
+        "type": "char",
+        "value": "P"
+      },
+      {
+        "type": "char",
+        "value": "R"
+      },
+      {
+        "type": "char",
+        "value": "S"
+      },
+      {
+        "type": "char",
+        "value": "T"
+      },
+      {
+        "type": "char",
+        "value": "U"
+      },
+      {
+        "type": "char",
+        "value": "W"
+      }
+    ],
+    [
+      {
+        "type": "char",
+        "value": "Z"
+      },
+      {
+        "type": "char",
+        "value": "Ż"
+      },
+      {
+        "type": "char",
+        "value": "Ź"
+      },
+      {
+        "type": "char",
+        "value": "X"
+      },
+      {
+        "type": "char",
+        "value": "Y"
+      },
+      {
+        "type": "char",
+        "value": "Ń"
+      },
+      null
+    ],
+    [
+      {
+        "type": "char",
+        "value": "Ć"
+      },
+      {
+        "type": "char",
+        "value": "Ę"
+      },
+      {
+        "type": "char",
+        "value": "Ą"
+      },
+      {
+        "type": "char",
+        "value": "Ś"
+      },
+      {
+        "type": "char",
+        "value": "SZ"
+      },
+      {
+        "type": "char",
+        "value": "CZ"
+      },
+      null
+    ]
+  ]
+}

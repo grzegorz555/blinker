@@ -12,7 +12,7 @@ generated:
 Branch: `feat/006-counting-core` (from `main`, worktree `C:/Repozytorium/Blinker/wt/006-counting-core`) · Gates:
 `npm run verify -- --quick` locally, full gates in CI.
 
-- [ ] **T1 [sonnet]: Board format v1, validator and his board.** `core/boards/board.ts` (types), `validate-board.ts`
+- [x] **T1 [sonnet]: Board format v1, validator and his board.** `core/boards/board.ts` (types), `validate-board.ts`
       (R1, R2, errors as `{ path, code }`), `public/boards/friend-pl.json`; `docs/board-format.md` finalized with the
       JSON Schema for people and the reason for our own validator. Tests: every invalid case of the test plan; the
       friend board equals the table in `friend-board.md`.
