@@ -151,8 +151,21 @@ describe('resolveVars and mergeTokenSets', () => {
 });
 
 describe('the project tokens (R3, R4)', () => {
-  it('has the app set and the m3 mock-up style', () => {
-    assert.deepEqual(Object.keys(readProjectTokenSets()).sort(), ['app', 'm3']);
+  it('has one set, the app tokens: the mock-ups no longer override values (T6)', () => {
+    assert.deepEqual(Object.keys(readProjectTokenSets()), ['app']);
+  });
+
+  it('reads light-dark() pairs in :root as the light and the dark value', () => {
+    const sets = readTokenSets(':root { --bg: light-dark(oklch(99% 0 0), oklch(15% 0 0)); }');
+    assert.deepEqual(sets.app, { light: { bg: 'oklch(99% 0 0)' }, dark: { bg: 'oklch(15% 0 0)' } });
+  });
+
+  it('the app tokens define every token of every pair, in light and dark', () => {
+    const { problems } = checkTokenSets(readProjectTokenSets());
+    assert.deepEqual(
+      problems.filter((p) => p.includes('missing')),
+      [],
+    );
   });
 
   it('meets every contrast threshold in light and dark', () => {
