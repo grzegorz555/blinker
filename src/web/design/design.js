@@ -120,8 +120,12 @@
       // A trailing space (after a word) stays, so the next letter starts the next word.
       const text = sentence.textContent.trimEnd();
       const trailing = sentence.textContent.slice(text.length);
-      const last = added.pop() ?? text.slice(-1);
-      if (!last || !text.endsWith(last)) return;
+      // Only letters added in this session can be undone, so undo never eats text it did not write.
+      const last = added.pop();
+      if (!last || !text.endsWith(last)) {
+        say('Nie ma litery do cofnięcia');
+        return;
+      }
       sentence.textContent = text.slice(0, -last.length) + trailing;
       say(`Usunięto ${last}`);
     }
@@ -178,6 +182,10 @@
         }
         const n = sum();
         s = { ...s, phase: 'rejected', parts: [], note: `Nie, to nie ${n}.` };
+      } else if (s.phase === 'rejected') {
+        // Right after a rejected number, another no only confirms it: it never deletes a letter or leaves the step,
+        // so a shake out of habit costs nothing (review of T4).
+        s = { ...s, phase: 'waiting', parts: [], note: '' };
       } else if (s.step === 'row') {
         // No / back one step: from rows back to columns.
         s = { ...s, step: 'column', column: 0, phase: 'waiting', parts: [], note: '' };
@@ -592,7 +600,9 @@
     const decimal = (n) => String(n).replace('.', ',');
 
     for (const input of document.querySelectorAll('[data-range-field]')) {
-      const error = document.getElementById(input.getAttribute('aria-describedby').split(' ')[1]);
+      // Each field's error has the id "<field id>-error" (settings.html), so the lookup does not depend on the
+      // order of the ids in aria-describedby.
+      const error = document.getElementById(`${input.id}-error`);
       const check = () => {
         const value = input.valueAsNumber;
         const ok = !Number.isNaN(value) && value >= Number(input.min) && value <= Number(input.max);

@@ -154,6 +154,32 @@ test.describe('signal simulator by keys (R7)', () => {
     await expect(question(page)).toHaveText('Podaj kolumnę');
   });
 
+  test('a shake right after a rejected number keeps the sentence and the step (review of T4)', async ({
+    page,
+  }) => {
+    await open(page, '#letter-added');
+    await press(page, 'h', 'Space', 'Space');
+    await expect(question(page)).toHaveText('Kolumna 7?');
+    await press(page, 's', 's');
+    await expect(question(page)).toHaveText('Podaj kolumnę');
+    await expect(sentence(page)).toHaveText('CHCĘ SIĘ NAPIĆ W');
+
+    await open(page, '#waiting-row');
+    await press(page, 'Space');
+    await expect(question(page)).toHaveText('Wiersz 1?');
+    await press(page, 's', 's');
+    await expect(question(page)).toHaveText('Podaj wiersz');
+  });
+
+  test('undo removes only letters added in this session, never the text it did not write', async ({
+    page,
+  }) => {
+    await open(page, '#waiting-column');
+    await page.getByRole('button', { name: 'Cofnij literę' }).click();
+    await expect(sentence(page)).toHaveText('CHCĘ SIĘ NAPIĆ ');
+    await expect(announce(page)).toHaveText('Nie ma litery do cofnięcia');
+  });
+
   test('a number past the board is rejected with the reason', async ({ page }) => {
     await open(page, '#waiting-column');
     await press(page, 'h', 'h');
