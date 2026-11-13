@@ -96,6 +96,7 @@ describe('checkTokenSets', () => {
     highlight: 'oklch(40% 0.15 260)',
     'primary-container': 'oklch(94% 0.02 260)',
     'on-primary-container': 'oklch(20% 0.08 260)',
+    error: 'oklch(45% 0.18 27)',
     'secondary-container': 'oklch(92% 0.02 260)',
     'on-secondary-container': 'oklch(20% 0.03 260)',
   };
@@ -166,6 +167,15 @@ describe('the project tokens (R3, R4)', () => {
       'fg/primary-container',
     ]) {
       assert.equal(PAIRS.find(([a, b]) => `${a}/${b}` === pair)?.[2], 7, pair);
+    }
+  });
+
+  it('checks form error text at 4.5:1 on the page and on cards (T5, SC 1.4.3)', () => {
+    for (const pair of ['error/bg', 'error/surface']) {
+      assert.ok(
+        PAIRS.some(([a, b, min]) => `${a}/${b}` === pair && min === 4.5),
+        pair,
+      );
     }
   });
 });

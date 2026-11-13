@@ -27,7 +27,11 @@
     link.href = url.href;
   }
 
-  if (root.dataset['page'] === 'communicate') liczenie();
+  const page = root.dataset['page'];
+  if (page === 'communicate') liczenie();
+  if ('wizard' in root.dataset) wizard();
+  else if (page === 'boards') boards();
+  else if (page === 'settings') settings();
   root.dataset['js'] = 'ready';
 
   /*
@@ -392,5 +396,245 @@
     }
     window.addEventListener('hashchange', fromHash);
     fromHash();
+  }
+
+  // ---- T5: caregiver pages -------------------------------------------------------------------------------------
+
+  /** A small inline icon (createElementNS, no markup strings): "alert" for errors, "check" for success. */
+  function icon(kind) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    for (const [k, v] of Object.entries({
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2.5',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      'aria-hidden': 'true',
+    })) {
+      svg.setAttribute(k, v);
+    }
+    const d = kind === 'check' ? ['M5 12l5 5L20 7'] : ['M12 8v5', 'M12 16.5v.01', 'M12 3 2 21h20z'];
+    for (const path of d) {
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', path);
+      svg.append(p);
+    }
+    return svg;
+  }
+
+  /** Polish plural: 1 kolumna, 2–4 kolumny, 5+ kolumn (12–14 are "many"). */
+  function plural(n, one, few, many) {
+    if (n === 1) return `${n} ${one}`;
+    const tens = n % 100;
+    return n % 10 >= 2 && n % 10 <= 4 && (tens < 12 || tens > 14) ? `${n} ${few}` : `${n} ${many}`;
+  }
+
+  /*
+   * The calibration wizard: one step at a time, each step a URL fragment, so the browser Back button works. On a
+   * step change focus moves to the step heading and the title says the step (WAI multi-page forms tutorial).
+   */
+  function wizard() {
+    const steps = [...document.querySelectorAll('.wizard-step')];
+    const progress = document.querySelector('[data-wizard-progress]');
+    const back = document.querySelector('[data-wizard-back]');
+    const next = document.querySelector('[data-wizard-next]');
+    const skip = document.querySelector('[data-wizard-skip]');
+    const save = document.querySelector('[data-wizard-save]');
+    const restart = document.querySelector('[data-wizard-restart]');
+    const NEXT_LABEL = { intro: 'Zacznij', camera: 'Włącz kamerę' };
+    let index = 0;
+
+    for (const step of steps) step.querySelector('h2').setAttribute('tabindex', '-1');
+
+    function show(focus) {
+      // The fragment is untrusted input: only a known step id counts.
+      index = Math.max(
+        0,
+        steps.findIndex((step) => step.id === location.hash.slice(1)),
+      );
+      const step = steps[index];
+      const last = index === steps.length - 1;
+      steps.forEach((s, i) => (s.hidden = i !== index));
+      progress.textContent = `Krok ${index + 1} z ${steps.length}`;
+      back.hidden = index === 0;
+      next.hidden = last;
+      save.hidden = !last;
+      restart.hidden = !last;
+      skip.hidden = step.id !== 'hand-right';
+      next.textContent = NEXT_LABEL[step.id] ?? 'Dalej';
+      document.title = `Kalibracja: krok ${index + 1} z ${steps.length}, ${step.dataset['stepTitle']} (makieta)`;
+      if (focus) step.querySelector('h2').focus();
+    }
+
+    const go = (delta) => {
+      location.hash = steps[index + delta].id;
+    };
+    back.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    skip.addEventListener('click', () => go(1));
+    window.addEventListener('hashchange', () => show(true));
+    show(false);
+  }
+
+  /*
+   * Board import. The file is untrusted input (security.md): size-limited before reading, parsed with JSON.parse,
+   * checked field by field, and shown only with textContent. Nothing is saved in the mock-up.
+   */
+  const BOARD_LIMITS = { bytes: 64 * 1024, size: 10, cell: 3, name: 40 };
+
+  /** The errors in a board file (an empty list = valid), in plain Polish, at most 10. */
+  function boardErrors(text) {
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return ['To nie jest poprawny plik JSON. Sprawdź nawiasy, przecinki i cudzysłowy.'];
+    }
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      return ['Plik musi zawierać obiekt z polami "name" i "rows".'];
+    }
+    const errors = [];
+    const name = typeof data.name === 'string' ? data.name.trim() : '';
+    if (!name) errors.push('Brak nazwy tablicy: pole "name" musi być niepustym tekstem.');
+    else if (name.length > BOARD_LIMITS.name) {
+      errors.push(`Nazwa jest za długa: ${name.length} znaków, najwyżej ${BOARD_LIMITS.name}.`);
+    }
+    const rows = data.rows;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      errors.push('Brak wierszy: pole "rows" musi być listą wierszy, a każdy wiersz listą pól.');
+      return errors;
+    }
+    if (rows.length > BOARD_LIMITS.size) {
+      errors.push(`Za dużo wierszy: ${rows.length}, najwyżej ${BOARD_LIMITS.size}.`);
+    }
+    const width = Array.isArray(rows[0]) ? rows[0].length : 0;
+    if (width > BOARD_LIMITS.size) {
+      errors.push(`Za dużo kolumn: ${width}, najwyżej ${BOARD_LIMITS.size}.`);
+    }
+    rows.slice(0, BOARD_LIMITS.size).forEach((row, r) => {
+      if (!Array.isArray(row) || row.length === 0) {
+        errors.push(`Wiersz ${r + 1} nie jest listą pól.`);
+        return;
+      }
+      if (row.length !== width) {
+        errors.push(
+          `Wiersz ${r + 1} ma ${plural(row.length, 'pole', 'pola', 'pól')}, a wiersz 1 ma ${width}. Wszystkie wiersze muszą być równe.`,
+        );
+      }
+      row.slice(0, BOARD_LIMITS.size).forEach((cell, c) => {
+        if (typeof cell !== 'string') {
+          errors.push(`Wiersz ${r + 1}, kolumna ${c + 1}: pole musi być tekstem w cudzysłowie.`);
+        } else if ([...cell].length > BOARD_LIMITS.cell) {
+          errors.push(
+            `Wiersz ${r + 1}, kolumna ${c + 1}: pole może mieć najwyżej ${BOARD_LIMITS.cell} znaki.`,
+          );
+        }
+      });
+    });
+    return errors.slice(0, 10);
+  }
+
+  function boards() {
+    const input = document.querySelector('[data-board-file]');
+    const result = document.querySelector('[data-board-result]');
+
+    function report(errors, summary) {
+      result.replaceChildren();
+      input.setAttribute('aria-invalid', String(errors.length > 0));
+      const p = document.createElement('p');
+      p.className = errors.length ? 'field-error mt-2' : 'field-ok mt-2';
+      p.append(icon(errors.length ? 'alert' : 'check'), document.createTextNode(summary));
+      result.append(p);
+      if (!errors.length) return;
+      const list = document.createElement('ul');
+      list.className = 'mt-1 list-disc pl-8 text-sm';
+      for (const error of errors) {
+        const li = document.createElement('li');
+        li.textContent = error;
+        list.append(li);
+      }
+      result.append(list);
+    }
+
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (file.size > BOARD_LIMITS.bytes) {
+        report(
+          [`Plik ma ${Math.ceil(file.size / 1024)} KB, a najwyżej może mieć 64 KB.`],
+          'Błąd: nie można użyć tego pliku.',
+        );
+        return;
+      }
+      const text = await file.text();
+      const errors = boardErrors(text);
+      if (errors.length) {
+        report(
+          errors,
+          `Błąd: nie można użyć tego pliku (${plural(errors.length, 'problem', 'problemy', 'problemów')}).`,
+        );
+        return;
+      }
+      const board = JSON.parse(text);
+      const cols = plural(board.rows[0].length, 'kolumna', 'kolumny', 'kolumn');
+      const rows = plural(board.rows.length, 'wiersz', 'wiersze', 'wierszy');
+      report(
+        [],
+        `Tablica „${board.name.trim()}” jest poprawna: ${cols}, ${rows}. W makiecie nie zapisuje się.`,
+      );
+    });
+  }
+
+  /* Settings: range checks with errors linked to the field, switches, the speech rate and the theme. */
+  function settings() {
+    const decimal = (n) => String(n).replace('.', ',');
+
+    for (const input of document.querySelectorAll('[data-range-field]')) {
+      const error = document.getElementById(input.getAttribute('aria-describedby').split(' ')[1]);
+      const check = () => {
+        const value = input.valueAsNumber;
+        const ok = !Number.isNaN(value) && value >= Number(input.min) && value <= Number(input.max);
+        input.setAttribute('aria-invalid', String(!ok));
+        error.hidden = ok;
+        error.replaceChildren();
+        if (!ok) {
+          error.append(
+            icon('alert'),
+            document.createTextNode(
+              `Błąd: podaj liczbę od ${decimal(input.min)} do ${decimal(input.max)}. Do tego czasu działa poprzednia wartość.`,
+            ),
+          );
+        }
+      };
+      input.addEventListener('input', check);
+      input.addEventListener('change', check);
+    }
+
+    for (const button of document.querySelectorAll('[data-switch]')) {
+      button.addEventListener('click', () => {
+        const on = button.getAttribute('aria-checked') !== 'true';
+        button.setAttribute('aria-checked', String(on));
+        const word = button.querySelector('[data-switch-word]');
+        if (word) word.textContent = on ? 'Wł.' : 'Wył.';
+      });
+    }
+
+    const rate = document.querySelector('[data-rate]');
+    const rateValue = document.querySelector('[data-rate-value]');
+    rate.addEventListener('input', () => {
+      const value = rate.valueAsNumber;
+      rateValue.textContent = `${decimal(value.toFixed(1))} ×${value === 1 ? ', zwykłe tempo' : ''}`;
+    });
+
+    // The theme applies at once, like ?scheme= on the catalog.
+    for (const radio of document.querySelectorAll('[data-theme]')) {
+      radio.checked = radio.value === scheme;
+      radio.addEventListener('change', () => {
+        if (radio.value === 'auto') delete root.dataset['scheme'];
+        else root.dataset['scheme'] = radio.value;
+      });
+    }
   }
 })();

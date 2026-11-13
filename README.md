@@ -13,7 +13,7 @@ them into sentences that are shown on screen and read aloud.
 ## Status
 
 **Stage 1: deploy** (spec [003](docs/specs/003-deploy/spec.md), in progress: security headers and a CSP-clean build are done, the Azure deploy follows; specs [001](docs/specs/001-app-skeleton/spec.md) and [002](docs/specs/002-ci-verify/spec.md) are done).
-**Stage 1.5: mock-ups** (spec [004](docs/specs/004-mockups/spec.md), in progress: the mock-up toolchain and polish round 1 are done: Material 3 style, Liczenie (the board) as the main screen with tappable letters, a navigation bar on phones and a rail from 600 px, Zdania and Kalibracja; ADR-0005 (Angular Material) is proposed. Every Liczenie state can be opened from the catalog, and a signal simulator plays his signals by keys or by buttons. The other screens and the final tokens follow).
+**Stage 1.5: mock-ups** (spec [004](docs/specs/004-mockups/spec.md), in progress: the mock-up toolchain and polish round 1 are done: Material 3 style, Liczenie (the board) as the main screen with tappable letters, a navigation bar on phones and a rail from 600 px, Zdania and Kalibracja; ADR-0005 (Angular Material) is proposed. Every Liczenie state can be opened from the catalog, and a signal simulator plays his signals by keys or by buttons. Kalibracja has a step-by-step wizard, Tablice a JSON import with errors in text, Ustawienia the timings, signals, voice, hints, language and theme. The final tokens and the icon follow).
 The app shell works in English and Polish (language switch, translated titles); there are no communication features yet. The stage plan is in [docs/backlog.md](docs/backlog.md).
 
 ## Tech stack

@@ -9,18 +9,139 @@
     <script src="design.js" defer></script>
   </head>
   <body class="bg-bg text-fg">
+    <!--
+      Spec 004, T5: boards. The list (which board Liczenie uses), a preview of the friend's layout (letters only, R9)
+      and a JSON import. The imported file is untrusted input (security.md): it is checked in the browser, shown only
+      with textContent, never saved in the mock-up. Errors are listed in text and linked to the field (SC 3.3.1).
+    -->
     <div class="shell">
       <header class="shell-top">
         <h1 class="title-large">Tablice</h1>
       </header>
+
       <main class="shell-main">
-        <section class="card max-w-2xl" aria-labelledby="soon-title">
-          <h2 id="soon-title" class="title-medium">Wkrótce</h2>
-          <p class="mt-1 text-muted">
-            Lista tablic, podgląd tablicy przyjaciela i import pliku JSON (spec 004, T5).
-          </p>
-        </section>
+        <div class="two-up mx-auto max-w-5xl">
+          <div class="grid gap-4">
+            <section class="card" aria-labelledby="list-title">
+              <h2 id="list-title" class="title-medium">Aktywna tablica</h2>
+              <fieldset class="mt-2">
+                <legend class="sr-only">Tablica używana w Liczeniu</legend>
+                <label class="choice">
+                  <input type="radio" name="board" value="friend" checked />
+                  <span><strong>Tablica przyjaciela</strong> · 7 kolumn, 5 wierszy, litery</span>
+                </label>
+                <label class="choice">
+                  <input type="radio" name="board" value="yes-no" />
+                  <span><strong>Tak i nie</strong> · 2 kolumny, 1 wiersz</span>
+                </label>
+              </fieldset>
+            </section>
+
+            <section class="card" aria-labelledby="preview-title">
+              <h2 id="preview-title" class="title-medium">Podgląd: Tablica przyjaciela</h2>
+              <div class="mt-2 overflow-x-auto">
+                <table class="preview-board">
+                  <caption class="sr-only">
+                    Układ tablicy przyjaciela: 7 kolumn, 5 wierszy.
+                  </caption>
+                  <thead>
+                    <tr>
+                      <td></td>
+                      <th scope="col">1</th>
+                      <th scope="col">2</th>
+                      <th scope="col">3</th>
+                      <th scope="col">4</th>
+                      <th scope="col">5</th>
+                      <th scope="col">6</th>
+                      <th scope="col">7</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>A</td>
+                      <td>B</td>
+                      <td>C</td>
+                      <td>D</td>
+                      <td>E</td>
+                      <td>F</td>
+                      <td>G</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">2</th>
+                      <td>H</td>
+                      <td>I</td>
+                      <td>J</td>
+                      <td>K</td>
+                      <td>L</td>
+                      <td>M</td>
+                      <td>N</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">3</th>
+                      <td>O</td>
+                      <td>P</td>
+                      <td>R</td>
+                      <td>S</td>
+                      <td>T</td>
+                      <td>U</td>
+                      <td>W</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">4</th>
+                      <td>Z</td>
+                      <td>Ż</td>
+                      <td>Ź</td>
+                      <td>X</td>
+                      <td>Y</td>
+                      <td>Ń</td>
+                      <td><span class="sr-only">puste</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">5</th>
+                      <td>Ć</td>
+                      <td>Ę</td>
+                      <td>Ą</td>
+                      <td>Ś</td>
+                      <td>SZ</td>
+                      <td>CZ</td>
+                      <td><span class="sr-only">puste</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <section class="card" aria-labelledby="import-title">
+            <h2 id="import-title" class="title-medium">Import tablicy z pliku</h2>
+            <p class="mt-1 text-muted">
+              Plik JSON z nazwą i wierszami. Pole może mieć najwyżej 3 znaki; pusty tekst to puste
+              pole. Najwyżej 10 kolumn i 10 wierszy, plik do 64 KB.
+            </p>
+            <pre class="code mt-2"><code>&#123;
+  "name": "Tak i nie",
+  "rows": [["TAK", "NIE"]]
+&#125;</code></pre>
+            <div class="field mt-4">
+              <label class="field-label" for="board-file">Plik tablicy</label>
+              <p id="board-file-hint" class="field-hint">
+                Wybierz plik .json. W makiecie tablica jest tylko sprawdzana, nie zapisuje się.
+              </p>
+              <input
+                id="board-file"
+                class="input"
+                type="file"
+                accept=".json,application/json"
+                aria-describedby="board-file-hint board-file-result"
+                data-board-file
+              />
+              <div id="board-file-result" aria-live="polite" data-board-result></div>
+            </div>
+          </section>
+        </div>
       </main>
+
       <!-- include nav.html -->
     </div>
   </body>

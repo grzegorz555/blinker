@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pl" data-style="m3" data-page="calibrate" data-wizard>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kalibracja: krok 1 z 8 (makieta)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="design.css" />
+    <script src="design.js" defer></script>
+  </head>
+  <body class="bg-bg text-fg">
+    <!--
+      Spec 004, T5: the calibration wizard. One step at a time (#intro … #result, so the browser Back button works);
+      the step number is in the heading area and in the page title, and focus moves to the step heading
+      (https://www.w3.org/WAI/tutorials/forms/multi-page/). The camera is explained before the browser asks for it.
+      Fake data only (R9): nothing is detected, the counts are invented.
+    -->
+    <div class="shell">
+      <header class="shell-top">
+        <h1 class="title-large">Kalibracja</h1>
+        <a class="btn btn-outline" href="calibrate.html">Przerwij</a>
+      </header>
+
+      <main class="shell-main">
+        <div class="card mx-auto max-w-2xl">
+          <p class="label-large text-muted" data-wizard-progress>Krok 1 z 8</p>
+
+          <section class="wizard-step" id="intro" data-step-title="Co się stanie">
+            <h2 class="title-medium mt-1">Co się stanie</h2>
+            <p class="mt-2">
+              Blinker pozna jego sygnały: długie mrugnięcie, spojrzenie na rękę, kiwnięcie i
+              kręcenie głową. To 6 krótkich kroków, razem około 2 minut.
+            </p>
+            <p class="mt-2">
+              Ustaw telefon tak jak do rozmowy: na statywie, na wprost twarzy, w zwykłym świetle.
+            </p>
+          </section>
+
+          <section class="wizard-step" id="camera" data-step-title="Kamera" hidden>
+            <h2 class="title-medium mt-1">Kamera</h2>
+            <p class="mt-2">
+              Za chwilę przeglądarka zapyta o dostęp do kamery. Wybierz <strong>Zezwól</strong>.
+            </p>
+            <p class="mt-2">
+              Obraz zostaje w telefonie: nic nie jest wysyłane ani nagrywane. Blinker widzi tylko
+              punkty twarzy, nie zapisuje zdjęć.
+            </p>
+            <p class="field-hint mt-2">
+              Jeśli odmówisz, możesz to zmienić później w ustawieniach strony w przeglądarce.
+            </p>
+          </section>
+
+          <section class="wizard-step" id="blink" data-step-title="Długie mrugnięcie" hidden>
+            <h2 class="title-medium mt-1">Długie mrugnięcie (+1)</h2>
+            <p class="mt-2">Poproś go o 3 długie mrugnięcia, w swoim tempie.</p>
+            <div class="camera-box mt-3">Tu będzie podgląd z kamery z zaznaczoną twarzą.</div>
+            <p class="status mt-3">Wykryto 2 z 3</p>
+          </section>
+
+          <section
+            class="wizard-step"
+            id="hand-left"
+            data-step-title="Spojrzenie na lewą rękę"
+            hidden
+          >
+            <h2 class="title-medium mt-1">Spojrzenie na lewą rękę (+5)</h2>
+            <p class="mt-2">
+              Poproś, żeby spojrzał w dół na lewą rękę i wrócił wzrokiem. Dwa razy.
+            </p>
+            <div class="camera-box mt-3">Tu będzie podgląd z kamery z zaznaczoną twarzą.</div>
+            <p class="status mt-3">Wykryto 2 z 2</p>
+          </section>
+
+          <section
+            class="wizard-step"
+            id="hand-right"
+            data-step-title="Spojrzenie na prawą rękę"
+            hidden
+          >
+            <h2 class="title-medium mt-1">Spojrzenie na prawą rękę</h2>
+            <p class="mt-2">
+              Tylko jeśli patrzy też na prawą rękę. Jeśli nie, pomiń ten krok: wystarczy lewa.
+            </p>
+            <div class="camera-box mt-3">Tu będzie podgląd z kamery z zaznaczoną twarzą.</div>
+            <p class="status mt-3">Wykryto 0 z 2</p>
+          </section>
+
+          <section class="wizard-step" id="nod" data-step-title="Kiwnięcie głową" hidden>
+            <h2 class="title-medium mt-1">Kiwnięcie głową (tak)</h2>
+            <p class="mt-2">Poproś go o kiwnięcie głową, tak jak odpowiada „tak”. Dwa razy.</p>
+            <div class="camera-box mt-3">Tu będzie podgląd z kamery z zaznaczoną twarzą.</div>
+            <p class="status mt-3">Wykryto 2 z 2</p>
+          </section>
+
+          <section class="wizard-step" id="shake" data-step-title="Kręcenie głową" hidden>
+            <h2 class="title-medium mt-1">Kręcenie głową (nie)</h2>
+            <p class="mt-2">Poproś go o pokręcenie głową, tak jak odpowiada „nie”. Dwa razy.</p>
+            <div class="camera-box mt-3">Tu będzie podgląd z kamery z zaznaczoną twarzą.</div>
+            <p class="status mt-3">Wykryto 2 z 2</p>
+          </section>
+
+          <section class="wizard-step" id="result" data-step-title="Wynik" hidden>
+            <h2 class="title-medium mt-1">Wynik</h2>
+            <p class="mt-2">
+              Blinker rozpoznaje jego sygnały. Możesz zapisać albo powtórzyć kalibrację.
+            </p>
+            <dl class="mt-2">
+              <div class="row-item min-h-12">
+                <dt class="flex-1 font-semibold">Długie mrugnięcie</dt>
+                <dd>3 z 3</dd>
+              </div>
+              <div class="row-item min-h-12">
+                <dt class="flex-1 font-semibold">Lewa ręka</dt>
+                <dd>2 z 2</dd>
+              </div>
+              <div class="row-item min-h-12">
+                <dt class="flex-1 font-semibold">Prawa ręka</dt>
+                <dd class="text-muted">Pominięto</dd>
+              </div>
+              <div class="row-item min-h-12">
+                <dt class="flex-1 font-semibold">Kiwnięcie głową</dt>
+                <dd>2 z 2</dd>
+              </div>
+              <div class="row-item min-h-12">
+                <dt class="flex-1 font-semibold">Kręcenie głową</dt>
+                <dd>2 z 2</dd>
+              </div>
+            </dl>
+          </section>
+
+          <div class="mt-4 flex flex-wrap items-center gap-2">
+            <button type="button" class="btn btn-outline" data-wizard-back>Wstecz</button>
+            <button type="button" class="btn btn-tonal" data-wizard-skip hidden>
+              Pomiń ten krok
+            </button>
+            <button type="button" class="btn btn-primary" data-wizard-next>Dalej</button>
+            <a class="btn btn-outline" href="#intro" data-wizard-restart hidden
+              >Powtórz od początku</a
+            >
+            <a class="btn btn-primary" href="calibrate.html" data-wizard-save hidden
+              >Zapisz kalibrację</a
+            >
+          </div>
+        </div>
+      </main>
+
+      <!-- include nav.html -->
+    </div>
+  </body>
+</html>
