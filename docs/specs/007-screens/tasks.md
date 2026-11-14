@@ -45,7 +45,7 @@ Branch: `feat/007-screens` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       the validator errors in text, delete with a confirmation, the active board used by Liczenie (Counting) (R10).
       Tests: unit for the board store and import; e2e with a valid, an invalid and a too-big file, axe on the errors.
       _To understand:_ reading a file safely, an error summary pattern, focus management after an error.
-- [ ] **T8 [sonnet]: Zdania (Sentences), docs and README.** The history store (cap, turn off), the page with say
+- [x] **T8 [sonnet]: Zdania (Sentences), docs and README.** The history store (cap, turn off), the page with say
       again, delete and delete all (R11); `docs/design/index.md` (Kalibracja (Calibration) later), architecture, the
       frontend and accessibility conventions (Angular Material instead of spartan), README status and features,
       specs index, log, Polish copies. Tests: unit for the history; e2e for a spoken sentence in the history and

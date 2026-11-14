@@ -1,0 +1,99 @@
+/* Zdania (Sentences) (spec 007 R11): days as M3 filled cards with a list, one column, mobile first. */
+:host {
+  display: grid;
+  max-width: 40rem;
+  gap: 1rem;
+  justify-items: start;
+}
+
+.group {
+  display: grid;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 0.5rem;
+  border-radius: var(--radius-card);
+  background-color: var(--surface);
+  padding: 1rem;
+}
+
+.group-title {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+}
+
+.toggle-label {
+  display: block;
+  font-weight: 600;
+}
+
+.toggle-hint,
+.muted,
+.time {
+  color: var(--muted);
+}
+
+.toggle-hint,
+.time {
+  display: block;
+  font-size: 0.875rem;
+}
+
+.entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* M3 list item: the sentence and its time, the actions at the end; wraps on a narrow phone. */
+.entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-block: 0.5rem;
+}
+
+.entry + .entry {
+  border-top: 1px solid var(--line);
+}
+
+.entry-text {
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.sentence {
+  font-size: 1.25rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.entry-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.entry-actions svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.problem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border: 2px solid var(--error);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  color: var(--error);
+  font-weight: 700;
+}
+
+.problem svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}

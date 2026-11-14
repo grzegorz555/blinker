@@ -1,0 +1,76 @@
+@if (problem(); as p) {
+  <p class="problem" role="status" data-testid="store-problem">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v6M12 16.5v.5" />
+    </svg>
+    <span>{{ 'sentences.problem.' + p | transloco }}</span>
+  </p>
+}
+
+<section class="group" aria-labelledby="sentences-keep">
+  <h2 id="sentences-keep" class="group-title">{{ 'sentences.keepTitle' | transloco }}</h2>
+  <mat-slide-toggle
+    #keep
+    [checked]="enabled()"
+    (change)="toggle($event.checked, keep)"
+    data-testid="toggle-history"
+  >
+    <span class="toggle-label">{{ 'sentences.keep' | transloco }}</span>
+    <span class="toggle-hint">{{ 'sentences.keepHint' | transloco: limits }}</span>
+  </mat-slide-toggle>
+</section>
+
+@if (days().length === 0) {
+  <p class="muted" data-testid="empty">{{ 'sentences.empty' | transloco }}</p>
+} @else {
+  @for (group of days(); track group.day) {
+    <section class="group" [attr.aria-labelledby]="'day-' + group.day">
+      <h2 class="group-title" [id]="'day-' + group.day">{{ dayLabel(group.day) }}</h2>
+      <ul class="entries">
+        @for (entry of group.entries; track entry.id) {
+          <li class="entry" data-testid="entry">
+            <div class="entry-text">
+              <p class="sentence" [attr.lang]="entry.lang">{{ entry.text }}</p>
+              <p class="time">{{ time(entry.at) }}</p>
+            </div>
+            <div class="entry-actions">
+              <button matButton="tonal" type="button" (click)="sayAgain(entry)">
+                {{ 'sentences.sayAgain' | transloco }}
+              </button>
+              <button
+                matIconButton
+                type="button"
+                [attr.aria-label]="'sentences.deleteNamed' | transloco: { text: entry.text }"
+                (click)="remove(entry)"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                </svg>
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+  <button matButton="outlined" type="button" class="clear-all" (click)="clearAll()">
+    {{ 'sentences.clear' | transloco }}
+  </button>
+}

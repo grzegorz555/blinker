@@ -81,6 +81,8 @@ export class CountingService {
   /** The latest text for the polite live region (SC 4.1.3). */
   readonly announcement = signal('');
   readonly speaking = signal(false);
+  /** The last sentence read aloud after his nod or a tap (a new object each time, so a repeat counts). */
+  readonly spoken = signal<{ readonly text: string; readonly lang: string } | null>(null);
   /** The result of the last attempt to speak: 'no-local-voice' is shown in text by spec 007. */
   readonly speakResult = signal<SpeakResult | null>(null);
 
@@ -135,11 +137,12 @@ export class CountingService {
     return this.speaker.hasVoice(this.settings().board.locale);
   }
 
-  /** "Posłuchaj" (Listen): says a sample text in the board language at the current rate. */
-  listen(text: string): void {
-    this.speakResult.set(
-      this.speaker.say(text, { lang: this.settings().board.locale, rate: this.rate() }),
-    );
+  /**
+   * Says a text at the current rate, in the board language unless given: "Posłuchaj" (Listen) in the settings,
+   * "Powiedz jeszcze raz" (Say again) in Zdania (Sentences). Not added to the history again.
+   */
+  listen(text: string, lang = this.settings().board.locale): void {
+    this.speakResult.set(this.speaker.say(text, { lang, rate: this.rate() }));
   }
 
   /** Changes the settings (the pause before the question within 500–5000 ms, SC 2.2.1; speaking the questions). */
@@ -176,12 +179,15 @@ export class CountingService {
           }),
         );
         return;
-      case 'speak':
+      case 'speak': {
         // His sentence, in the language of the board.
-        this.speakResult.set(
-          this.speaker.say(effect.text, { lang: this.settings().board.locale, rate: this.rate() }),
-        );
+        const lang = this.settings().board.locale;
+        const result = this.speaker.say(effect.text, { lang, rate: this.rate() });
+        this.speakResult.set(result);
+        // Zdania (Sentences) keeps what was really read aloud (spec 007, R11).
+        if (result === 'started') this.spoken.set({ text: effect.text, lang });
         return;
+      }
       case 'stopSpeaking':
         this.speaker.cancel();
         return;

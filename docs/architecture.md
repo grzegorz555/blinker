@@ -29,7 +29,7 @@ signals. That way all the logic can be tested without a camera.
 ```
 src/web/
   src/app/
-    app.ts|html            shell: skip link, header (name + language switch), main, footer disclaimer
+    app.ts|html|css        shell: top app bar (page heading, skip link, page actions), main (the only scroll area), navigation
     app.config.ts          router, HttpClient, Transloco, TranslatedTitleStrategy, language initializer, service worker
     app.routes.ts          lazy routes; `title` is a translation key
     core/i18n/             languages.ts (pure resolveLanguage), LanguageService, TranslocoHttpLoader, TranslatedTitleStrategy
@@ -39,8 +39,16 @@ src/web/
                            counting.service.ts (Angular: state in a signal, one TICK scheduler, effects to the speaker)
     core/input/            signals.ts (one input type for every source), keyboard.ts (off by default, SC 2.1.4)
     core/speech/           speaker.ts (interface), web-speaker.ts (on-device voices only), fake-speaker.ts (tests)
-    features/home/, features/not-found/
-    shared/language-switch/
+    core/boards/boards.service.ts   built-in and imported boards, the active board  (spec 007)
+    core/settings/         settings.ts (defaults, validator), SettingsService (applies and stores them)
+    core/history/          history.ts (cap, days), HistoryService (sentences read aloud)
+    core/storage/          local-store.ts (localStorage that may throw; values validated when read back)
+    core/screen/           wake-lock.ts (screen on while Liczenie (Counting) is visible)
+    shell/                 nav.ts (M3 navigation bar and rail), top-bar.ts (page actions through a CDK portal)
+    features/counting/     the Liczenie (Counting) screen, board-view, signal-panel
+    features/sentences/, features/boards/, features/settings/, features/not-found/
+    shared/confirm-dialog/ (MatDialog, Cancel first), shared/language-switch/
+  src/material.scss        Angular Material (M3) theme mapped to tokens.css (ADR-0005)
   src/styles/tokens.css    design tokens (OKLCH, light/dark, contrast noted)
   src/testing/             test helpers (translocoTesting with the real en/pl files)
   public/i18n/{en,pl}.json, public/boards/friend-pl.json, public/manifest.webmanifest, public/icons/
@@ -70,17 +78,20 @@ machine. Stage 4 adds his face signals as one more source of `InputSignal`.
 - `core/signals/`: the signal detector, the calibration profile and the thresholds.
 - `core/input/`: the signal-to-action mapping and the input modes.
 - `core/counting/`: the counting state machine (mode B); `core/scanning/` (mode A) after the PoC.
-- `core/boards/`: the board model, the import validator; IndexedDB storage later.
+- `core/boards/`: the board model, the import validator, the built-in and imported boards (localStorage).
 - `core/speech/`: the Speaker interface and the Web Speech implementation (on-device voices only).
 - `core/i18n/`: Transloco (en, pl).
-- `features/communicate`, `features/calibrate`, `features/boards`, `features/settings`.
+- `core/settings/`, `core/history/`, `core/storage/`: settings, the sentence history, storage that may fail.
+- `features/counting`, `features/sentences`, `features/boards`, `features/settings`; `features/calibrate` in stage 4.
 
 # Storage
 
 Everything stays on the device:
 
-- IndexedDB: boards and calibration profiles;
-- localStorage: small settings.
+- localStorage (spec 007): the settings, the imported boards and the active board, the sentence history, under
+  versioned keys (`blinker.*.v1`); every value is validated when read back, and the app keeps working in memory
+  when the storage is blocked or full;
+- IndexedDB later, if calibration profiles or many boards outgrow localStorage.
 
 There are no cookies, no server state and no telemetry.
 

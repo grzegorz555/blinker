@@ -98,7 +98,25 @@
     "settings": "Settings"
   },
   "sentences": {
-    "empty": "No sentences yet."
+    "empty": "No sentences yet. Sentences read aloud on Counting appear here.",
+    "keepTitle": "History",
+    "keep": "Keep the sentences read aloud",
+    "keepHint": "Only on this device: at most {{entries}} sentences or {{days}} days. Turning it off deletes them.",
+    "sayAgain": "Say again",
+    "delete": "Delete",
+    "deleteNamed": "Delete the sentence: {{text}}",
+    "deleteOneTitle": "Delete this sentence?",
+    "deleteOneMessage": "\"{{text}}\" will be removed from the history.",
+    "clear": "Delete history",
+    "clearTitle": "Delete the whole history?",
+    "clearMessage": "Every sentence will be removed from this device. This cannot be undone.",
+    "off": "Turn off and delete",
+    "offTitle": "Turn the history off?",
+    "offMessage": "The sentences kept so far will be deleted from this device.",
+    "problem": {
+      "corrupted": "The saved sentences could not be read, so the history starts again.",
+      "unavailable": "This browser does not let Blinker save on the device, so sentences are kept only until the page is closed."
+    }
   },
   "boards": {
     "intro": "His board is the active board.",

@@ -22,6 +22,15 @@ Source: the Angular Style Guide (https://angular.dev/style-guide) and the best p
 - **Domain logic is plain TypeScript** (state machines, the signal detector, the board validator) with no Angular imports. A thin Angular service wraps it. This keeps the logic fast to unit-test and reusable in a Web Worker.
 - Heavy work (MediaPipe inference) runs in a **Web Worker** so the UI thread stays responsive (https://angular.dev/ecosystem/web-workers).
 
+# Angular Material (ADR-0005)
+- Use Angular Material for the components it has (buttons with `matButton="filled|tonal|outlined"`, form fields,
+  selects, radio groups, slide toggles, dialogs); the M3 theme in `src/material.scss` maps the system tokens to
+  `tokens.css`, so never set colors on a Material component directly.
+- Our own components where Material has none (navigation bar and rail, the board, the Liczenie (Counting) layout),
+  styled with the tokens in a component CSS file; Tailwind utilities for page layout.
+- No icon font and no `MatIconRegistry`: icons are inline SVG with `aria-hidden="true"` next to a visible label.
+- A destructive action goes through `ConfirmService` (`shared/confirm-dialog`): "Anuluj" (Cancel) first.
+
 # i18n (Transloco)
 - No hardcoded UI strings. Keys follow `feature.element` (for example `communicate.scanningColumns`), and every key is added to both `public/i18n/en.json` and `public/i18n/pl.json`.
 - The default language comes from the browser, with `pl` as the fallback. The language switch shows each language's own name (English, Polski).
