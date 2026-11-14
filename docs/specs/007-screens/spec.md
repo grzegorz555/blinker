@@ -122,21 +122,21 @@ signal source.
 
 # Acceptance criteria
 
-- [ ] The Angular Material spike passes: a dialog, a slide toggle and a select, zoneless, no CSP or Trusted Types
+- [x] The Angular Material spike passes: a dialog, a slide toggle and a select, zoneless, no CSP or Trusted Types
       violation in the e2e guard; spartan-ng is gone from the code, `.mcp.json` and the docs (R1).
-- [ ] The navigation bar and rail follow R2 at every checked size, with `aria-current="page"`, in both orientations.
-- [ ] A full path on Liczenie (Counting) with the signal buttons: hand + 2 blinks → "Kolumna 7?" (Column 7?) → yes →
+- [x] The navigation bar and rail follow R2 at every checked size, with `aria-current="page"`, in both orientations.
+- [x] A full path on Liczenie (Counting) with the signal buttons: hand + 2 blinks → "Kolumna 7?" (Column 7?) → yes →
       row 3 → yes → "W" in the sentence and announced; finish → yes → read aloud; with the keys when the mapping is
       on, and no reaction to the keys when it is off (R4, R6).
-- [ ] Tapping a cell and the sentence actions works through `TOUCH`; "Wyczyść" (Clear) only after the dialog; the
+- [x] Tapping a cell and the sentence actions works through `TOUCH`; "Wyczyść" (Clear) only after the dialog; the
       table test covers 11 × 8 pairs (R3, R5).
-- [ ] With no local voice, the screen says so in text (R7).
-- [ ] The board is never covered or scrolled at the listed sizes, also with the wide font (R4).
-- [ ] Settings, boards and the history survive a reload; a corrupted stored value falls back to defaults with a
+- [x] With no local voice, the screen says so in text (R7).
+- [x] The board is never covered or scrolled at the listed sizes, also with the wide font (R4).
+- [x] Settings, boards and the history survive a reload; a corrupted stored value falls back to defaults with a
       notice (R9–R12).
-- [ ] An invalid board file shows every error in text with its path; a file over 64 KB is rejected before reading
+- [x] An invalid board file shows every error in text with its path; a file over 64 KB is rejected before reading
       (R10).
-- [ ] axe finds no violation on any page and state; Lighthouse accessibility is 100; `npm run verify` passes.
+- [x] axe finds no violation on any page and state; Lighthouse accessibility is 100; `npm run verify` passes.
 
 # Test plan
 

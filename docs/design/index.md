@@ -79,6 +79,10 @@ current page marked by `aria-current="page"`:
 
 **Liczenie** (Counting) · **Zdania** (Sentences) · **Tablice** (Boards) · **Kalibracja** (Calibration) · **Ustawienia** (Settings)
 
+In the app (spec 007) Kalibracja (Calibration) joins the navigation in stage 4, when there is a camera; until then the
+navigation has four items. The shell is exactly the viewport high and only the main area scrolls, so nothing slides
+under the navigation bar; the skip link appears in the top app bar over the page title.
+
 - Below 600 px: an M3 **navigation bar** at the bottom (icons with labels, 44 px targets, safe-area padding).
 - From 600 px: an M3 **navigation rail** on the left, so the board keeps the width.
 

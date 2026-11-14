@@ -5,6 +5,7 @@ import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterOutlet } from '@an
 import { TranslocoPipe } from '@jsverse/transloco';
 import { filter, map } from 'rxjs';
 import { BoardsService } from './core/boards/boards.service';
+import { HistoryService } from './core/history/history.service';
 import { SettingsService } from './core/settings/settings.service';
 import { AppNav } from './shell/nav';
 import { TopBar } from './shell/top-bar';
@@ -57,6 +58,8 @@ export class App {
   private readonly settings = inject(SettingsService);
   /** Reads the stored boards at start, so Liczenie (Counting) uses the active one (spec 007, R10). */
   private readonly boardsService = inject(BoardsService);
+  /** Starts keeping the sentences read aloud, whichever page is open (spec 007, R11). */
+  private readonly history = inject(HistoryService);
 
   /** Moves focus to <main>, so the next Tab continues inside the page content. */
   protected skipToMain(event: Event): void {

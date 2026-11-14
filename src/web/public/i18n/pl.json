@@ -98,7 +98,25 @@
     "settings": "Ustawienia"
   },
   "sentences": {
-    "empty": "Nie ma jeszcze zdań."
+    "empty": "Nie ma jeszcze zdań. Zdania przeczytane na głos w Liczeniu pojawią się tutaj.",
+    "keepTitle": "Historia",
+    "keep": "Zapisuj zdania przeczytane na głos",
+    "keepHint": "Tylko na tym urządzeniu: najwyżej {{entries}} zdań albo {{days}} dni. Wyłączenie usuwa zapisane zdania.",
+    "sayAgain": "Powiedz jeszcze raz",
+    "delete": "Usuń",
+    "deleteNamed": "Usuń zdanie: {{text}}",
+    "deleteOneTitle": "Usunąć to zdanie?",
+    "deleteOneMessage": "„{{text}}” zniknie z historii.",
+    "clear": "Usuń historię",
+    "clearTitle": "Usunąć całą historię?",
+    "clearMessage": "Wszystkie zdania zostaną usunięte z tego urządzenia. Tego nie da się cofnąć.",
+    "off": "Wyłącz i usuń",
+    "offTitle": "Wyłączyć historię?",
+    "offMessage": "Zapisane dotąd zdania zostaną usunięte z tego urządzenia.",
+    "problem": {
+      "corrupted": "Nie udało się odczytać zapisanych zdań, więc historia zaczyna się od nowa.",
+      "unavailable": "Ta przeglądarka nie pozwala Blinkerowi zapisywać na urządzeniu, więc zdania są tylko do zamknięcia strony."
+    }
   },
   "boards": {
     "intro": "Aktywna jest jego tablica.",
