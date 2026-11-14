@@ -23,7 +23,7 @@ Branch: `feat/007-screens` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       removed; focus to the heading after navigation. Tests: unit for the navigation; e2e for bar and rail at every
       size and orientation, `aria-current`, axe.
       _To understand:_ M3 navigation patterns, SC 3.2.3, lazy routes, focus after navigation in an SPA.
-- [ ] **T3 [opus]: `TOUCH` in the counting machine.** The new signal with a cell or action target (R3) in
+- [x] **T3 [opus]: `TOUCH` in the counting machine.** The new signal with a cell or action target (R3) in
       `counting.ts`; the table grows to 11 × 8; `CountingService.touch()`. Tests: the table test and every touch case
       of the test plan.
       _To understand:_ extending a state machine without breaking it, why touch skips the nod.

@@ -118,6 +118,17 @@ describe('CountingService', () => {
     expect(speaker.cancels).toBe(1);
   });
 
+  it('a tap on a cell adds the letter and says it; a tap on Przeczytaj (Read aloud) reads the sentence (spec 007, R3)', () => {
+    const { service, speaker } = setup();
+    service.touch({ kind: 'cell', column: 7, row: 3 });
+    service.touch({ kind: 'cell', column: 1, row: 1 });
+    expect(service.sentence()).toBe('WA');
+    expect(service.announcement()).toBe('Dodano A');
+    service.touch({ kind: 'speak' });
+    expect(speaker.said.at(-1)).toEqual({ text: 'WA', options: { lang: 'pl' } });
+    expect(service.state().name).toBe('speaking');
+  });
+
   it('reports no-local-voice when the device has no voice for the language', () => {
     const { service, speaker } = setup();
     speaker.result = 'no-local-voice';

@@ -9,11 +9,12 @@
 //   a missing pair is a compile error; nothing falls through to a default (docs/knowledge/no-depends-on-context.md).
 // - Effects are data (what to ask, say, announce or read aloud); the Angular service carries them out.
 // - Texts are Transloco keys with parameters, so the machine has no language.
-import { cellAt, type Board } from '../boards/board';
+import { cellAt, type Board, type Cell } from '../boards/board';
 import {
   applyCell,
   append,
   canUndo,
+  clear,
   createSentence,
   undo,
   type Sentence,
@@ -35,12 +36,34 @@ export const STATE_NAMES = [
 ] as const;
 export type StateName = (typeof STATE_NAMES)[number];
 
-export const SIGNAL_TYPES = ['BLINK', 'HAND', 'NOD', 'SHAKE', 'RIGHT', 'PAUSE', 'TICK'] as const;
+export const SIGNAL_TYPES = [
+  'BLINK',
+  'HAND',
+  'NOD',
+  'SHAKE',
+  'RIGHT',
+  'PAUSE',
+  'TICK',
+  'TOUCH',
+] as const;
 export type SignalType = (typeof SIGNAL_TYPES)[number];
 
-/** His signals (stages 3–4 detect them on the face; until then buttons and keys), plus TICK for time. */
+/**
+ * What a tap chose (spec 007, R3): a board cell (1-based, like the numbers he gives) or one of the sentence actions.
+ * "clear" is sent only after the confirmation dialog, so the machine clears at once.
+ */
+export type TouchTarget =
+  | { readonly kind: 'cell'; readonly column: number; readonly row: number }
+  | { readonly kind: 'undo' | 'clear' | 'speak' };
+
+/**
+ * His signals (stages 3–4 detect them on the face; until then buttons and keys), TICK for time, and TOUCH for a tap
+ * on the screen (spec 007, R3): a deliberate choice by the person who taps, so it needs no nod.
+ */
 export type Signal =
-  { readonly type: Exclude<SignalType, 'TICK'> } | { readonly type: 'TICK'; readonly now: number };
+  | { readonly type: Exclude<SignalType, 'TICK' | 'TOUCH'> }
+  | { readonly type: 'TICK'; readonly now: number }
+  | { readonly type: 'TOUCH'; readonly target: TouchTarget };
 
 /** A text for the screen or the voice: a Transloco key with its parameters. */
 export interface Message {
@@ -144,12 +167,12 @@ export const total = (state: Pick<CountingState, 'parts'>) =>
 /** The one entry point (R4). */
 export function next(state: CountingState, signal: Signal, config: CountingConfig): Transition {
   const now = signal.type === 'TICK' ? Math.max(state.now, signal.now) : state.now;
-  return TRANSITIONS[state.name][signal.type]({ ...state, now }, config);
+  return TRANSITIONS[state.name][signal.type]({ ...state, now }, config, signal);
 }
 
 // ---- helpers ---------------------------------------------------------------------------------------------------
 
-type Handler = (state: CountingState, config: CountingConfig) => Transition;
+type Handler = (state: CountingState, config: CountingConfig, signal: Signal) => Transition;
 
 const stay: Handler = (state) => ({ state, effects: [] });
 
@@ -259,18 +282,18 @@ function reject(state: CountingState, step: 'column' | 'row', notice: Message): 
 }
 
 /** After the pause with no new signal, ask about the number (or reject it with the reason). */
-const askColumnWhenReady: Handler = (state, config) => {
+const askColumnWhenReady: Handler = (state, config, signal) => {
   if (state.lastCountAt === null || state.now - state.lastCountAt < config.askAfterMs)
-    return stay(state, config);
+    return stay(state, config, signal);
   const n = total(state);
   if (n > config.board.columns.length)
     return reject(state, 'column', msg('counting.noColumn', { n }));
   return go(state, { name: 'column.asking' }, ask(config, msg('counting.askColumn', { n })));
 };
 
-const askRowWhenReady: Handler = (state, config) => {
+const askRowWhenReady: Handler = (state, config, signal) => {
   if (state.lastCountAt === null || state.now - state.lastCountAt < config.askAfterMs)
-    return stay(state, config);
+    return stay(state, config, signal);
   const n = total(state);
   const column = state.column ?? 0;
   if (n > config.board.rows.length) return reject(state, 'row', msg('counting.noRow', { n }));
@@ -295,18 +318,30 @@ const shakeNumber =
 
 // ---- row step --------------------------------------------------------------------------------------------------
 
+const BACK = { name: 'column.waiting', column: null, parts: [], lastCountAt: null } as const;
+
 /** A nod on "Wiersz N?" (Row N?): the cell is chosen. A letter or word is added and said; an action is carried out. */
-const confirmRow: Handler = (state, config) => {
+const confirmRow: Handler = (state, config, signal) => {
   const column = state.column ?? 0;
   const cell = cellAt(config.board, column, total(state));
-  const back = { name: 'column.waiting', column: null, parts: [], lastCountAt: null } as const;
   if (!cell) return reject(state, 'row', msg('counting.emptyCell', { column, row: total(state) }));
   if (cell.type === 'action' && cell.value === 'speak') {
-    return finish({ ...state, ...back }, config);
+    return finish({ ...state, ...BACK }, config, signal);
   }
-  if (cell.type === 'action' && cell.value === 'undo') {
-    return shakeToUndo({ ...state, ...back }, config);
-  }
+  return useCell({ ...state, ...BACK }, cell, config, signal);
+};
+
+/**
+ * A chosen cell (by a nod on the row, or a tap): a letter or word is added and said; an action is carried out. The
+ * state is already back at the columns.
+ */
+function useCell(
+  state: CountingState,
+  cell: Cell,
+  config: CountingConfig,
+  signal: Signal,
+): Transition {
+  if (cell.type === 'action' && cell.value === 'undo') return shakeToUndo(state, config, signal);
   const sentence = applyCell(state.sentence, cell);
   let notice: Message;
   let spoken: Message;
@@ -322,11 +357,11 @@ const confirmRow: Handler = (state, config) => {
     notice = msg('counting.added', { letter: cell.value });
     spoken = msg('counting.letter', { letter: cell.value });
   }
-  return go(state, { ...back, sentence, notice }, [
+  return go(state, { sentence, notice }, [
     { type: 'announce', message: notice },
     { type: 'say', message: spoken },
   ]);
-};
+}
 
 const backToColumns: Handler = (state) => {
   const notice = msg('counting.backToColumns');
@@ -359,6 +394,46 @@ const resume: Handler = (state) => {
   ]);
 };
 
+// ---- touch (spec 007, R3) ---------------------------------------------------------------------------------------
+
+/**
+ * A tap in every state but the pause (spec 007, R3): the number being given is dropped and the machine waits for a
+ * column again. While reading aloud, a tap goes on writing like a blink does; "Przeczytaj" (Read aloud) reads again. A tap is a deliberate choice, so it needs no nod.
+ */
+const touchWhileWriting: Handler = (state, config, signal) => {
+  if (signal.type !== 'TOUCH') return stay(state, config, signal);
+  const back = { ...state, ...BACK, notice: null };
+  const { target } = signal;
+  switch (target.kind) {
+    case 'cell': {
+      const cell = cellAt(config.board, target.column, target.row);
+      if (!cell) return stay(state, config, signal); // empty cells are not buttons
+      if (cell.type === 'action' && cell.value === 'speak') return speakIfAny(back, config, signal);
+      return useCell(back, cell, config, signal);
+    }
+    case 'undo':
+      return shakeToUndo(back, config, signal);
+    case 'clear': {
+      const notice = msg('counting.cleared');
+      return go(back, { sentence: clear(state.sentence), notice }, [
+        { type: 'announce', message: notice },
+        { type: 'say', message: notice },
+      ]);
+    }
+    case 'speak':
+      return speakIfAny(back, config, signal);
+  }
+};
+
+/** "Przeczytaj" (Read aloud) tapped: read the sentence at once, or say there is nothing to read. */
+const speakIfAny: Handler = (state, config, signal) => {
+  if (!state.sentence.text.trim()) {
+    const notice = msg('counting.nothingToSpeak');
+    return go(state, { notice }, [{ type: 'announce', message: notice }]);
+  }
+  return speakNow(state, config, signal);
+};
+
 // ---- the table: every state × every signal ---------------------------------------------------------------------
 
 export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType, Handler>>>> = {
@@ -370,6 +445,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: finish,
     PAUSE: pause('column.waiting'),
     TICK: stay,
+    TOUCH: touchWhileWriting,
   },
   'column.counting': {
     BLINK: count(1, 'column', true),
@@ -379,6 +455,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: stay,
     PAUSE: pause('column.waiting'),
     TICK: askColumnWhenReady,
+    TOUCH: touchWhileWriting,
   },
   'column.asking': {
     BLINK: count(1, 'column', true), // he was not done: keep counting
@@ -388,6 +465,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: stay,
     PAUSE: pause('column.waiting'),
     TICK: stay,
+    TOUCH: touchWhileWriting,
   },
   'column.rejected': {
     BLINK: count(1, 'column', false),
@@ -397,6 +475,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: finish,
     PAUSE: pause('column.waiting'),
     TICK: stay,
+    TOUCH: touchWhileWriting,
   },
   'row.waiting': {
     BLINK: count(1, 'row', false),
@@ -406,6 +485,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: finish,
     PAUSE: pause('row.waiting'),
     TICK: stay,
+    TOUCH: touchWhileWriting,
   },
   'row.counting': {
     BLINK: count(1, 'row', true),
@@ -415,6 +495,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: stay,
     PAUSE: pause('row.waiting'),
     TICK: askRowWhenReady,
+    TOUCH: touchWhileWriting,
   },
   'row.asking': {
     BLINK: count(1, 'row', true),
@@ -424,6 +505,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: stay,
     PAUSE: pause('row.waiting'),
     TICK: stay,
+    TOUCH: touchWhileWriting,
   },
   'row.rejected': {
     BLINK: count(1, 'row', false),
@@ -433,6 +515,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: finish,
     PAUSE: pause('row.waiting'),
     TICK: stay,
+    TOUCH: touchWhileWriting,
   },
   'speak.asking': {
     BLINK: stay, // only yes or no answers the question
@@ -442,6 +525,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: stay,
     PAUSE: pause('column.waiting'),
     TICK: stay,
+    TOUCH: touchWhileWriting,
   },
   speaking: {
     BLINK: count(1, 'column', false), // he starts the next letter
@@ -451,6 +535,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: stay,
     PAUSE: pause('column.waiting', true),
     TICK: stay,
+    TOUCH: touchWhileWriting, // like a blink: he goes on writing (the reading is not stopped)
   },
   paused: {
     BLINK: stay,
@@ -460,6 +545,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     RIGHT: stay,
     PAUSE: resume,
     TICK: stay,
+    TOUCH: stay, // a pause stops every input but PAUSE, taps included
   },
 };
 

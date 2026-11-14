@@ -2,10 +2,10 @@
 // face signals later (stages 3–4). All of them call the same sink, so the counting machine never knows the source.
 import type { Signal } from '../counting/counting';
 
-/** A signal from a person (TICK is time, not input). */
+/** A signal from a person: his signals and a tap on the screen (TICK is time, not input). */
 export type InputSignal = Exclude<Signal, { type: 'TICK' }>;
-export type InputSignalType = InputSignal['type'];
 
+/** His six signals, the ones a button, a key or (later) his face gives; a tap (TOUCH) carries a target instead. */
 export const INPUT_SIGNALS = [
   'BLINK',
   'HAND',
@@ -13,7 +13,8 @@ export const INPUT_SIGNALS = [
   'SHAKE',
   'RIGHT',
   'PAUSE',
-] as const satisfies readonly InputSignalType[];
+] as const satisfies readonly InputSignal['type'][];
+export type InputSignalType = (typeof INPUT_SIGNALS)[number];
 
 /** Where every source sends its signals. */
 export type SignalSink = (signal: InputSignal) => void;
