@@ -1,5 +1,9 @@
 # Log
 
+## 2026-11-14 (spec 006 learnings, spec 007 plan)
+- PR #15 merged; learnings: Ajv needs unsafe-eval (our own validator instead), a rebase-merged branch looks unmerged to git, the transition table checked by the compiler.
+- Spec 007 (screens) planned: Angular Material spike first, the shell, TOUCH in the machine, Liczenie (Counting), settings, boards, sentences.
+
 ## 2026-11-13 (spec 006, T1–T6)
 - The counting core without UI: board format v1 and validator, his board as the default, the sentence with undo, the counting state machine (77 explicit state × signal pairs, time only from TICK, a lint rule against clocks in the core), one input type and a keyboard mapping that is off by default, on-device speech, CountingService.
 - The author: a nod without a number while Blinker waits for a column is a space (he does not signal the end of a word today).

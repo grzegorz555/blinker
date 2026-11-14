@@ -29,9 +29,13 @@ Body: **Context** (what happened), **Lesson** (the rule), **How to apply** (wher
 ## Interaction
 * ["No" means a different thing in every state](no-depends-on-context.md) - Map every state and signal explicitly; a second "no" must not delete.
 
+## Security
+* [Ajv compiles schemas with new Function, which our CSP blocks](ajv-needs-unsafe-eval.md) - Check a dependency for run-time code generation before adding it.
+
 ## Accessibility
 * [A visible skip link must not overlap other targets](skip-link-must-not-overlap.md) - SC 2.5.8; render focus-revealed controls in flow; scan focused states with axe.
 
 ## Tooling
 * [Start Claude Code in the repo root](claude-session-start-directory.md) - Otherwise project agents (code-reviewer) are not loaded.
 * [`node -e` template strings eat backslashes](node-e-template-eats-backslashes.md) - Use Write/Edit or String.raw for regexes and paths.
+* [After a rebase merge, git branch -d says the branch is not merged](rebased-branch-is-not-merged-for-git.md) - Compare the trees with git diff before deleting.
