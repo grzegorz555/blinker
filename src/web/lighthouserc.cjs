@@ -12,7 +12,14 @@ module.exports = {
       // The production build, served like in e2e (SPA fallback for the 404 page).
       startServerCommand: 'node e2e/serve-dist.mjs',
       startServerReadyPattern: 'Serving',
-      url: [`${base}/`, `${base}/does-not-exist`],
+      // Every page of the app (spec 007) and the 404 page.
+      url: [
+        `${base}/`,
+        `${base}/sentences`,
+        `${base}/boards`,
+        `${base}/settings`,
+        `${base}/does-not-exist`,
+      ],
       numberOfRuns: 1,
       settings: {
         // Mobile emulation is Lighthouse's default. The app picks its language from the browser
