@@ -19,6 +19,7 @@ import {
   type CountingState,
   type Effect,
   type Message,
+  type TouchTarget,
 } from './counting';
 
 /** Calls back with the current time at a fixed interval; returns a function that stops it. */
@@ -105,6 +106,11 @@ export class CountingService {
   /** Every source (buttons, keys, later his face) sends its signals here. */
   send(signal: InputSignal): void {
     this.apply(signal);
+  }
+
+  /** A tap on a board cell or a sentence action (spec 007, R3); "clear" only after the confirmation dialog. */
+  touch(target: TouchTarget): void {
+    this.apply({ type: 'TOUCH', target });
   }
 
   /** Changes the settings (the pause before the question within 500–5000 ms, SC 2.2.1; speaking the questions). */

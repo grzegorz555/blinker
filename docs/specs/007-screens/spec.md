@@ -47,9 +47,9 @@ signal source.
     and the machine waits for a column;
   - `undo` removes the last thing this session added; `speak` reads the sentence aloud; `clear` is sent only after the
     confirmation dialog (R5), so the machine clears at once;
-  - `paused` ignores `TOUCH` like every other signal except `PAUSE`; in `speaking`, `speak` starts the reading
-    again, while a cell, `undo` and `clear` are ignored with an announcement (the text does not change while it is
-    read aloud).
+  - `paused` ignores `TOUCH` like every other signal except `PAUSE`; in `speaking` a tap goes on writing, like a
+    blink does (the machine does not know when the reading ends, so ignoring taps there could lock the board), and
+    `speak` reads the sentence again.
   The table test grows to 11 × 8 pairs; every pair stays explicit.
 - **R4. Liczenie (Counting) screen** (design, Screens and states; spec 004 layout):
   - the board as a table with column and row headers (the numbers he gives), each cell a button with the cell

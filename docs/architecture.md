@@ -35,7 +35,7 @@ src/web/
     core/i18n/             languages.ts (pure resolveLanguage), LanguageService, TranslocoHttpLoader, TranslatedTitleStrategy
     core/boards/           board.ts (format v1), validate-board.ts (imported files are untrusted input)  (spec 006)
     core/sentence/         sentence.ts (the text with undo of every step this session made)
-    core/counting/         counting.ts (the counting state machine: pure, every state × signal explicit, time from TICK),
+    core/counting/         counting.ts (the counting state machine: pure, every state × signal explicit, taps as TOUCH, time from TICK),
                            counting.service.ts (Angular: state in a signal, one TICK scheduler, effects to the speaker)
     core/input/            signals.ts (one input type for every source), keyboard.ts (off by default, SC 2.1.4)
     core/speech/           speaker.ts (interface), web-speaker.ts (on-device voices only), fake-speaker.ts (tests)
@@ -62,8 +62,9 @@ This way the service worker, hashing and the absence of source maps are tested a
 
 The core is plain TypeScript with no Angular imports and no clock (a lint rule enforces it); a thin Angular service
 wraps it. Data flow without a camera: a button or a key → `InputSignal` → `CountingService.send()` → `next(state,
-signal)` → effects (the text for the screen and the live region, `Speaker.say()`). Stage 4 adds his face signals as
-one more source of `InputSignal`.
+signal)` → effects (the text for the screen and the live region, `Speaker.say()`). A tap on a cell or a sentence
+action is the `TOUCH` signal (`CountingService.touch()`, spec 007), so every change of the text goes through the
+machine. Stage 4 adds his face signals as one more source of `InputSignal`.
 
 - `core/vision/`: camera access, the worker, and the MediaPipe wrapper. The model (`.task`) and the wasm files are served from `public/models/`, never from a CDN.
 - `core/signals/`: the signal detector, the calibration profile and the thresholds.

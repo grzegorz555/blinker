@@ -29,8 +29,13 @@ if (!parsed.ok) throw new Error('friend board invalid');
 const board: Board = parsed.board;
 const config: CountingConfig = { board, askAfterMs: ASK_AFTER.default, speakQuestions: true };
 
+/** TOUCH in the table: a tap on the first cell of his board, "A" (spec 007, R3). */
 const signal = (type: SignalType, now = 0): Signal =>
-  type === 'TICK' ? { type, now } : ({ type } as Signal);
+  type === 'TICK'
+    ? { type, now }
+    : type === 'TOUCH'
+      ? { type, target: { kind: 'cell', column: 1, row: 1 } }
+      : ({ type } as Signal);
 
 /** A typical state for each name: the sentence "AB", 7 (hand + 2) in the column step, 3 in the row step of column 7. */
 function fixture(name: StateName): CountingState {
@@ -55,19 +60,19 @@ function fixture(name: StateName): CountingState {
 const A = 'announce';
 const S = 'say';
 // prettier-ignore
-/** Expected next state and effect types, per signal in SIGNAL_TYPES order: BLINK HAND NOD SHAKE RIGHT PAUSE TICK. */
+/** Expected next state and effect types, per signal in SIGNAL_TYPES order: BLINK HAND NOD SHAKE RIGHT PAUSE TICK TOUCH. */
 const TABLE: Record<StateName, readonly (readonly [StateName, readonly Effect['type'][]])[]> = {
-  'column.waiting':  [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.waiting', [A]], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.waiting', []]],
-  'column.counting': [['column.counting', []], ['column.counting', []], ['column.counting', []], ['column.rejected', [A, S]], ['column.counting', []], ['paused', [A]], ['column.counting', []]],
-  'column.asking':   [['column.counting', []], ['column.counting', []], ['row.waiting', [A]], ['column.rejected', [A, S]], ['column.asking', []], ['paused', [A]], ['column.asking', []]],
-  'column.rejected': [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.rejected', []]],
-  'row.waiting':     [['row.counting', []], ['row.counting', []], ['row.waiting', []], ['column.waiting', [A]], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.waiting', []]],
-  'row.counting':    [['row.counting', []], ['row.counting', []], ['row.counting', []], ['row.rejected', [A, S]], ['row.counting', []], ['paused', [A]], ['row.counting', []]],
-  'row.asking':      [['row.counting', []], ['row.counting', []], ['column.waiting', [A, S]], ['row.rejected', [A, S]], ['row.asking', []], ['paused', [A]], ['row.asking', []]],
-  'row.rejected':    [['row.counting', []], ['row.counting', []], ['row.rejected', []], ['row.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.rejected', []]],
-  'speak.asking':    [['speak.asking', []], ['speak.asking', []], ['speaking', ['speak']], ['column.waiting', ['stopSpeaking', A]], ['speak.asking', []], ['paused', [A]], ['speak.asking', []]],
-  speaking:          [['column.counting', []], ['column.counting', []], ['speaking', ['speak']], ['column.waiting', ['stopSpeaking', A]], ['speaking', []], ['paused', ['stopSpeaking', A]], ['speaking', []]],
-  paused:            [['paused', []], ['paused', []], ['paused', []], ['paused', []], ['paused', []], ['column.waiting', [A]], ['paused', []]],
+  'column.waiting':  [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.waiting', [A]], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.waiting', []], ['column.waiting', [A, S]]],
+  'column.counting': [['column.counting', []], ['column.counting', []], ['column.counting', []], ['column.rejected', [A, S]], ['column.counting', []], ['paused', [A]], ['column.counting', []], ['column.waiting', [A, S]]],
+  'column.asking':   [['column.counting', []], ['column.counting', []], ['row.waiting', [A]], ['column.rejected', [A, S]], ['column.asking', []], ['paused', [A]], ['column.asking', []], ['column.waiting', [A, S]]],
+  'column.rejected': [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.rejected', []], ['column.waiting', [A, S]]],
+  'row.waiting':     [['row.counting', []], ['row.counting', []], ['row.waiting', []], ['column.waiting', [A]], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.waiting', []], ['column.waiting', [A, S]]],
+  'row.counting':    [['row.counting', []], ['row.counting', []], ['row.counting', []], ['row.rejected', [A, S]], ['row.counting', []], ['paused', [A]], ['row.counting', []], ['column.waiting', [A, S]]],
+  'row.asking':      [['row.counting', []], ['row.counting', []], ['column.waiting', [A, S]], ['row.rejected', [A, S]], ['row.asking', []], ['paused', [A]], ['row.asking', []], ['column.waiting', [A, S]]],
+  'row.rejected':    [['row.counting', []], ['row.counting', []], ['row.rejected', []], ['row.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.rejected', []], ['column.waiting', [A, S]]],
+  'speak.asking':    [['speak.asking', []], ['speak.asking', []], ['speaking', ['speak']], ['column.waiting', ['stopSpeaking', A]], ['speak.asking', []], ['paused', [A]], ['speak.asking', []], ['column.waiting', [A, S]]],
+  speaking:          [['column.counting', []], ['column.counting', []], ['speaking', ['speak']], ['column.waiting', ['stopSpeaking', A]], ['speaking', []], ['paused', ['stopSpeaking', A]], ['speaking', []], ['column.waiting', [A, S]]],
+  paused:            [['paused', []], ['paused', []], ['paused', []], ['paused', []], ['paused', []], ['column.waiting', [A]], ['paused', []], ['paused', []]],
 };
 
 /** The only pairs that change the text (everything else must leave the sentence as it was). */
@@ -76,15 +81,17 @@ const TEXT_CHANGES = new Set([
   'column.waiting SHAKE', // undo
   'column.rejected NOD', // a space
   'row.asking NOD', // the letter W
+  // a tap on "A" adds it in every state but the pause (spec 007, R3)
+  ...STATE_NAMES.filter((name) => name !== 'paused').map((name) => `${name} TOUCH`),
 ]);
 
 describe('the transition table (R4)', () => {
-  it('has an entry for every state and every signal: 11 × 7 = 77', () => {
+  it('has an entry for every state and every signal: 11 × 8 = 88', () => {
     expect(Object.keys(TRANSITIONS).sort()).toEqual([...STATE_NAMES].sort());
     for (const name of STATE_NAMES) {
       expect(Object.keys(TRANSITIONS[name]).sort(), name).toEqual([...SIGNAL_TYPES].sort());
     }
-    expect(STATE_NAMES.length * SIGNAL_TYPES.length).toBe(77);
+    expect(STATE_NAMES.length * SIGNAL_TYPES.length).toBe(88);
   });
 
   for (const name of STATE_NAMES) {
@@ -325,5 +332,94 @@ describe('texts (Transloco keys)', () => {
       expect(typeof enText, `en ${key}`).toBe('string');
       expect(params(plText), key).toEqual(params(enText));
     }
+  });
+});
+
+describe('touch: a tap on the screen (spec 007, R3)', () => {
+  const tap = (target: Extract<Signal, { type: 'TOUCH' }>['target']): Signal => ({
+    type: 'TOUCH',
+    target,
+  });
+  const cell = (column: number, row: number) => tap({ kind: 'cell', column, row });
+
+  it('a cell adds its value and says it, with no nod, and drops the number being given', () => {
+    const { state, effects } = run([H, B, cell(7, 3)]);
+    expect(state.sentence.text).toBe('W');
+    expect(state.name).toBe('column.waiting');
+    expect(state.parts).toEqual([]);
+    expect(state.column).toBeNull();
+    expect(texts(effects, 'say')).toEqual([{ key: 'counting.letter', params: { letter: 'W' } }]);
+  });
+
+  it('works in the middle of the row step, and while the question about reading aloud waits', () => {
+    expect(run([cell(1, 1)], fixture('row.asking')).state.sentence.text).toBe('ABA');
+    expect(run([cell(1, 1)], fixture('speak.asking')).state.name).toBe('column.waiting');
+  });
+
+  it('an empty cell changes nothing', () => {
+    const before = fixture('column.waiting');
+    const { state, effects } = run([cell(7, 5)], before);
+    expect(state).toEqual(before);
+    expect(effects).toEqual([]);
+  });
+
+  it('undo removes the last thing this session added, and says so', () => {
+    const { state, effects } = run([cell(1, 1), cell(2, 1), tap({ kind: 'undo' })]);
+    expect(state.sentence.text).toBe('A');
+    expect(texts(effects, 'announce').at(-1)).toEqual({
+      key: 'counting.undone',
+      params: { text: 'B' },
+    });
+  });
+
+  it('clear (sent after the dialog) empties the sentence at once, and undo brings it back', () => {
+    const cleared = run([tap({ kind: 'clear' })], fixture('column.waiting')).state;
+    expect(cleared.sentence.text).toBe('');
+    expect(cleared.notice).toEqual({ key: 'counting.cleared' });
+    expect(run([tap({ kind: 'undo' })], cleared).state.sentence.text).toBe('AB');
+  });
+
+  it('speak reads the sentence at once; with nothing to read it only says so', () => {
+    const { state, effects } = run([tap({ kind: 'speak' })], fixture('column.counting'));
+    expect(state.name).toBe('speaking');
+    expect(effects).toContainEqual({ type: 'speak', text: 'AB' });
+    const empty = run([tap({ kind: 'speak' })]);
+    expect(empty.state.name).toBe('column.waiting');
+    expect(empty.effects.some((e) => e.type === 'speak')).toBe(false);
+  });
+
+  it('while reading aloud, a cell goes on writing and speak reads again', () => {
+    expect(run([cell(1, 1)], fixture('speaking')).state.sentence.text).toBe('ABA');
+    expect(run([tap({ kind: 'speak' })], fixture('speaking')).effects).toEqual([
+      { type: 'speak', text: 'AB' },
+    ]);
+  });
+
+  it('a pause ignores every tap', () => {
+    const before = fixture('paused');
+    for (const target of [
+      { kind: 'cell', column: 1, row: 1 },
+      { kind: 'undo' },
+      { kind: 'clear' },
+      { kind: 'speak' },
+    ] as const) {
+      const { state, effects } = run([tap(target)], before);
+      expect(state).toEqual(before);
+      expect(effects).toEqual([]);
+    }
+  });
+
+  it('a speak action cell reads at once, like the button', () => {
+    const speakBoard: Board = {
+      ...board,
+      columns: ['1'],
+      rows: ['1'],
+      cells: [[{ type: 'action', value: 'speak' }]],
+    };
+    const { state } = run([cell(1, 1)], fixture('column.waiting'), {
+      ...config,
+      board: speakBoard,
+    });
+    expect(state.name).toBe('speaking');
   });
 });
