@@ -27,7 +27,11 @@ export class SettingsService {
 
     effect(() => {
       const s = this.current();
-      this.counting.configure({ askAfterMs: s.askAfterMs, speakQuestions: s.speakQuestions });
+      this.counting.configure({
+        askAfterMs: s.askAfterMs,
+        speakPrompts: s.speakPrompts,
+        confirmByNod: s.confirmByNod,
+      });
       this.counting.setRate(s.rate);
       // light-dark() in tokens.css follows the used color-scheme; "system" leaves it to the device.
       this.document.documentElement.style.colorScheme = s.theme === 'system' ? '' : s.theme;

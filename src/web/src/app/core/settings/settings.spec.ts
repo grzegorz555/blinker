@@ -64,11 +64,12 @@ describe('SettingsService (spec 007, R9, R12)', () => {
 
   it('reads stored settings and applies them to the counting machine', () => {
     const { service, counting } = setup(
-      JSON.stringify({ askAfterMs: 2000, speakQuestions: false }),
+      JSON.stringify({ askAfterMs: 2000, speakPrompts: true, confirmByNod: true }),
     );
     expect(service.settings().askAfterMs).toBe(2000);
     expect(counting.config().askAfterMs).toBe(2000);
-    expect(counting.config().speakQuestions).toBe(false);
+    expect(counting.config().speakPrompts).toBe(true);
+    expect(counting.config().confirmByNod).toBe(true);
   });
 
   it('falls back to the defaults on a corrupted value, and says so', () => {

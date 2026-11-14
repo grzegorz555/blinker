@@ -65,7 +65,8 @@
         "undo": "Undo"
       },
       "space": "Space",
-      "hintColumn": "Nod without a number = space (end of a word) · Shake your head = undo the last letter"
+      "hintColumn": "Nod without a number = space (end of a word) · Shake your head = undo the last letter",
+      "hintPause": "A pause = go on · Shake your head = start over"
     },
     "signals": {
       "title": "His signals",
@@ -181,8 +182,10 @@
       "askAfter": "Pause before the question",
       "askAfterHint": "From {{min}} to {{max}} ms. Blinker asks after this pause without a signal.",
       "askAfterError": "Error: enter a whole number from {{min}} to {{max}} ms.",
-      "speakQuestions": "Say the questions aloud",
-      "speakQuestionsHint": "Column 7? is also spoken, not only shown.",
+      "confirmByNod": "Confirm the column and the row with a nod",
+      "confirmByNodHint": "Blinker asks “Column 7?” and waits for a nod. Off: the pause after blinking moves on, and a shake undoes the letter.",
+      "speakPrompts": "Say the questions and notices",
+      "speakPromptsHint": "Off: Blinker says only the chosen letter, and the whole sentence when he asks for it.",
       "signalButtons": "Signal buttons",
       "signalButtonsHint": "Buttons for his signals under the board (there is no camera yet).",
       "keyboard": "Keyboard shortcuts",

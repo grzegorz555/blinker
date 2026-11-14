@@ -43,11 +43,14 @@ confirms it with a nod or rejects it by shaking his head. Blinker takes the care
 2. While he gives a number:
    - each `LONG_BLINK` adds **1**;
    - `LOOK_AT_HAND` adds **5**, so he doesn't have to blink five times (7 = hand + 2 blinks). He looks **down at his hand, usually to his left, sometimes to his right**, so calibration must accept either side.
-3. When no signal comes for a short while (configurable), Blinker **asks**, on screen and aloud: "Column 4?".
-4. **Every number is confirmed separately:**
+3. When no signal comes for a short while (configurable), **the pause takes the number** (spec 009, the default): the
+   column is fixed and he gives the row the same way; the pause after the row adds the letter, and Blinker **says only
+   the letter** ("K"). Blinking again is the next letter; a shake right after it undoes it, so he gives it again.
+4. With "Potwierdzaj kolumnę i wiersz skinieniem" (Confirm the column and the row with a nod) on, Blinker asks instead,
+   on screen (and aloud with "Mów pytania i komunikaty" (Say the questions and notices) on): "Column 4?":
    - `HEAD_NOD` = yes: the column is fixed, and he gives the row number the same way ("Row 2?");
    - `HEAD_SHAKE` = no: the number is discarded and he gives it again.
-5. After the row is confirmed, Blinker says the letter ("K") and appends it to the text. Undo is still one signal away.
+5. After the row, Blinker says the letter ("K") and appends it to the text. Undo is still one signal away.
 
 `LOOK_AT_HAND` = 5 is used **only in counting**. In scanning it means nothing (decided on 2026-11-11), so a glance at
 his hand can never make the scan jump.
@@ -57,13 +60,15 @@ confirms it** (says it aloud and waits for his answer). In Blinker the confirmat
 (`HEAD_NOD` / `HEAD_SHAKE`, steps 3–4 above), so no caregiver is needed.
 
 **He listens, he does not read (author, 2026-11-14):** he knows the digits and which letter is under each column and
-row, and he **puts words together by ear**, not by reading. So everything that reaches him is said aloud: the
-questions, each letter added, **the word just finished when he adds a space**, and what an undo removed. The screen
-shows the sentence in big letters for the people around him, and the prompts small (spec 008).
+row, and he **puts words together by ear**, not by reading. The screen shows the sentence in big letters for the
+people around him, and the prompts small (spec 008). **The voice says only the chosen letter, and the whole sentence
+when he asks for it** (author, 2026-11-14, spec 009): questions and notices are shown and announced to screen
+readers, and said aloud only with "Mów pytania i komunikaty" (Say the questions and notices) on.
 
 **Shortcuts by head (spec 008):**
-- **space** = a nod without a number while Blinker waits for a column (it says the finished word);
-- **undo** = a shake while Blinker waits for a column (it says what it removed; it also brings back a cleared sentence);
+- **space** = a nod without a number while Blinker waits for a column;
+- **undo** = a shake while Blinker waits for a column (right after a letter: the letter starts over; it also brings
+  back a cleared sentence);
 - **read aloud** = head right, then a nod on "Przeczytać na głos?" (Read it aloud?);
 - **new sentence** = a nod on "Nowe zdanie?" (New sentence?), which Blinker asks when a reading ends; a shake keeps
   the sentence, a blink or a hand goes on with it.
@@ -71,7 +76,8 @@ shows the sentence in big letters for the people around him, and the prompts sma
 **Still open:**
 - The pace and the pauses between signals, and what happens after a miscount: tuned during the trial (stage 6).
 - How long the pause before "Column 4?" should be: we tune it during the trial with him (stage 6).
-- Whether, once he is fluent, he would rather confirm only the letter instead of each number: a setting to consider after the trial.
+- Whether the pause alone (spec 009, the default) or the nod per number suits him better: the setting is there, the
+  trial (stage 6) decides.
 
 # Default actions (all remappable in settings)
 
@@ -79,7 +85,7 @@ shows the sentence in big letters for the people around him, and the prompts sma
 |---|---|---|
 | `LONG_BLINK` | select (scanning) / +1 (counting) | — |
 | `LOOK_AT_HAND` | +5 (counting only; ignored in scanning) | — |
-| `HEAD_NOD` | confirm the number or letter Blinker asked about; **without a number, while Blinker waits for a column: a space** (the end of a word; author, 2026-11-13) | **yes** |
+| `HEAD_NOD` | confirm the number Blinker asked about (with the nod confirmation on); **without a number, while Blinker waits for a column: a space** (the end of a word; author, 2026-11-13) | **yes** |
 | `HEAD_SHAKE` or `HEAD_LEFT` | **no / back one step (−1)**: in counting, discard the number Blinker asked about; otherwise from rows back to columns, and at columns delete the last character | **no** |
 | `HEAD_RIGHT` | finish the sentence and ask "Read it aloud?"; after reading, Blinker asks "New sentence?" | — |
 | `VERY_LONG_CLOSE` | pause or resume input (rest mode) | — |
@@ -88,6 +94,7 @@ The board can also contain **action cells** (space, delete, read aloud, clear). 
 with `LONG_BLINK` alone on a day when head movements are not reliable.
 
 # Safety rules
-- Nothing is spoken and the text is never cleared without a yes/no confirmation.
+- The sentence is never read aloud or cleared without a yes/no confirmation; a chosen letter is said at once and
+  undone by one shake.
 - Undo is always one signal away.
 - The current state ("scanning columns", "column 3: rows", "paused") is always visible and can be heard.

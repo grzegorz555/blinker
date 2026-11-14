@@ -10,6 +10,18 @@ const signal = (page: Page, name: string) =>
 const question = (page: Page) => page.getByTestId('question');
 const sentence = (page: Page) => page.getByTestId('sentence');
 
+/** Both spec 009 switches on (the nod confirmation, the spoken questions and notices): specs 006–008 as they were. */
+async function asBefore(page: Page): Promise<void> {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'blinker.settings.v1',
+      JSON.stringify({ speakPrompts: true, confirmByNod: true }),
+    ),
+  );
+  await page.reload();
+  await expect(page.getByRole('table')).toBeVisible();
+}
+
 test.describe('Liczenie (Counting) with the signal buttons', () => {
   test.beforeEach(async ({ page }) => {
     await fakeSpeech(page);
@@ -33,9 +45,38 @@ test.describe('Liczenie (Counting) with the signal buttons', () => {
     }
   });
 
-  test('the full path: hand + 2 blinks, "Kolumna 7?" (Column 7?), yes, 3 blinks, "Wiersz 3?" (Row 3?), yes: W; finish, yes: read aloud', async ({
+  test('the letter by ear (spec 009): hand + 2 blinks, a pause, 3 blinks, a pause: W is added and only W is said; blinking again is the next letter, a shake undoes it', async ({
     page,
   }) => {
+    test.slow();
+    await signal(page, 'Ręka +5').click();
+    await signal(page, 'Mrugnięcie +1').click();
+    await signal(page, 'Mrugnięcie +1').click();
+    await expect(question(page)).toHaveText('Kolumna 7. Podaj wiersz', { timeout: 5000 });
+    for (let i = 0; i < 3; i++) await signal(page, 'Mrugnięcie +1').click();
+    await expect(sentence(page)).toHaveText('W', { timeout: 5000 });
+    await expect.poll(() => spoken(page)).toEqual(['W']);
+    await expectNoA11yViolations(page);
+
+    await signal(page, 'Kręcenie głową: nie').click();
+    await expect(sentence(page)).toHaveText('');
+    await signal(page, 'Mrugnięcie +1').click();
+    await expect(question(page)).toHaveText('Kolumna 1. Podaj wiersz', { timeout: 5000 });
+    await signal(page, 'Mrugnięcie +1').click();
+    await expect(sentence(page)).toHaveText('A', { timeout: 5000 });
+    expect(await spoken(page)).toEqual(['W', 'A']);
+
+    // Reading aloud asks first (shown, not said), and reads on a nod.
+    await signal(page, 'Głowa w prawo: koniec').click();
+    await expect(question(page)).toHaveText('Przeczytać na głos?');
+    await signal(page, 'Skinienie: tak').click();
+    await expect.poll(() => spoken(page)).toEqual(['W', 'A', 'A']);
+  });
+
+  test('with the nod confirmation on (spec 006): hand + 2 blinks, "Kolumna 7?" (Column 7?), yes, 3 blinks, "Wiersz 3?" (Row 3?), yes: W; finish, yes: read aloud', async ({
+    page,
+  }) => {
+    await asBefore(page);
     // Two pauses before a question and two axe scans: slow on WebKit when the whole suite runs in parallel.
     test.slow();
     await signal(page, 'Ręka +5').click();
@@ -83,7 +124,10 @@ test.describe('Liczenie (Counting) with the signal buttons', () => {
     await expect(sentence(page)).toHaveText('A B');
   });
 
-  test('a shake rejects the number; a second shake changes nothing', async ({ page }) => {
+  test('with the nod confirmation on, a shake rejects the number; a second shake changes nothing', async ({
+    page,
+  }) => {
+    await asBefore(page);
     await page.getByRole('table').getByRole('button', { name: 'A', exact: true }).click();
     await signal(page, 'Mrugnięcie +1').click();
     await expect(question(page)).toHaveText('Kolumna 1?', { timeout: 5000 });
@@ -117,6 +161,7 @@ test.describe('for a listener (spec 008)', () => {
   test('after reading aloud Blinker asks "Nowe zdanie?" (New sentence?): yes clears, a shake brings it back', async ({
     page,
   }) => {
+    await asBefore(page);
     test.slow();
     await page.getByRole('table').getByRole('button', { name: 'A', exact: true }).click();
     await endSpeech(page);
@@ -134,7 +179,8 @@ test.describe('for a listener (spec 008)', () => {
     await expect.poll(() => spoken(page)).toContain('Cofnięto A');
   });
 
-  test('a space says the word just finished', async ({ page }) => {
+  test('with the spoken notices on, a space says the word just finished', async ({ page }) => {
+    await asBefore(page);
     for (const l of ['T', 'A', 'K']) {
       await page.getByRole('table').getByRole('button', { name: l, exact: true }).click();
     }
