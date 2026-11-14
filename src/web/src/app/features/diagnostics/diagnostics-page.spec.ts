@@ -1,0 +1,86 @@
+import { signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { translocoTesting } from '../../../testing/transloco';
+import type { FaceFrame } from '../../core/vision/face-frame';
+import { FaceTrackerService, type TrackerStatus } from '../../core/vision/face-tracker.service';
+import { frameStats } from '../../core/vision/frame-stats';
+import { DiagnosticsPage } from './diagnostics-page';
+
+/** A tracker the test drives by hand (no camera, no worker). */
+function fakeTracker() {
+  return {
+    status: signal<TrackerStatus>('idle'),
+    error: signal<string | null>(null),
+    delegate: signal<'GPU' | 'CPU' | null>(null),
+    frame: signal<FaceFrame | null>(null),
+    stats: signal(frameStats([])),
+    blocked: signal<readonly string[]>([]),
+    start: vi.fn(async () => undefined),
+    stop: vi.fn(),
+  };
+}
+
+describe('DiagnosticsPage (spec 010, R4)', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  async function render() {
+    const tracker = fakeTracker();
+    await TestBed.configureTestingModule({ imports: [DiagnosticsPage, translocoTesting()] })
+      .overrideComponent(DiagnosticsPage, {
+        set: { providers: [{ provide: FaceTrackerService, useValue: tracker }] },
+      })
+      .compileComponents();
+    const fixture = TestBed.createComponent(DiagnosticsPage);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const text = (id: string) => root.querySelector(`[data-testid="${id}"]`)?.textContent?.trim();
+    const button = (name: string) =>
+      [...root.querySelectorAll('button')].find((b) => b.textContent?.trim() === name);
+    return { fixture, root, tracker, text, button };
+  }
+
+  it('starts with the camera off and turns it on only on the button', async () => {
+    const { tracker, text, button, root } = await render();
+    expect(text('tracker-status')).toBe('The camera is off.');
+    expect(tracker.start).not.toHaveBeenCalled();
+    button('Turn on the camera')!.click();
+    expect(tracker.start).toHaveBeenCalledWith(root.querySelector('video'));
+  });
+
+  it('shows the live values: face, rate, analysis time, engine, eye meters and head angles', async () => {
+    const { fixture, tracker, text, root } = await render();
+    tracker.status.set('running');
+    tracker.delegate.set('GPU');
+    tracker.stats.set({ fps: 29.97, medianMs: 11.24, p95Ms: 18.5, frames: 60 });
+    tracker.frame.set({
+      timestamp: 0,
+      inferenceMs: 11,
+      face: true,
+      eyes: { eyeBlinkLeft: 0.9 },
+      head: { yaw: 12.4, pitch: -3.6, roll: 0 },
+    });
+    await fixture.whenStable();
+    expect(text('tracker-status')).toBe('Running. Analysis: GPU.');
+    expect(text('face')).toBe('yes');
+    expect(text('fps')).toBe('30.0');
+    expect(text('analysis')).toBe('median 11.2 ms, p95 18.5 ms');
+    const meter = root.querySelector('meter') as HTMLMeterElement;
+    expect(meter.value).toBeCloseTo(0.9);
+    expect(text('head')).toContain('12°');
+    expect(text('head')).toContain('-4°');
+  });
+
+  it('says why the camera stopped, in text', async () => {
+    const { fixture, tracker, text } = await render();
+    tracker.status.set('error');
+    tracker.error.set('denied');
+    await fixture.whenStable();
+    expect(text('tracker-status')).toContain('No permission for the camera');
+  });
+
+  it('turns the camera off when the page goes', async () => {
+    const { fixture, tracker } = await render();
+    fixture.destroy();
+    expect(tracker.stop).toHaveBeenCalled();
+  });
+});

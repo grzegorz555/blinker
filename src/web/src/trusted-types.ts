@@ -1,4 +1,5 @@
-// ADR-0004: a Trusted Types `default` policy that accepts exactly one value, the same-origin service worker script.
+// ADR-0004: a Trusted Types `default` policy that accepts two kinds of same-origin script URL: the service worker
+// script, and (spec 010) a web worker emitted by our build (`/worker-<hash>.js`, the face worker).
 // @angular/service-worker calls navigator.serviceWorker.register() with a plain string, and the production CSP
 // (`require-trusted-types-for 'script'`) blocks plain strings. The policy defines no createHTML and no createScript,
 // so those sinks stay blocked; every other script URL throws.
@@ -14,11 +15,22 @@ export interface TrustedTypesFactory {
   ): { createScriptURL(value: string): unknown };
 }
 
-/** Returns the URL unchanged when it is the service worker script, and throws otherwise. */
-export function allowServiceWorkerScript(value: string, base: string): string {
+/** A web worker file of our build: Angular's bundler names it worker-<hash>.js at the root (spec 010). */
+export const BUILD_WORKER = /^\/worker-[A-Za-z0-9_-]+\.js$/;
+
+/**
+ * Returns the URL unchanged when it is the service worker script or a worker file of our build, on this origin and
+ * without a query or fragment; throws otherwise.
+ */
+export function allowScriptUrl(value: string, base: string): string {
   const url = new URL(value, base);
-  const expected = new URL(SERVICE_WORKER_PATH, base);
-  if (url.href !== expected.href) {
+  const serviceWorker = new URL(SERVICE_WORKER_PATH, base);
+  const buildWorker =
+    url.origin === serviceWorker.origin &&
+    !url.search &&
+    !url.hash &&
+    BUILD_WORKER.test(url.pathname);
+  if (url.href !== serviceWorker.href && !buildWorker) {
     throw new TypeError(`Trusted Types: script URL not allowed: ${value}`);
   }
   return value;
@@ -38,7 +50,7 @@ export function installDefaultPolicy(
   if (!factory) return false;
   try {
     factory.createPolicy('default', {
-      createScriptURL: (value) => allowServiceWorkerScript(value, base()),
+      createScriptURL: (value) => allowScriptUrl(value, base()),
     });
     return true;
   } catch (error) {

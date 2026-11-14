@@ -1,11 +1,12 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
+import { MatAnchor, MatButton } from '@angular/material/button';
 import { MatError, MatFormField, MatHint, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ASK_AFTER } from '../../core/counting/counting';
 import { CountingService } from '../../core/counting/counting.service';
@@ -24,6 +25,7 @@ type Toggle = 'confirmByNod' | 'speakPrompts' | 'signalButtons' | 'keyboard' | '
   selector: 'app-settings-page',
   imports: [
     LanguageSwitch,
+    MatAnchor,
     MatButton,
     MatError,
     MatFormField,
@@ -37,6 +39,7 @@ type Toggle = 'confirmByNod' | 'speakPrompts' | 'signalButtons' | 'keyboard' | '
     MatSlideToggle,
     MatSuffix,
     ReactiveFormsModule,
+    RouterLink,
     TranslocoPipe,
   ],
   templateUrl: './settings-page.html',

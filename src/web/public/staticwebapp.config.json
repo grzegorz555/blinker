@@ -5,7 +5,9 @@
     "exclude": [
       "/*.{js,css,json,webmanifest,png,ico,svg,wasm,task,txt,map,md}",
       "/icons/*",
-      "/i18n/*"
+      "/i18n/*",
+      "/mediapipe/*",
+      "/models/*"
     ]
   },
   "routes": [

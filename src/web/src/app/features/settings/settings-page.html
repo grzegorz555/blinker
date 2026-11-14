@@ -108,6 +108,15 @@
   </mat-radio-group>
 </section>
 
+<!-- Diagnostyka (Diagnostics), spec 010 -->
+<section class="group" aria-labelledby="settings-diagnostics">
+  <h2 id="settings-diagnostics" class="group-title">
+    {{ 'settings.diagnostics.title' | transloco }}
+  </h2>
+  <p class="muted">{{ 'settings.diagnostics.help' | transloco }}</p>
+  <a matButton="tonal" routerLink="/diagnostics">{{ 'settings.diagnostics.open' | transloco }}</a>
+</section>
+
 <!-- O aplikacji (About) -->
 <section class="group" aria-labelledby="settings-about">
   <h2 id="settings-about" class="group-title">{{ 'settings.about' | transloco }}</h2>

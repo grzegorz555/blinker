@@ -19,10 +19,16 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
+            "webWorkerTsConfig": "tsconfig.worker.json",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "vision_wasm_module_internal.{js,wasm}",
+                "input": "node_modules/@mediapipe/tasks-vision/wasm",
+                "output": "mediapipe"
               }
             ],
             "styles": ["src/styles.css", "src/material.scss"]
@@ -44,7 +50,10 @@
               "outputHashing": "all",
               "optimization": {
                 "scripts": true,
-                "styles": { "minify": true, "inlineCritical": false },
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
                 "fonts": true
               },
               "sourceMap": false,

@@ -1,20 +1,14 @@
-// ADR-0004: the default Trusted Types policy accepts only the service worker script.
+// ADR-0004: the default Trusted Types policy accepts only the service worker script and the workers of our build.
 import { describe, expect, it, vi } from 'vitest';
-import {
-  allowServiceWorkerScript,
-  installDefaultPolicy,
-  type TrustedTypesFactory,
-} from './trusted-types';
+import { allowScriptUrl, installDefaultPolicy, type TrustedTypesFactory } from './trusted-types';
 
 const base = 'https://blinker.example/settings/voice';
 
-describe('allowServiceWorkerScript', () => {
+describe('allowScriptUrl', () => {
   it('accepts the service worker script, relative or absolute', () => {
-    expect(allowServiceWorkerScript('ngsw-worker.js', 'https://blinker.example/')).toBe(
-      'ngsw-worker.js',
-    );
-    expect(allowServiceWorkerScript('/ngsw-worker.js', base)).toBe('/ngsw-worker.js');
-    expect(allowServiceWorkerScript('https://blinker.example/ngsw-worker.js', base)).toBe(
+    expect(allowScriptUrl('ngsw-worker.js', 'https://blinker.example/')).toBe('ngsw-worker.js');
+    expect(allowScriptUrl('/ngsw-worker.js', base)).toBe('/ngsw-worker.js');
+    expect(allowScriptUrl('https://blinker.example/ngsw-worker.js', base)).toBe(
       'https://blinker.example/ngsw-worker.js',
     );
   });
@@ -26,8 +20,22 @@ describe('allowServiceWorkerScript', () => {
     ['a data URL', 'data:text/javascript,alert(1)'],
     ['a javascript URL', 'javascript:alert(1)'],
     ['the worker under a deep path', 'ngsw-worker.js'],
+    ['a build worker on another origin', 'https://evil.example/worker-ABC123.js'],
+    ['a build worker in a folder', '/assets/worker-ABC123.js'],
+    ['a build worker with a query', '/worker-ABC123.js?x=1'],
+    ['a build worker with a fragment', '/worker-ABC123.js#x'],
+    ['any other worker name', '/face-worker.js'],
   ])('rejects %s', (_label, value) => {
-    expect(() => allowServiceWorkerScript(value, base)).toThrow(TypeError);
+    expect(() => allowScriptUrl(value, base)).toThrow(TypeError);
+  });
+});
+
+describe('allowScriptUrl: the workers of our build (spec 010)', () => {
+  it('accepts worker-<hash>.js at the root, relative or absolute', () => {
+    expect(allowScriptUrl('https://blinker.example/worker-XAWWNJ4R.js', base)).toBe(
+      'https://blinker.example/worker-XAWWNJ4R.js',
+    );
+    expect(allowScriptUrl('/worker-a_b-C9.js', base)).toBe('/worker-a_b-C9.js');
   });
 });
 

@@ -16,6 +16,14 @@
       "resources": {
         "files": ["/icons/*.png", "/**/*.(svg|jpg|jpeg|png|webp|avif|woff2)"]
       }
+    },
+    {
+      "name": "vision",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "resources": {
+        "files": ["/mediapipe/*", "/models/*"]
+      }
     }
   ]
 }

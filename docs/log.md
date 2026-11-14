@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (spec 010, face-tracking spike)
+- MediaPipe Face Landmarker runs in a module worker under the production CSP and Trusted Types (GPU in Chromium); the wasm and model are self-hosted, the model hash pinned. The library sends usage metrics to Google: blocked by the CSP and a fetch guard in the worker. Diagnostyka (Diagnostics) shows the eye and head values, FPS and analysis time; ADR-0006 proposed, waiting for the measurements on his devices.
+
 ## 2026-11-14 (spec 009, the letter by ear; fixes, PR #18)
 - The author after trying spec 008: the voice says too much. Blinker now says only the chosen letter and the sentence when he reads it; a pause takes the column and then the letter, blinking again starts the next letter, a shake undoes it. The nod per number and the spoken questions and notices are settings, both off by default.
 - Fixes: space between the pause hint and the switches in Ustawienia (Settings); a Material button and an example file for the board import; a pointer and hover on the language buttons.

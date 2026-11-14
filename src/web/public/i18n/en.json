@@ -10,7 +10,8 @@
     "counting": "Counting · Blinker",
     "sentences": "Sentences · Blinker",
     "boards": "Boards · Blinker",
-    "settings": "Settings · Blinker"
+    "settings": "Settings · Blinker",
+    "diagnostics": "Diagnostics · Blinker"
   },
   "notFound": {
     "heading": "Page not found",
@@ -209,6 +210,60 @@
       "system": "Like the device",
       "light": "Light",
       "dark": "Dark"
+    },
+    "diagnostics": {
+      "title": "Camera diagnostics",
+      "help": "Check how the phone tracks the face: blinks, head movement, analysis speed.",
+      "open": "Open diagnostics"
     }
+  },
+  "diagnostics": {
+    "heading": "Diagnostics",
+    "camera": "Camera",
+    "privacy": "The camera picture is analysed only on this device. It is never saved or sent anywhere. The usage statistics the MediaPipe library wants to send to Google are blocked.",
+    "preview": "Front camera preview",
+    "start": "Turn on the camera",
+    "stop": "Turn off the camera",
+    "status": {
+      "idle": "The camera is off.",
+      "starting": "Turning on the camera and loading the model…",
+      "running": "Running. Analysis: {{delegate}}."
+    },
+    "error": {
+      "denied": "No permission for the camera. Allow it in the browser settings and try again.",
+      "no-camera": "No front camera found.",
+      "unsupported": "This browser does not support the camera or workers.",
+      "model": "The face model could not be loaded.",
+      "failed": "The camera stopped working. Try again."
+    },
+    "values": "Readings",
+    "face": "Face in view",
+    "yes": "yes",
+    "no": "no",
+    "fps": "Frames per second",
+    "analysis": "Analysis time",
+    "analysisValue": "median {{median}} ms, p95 {{p95}} ms",
+    "delegate": "Engine",
+    "faceShare": "Frames with a face",
+    "battery": "Battery",
+    "batteryUnknown": "not reported by the browser",
+    "eyes": "Eyes (0–1)",
+    "shape": {
+      "eyeBlinkLeft": "Blink, his left eye",
+      "eyeBlinkRight": "Blink, his right eye",
+      "eyeLookDownLeft": "Looks down, left eye",
+      "eyeLookDownRight": "Looks down, right eye",
+      "eyeLookInLeft": "Left eye towards the nose",
+      "eyeLookInRight": "Right eye towards the nose",
+      "eyeLookOutLeft": "Left eye outwards",
+      "eyeLookOutRight": "Right eye outwards"
+    },
+    "head": "Head",
+    "yaw": "Turn (left / right)",
+    "pitch": "Nod (up / down)",
+    "roll": "Tilt",
+    "blocked": "Blocked sending to: {{origins}}",
+    "copy": "Copy the results",
+    "copied": "Results copied (no picture)."
   }
 }

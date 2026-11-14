@@ -10,7 +10,8 @@
     "counting": "Liczenie · Blinker",
     "sentences": "Zdania · Blinker",
     "boards": "Tablice · Blinker",
-    "settings": "Ustawienia · Blinker"
+    "settings": "Ustawienia · Blinker",
+    "diagnostics": "Diagnostyka · Blinker"
   },
   "notFound": {
     "heading": "Nie znaleziono strony",
@@ -209,6 +210,60 @@
       "system": "Jak w urządzeniu",
       "light": "Jasny",
       "dark": "Ciemny"
+    },
+    "diagnostics": {
+      "title": "Diagnostyka kamery",
+      "help": "Sprawdź, jak telefon śledzi twarz: mrugnięcia, ruch głowy, szybkość analizy.",
+      "open": "Otwórz diagnostykę"
     }
+  },
+  "diagnostics": {
+    "heading": "Diagnostyka",
+    "camera": "Kamera",
+    "privacy": "Obraz z kamery jest analizowany tylko na tym urządzeniu. Nie jest zapisywany ani nigdzie wysyłany. Statystyki użycia, które biblioteka MediaPipe chce wysyłać do Google, są blokowane.",
+    "preview": "Podgląd z przedniej kamery",
+    "start": "Włącz kamerę",
+    "stop": "Wyłącz kamerę",
+    "status": {
+      "idle": "Kamera wyłączona.",
+      "starting": "Włączam kamerę i wczytuję model…",
+      "running": "Działa. Analiza: {{delegate}}."
+    },
+    "error": {
+      "denied": "Brak zgody na kamerę. Zezwól na nią w ustawieniach przeglądarki i spróbuj ponownie.",
+      "no-camera": "Nie znaleziono przedniej kamery.",
+      "unsupported": "Ta przeglądarka nie obsługuje kamery albo workerów.",
+      "model": "Nie udało się wczytać modelu twarzy.",
+      "failed": "Kamera przestała działać. Spróbuj ponownie."
+    },
+    "values": "Odczyty",
+    "face": "Twarz w kadrze",
+    "yes": "tak",
+    "no": "nie",
+    "fps": "Klatki na sekundę",
+    "analysis": "Czas analizy",
+    "analysisValue": "mediana {{median}} ms, p95 {{p95}} ms",
+    "delegate": "Silnik",
+    "faceShare": "Klatki z twarzą",
+    "battery": "Bateria",
+    "batteryUnknown": "przeglądarka nie podaje",
+    "eyes": "Oczy (0–1)",
+    "shape": {
+      "eyeBlinkLeft": "Mrugnięcie, jego lewe oko",
+      "eyeBlinkRight": "Mrugnięcie, jego prawe oko",
+      "eyeLookDownLeft": "Patrzy w dół, lewe oko",
+      "eyeLookDownRight": "Patrzy w dół, prawe oko",
+      "eyeLookInLeft": "Lewe oko do nosa",
+      "eyeLookInRight": "Prawe oko do nosa",
+      "eyeLookOutLeft": "Lewe oko na zewnątrz",
+      "eyeLookOutRight": "Prawe oko na zewnątrz"
+    },
+    "head": "Głowa",
+    "yaw": "Obrót (w lewo / w prawo)",
+    "pitch": "Skinienie (w górę / w dół)",
+    "roll": "Przechylenie",
+    "blocked": "Zablokowano wysyłkę do: {{origins}}",
+    "copy": "Kopiuj wyniki",
+    "copied": "Skopiowano wyniki (bez obrazu)."
   }
 }

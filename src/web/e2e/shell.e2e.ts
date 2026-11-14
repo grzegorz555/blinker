@@ -24,6 +24,8 @@ test.describe('app shell', () => {
     // Desktop Safari/WebKit skips links on Tab by default; keyboard checks run in Chromium.
     test.skip(browserName === 'webkit', 'WebKit does not focus links with Tab by default');
     await page.goto('/');
+    // Under load the first Tab can come before the page is ready: wait for the lazy start page first.
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await page.keyboard.press('Tab');
     const skipLink = page.getByRole('link', { name: 'Skip to main content' });
     await expect(skipLink).toBeFocused();

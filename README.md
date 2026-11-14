@@ -19,8 +19,12 @@ them into sentences that are shown on screen and read aloud.
 - **Liczenie (Counting)**, the start page: a small status line (the prompt and the counter), the sentence in big letters above his board, and the pointer on the board (an outline, never color alone). He listens rather than reads (specs [008](docs/specs/008-listener/spec.md), [009](docs/specs/009-letter-by-ear/spec.md)): a pause after his blinks takes the column, a pause after the row adds the letter and **only the letter is said**; blinking again is the next letter, a shake undoes it (the nod per number and the spoken questions are switches in the settings); head shortcuts: a nod without a number = space, a shake = undo, head right = read aloud, and after reading "Nowe zdanie?" (New sentence?) - a nod clears. His signals come from buttons (+1, +5, yes, no, finish) or, when turned on in the settings, the keys; a tap on a letter adds it at once. "Cofnij literę" (Undo letter), "Spacja" (Space), "Wyczyść" (Clear, after a confirmation), "Przeczytaj" (Read aloud, then "Zatrzymaj" (Stop)) and "Pauza" (Pause). The screen stays on; a missing on-device Polish voice is shown in text.
 - **Zdania (Sentences)**: every sentence read aloud, by day, with "Powiedz jeszcze raz" (Say again); delete one or all; the history can be turned off (at most 500 sentences or 30 days).
 - **Tablice (Boards)**: his built-in board or an imported JSON board (checked on the device, every error shown with its path), a preview, delete after a confirmation.
-- **Ustawienia (Settings)**: the pause before the question, spoken questions, signal buttons, keyboard shortcuts, hints, speech rate with a voice check, language and theme.
+- **Ustawienia (Settings)**: the pause before the question, the nod confirmation, spoken questions and notices, signal buttons, keyboard shortcuts, hints, speech rate with a voice check, language and theme.
 - A navigation bar on phones and a rail from 600 px; English and Polish; everything is kept on the device only (localStorage, validated when read back).
+
+**Stage 3: face-tracking spike** (spec [010](docs/specs/010-face-spike/spec.md), built; ADR-[0006](docs/adr/0006-face-tracking-mediapipe-worker.md) proposed, waiting for the measurements on his devices):
+
+- **Diagnostyka (Diagnostics)**, linked from Ustawienia (Settings): the front camera, analysed on the device by MediaPipe Face Landmarker in a Web Worker (GPU, or CPU as a fallback), with the eye values (blinks, where the eyes look), the head angles, frames per second, the analysis time, the share of frames with a face and the battery; "Kopiuj wyniki" (Copy the results) copies a short text for the ADR. The wasm runtime and the model are served from our origin (the model hash is pinned); MediaPipe's usage metrics to Google are blocked.
 
 The stage plan is in [docs/backlog.md](docs/backlog.md).
 
@@ -34,7 +38,7 @@ The stage plan is in [docs/backlog.md](docs/backlog.md).
 - Tailwind CSS v4 with design tokens in `src/web/src/styles/tokens.css` (light and dark, WCAG contrast checked)
 - Web Speech API with on-device voices only
 - Planned:
-  - MediaPipe Face Landmarker (stages 3–4);
+  - MediaPipe Face Landmarker `@mediapipe/tasks-vision` (pinned), in a module Web Worker (stages 3–4);
   - hosting on Azure Static Web Apps (Free).
 
 ## Getting started
