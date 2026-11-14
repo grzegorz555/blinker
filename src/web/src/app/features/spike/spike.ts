@@ -15,8 +15,7 @@ import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
   selector: 'app-spike',
   imports: [MatButton, MatFormField, MatLabel, MatOption, MatSelect, MatSlideToggle, TranslocoPipe],
   template: `
-    <h1 class="text-3xl font-bold">{{ 'spike.title' | transloco }}</h1>
-    <div class="mt-6 flex max-w-md flex-col items-start gap-6">
+    <div class="flex max-w-md flex-col items-start gap-6">
       <mat-slide-toggle [checked]="toggled()" (change)="toggled.set($event.checked)">
         {{ 'spike.toggle' | transloco }}
       </mat-slide-toggle>

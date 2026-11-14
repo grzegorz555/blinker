@@ -18,7 +18,7 @@ Branch: `feat/007-screens` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       (`.mcp.json`, `CLAUDE.md`, conventions) (R1). If the spike fails, stop and bring it to the author (ADR-0005,
       "Revisit when").
       _To understand:_ M3 system tokens as CSS variables, Sass theming, why overlays and Trusted Types can clash.
-- [ ] **T2 [sonnet]: The shell and routes.** Top app bar, our navigation bar and rail (R2), routes for Liczenie
+- [x] **T2 [sonnet]: The shell and routes.** Top app bar, our navigation bar and rail (R2), routes for Liczenie
       (Counting) at `/`, Zdania (Sentences), Tablice (Boards), Ustawienia (Settings) with empty pages; the home page
       removed; focus to the heading after navigation. Tests: unit for the navigation; e2e for bar and rail at every
       size and orientation, `aria-current`, axe.

@@ -2,11 +2,14 @@ import { expect, test } from './support/test';
 import { expectNoA11yViolations } from './support/a11y';
 
 /**
- * Spec 001 acceptance: axe reports 0 violations on the home and 404 pages,
+ * Spec 001 acceptance, extended by spec 007: axe reports 0 violations on every page and the 404 page,
  * in light and dark mode, in both languages.
  */
 const pages = [
-  { path: '/', heading: { en: 'Blinker', pl: 'Blinker' } },
+  { path: '/', heading: { en: 'Counting', pl: 'Liczenie' } },
+  { path: '/sentences', heading: { en: 'Sentences', pl: 'Zdania' } },
+  { path: '/boards', heading: { en: 'Boards', pl: 'Tablice' } },
+  { path: '/settings', heading: { en: 'Settings', pl: 'Ustawienia' } },
   { path: '/does-not-exist', heading: { en: 'Page not found', pl: 'Nie znaleziono strony' } },
 ] as const;
 
