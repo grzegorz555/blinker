@@ -82,6 +82,10 @@ export class WebSpeaker implements Speaker {
     return 'started';
   }
 
+  hasVoice(lang: string): boolean {
+    return !!this.synth && pickVoice(this.synth.getVoices(), lang) !== null;
+  }
+
   cancel(): void {
     if (!this.synth) return;
     this.current = null;

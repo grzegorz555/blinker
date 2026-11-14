@@ -84,7 +84,7 @@ signal source.
     SC 2.2.1 and 3.3.1), say the questions aloud, the signal buttons, the keyboard mapping, the hints line;
   - Głos (Voice): speech rate, the voice status (R7) and a "Posłuchaj" (Listen) test button;
   - Wygląd (Appearance): language (English, Polski) and theme (system, light, dark → `color-scheme`);
-  - O aplikacji (About): the disclaimer and the version.
+  - O aplikacji (About): the disclaimer and where his data lives (only on this device).
   Changes apply at once and are kept on the device (R12).
 - **R10. Tablice (Boards):** the built-in board (his, `friend-pl.json`) and imported ones as a radio group (the
   active board); a preview of the selected board; **import** from a file: `file.size` checked against 64 KB before

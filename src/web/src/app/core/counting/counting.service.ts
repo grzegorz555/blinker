@@ -7,7 +7,7 @@ import friendBoard from '../../../../public/boards/friend-pl.json';
 import type { Board } from '../boards/board';
 import { validateBoardData } from '../boards/validate-board';
 import type { InputSignal } from '../input/signals';
-import type { SpeakResult, Speaker } from '../speech/speaker';
+import { RATE, type SpeakResult, type Speaker } from '../speech/speaker';
 import { createWebSpeaker } from '../speech/web-speaker';
 import {
   ASK_AFTER,
@@ -63,6 +63,7 @@ export class CountingService {
   private stopTicks: (() => void) | null = null;
 
   private readonly current = signal<CountingState>(initialState());
+  private readonly rate = signal<number>(RATE.default);
   private readonly settings = signal<CountingConfig>({
     board: defaultBoard(),
     askAfterMs: ASK_AFTER.default,
@@ -118,6 +119,29 @@ export class CountingService {
     this.speaker.cancel();
   }
 
+  /** The speech rate from Ustawienia (Settings), 0.5–2. */
+  setRate(rate: number): void {
+    this.rate.set(Math.min(RATE.max, Math.max(RATE.min, rate)));
+  }
+
+  /** Uses another board (Tablice (Boards), spec 007 R10); the count starts again at the columns, the sentence stays. */
+  useBoard(board: Board): void {
+    this.settings.update((c) => ({ ...c, board }));
+    this.current.update((state) => initialState(state.sentence, state.now));
+  }
+
+  /** True when the device has an on-device voice for the language of the board (Ustawienia (Settings), R7). */
+  hasVoice(): boolean {
+    return this.speaker.hasVoice(this.settings().board.locale);
+  }
+
+  /** "Posłuchaj" (Listen): says a sample text in the board language at the current rate. */
+  listen(text: string): void {
+    this.speakResult.set(
+      this.speaker.say(text, { lang: this.settings().board.locale, rate: this.rate() }),
+    );
+  }
+
   /** Changes the settings (the pause before the question within 500–5000 ms, SC 2.2.1; speaking the questions). */
   configure(patch: Partial<Omit<CountingConfig, 'board'>>): void {
     const askAfterMs =
@@ -146,12 +170,17 @@ export class CountingService {
       case 'say':
         // A question or a short notice, in the UI language.
         this.speakResult.set(
-          this.speaker.say(this.text(effect.message), { lang: this.transloco.getActiveLang() }),
+          this.speaker.say(this.text(effect.message), {
+            lang: this.transloco.getActiveLang(),
+            rate: this.rate(),
+          }),
         );
         return;
       case 'speak':
         // His sentence, in the language of the board.
-        this.speakResult.set(this.speaker.say(effect.text, { lang: this.settings().board.locale }));
+        this.speakResult.set(
+          this.speaker.say(effect.text, { lang: this.settings().board.locale, rate: this.rate() }),
+        );
         return;
       case 'stopSpeaking':
         this.speaker.cancel();

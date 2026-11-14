@@ -7,7 +7,6 @@
   },
   "titles": {
     "notFound": "Page not found · Blinker",
-    "spike": "Component check · Blinker",
     "counting": "Counting · Blinker",
     "sentences": "Sentences · Blinker",
     "boards": "Boards · Blinker",
@@ -91,19 +90,6 @@
   "common": {
     "cancel": "Cancel"
   },
-  "spike": {
-    "title": "Component check",
-    "toggle": "A switch",
-    "select": "A choice",
-    "option": "Option {{n}}",
-    "open": "Open the dialog",
-    "none": "Nothing chosen yet.",
-    "yes": "Confirmed.",
-    "no": "Cancelled.",
-    "dialogTitle": "Clear the sentence?",
-    "dialogMessage": "The sentence will be removed.",
-    "dialogConfirm": "Clear"
-  },
   "nav": {
     "label": "Main menu",
     "counting": "Counting",
@@ -119,6 +105,42 @@
   },
   "settings": {
     "appearance": "Appearance",
-    "about": "About"
+    "about": "About",
+    "privacy": "Everything stays on this device: settings, boards and sentences are never sent anywhere.",
+    "problem": {
+      "corrupted": "The saved settings could not be read, so the defaults are used. Change a setting to save it again.",
+      "unavailable": "This browser does not let Blinker save on the device, so settings last only until the page is closed."
+    },
+    "counting": {
+      "title": "Counting",
+      "askAfter": "Pause before the question",
+      "askAfterHint": "From {{min}} to {{max}} ms. Blinker asks after this pause without a signal.",
+      "askAfterError": "Error: enter a whole number from {{min}} to {{max}} ms.",
+      "speakQuestions": "Say the questions aloud",
+      "speakQuestionsHint": "Column 7? is also spoken, not only shown.",
+      "signalButtons": "Signal buttons",
+      "signalButtonsHint": "Buttons for his signals under the board (there is no camera yet).",
+      "keyboard": "Keyboard shortcuts",
+      "keyboardHint": "Space = blink, H = hand, N = nod, S = shake, R = finish, P = pause.",
+      "hints": "Hints in Counting",
+      "hintsHint": "A line explaining nod and shake under the question."
+    },
+    "voice": {
+      "title": "Voice",
+      "rate": "Speech rate",
+      "rate75": "Slower",
+      "rate100": "Normal",
+      "rate125": "Faster",
+      "rate150": "Fastest",
+      "ok": "An on-device voice is available: nothing you say leaves this device.",
+      "listen": "Listen",
+      "sample": "Dzień dobry"
+    },
+    "theme": {
+      "label": "Theme",
+      "system": "Like the device",
+      "light": "Light",
+      "dark": "Dark"
+    }
   }
 }

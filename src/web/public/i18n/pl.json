@@ -7,7 +7,6 @@
   },
   "titles": {
     "notFound": "Nie znaleziono strony · Blinker",
-    "spike": "Sprawdzenie komponentów · Blinker",
     "counting": "Liczenie · Blinker",
     "sentences": "Zdania · Blinker",
     "boards": "Tablice · Blinker",
@@ -91,19 +90,6 @@
   "common": {
     "cancel": "Anuluj"
   },
-  "spike": {
-    "title": "Sprawdzenie komponentów",
-    "toggle": "Przełącznik",
-    "select": "Wybór",
-    "option": "Opcja {{n}}",
-    "open": "Otwórz okno",
-    "none": "Jeszcze nic nie wybrano.",
-    "yes": "Potwierdzono.",
-    "no": "Anulowano.",
-    "dialogTitle": "Wyczyścić zdanie?",
-    "dialogMessage": "Zdanie zostanie usunięte.",
-    "dialogConfirm": "Wyczyść"
-  },
   "nav": {
     "label": "Menu główne",
     "counting": "Liczenie",
@@ -119,6 +105,42 @@
   },
   "settings": {
     "appearance": "Wygląd",
-    "about": "O aplikacji"
+    "about": "O aplikacji",
+    "privacy": "Wszystko zostaje na tym urządzeniu: ustawienia, tablice i zdania nigdy nie są nigdzie wysyłane.",
+    "problem": {
+      "corrupted": "Nie udało się odczytać zapisanych ustawień, więc działają domyślne. Zmień dowolne ustawienie, żeby zapisać je ponownie.",
+      "unavailable": "Ta przeglądarka nie pozwala Blinkerowi zapisywać na urządzeniu, więc ustawienia działają tylko do zamknięcia strony."
+    },
+    "counting": {
+      "title": "Liczenie",
+      "askAfter": "Pauza przed pytaniem",
+      "askAfterHint": "Od {{min}} do {{max}} ms. Blinker pyta po takiej przerwie bez sygnału.",
+      "askAfterError": "Błąd: wpisz liczbę całkowitą od {{min}} do {{max}} ms.",
+      "speakQuestions": "Mów pytania na głos",
+      "speakQuestionsHint": "„Kolumna 7?” jest też wypowiadana, nie tylko pokazana.",
+      "signalButtons": "Przyciski sygnałów",
+      "signalButtonsHint": "Przyciski jego sygnałów pod tablicą (kamery jeszcze nie ma).",
+      "keyboard": "Skróty klawiszowe",
+      "keyboardHint": "Spacja = mrugnięcie, H = ręka, N = skinienie, S = kręcenie głową, R = koniec, P = pauza.",
+      "hints": "Podpowiedzi w Liczeniu",
+      "hintsHint": "Linijka o skinieniu i kręceniu głową pod pytaniem."
+    },
+    "voice": {
+      "title": "Głos",
+      "rate": "Tempo mowy",
+      "rate75": "Wolniej",
+      "rate100": "Normalnie",
+      "rate125": "Szybciej",
+      "rate150": "Najszybciej",
+      "ok": "Jest głos na urządzeniu: nic, co mówisz, nie opuszcza tego urządzenia.",
+      "listen": "Posłuchaj",
+      "sample": "Dzień dobry"
+    },
+    "theme": {
+      "label": "Motyw",
+      "system": "Jak w urządzeniu",
+      "light": "Jasny",
+      "dark": "Ciemny"
+    }
   }
 }

@@ -65,7 +65,7 @@ describe('CountingService', () => {
     service.send({ type: 'BLINK' });
     scheduler.at(ASK_AFTER.default);
     expect(service.announcement()).toBe('Kolumna 7?');
-    expect(speaker.said.at(-1)).toEqual({ text: 'Kolumna 7?', options: { lang: 'pl' } });
+    expect(speaker.said.at(-1)).toEqual({ text: 'Kolumna 7?', options: { lang: 'pl', rate: 1 } });
     expect(service.pointer()).toEqual({ column: 7, row: null });
 
     service.send({ type: 'NOD' });
@@ -109,7 +109,7 @@ describe('CountingService', () => {
     const before = speaker.said.length;
     service.send({ type: 'NOD' });
     expect(speaker.said.length).toBe(before + 1);
-    expect(speaker.said.at(-1)).toEqual({ text: 'W', options: { lang: 'pl' } });
+    expect(speaker.said.at(-1)).toEqual({ text: 'W', options: { lang: 'pl', rate: 1 } });
     expect(service.speaking()).toBe(true);
     speaker.finish();
     expect(service.speaking()).toBe(false);
@@ -125,7 +125,7 @@ describe('CountingService', () => {
     expect(service.sentence()).toBe('WA');
     expect(service.announcement()).toBe('Dodano A');
     service.touch({ kind: 'speak' });
-    expect(speaker.said.at(-1)).toEqual({ text: 'WA', options: { lang: 'pl' } });
+    expect(speaker.said.at(-1)).toEqual({ text: 'WA', options: { lang: 'pl', rate: 1 } });
     expect(service.state().name).toBe('speaking');
   });
 

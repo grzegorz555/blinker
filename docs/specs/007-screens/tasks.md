@@ -36,7 +36,7 @@ Branch: `feat/007-screens` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       mapping attached from settings (R6), the voice status and `no-local-voice` (R7), the screen wake lock (R8).
       Tests: unit with fakes; e2e for the full path with buttons and with keys, the no-voice message.
       _To understand:_ one input path for every source, the Screen Wake Lock API, faking `speechSynthesis` in e2e.
-- [ ] **T6 [sonnet]: Ustawienia (Settings) and storage.** A settings store over `localStorage` with a versioned,
+- [x] **T6 [sonnet]: Ustawienia (Settings) and storage.** A settings store over `localStorage` with a versioned,
       validated value (R12); the settings page with Angular Material controls (R9); the theme and the language
       applied at once; the disclaimer in "O aplikacji" (About). Tests: the store cases; e2e for a change that
       survives a reload and a range error, axe.

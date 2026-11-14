@@ -22,5 +22,8 @@ WCAG 2.2 SC 2.5.8 (Target Size, Minimum) also counts **overlapping** targets
 axe catches this only when the overlay is visible, so the test must focus it first.
 
 # How to apply
-- Skip links and other focus-revealed controls appear in the normal flow and push content down, instead of covering it.
+- Skip links and other focus-revealed controls must not cover another target. In the normal flow they push content
+  down, which is fine on a scrolling page but not on a full-height one: in spec 007 the skip link pushed Liczenie
+  (Counting) down, and the sticky navigation bar then covered the signal buttons (axe target-size on the Pixel). Since
+  spec 007 the skip link sits in the top app bar over the page title, which is text, not a target.
 - E2E accessibility tests also scan **interactive states** (focused, open, expanded), not only the initial page.

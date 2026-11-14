@@ -4,9 +4,9 @@ import { ConfirmService, type ConfirmData } from './confirm-dialog';
 
 describe('ConfirmService (spec 007, R5)', () => {
   const data: ConfirmData = {
-    title: 'spike.dialogTitle',
-    message: 'spike.dialogMessage',
-    confirm: 'spike.dialogConfirm',
+    title: 'counting.page.clearTitle',
+    message: 'counting.page.clearMessage',
+    confirm: 'counting.page.clear',
   };
 
   async function open() {
@@ -29,7 +29,7 @@ describe('ConfirmService (spec 007, R5)', () => {
     const title = dialog.querySelector('h2')!;
     expect(title.textContent?.trim()).toBe('Clear the sentence?');
     expect(dialog.getAttribute('aria-labelledby')).toBe(title.id);
-    expect(dialog.textContent).toContain('The sentence will be removed.');
+    expect(dialog.textContent).toContain('The whole sentence will be removed.');
   });
 
   it('puts Cancel first, marked for the initial focus, so Enter never confirms by accident', async () => {
