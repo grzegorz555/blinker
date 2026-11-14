@@ -51,6 +51,11 @@ Header changes: `base-uri 'none'` → `base-uri 'self'`; `trusted-types angular 
 - A unit test proves the policy rejects every other URL and has no HTML or script factory.
 - Any new code that hands a string to a Trusted Types sink fails loudly instead of working silently.
 
+## Amendment (2026-11-15, spec 010, ADR-0006)
+The `default` policy also accepts a web worker file of our build: same origin, path `/worker-<hash>.js` at the root,
+no query and no fragment (`new Worker(new URL(...))` of the face worker). Every other URL is still refused; the unit
+test lists the rejected cases.
+
 ## Revisit when
 - `@angular/service-worker` registers with a `TrustedScriptURL` itself: remove the `default` policy.
 - Angular no longer needs `<base href>`.

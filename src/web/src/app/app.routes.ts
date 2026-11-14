@@ -30,6 +30,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/settings/settings-page').then((m) => m.SettingsPage),
   },
   {
+    // Spec 010: the face-tracking spike, linked from Ustawienia (Settings), not from the navigation.
+    path: 'diagnostics',
+    title: 'titles.diagnostics',
+    data: { heading: 'diagnostics.heading' } satisfies ShellData,
+    loadComponent: () =>
+      import('./features/diagnostics/diagnostics-page').then((m) => m.DiagnosticsPage),
+  },
+  {
     path: '**',
     title: 'titles.notFound',
     data: { heading: 'notFound.heading' } satisfies ShellData,

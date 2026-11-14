@@ -12,6 +12,12 @@ const designURL = `http://127.0.0.1:${designPort}`;
  * DEPLOY_URL=http://127.0.0.1:4300 runs the deployed tests against the local server (HTTPS checks are skipped).
  */
 const deployURL = process.env['DEPLOY_URL']?.replace(/\/+$/, '');
+/** Spec 010: a fake front camera in Chromium (a moving test pattern), for Diagnostyka (Diagnostics). */
+const fakeCamera = {
+  launchOptions: {
+    args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
+  },
+};
 const deployedTests = ['headers.e2e.ts', 'smoke.e2e.ts', 'deployed/**/*.e2e.ts'];
 
 const appServer = {
@@ -51,12 +57,12 @@ export default defineConfig({
         {
           name: 'desktop-chromium',
           testIgnore: ['deployed/**', 'design/**'],
-          use: { ...devices['Desktop Chrome'] },
+          use: { ...devices['Desktop Chrome'], ...fakeCamera },
         },
         {
           name: 'pixel-chromium',
           testIgnore: ['deployed/**', 'design/**'],
-          use: { ...devices['Pixel 7'] },
+          use: { ...devices['Pixel 7'], ...fakeCamera },
         },
         {
           name: 'iphone-webkit',

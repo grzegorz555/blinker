@@ -1,0 +1,126 @@
+<section class="group" aria-labelledby="diag-camera">
+  <h2 id="diag-camera" class="group-title">{{ 'diagnostics.camera' | transloco }}</h2>
+  <p class="muted" data-testid="privacy">{{ 'diagnostics.privacy' | transloco }}</p>
+
+  <div class="preview" [class.on]="on()">
+    <!-- Mirrored only on screen, like a mirror; the worker gets the picture as the camera sees it, so Left is his left. -->
+    <video
+      #video
+      playsinline
+      muted
+      [attr.aria-label]="'diagnostics.preview' | transloco"
+      data-testid="preview"
+    ></video>
+  </div>
+
+  <div class="actions">
+    @if (on()) {
+      <button matButton="filled" type="button" (click)="stop()">
+        {{ 'diagnostics.stop' | transloco }}
+      </button>
+    } @else {
+      <button matButton="filled" type="button" (click)="start()">
+        {{ 'diagnostics.start' | transloco }}
+      </button>
+    }
+  </div>
+  <p class="status" role="status" data-testid="tracker-status" [class.error]="status() === 'error'">
+    {{ statusText() }}
+  </p>
+</section>
+
+<section class="group" aria-labelledby="diag-values">
+  <h2 id="diag-values" class="group-title">{{ 'diagnostics.values' | transloco }}</h2>
+  <!-- Live values change many times a second: they are not a live region, so a screen reader is not flooded. -->
+  <dl class="facts" data-testid="facts">
+    <div>
+      <dt>{{ 'diagnostics.face' | transloco }}</dt>
+      <dd data-testid="face">
+        {{ (frame()?.face ? 'diagnostics.yes' : 'diagnostics.no') | transloco }}
+      </dd>
+    </div>
+    <div>
+      <dt>{{ 'diagnostics.fps' | transloco }}</dt>
+      <dd data-testid="fps">{{ round(stats().fps, 1) }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'diagnostics.analysis' | transloco }}</dt>
+      <dd data-testid="analysis">
+        {{
+          'diagnostics.analysisValue'
+            | transloco: { median: round(stats().medianMs, 1), p95: round(stats().p95Ms, 1) }
+        }}
+      </dd>
+    </div>
+    <div>
+      <dt>{{ 'diagnostics.delegate' | transloco }}</dt>
+      <dd data-testid="delegate">{{ delegate() ?? '–' }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'diagnostics.faceShare' | transloco }}</dt>
+      <dd>{{ facePercent() }}%</dd>
+    </div>
+    <div>
+      <dt>{{ 'diagnostics.battery' | transloco }}</dt>
+      <dd>
+        @if (battery(); as b) {
+          {{ round(b.start * 100) }}% → {{ round(b.now * 100) }}%
+        } @else {
+          {{ 'diagnostics.batteryUnknown' | transloco }}
+        }
+      </dd>
+    </div>
+  </dl>
+
+  <h3 class="sub-title">{{ 'diagnostics.eyes' | transloco }}</h3>
+  <ul class="meters">
+    @for (shape of shapes; track shape) {
+      <li>
+        <span [id]="'meter-' + shape">{{ 'diagnostics.shape.' + shape | transloco }}</span>
+        <meter
+          min="0"
+          max="1"
+          low="0.3"
+          high="0.7"
+          optimum="0"
+          [value]="eye(shape)"
+          [attr.aria-labelledby]="'meter-' + shape"
+        ></meter>
+        <span class="number">{{ round(eye(shape), 2) }}</span>
+      </li>
+    }
+  </ul>
+
+  <h3 class="sub-title">{{ 'diagnostics.head' | transloco }}</h3>
+  <dl class="facts" data-testid="head">
+    <div>
+      <dt>{{ 'diagnostics.yaw' | transloco }}</dt>
+      <dd>{{ frame()?.head ? round(frame()!.head!.yaw) + '°' : '–' }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'diagnostics.pitch' | transloco }}</dt>
+      <dd>{{ frame()?.head ? round(frame()!.head!.pitch) + '°' : '–' }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'diagnostics.roll' | transloco }}</dt>
+      <dd>{{ frame()?.head ? round(frame()!.head!.roll) + '°' : '–' }}</dd>
+    </div>
+  </dl>
+
+  @if (blocked().length) {
+    <p class="muted" data-testid="blocked">
+      {{ 'diagnostics.blocked' | transloco: { origins: blocked().join(', ') } }}
+    </p>
+  }
+
+  <div class="actions">
+    <button matButton="tonal" type="button" (click)="copy()" [disabled]="!stats().frames">
+      {{ 'diagnostics.copy' | transloco }}
+    </button>
+    <p role="status" class="muted">
+      @if (copied()) {
+        {{ 'diagnostics.copied' | transloco }}
+      }
+    </p>
+  </div>
+</section>

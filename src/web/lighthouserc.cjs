@@ -18,6 +18,7 @@ module.exports = {
         `${base}/sentences`,
         `${base}/boards`,
         `${base}/settings`,
+        `${base}/diagnostics`,
         `${base}/does-not-exist`,
       ],
       numberOfRuns: 1,

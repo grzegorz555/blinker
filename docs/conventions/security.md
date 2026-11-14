@@ -42,7 +42,7 @@ X-Content-Type-Options: nosniff
 Referrer-Policy: no-referrer
 Cross-Origin-Opener-Policy: same-origin
 ```
-`'wasm-unsafe-eval'` is required by MediaPipe wasm. `base-uri 'self'` and the `default` Trusted Types policy (only `/ngsw-worker.js`) are explained in ADR-0004. `style-src 'unsafe-inline'` stays: Angular adds component styles at runtime, and a static host can't issue a nonce.
+`'wasm-unsafe-eval'` is required by MediaPipe wasm. **MediaPipe sends usage metrics to Google** (`odml.pa.googleapis.com`); `connect-src 'self'` blocks them and the face worker also refuses every cross-origin `fetch` (ADR-0006); a library update must be checked for new network calls. `base-uri 'self'` and the `default` Trusted Types policy (only `/ngsw-worker.js`) are explained in ADR-0004. `style-src 'unsafe-inline'` stays: Angular adds component styles at runtime, and a static host can't issue a nonce.
 Critical CSS inlining is off (`inlineCritical: false`), because it adds an inline script that `script-src 'self'` blocks. Any change to this list needs an ADR.
 The headers are written only in `src/web/public/staticwebapp.config.json`; a unit test keeps it equal to this list, and
 the local e2e server sends the same headers, so every e2e run fails on a CSP or Trusted Types violation (spec 003).
