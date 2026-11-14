@@ -78,6 +78,18 @@ svg {
   height: 1.5rem;
 }
 
+/* A short phone held upright (360 × 640): a lower bar, so Liczenie (Counting) keeps the board; targets stay 44 px+. */
+@media (orientation: portrait) and (max-height: 760px) {
+  .nav-link {
+    min-height: 3.5rem;
+    gap: 0.125rem;
+  }
+
+  .nav-indicator {
+    height: 1.75rem;
+  }
+}
+
 @media (min-width: 600px) {
   :host {
     top: 0;
