@@ -113,6 +113,11 @@ export class CountingService {
     this.apply({ type: 'TOUCH', target });
   }
 
+  /** "Zatrzymaj" (Stop): stops reading aloud at once; the text does not change (spec 007, R7). */
+  stopSpeaking(): void {
+    this.speaker.cancel();
+  }
+
   /** Changes the settings (the pause before the question within 500–5000 ms, SC 2.2.1; speaking the questions). */
   configure(patch: Partial<Omit<CountingConfig, 'board'>>): void {
     const askAfterMs =

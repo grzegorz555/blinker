@@ -26,7 +26,7 @@
   </button>
 </ng-template>
 
-<div class="count" [attr.data-state]="state().name">
+<div class="count" [class.with-signals]="showSignals()" [attr.data-state]="state().name">
   <!-- The question with the counter: what he reads after the board (M3 supporting pane). -->
   <section class="count-question card card-primary" aria-labelledby="question">
     <p class="count-step label-large">{{ stepKey() | transloco }}</p>
@@ -44,7 +44,24 @@
         <span class="tally-total" aria-hidden="true">= {{ total() }}</span>
       </p>
     }
-    @if (notice(); as n) {
+    <!-- Speech in text, never a silent failure (R7): no on-device voice takes the notice line. -->
+    @if (noVoice()) {
+      <p class="notice voice-error" data-testid="voice-status">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v6M12 16.5v.5" />
+        </svg>
+        <span>{{ 'counting.voice.noLocalVoice' | transloco }}</span>
+      </p>
+    } @else if (notice(); as n) {
       <p class="notice" data-testid="notice">{{ n.key | transloco: n.params }}</p>
     }
     @if (showHints()) {
@@ -97,25 +114,47 @@
         </svg>
         {{ 'counting.page.clear' | transloco }}
       </button>
-      <button type="button" class="action action-primary" (click)="touch('speak')">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M11 5 6 9H3v6h3l5 4z" />
-          <path d="M15.5 8.5a5 5 0 0 1 0 7" />
-          <path d="M18.5 5.5a9 9 0 0 1 0 13" />
-        </svg>
-        {{ 'counting.page.read' | transloco }}
-      </button>
+      <!-- While reading aloud, the main action stops it (R7); the text does not change. -->
+      @if (speaking()) {
+        <button type="button" class="action action-primary" (click)="stopSpeaking()">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="6" y="6" width="12" height="12" rx="1" />
+          </svg>
+          {{ 'counting.voice.stop' | transloco }}
+        </button>
+      } @else {
+        <button type="button" class="action action-primary" (click)="touch('speak')">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M11 5 6 9H3v6h3l5 4z" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+            <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+          </svg>
+          {{ 'counting.page.read' | transloco }}
+        </button>
+      }
     </div>
   </section>
 </div>
+
+@if (showSignals()) {
+  <app-signal-panel class="count-signals" (send)="send($event)" />
+}
 
 <!-- The one polite live region of the screen (SC 4.1.3): questions, added letters, rejections. -->
 <p class="sr-only" aria-live="polite" data-testid="announcer">{{ announcement() }}</p>

@@ -32,7 +32,7 @@ Branch: `feat/007-screens` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       component tests; e2e for touch, undo, clear with the dialog, the board fit at every size and with the wide
       font, axe in the main states.
       _To understand:_ table semantics for a grid of buttons, live regions, a layout that never covers the board.
-- [ ] **T5 [sonnet]: Signal input, speech status and the wake lock.** The signal button panel and the keyboard
+- [x] **T5 [sonnet]: Signal input, speech status and the wake lock.** The signal button panel and the keyboard
       mapping attached from settings (R6), the voice status and `no-local-voice` (R7), the screen wake lock (R8).
       Tests: unit with fakes; e2e for the full path with buttons and with keys, the no-voice message.
       _To understand:_ one input path for every source, the Screen Wake Lock API, faking `speechSynthesis` in e2e.

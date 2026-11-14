@@ -67,6 +67,25 @@
         "clear": "Wyczyść",
         "undo": "Cofnij"
       }
+    },
+    "signals": {
+      "title": "Jego sygnały",
+      "blink": "Mrugnięcie",
+      "blinkShort": "+1",
+      "hand": "Ręka",
+      "handShort": "+5",
+      "nod": "Skinienie:",
+      "nodShort": "tak",
+      "shake": "Kręcenie głową:",
+      "shakeShort": "nie",
+      "right": "Głowa w prawo:",
+      "rightShort": "koniec"
+    },
+    "voice": {
+      "speaking": "Czytam na głos…",
+      "stop": "Zatrzymaj",
+      "noLocalVoice": "Brak polskiego głosu na urządzeniu",
+      "noLocalVoiceHelp": "Na tym urządzeniu nie ma polskiego głosu, więc nic nie zostanie przeczytane. Zainstaluj polski głos w ustawieniach syntezy mowy systemu."
     }
   },
   "common": {

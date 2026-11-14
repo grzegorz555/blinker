@@ -29,6 +29,7 @@ function layoutProblems(page: Page) {
       ['question', '.count-question'],
       ['board', '.count-board .board'],
       ['sentence', '.count-sentence'],
+      ['signals', '.count-signals'],
       ['nav', 'app-nav'],
       ['top bar', '.shell-top'],
     ].map(([name, selector]) => [name, document.querySelector(selector)!.getBoundingClientRect()]);

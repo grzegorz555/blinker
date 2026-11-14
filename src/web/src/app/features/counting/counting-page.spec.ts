@@ -2,12 +2,15 @@ import { TestBed } from '@angular/core/testing';
 import { translocoTesting } from '../../../testing/transloco';
 import { SPEAKER, TICK_SCHEDULER, type TickScheduler } from '../../core/counting/counting.service';
 import { FakeSpeaker } from '../../core/speech/fake-speaker';
+import { SettingsService } from '../../core/settings/settings.service';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 import { TopBar } from '../../shell/top-bar';
 import { CountingPage } from './counting-page';
 
 describe('CountingPage (spec 007, R4, R5)', () => {
   let answer = true;
+  let speaker: FakeSpeaker;
+  afterEach(() => TestBed.resetTestingModule());
 
   async function render() {
     const scheduler: TickScheduler = { every: () => () => undefined };
@@ -15,7 +18,7 @@ describe('CountingPage (spec 007, R4, R5)', () => {
       imports: [CountingPage, translocoTesting()],
       providers: [
         { provide: TICK_SCHEDULER, useValue: scheduler },
-        { provide: SPEAKER, useValue: new FakeSpeaker() },
+        { provide: SPEAKER, useValue: (speaker = new FakeSpeaker()) },
         { provide: ConfirmService, useValue: { confirm: async () => answer } },
       ],
     }).compileComponents();
@@ -67,5 +70,49 @@ describe('CountingPage (spec 007, R4, R5)', () => {
   it('shows the hint line', async () => {
     const { text } = await render();
     expect(text('hint')).toBe('Nod = yes · Shake your head = no');
+  });
+
+  it('the signal buttons send his signals (R6) and can be hidden by the setting', async () => {
+    const { fixture, root, button, text } = await render();
+    expect(root.querySelectorAll('app-signal-panel button')).toHaveLength(5);
+    button('Hand +5').click();
+    button('Blink +1').click();
+    await fixture.whenStable();
+    expect(text('tally')).toContain('= 6');
+    TestBed.inject(SettingsService).update({ signalButtons: false });
+    await fixture.whenStable();
+    expect(root.querySelector('app-signal-panel')).toBeNull();
+  });
+
+  it('listens to the keys only when the keyboard mapping is on (SC 2.1.4)', async () => {
+    const { fixture, text } = await render();
+    const press = (key: string) =>
+      document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+    press('h');
+    await fixture.whenStable();
+    expect(text('tally')).toBeUndefined();
+    TestBed.inject(SettingsService).update({ keyboard: true });
+    press('h');
+    await fixture.whenStable();
+    expect(text('tally')).toContain('= 5');
+    fixture.destroy();
+    press('h'); // no listener left after the screen goes
+  });
+
+  it('turns Read aloud into Stop while speaking, and shows a missing voice in text (R7)', async () => {
+    const { fixture, button, text } = await render();
+    button('A').click();
+    button('Read aloud').click();
+    await fixture.whenStable();
+    expect(button('Read aloud')).toBeUndefined();
+    button('Stop').click();
+    await fixture.whenStable();
+    expect(speaker.cancels).toBeGreaterThan(0);
+    expect(button('Read aloud')).toBeDefined();
+
+    speaker.result = 'no-local-voice';
+    button('Read aloud').click();
+    await fixture.whenStable();
+    expect(text('voice-status')).toBe('No Polish voice on this device');
   });
 });
