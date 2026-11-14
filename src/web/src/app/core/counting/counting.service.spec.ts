@@ -111,11 +111,35 @@ describe('CountingService', () => {
     expect(speaker.said.length).toBe(before + 1);
     expect(speaker.said.at(-1)).toEqual({ text: 'W', options: { lang: 'pl', rate: 1 } });
     expect(service.speaking()).toBe(true);
-    speaker.finish();
-    expect(service.speaking()).toBe(false);
-
-    service.send({ type: 'SHAKE' }); // back to writing: stops speech
+    service.send({ type: 'SHAKE' }); // stop reading: back to writing, no question afterwards
     expect(speaker.cancels).toBe(1);
+    expect(service.state().name).toBe('column.waiting');
+  });
+
+  it('when a reading ends by itself it asks "Nowe zdanie?" (New sentence?); a nod clears, a shake undoes it (spec 008, R3)', () => {
+    const { service, speaker } = setup();
+    service.touch({ kind: 'cell', column: 1, row: 1 });
+    speaker.finish();
+    service.touch({ kind: 'speak' });
+    expect(service.state().name).toBe('speaking');
+    speaker.finish(); // the browser says the reading ended
+    expect(service.state().name).toBe('clear.asking');
+    expect(speaker.said.at(-1)?.text).toBe('Nowe zdanie?');
+    speaker.finish();
+    service.send({ type: 'NOD' });
+    expect(service.sentence()).toBe('');
+    expect(speaker.said.at(-1)?.text).toBe('Nowe zdanie');
+    service.send({ type: 'SHAKE' }); // undo at the columns brings it back
+    expect(service.sentence()).toBe('A');
+  });
+
+  it('a cancelled reading (Zatrzymaj (Stop)) never asks about a new sentence', () => {
+    const { service, speaker } = setup();
+    service.touch({ kind: 'cell', column: 1, row: 1 });
+    service.touch({ kind: 'speak' });
+    service.stopSpeaking();
+    expect(service.state().name).toBe('speaking');
+    expect(speaker.said.at(-1)?.text).toBe('A');
   });
 
   it('a tap on a cell adds the letter and says it; a tap on Przeczytaj (Read aloud) reads the sentence (spec 007, R3)', () => {
