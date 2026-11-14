@@ -27,9 +27,8 @@
 </ng-template>
 
 <div class="count" [class.with-signals]="showSignals()" [attr.data-state]="state().name">
-  <!-- The question with the counter: what he reads after the board (M3 supporting pane). -->
+  <!-- A small status line: the prompt and the counter (spec 008, R4). He listens; the text is for his helpers. -->
   <section class="count-question card card-primary" aria-labelledby="question">
-    <p class="count-step label-large">{{ stepKey() | transloco }}</p>
     <p id="question" class="question" data-testid="question">
       {{ prompt().key | transloco: prompt().params }}
     </p>
@@ -69,14 +68,9 @@
     }
   </section>
 
-  <!-- The board, the main pane: never covered, never scrolled. -->
-  <div class="count-board">
-    <app-board-view [board]="board()" [pointer]="pointer()" (pick)="tapCell($event)" />
-  </div>
-
-  <!-- The sentence with its actions. -->
+  <!-- The sentence he builds, in big letters, with its actions (spec 008, R4). -->
   <section class="count-sentence card" aria-labelledby="sentence-title">
-    <h2 id="sentence-title" class="label-large text-muted">
+    <h2 id="sentence-title" class="sr-only">
       {{ 'counting.page.sentence' | transloco }}
     </h2>
     <p class="sentence-text" [attr.lang]="board().locale" data-testid="sentence">
@@ -164,6 +158,11 @@
       }
     </div>
   </section>
+
+  <!-- The board, the main pane: never covered, never scrolled. -->
+  <div class="count-board">
+    <app-board-view [board]="board()" [pointer]="pointer()" (pick)="tapCell($event)" />
+  </div>
 </div>
 
 @if (showSignals()) {

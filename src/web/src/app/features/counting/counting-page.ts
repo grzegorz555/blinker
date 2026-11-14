@@ -67,11 +67,6 @@ export class CountingPage implements AfterViewInit, OnDestroy {
       : 'counting.page.hint',
   );
 
-  /** "Krok 1 z 2 · kolumna" (Step 1 of 2 · column) while giving a number. */
-  protected readonly stepKey = computed(() =>
-    this.state().name.startsWith('row.') ? 'counting.page.stepRow' : 'counting.page.stepColumn',
-  );
-
   protected readonly tallyParams = computed(() => {
     const parts = this.state().parts;
     return {

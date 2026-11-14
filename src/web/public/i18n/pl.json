@@ -46,8 +46,6 @@
     "page": {
       "pause": "Pauza",
       "resume": "Wznów",
-      "stepColumn": "Krok 1 z 2 · kolumna",
-      "stepRow": "Krok 2 z 2 · wiersz",
       "hand": "ręka +5",
       "blink": "+1",
       "tallyText": "Policzone: ręka {{hands}} ×, mrugnięcie {{blinks}} ×, razem {{n}}.",

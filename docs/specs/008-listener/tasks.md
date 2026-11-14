@@ -16,7 +16,7 @@ button and the hint of the moment (commit before this spec). Gates: `npm run ver
       (R2), an undo said aloud (R1); CountingService sends SPOKEN when a reading ends. Tests: the 12 × 9 table and
       the paths of the test plan.
       _To understand:_ an event from the outside world as a signal, why the machine still never waits on a timer.
-- [ ] **T2 [sonnet]: The layout with the sentence big.** Status line small at the top, the sentence big above the
+- [x] **T2 [sonnet]: The layout with the sentence big.** Status line small at the top, the sentence big above the
       board, the actions with it (R4, R5). Tests: e2e fit at every size and with the wide font, the "Nowe zdanie?"
       path, axe.
       _To understand:_ designing for a person who listens: what the screen is for, and for whom.

@@ -104,6 +104,60 @@ test.describe('Liczenie (Counting) with the signal buttons', () => {
   });
 });
 
+test.describe('for a listener (spec 008)', () => {
+  test.beforeEach(async ({ page }) => {
+    await fakeSpeech(page);
+    await page.goto('/');
+    await expect(page.getByRole('table')).toBeVisible();
+  });
+
+  const endSpeech = (page: Page) =>
+    page.evaluate(() => (window as unknown as { __endSpeech: () => void }).__endSpeech());
+
+  test('after reading aloud Blinker asks "Nowe zdanie?" (New sentence?): yes clears, a shake brings it back', async ({
+    page,
+  }) => {
+    test.slow();
+    await page.getByRole('table').getByRole('button', { name: 'A', exact: true }).click();
+    await endSpeech(page);
+    await signal(page, 'Głowa w prawo: koniec').click();
+    await signal(page, 'Skinienie: tak').click();
+    await expect.poll(() => spoken(page)).toContain('A');
+    await endSpeech(page); // the reading ends
+    await expect(question(page)).toHaveText('Nowe zdanie?');
+    await expect.poll(() => spoken(page)).toContain('Nowe zdanie?');
+    await expectNoA11yViolations(page);
+    await signal(page, 'Skinienie: tak').click();
+    await expect(sentence(page)).toHaveText('');
+    await signal(page, 'Kręcenie głową: nie').click();
+    await expect(sentence(page)).toHaveText('A');
+    await expect.poll(() => spoken(page)).toContain('Cofnięto A');
+  });
+
+  test('a space says the word just finished', async ({ page }) => {
+    for (const l of ['T', 'A', 'K']) {
+      await page.getByRole('table').getByRole('button', { name: l, exact: true }).click();
+    }
+    await signal(page, 'Skinienie: tak').click();
+    await expect.poll(async () => (await spoken(page)).at(-1)).toBe('TAK');
+  });
+
+  test('the sentence is the biggest text, above the board; the prompt is small (R4)', async ({
+    page,
+  }) => {
+    // Above the board on a phone held upright; in landscape the pane sits beside the board.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload();
+    await page.getByRole('table').getByRole('button', { name: 'A', exact: true }).click();
+    const size = (testId: string) =>
+      page.getByTestId(testId).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    expect(await size('sentence')).toBeGreaterThanOrEqual(2 * (await size('question')));
+    const sentenceBox = (await page.getByTestId('sentence').boundingBox())!;
+    const boardBox = (await page.getByRole('table').boundingBox())!;
+    expect(sentenceBox.y).toBeLessThan(boardBox.y);
+  });
+});
+
 test.describe('speech status', () => {
   test('with no on-device Polish voice, the screen says so in text and nothing is spoken (R7)', async ({
     page,
