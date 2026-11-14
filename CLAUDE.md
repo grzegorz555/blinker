@@ -15,7 +15,7 @@ Details: `docs/vision.md`, `docs/interaction-model.md`.
 The author also wants to **learn** from every step.
 
 ## Stack (ADR-0001)
-- Angular 22 PWA (standalone, signals, zoneless), Transloco (en, pl), Tailwind CSS v4, spartan-ng, in `src/web` (stage 1)
+- Angular 22 PWA (standalone, signals, zoneless), Transloco (en, pl), Tailwind CSS v4, Angular Material (M3) on our tokens (ADR-0005), in `src/web`
 - MediaPipe Face Landmarker, running on the device in a Web Worker, with the model and wasm self-hosted
 - Web Speech API for text-to-speech
 - Tests: Vitest (unit) and Playwright with axe-core (e2e and accessibility)

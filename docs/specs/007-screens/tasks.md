@@ -12,7 +12,7 @@ generated:
 Branch: `feat/007-screens` (from `main`, worktree `C:/Repozytorium/Blinker/wt/007-screens`) · Gates:
 `npm run verify -- --quick` locally, full gates in CI.
 
-- [ ] **T1 [opus]: Angular Material spike and the theme.** Add `@angular/material` and `@angular/cdk`; the M3 theme
+- [x] **T1 [opus]: Angular Material spike and the theme.** Add `@angular/material` and `@angular/cdk`; the M3 theme
       mapped to `tokens.css`, the system font, no icon font; a dialog, a slide toggle and a select checked zoneless
       under the CSP and Trusted Types (e2e CSP guard and axe on a test page that does not ship); remove spartan-ng
       (`.mcp.json`, `CLAUDE.md`, conventions) (R1). If the spike fails, stop and bring it to the author (ADR-0005,

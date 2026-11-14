@@ -1,0 +1,57 @@
+// Angular Material (M3) on our tokens (ADR-0005, spec 007 R1).
+// https://material.angular.dev/guide/theming
+//
+// mat.theme() emits every --mat-sys-* system token (colors as light-dark() pairs, typography, shape, density).
+// mat.theme-overrides() then points the color roles we use at tokens.css, so tokens.css stays the only source of
+// colors and the contrast table in docs/design/index.md holds for Material components too.
+// The system font stack: Material never loads Roboto or the Material Symbols font by itself (only `ng add` would
+// add Google Fonts links, which we don't use; security.md: no third-party origins).
+@use '@angular/material' as mat;
+
+$font:
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  Roboto,
+  sans-serif;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$violet-palette,
+        theme-type: color-scheme,
+      ),
+      typography: (
+        plain-family: $font,
+        brand-family: $font,
+      ),
+      density: 0,
+    )
+  );
+
+  @include mat.theme-overrides(
+    (
+      background: var(--bg),
+      on-background: var(--fg),
+      surface: var(--bg),
+      surface-bright: var(--bg),
+      surface-container-lowest: var(--bg),
+      surface-container-low: var(--surface),
+      surface-container: var(--surface),
+      surface-container-high: var(--surface),
+      surface-container-highest: var(--surface),
+      on-surface: var(--fg),
+      on-surface-variant: var(--muted),
+      primary: var(--primary),
+      on-primary: var(--on-primary),
+      primary-container: var(--primary-container),
+      on-primary-container: var(--on-primary-container),
+      secondary-container: var(--secondary-container),
+      on-secondary-container: var(--on-secondary-container),
+      outline: var(--border),
+      outline-variant: var(--line),
+      error: var(--error),
+    )
+  );
+}

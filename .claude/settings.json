@@ -1,11 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "enableAllProjectMcpServers": false,
-  "enabledMcpjsonServers": ["angular-cli", "spartan-ui"],
+  "enabledMcpjsonServers": ["angular-cli"],
   "permissions": {
     "allow": [
       "mcp__angular-cli",
-      "mcp__spartan-ui",
       "Bash(git status*)",
       "Bash(git diff*)",
       "Bash(git log*)",
