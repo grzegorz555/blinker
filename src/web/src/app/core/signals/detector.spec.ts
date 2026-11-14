@@ -1,0 +1,159 @@
+import { describe, expect, it } from 'vitest';
+import { detectAll } from './detector';
+import { DEFAULT_PROFILE as P } from './profile';
+import { closed, pulse, pulses, record } from './synthetic';
+
+const signals = (frames: Parameters<typeof detectAll>[0], profile = P) =>
+  detectAll(frames, profile).map((x) => x.signal);
+
+describe('detector: long blink (spec 011, R1)', () => {
+  it('a 700 ms closure is one BLINK, sent when the eyes open', () => {
+    const found = detectAll(record(2000, { eyes: closed(500, 1200) }), P);
+    expect(found.map((x) => x.signal)).toEqual(['BLINK']);
+    expect(found[0].at).toBeGreaterThanOrEqual(1200);
+  });
+
+  it('an involuntary 200 ms blink is ignored', () => {
+    expect(signals(record(2000, { eyes: closed(500, 700) }))).toEqual([]);
+  });
+
+  it('eyes closed for 4 s (resting) is not a blink', () => {
+    expect(signals(record(6000, { eyes: closed(500, 4500) }))).toEqual([]);
+  });
+
+  it('three long blinks are three signals', () => {
+    const eyes = (t: number) => {
+      const v = pulses(
+        [
+          [300, 1100, 0.9],
+          [1700, 2500, 0.9],
+          [3100, 3900, 0.9],
+        ],
+        0.05,
+      )(t);
+      return { eyeBlinkLeft: v, eyeBlinkRight: v };
+    };
+    expect(signals(record(4500, { eyes }))).toEqual(['BLINK', 'BLINK', 'BLINK']);
+  });
+
+  it('one eye closed (a wink, or a droopy lid) is not a blink: both eyes must close', () => {
+    const eyes = (t: number) => ({ eyeBlinkLeft: pulse(500, 1300, 0.9, 0.05)(t) });
+    expect(signals(record(2000, { eyes }))).toEqual([]);
+  });
+
+  it('noise around the threshold does not split one blink into two (hysteresis)', () => {
+    // 0.9, then a dip to 0.45 (below the threshold, above the release level), then 0.9 again.
+    const eyes = (t: number) => {
+      const v = pulses(
+        [
+          [400, 800, 0.9],
+          [800, 830, 0.45],
+          [830, 1200, 0.9],
+        ],
+        0.05,
+      )(t);
+      return { eyeBlinkLeft: v, eyeBlinkRight: v };
+    };
+    expect(signals(record(2000, { eyes }))).toEqual(['BLINK']);
+  });
+});
+
+describe('detector: the look at his hand', () => {
+  it('eyes down for 600 ms is one HAND, even if held longer', () => {
+    const eyes = (t: number) => ({ eyeLookDownLeft: pulse(300, 1800, 0.8, 0.05)(t) });
+    const found = detectAll(record(2500, { eyes }), P);
+    expect(found.map((x) => x.signal)).toEqual(['HAND']);
+    expect(found[0].at).toBeGreaterThanOrEqual(300 + P.hand.holdMs);
+  });
+
+  it('a glance down shorter than the hold is nothing', () => {
+    const eyes = (t: number) => ({ eyeLookDownRight: pulse(300, 500, 0.8, 0.05)(t) });
+    expect(signals(record(1500, { eyes }))).toEqual([]);
+  });
+
+  it('looking down lowers the lids: that closure is not a blink', () => {
+    const eyes = (t: number) => {
+      const lids = pulse(300, 1300, 0.7, 0.05)(t);
+      return {
+        eyeLookDownLeft: pulse(300, 1300, 0.8, 0.05)(t),
+        eyeBlinkLeft: lids,
+        eyeBlinkRight: lids,
+      };
+    };
+    expect(signals(record(2000, { eyes }))).toEqual(['HAND']);
+  });
+
+  it('two looks are two signals; a hand + 2 blinks is HAND, BLINK, BLINK (7)', () => {
+    const eyes = (t: number) => {
+      const lids = pulses(
+        [
+          [1500, 2200, 0.9],
+          [2800, 3500, 0.9],
+        ],
+        0.05,
+      )(t);
+      return {
+        eyeLookDownLeft: pulse(200, 900, 0.8, 0.05)(t),
+        eyeBlinkLeft: lids,
+        eyeBlinkRight: lids,
+      };
+    };
+    expect(signals(record(4000, { eyes }))).toEqual(['HAND', 'BLINK', 'BLINK']);
+  });
+});
+
+describe('detector: head signals', () => {
+  it('a nod down and back within the window is NOD', () => {
+    expect(signals(record(2000, { pitch: pulse(400, 900, -18) }))).toEqual(['NOD']);
+  });
+
+  it('a slow look down that stays (over the window) is not a nod', () => {
+    expect(signals(record(4000, { pitch: pulse(400, 2500, -18) }))).toEqual([]);
+  });
+
+  it('with a learnt direction, the other way is not a nod', () => {
+    const profile = { ...P, nod: { ...P.nod, direction: -1 as const } };
+    expect(signals(record(2000, { pitch: pulse(400, 900, 18) }), profile)).toEqual([]);
+    expect(signals(record(2000, { pitch: pulse(400, 900, -18) }), profile)).toEqual(['NOD']);
+  });
+
+  it('left then right within the window is SHAKE, once', () => {
+    const yaw = pulses([
+      [300, 500, -15],
+      [600, 800, 15],
+      [900, 1100, -15],
+    ]);
+    expect(signals(record(2000, { yaw }))).toEqual(['SHAKE']);
+  });
+
+  it('a head right held and back is RIGHT, not a shake', () => {
+    expect(signals(record(2000, { yaw: pulse(300, 900, 25) }))).toEqual(['RIGHT']);
+  });
+
+  it('a head turn to his left is not RIGHT', () => {
+    expect(signals(record(2000, { yaw: pulse(300, 900, -25) }))).toEqual([]);
+  });
+
+  it('a quick flick right (shorter than the hold) is not RIGHT', () => {
+    expect(signals(record(2000, { yaw: pulse(300, 400, 25) }))).toEqual([]);
+  });
+
+  it('the neutral pose is subtracted: a head resting turned 15° is quiet', () => {
+    const profile = { ...P, neutral: { yaw: 15, pitch: -10 } };
+    expect(signals(record(2000, { yaw: () => 15, pitch: () => -10 }), profile)).toEqual([]);
+  });
+});
+
+describe('detector: safety', () => {
+  it('a face lost in the middle of a blink drops it', () => {
+    const face = (t: number) => t < 800 || t > 1000;
+    expect(signals(record(2000, { eyes: closed(500, 1300), face }))).toEqual([]);
+  });
+
+  it('after a signal, the refractory time passes before the next one', () => {
+    // A hand look, and a nod 200 ms after the HAND is sent: only HAND.
+    const eyes = (t: number) => ({ eyeLookDownLeft: pulse(0, 700, 0.8, 0.05)(t) });
+    const found = detectAll(record(2000, { eyes, pitch: pulse(450, 600, -18) }), P);
+    expect(found.map((x) => x.signal)).toEqual(['HAND']);
+  });
+});
