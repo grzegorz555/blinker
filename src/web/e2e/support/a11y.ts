@@ -12,6 +12,10 @@ export const WCAG_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22
 export async function expectNoA11yViolations(page: Page): Promise<void> {
   // Let running animations finish first: axe measures contrast as it is now, and a fading-in error text (Angular
   // Material form field) or dialog is not yet at full opacity on a slow CI machine. Endless animations are skipped.
+  // Two frames first: an animation that starts with the next frame is not listed yet.
+  await page.evaluate(
+    () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+  );
   await page.evaluate(() =>
     Promise.all(
       document
