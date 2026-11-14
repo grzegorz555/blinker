@@ -27,7 +27,7 @@ Branch: `feat/007-screens` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       `counting.ts`; the table grows to 11 × 8; `CountingService.touch()`. Tests: the table test and every touch case
       of the test plan.
       _To understand:_ extending a state machine without breaking it, why touch skips the nod.
-- [ ] **T4 [opus]: Liczenie (Counting) screen.** Board, pointer, question and counter, notice, sentence with its
+- [x] **T4 [opus]: Liczenie (Counting) screen.** Board, pointer, question and counter, notice, sentence with its
       actions, the clear dialog, the live region, the hints line, portrait and landscape layout (R4, R5). Tests:
       component tests; e2e for touch, undo, clear with the dialog, the board fit at every size and with the wide
       font, axe in the main states.

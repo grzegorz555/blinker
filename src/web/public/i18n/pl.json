@@ -45,7 +45,28 @@
     "paused": "Pauza",
     "resumed": "Wracamy",
     "page": {
-      "intro": "Podaj kolumnę, potem wiersz: Blinker pyta, a skinienie potwierdza. Tablica pojawi się w kolejnym kroku etapu 2."
+      "pause": "Pauza",
+      "resume": "Wznów",
+      "stepColumn": "Krok 1 z 2 · kolumna",
+      "stepRow": "Krok 2 z 2 · wiersz",
+      "hand": "ręka +5",
+      "blink": "+1",
+      "tallyText": "Policzone: ręka {{hands}} ×, mrugnięcie {{blinks}} ×, razem {{n}}.",
+      "hint": "Kiwnij głową = tak · Pokręć głową = nie",
+      "sentence": "Zdanie",
+      "undo": "Cofnij literę",
+      "clear": "Wyczyść",
+      "read": "Przeczytaj",
+      "clearTitle": "Wyczyścić zdanie?",
+      "clearMessage": "Całe zdanie zostanie usunięte. „Cofnij literę” je przywróci.",
+      "boardCaption": "Tablica liter: kolumny od 1 do {{columns}}, wiersze od 1 do {{rows}}. Dotknij litery, żeby dodać ją do zdania.",
+      "action": {
+        "space": "Spacja",
+        "delete": "Usuń",
+        "speak": "Przeczytaj",
+        "clear": "Wyczyść",
+        "undo": "Cofnij"
+      }
     }
   },
   "common": {

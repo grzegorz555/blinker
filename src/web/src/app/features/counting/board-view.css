@@ -1,0 +1,114 @@
+/*
+ * The letter board (spec 007 R4), from the spec 004 mock-up (design/design.css, ".board"). Square cells: --cell is the
+ * largest square that fits --cols columns across the width and --rows rows down the height, after the number headers
+ * (1.5rem column, 1.75rem row) and the gaps of 0.25rem; the height keeps 0.25rem spare, so the board never reaches
+ * past its pane (docs/knowledge/layout-fits-with-a-wider-font.md). The host is a size container (counting-page.css).
+ */
+:host {
+  display: contents;
+}
+
+.board {
+  --cols: 7;
+  --rows: 5;
+  /* Extra width: the row numbers and the column gaps; extra height: the column numbers, the row gaps and 0.25rem spare. */
+  --extra-w: calc(1.5rem + (var(--cols) + 1) * 0.25rem);
+  --extra-h: calc(1.75rem + (var(--rows) + 3) * 0.25rem);
+  --cell: min(
+    calc((100cqw - var(--extra-w)) / var(--cols)),
+    calc((100cqh - var(--extra-h)) / var(--rows))
+  );
+  width: calc(var(--cols) * var(--cell) + var(--extra-w));
+  height: calc(var(--rows) * var(--cell) + var(--extra-h));
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0.25rem;
+}
+
+th {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+thead th {
+  height: 1.75rem;
+}
+
+/* With table-layout: fixed the first row sets the column widths: the corner cell is as narrow as the row numbers. */
+tr > :first-child {
+  width: 1.5rem;
+}
+
+th.is-active {
+  border-radius: 9999px;
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+  font-weight: 800;
+}
+
+.board-cell {
+  height: var(--cell);
+  border-radius: 0.75rem;
+  background-color: var(--surface);
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1;
+  /* At least 32 px for every letter (AAC rule in docs/design), larger when there is room. */
+  font-size: max(2rem, calc(var(--cell) * 0.5));
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.board-cell.is-empty {
+  background-color: transparent;
+}
+
+/* A tap on a letter adds it: the caregiver (or he, by touch) can always pick by hand. */
+.cell-btn {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  color: inherit;
+  font: inherit;
+}
+
+/* Action cells hold a word ("Spacja" (Space)), so a smaller size keeps it inside the square. */
+.cell-action {
+  overflow: hidden;
+  padding-inline: 0.125rem;
+  font-size: max(0.875rem, calc(var(--cell) * 0.2));
+  overflow-wrap: anywhere;
+}
+
+.cell-btn:focus-visible {
+  outline: 3px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .cell-btn:hover {
+    background-color: var(--subtle);
+  }
+}
+
+/* The pointer: a 4 px outline plus bold text and a tonal fill, never color alone (SC 1.4.1). */
+.is-active {
+  outline: 4px solid var(--highlight);
+  outline-offset: -4px;
+  font-weight: 800;
+}
+
+.board-cell.is-active {
+  background-color: var(--primary-container);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .is-active {
+    transition: outline-color 150ms ease-out;
+  }
+}
