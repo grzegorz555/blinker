@@ -101,6 +101,27 @@ test.describe('Liczenie (Counting) screen', () => {
     await expect(page.getByTestId('announcer')).toHaveText('Cofnięto A');
   });
 
+  test('Spacja (Space) ends a word: after a letter only, never at the start or twice', async ({
+    page,
+  }) => {
+    const space = page.getByRole('button', { name: 'Spacja', exact: true });
+    await expect(page.getByTestId('hint')).toHaveText(
+      'Kiwnij bez liczby = spacja (koniec słowa) · Pokręć głową = cofnij literę',
+    );
+    await space.click();
+    await expect(sentence(page)).toHaveText('');
+    await cell(page, 'T').click();
+    await cell(page, 'A').click();
+    await space.click();
+    await expect(page.getByTestId('announcer')).toHaveText('Spacja');
+    await space.click();
+    await expect(page.getByTestId('announcer')).toHaveText(
+      'Bez spacji: zdanie jest puste albo kończy się spacją',
+    );
+    await cell(page, 'K').click();
+    await expect(sentence(page)).toHaveText('TA K');
+  });
+
   test('Wyczyść (Clear) asks first; Anuluj (Cancel) keeps the sentence, Wyczyść clears it (R5)', async ({
     page,
   }) => {

@@ -49,6 +49,8 @@ signal source.
     and the machine waits for a column;
   - `undo` removes the last thing this session added; `speak` reads the sentence aloud; `clear` is sent only after the
     confirmation dialog (R5), so the machine clears at once;
+  - `space` (the "Spacja" (Space) button, added after the author asked about it on 2026-11-14) follows the rule
+    of a nod without a number: a space after a word, never at the start or twice;
   - `paused` ignores `TOUCH` like every other signal except `PAUSE`; in `speaking` a tap goes on writing, like a
     blink does (the machine does not know when the reading ends, so ignoring taps there could lock the board), and
     `speak` reads the sentence again.
@@ -59,12 +61,13 @@ signal source.
   - the pointer (the active column, then the cell) with a 4 px outline and bold text, never color alone (SC 1.4.1);
   - the question and the counter ("Kolumna 7?" (Column 7?), `[5, 1, 1]` as a hand and two blinks), the notice
     (rejected and why, "Dodano W" (Added W), "Spacja" (Space)); announcements in one polite live region (SC 4.1.3);
-  - the sentence, large, with "Cofnij literę" (Undo letter), "Wyczyść" (Clear) and "Przeczytaj" (Read aloud) as the
+  - the sentence, large, with "Cofnij literę" (Undo letter), "Spacja" (Space), "Wyczyść" (Clear) and "Przeczytaj" (Read aloud) as the
     one filled button; "Pauza" (Pause) as a toggle button (`aria-pressed`);
   - portrait: question, board, sentence from top to bottom; landscape: board left, pane right; the board is never
     covered or scrolled at 360 × 640, 390 × 844, 768 × 1024, 1280 × 800 and in landscape, also with a wider font
     ([learning](../../knowledge/layout-fits-with-a-wider-font.md));
-  - the hints line ("Podpowiedzi w Liczeniu" (Hints in Counting)) shown only when the setting is on.
+  - the hints line ("Podpowiedzi w Liczeniu" (Hints in Counting)) shown only when the setting is on; while Blinker waits
+    for a column it says that a nod without a number is a space and a shake undoes the last letter.
 - **R5. Confirmations and undo** (CLAUDE.md rule 13): "Wyczyść" (Clear) opens a modal dialog (Angular Material,
   [APG dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)) with "Anuluj" (Cancel) focused
   first; the same for deleting a board or the sentence history. Everything else can be undone.

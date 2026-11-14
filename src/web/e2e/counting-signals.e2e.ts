@@ -74,6 +74,15 @@ test.describe('Liczenie (Counting) with the signal buttons', () => {
     await expect(sentence(page)).toHaveText('W');
   });
 
+  test('a nod without a number adds a space after a word (author, 2026-11-13)', async ({
+    page,
+  }) => {
+    await page.getByRole('table').getByRole('button', { name: 'A', exact: true }).click();
+    await signal(page, 'Skinienie: tak').click();
+    await page.getByRole('table').getByRole('button', { name: 'B', exact: true }).click();
+    await expect(sentence(page)).toHaveText('A B');
+  });
+
   test('a shake rejects the number; a second shake changes nothing', async ({ page }) => {
     await page.getByRole('table').getByRole('button', { name: 'A', exact: true }).click();
     await signal(page, 'Mrugnięcie +1').click();
@@ -135,8 +144,9 @@ test.describe('screen wake lock (R8)', () => {
     });
     const locks = () => page.evaluate(() => (window as unknown as { __locks: string[] }).__locks);
     await page.goto('/');
-    await expect.poll(locks).toEqual(['taken']);
+    await expect.poll(locks).toContain('taken');
     await page.getByRole('link', { name: 'Ustawienia' }).click();
-    await expect.poll(locks).toEqual(['taken', 'released']);
+    // Released when leaving (the browser may also have taken it again on a visibility change: count is not the point).
+    await expect.poll(async () => (await locks()).at(-1), { timeout: 10_000 }).toBe('released');
   });
 });

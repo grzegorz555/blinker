@@ -54,7 +54,7 @@ export type SignalType = (typeof SIGNAL_TYPES)[number];
  */
 export type TouchTarget =
   | { readonly kind: 'cell'; readonly column: number; readonly row: number }
-  | { readonly kind: 'undo' | 'clear' | 'speak' };
+  | { readonly kind: 'undo' | 'clear' | 'speak' | 'space' };
 
 /**
  * His signals (stages 3–4 detect them on the face; until then buttons and keys), TICK for time, and TOUCH for a tap
@@ -413,6 +413,9 @@ const touchWhileWriting: Handler = (state, config, signal) => {
     }
     case 'undo':
       return shakeToUndo(back, config, signal);
+    case 'space':
+      // The same rule as a nod without a number: no space at the start or after a space.
+      return nodForSpace(back, config, signal);
     case 'clear': {
       const notice = msg('counting.cleared');
       return go(back, { sentence: clear(state.sentence), notice }, [
