@@ -67,12 +67,14 @@ signal source.
   [APG dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)) with "Anuluj" (Cancel) focused
   first; the same for deleting a board or the sentence history. Everything else can be undone.
 - **R6. Signal buttons** (stage 2 input): a panel with his six signals as buttons, "Mrugnięcie +1" (Blink +1),
-  "Ręka +5" (Hand +5), "Tak" (Yes), "Nie" (No), "Koniec" (Finish), "Pauza" (Pause), each sending its `Signal`
-  through `CountingService.send()`. Shown by default in stage 2 (there is no camera yet), hidden by a setting. The
+  "Ręka +5" (Hand +5), "Skinienie: tak" (Nod: yes), "Kręcenie głową: nie" (Shake: no), "Głowa w prawo: koniec" (Head right: finish), each sending its `Signal`
+  through `CountingService.send()`; "Pauza" (Pause) is the toggle in the top bar, so it is not repeated. On a phone the
+  labels are short ("+1", "tak" (yes)) and the full name stays in the accessible name (SC 2.5.3). Shown by default in stage 2 (there is no camera yet), hidden by a setting. The
   keyboard mapping from spec 006 (R7) is attached on this screen only when its setting is on (SC 2.1.4).
-- **R7. Speech on the screen.** The status of the voice is visible in text: speaking ("Czytam…" (Reading…), with
-  "Zatrzymaj" (Stop)), and **no local voice** ("Brak polskiego głosu na urządzeniu" (No Polish voice on the device),
-  with what to install), never a silent failure.
+- **R7. Speech on the screen.** The status of the voice is visible in text: while reading, the question says "Czytam na
+  głos" (Reading aloud) and "Przeczytaj" (Read aloud) turns into "Zatrzymaj" (Stop); with **no local voice** the
+  question card says "Brak polskiego głosu na urządzeniu" (No Polish voice on the device) in one line, and Ustawienia
+  (Settings) explains what to install. Never a silent failure, and no extra row that would take the board's height.
 - **R8. Screen awake.** While Liczenie (Counting) is visible, a
   [Screen Wake Lock](https://developer.mozilla.org/docs/Web/API/Screen_Wake_Lock_API) keeps the screen on; it is
   taken again after the page becomes visible and released when he leaves the screen. Where the API is missing,

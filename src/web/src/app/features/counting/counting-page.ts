@@ -1,6 +1,8 @@
 import { CdkPortal } from '@angular/cdk/portal';
+import { DOCUMENT } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   computed,
   inject,
   type AfterViewInit,
@@ -11,10 +13,14 @@ import { MatButton } from '@angular/material/button';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CountingService } from '../../core/counting/counting.service';
 import { total, type TouchTarget } from '../../core/counting/counting';
+import { listenToKeys } from '../../core/input/keyboard';
 import type { InputSignalType } from '../../core/input/signals';
+import { keepScreenAwake, type WakeLockLike } from '../../core/screen/wake-lock';
+import { SettingsService } from '../../core/settings/settings.service';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 import { TopBar } from '../../shell/top-bar';
 import { BoardView, type CellPick } from './board-view';
+import { SignalPanel } from './signal-panel';
 
 /**
  * Liczenie (Counting), the main screen (spec 007, R4, R5): the M3 supporting-pane layout on the spec 006 counting core.
@@ -24,7 +30,7 @@ import { BoardView, type CellPick } from './board-view';
  */
 @Component({
   selector: 'app-counting-page',
-  imports: [BoardView, CdkPortal, MatButton, TranslocoPipe],
+  imports: [BoardView, CdkPortal, MatButton, SignalPanel, TranslocoPipe],
   templateUrl: './counting-page.html',
   styleUrl: './counting-page.css',
 })
@@ -32,6 +38,7 @@ export class CountingPage implements AfterViewInit, OnDestroy {
   private readonly counting = inject(CountingService);
   private readonly confirmService = inject(ConfirmService);
   private readonly topBar = inject(TopBar);
+  private readonly settings = inject(SettingsService).settings;
   private readonly actions = viewChild.required(CdkPortal);
 
   protected readonly state = this.counting.state;
@@ -43,8 +50,12 @@ export class CountingPage implements AfterViewInit, OnDestroy {
   protected readonly paused = computed(() => this.state().name === 'paused');
   protected readonly total = computed(() => total(this.state()));
   protected readonly notice = computed(() => this.state().notice);
-  /** "Podpowiedzi w Liczeniu" (Hints in Counting): a setting from T6; on until then. */
-  protected readonly showHints = computed(() => true);
+  /** "Podpowiedzi w Liczeniu" (Hints in Counting). */
+  protected readonly showHints = computed(() => this.settings().hints);
+  protected readonly showSignals = computed(() => this.settings().signalButtons);
+  /** Speech status in text (R7): reading now, or no on-device voice. */
+  protected readonly speaking = this.counting.speaking;
+  protected readonly noVoice = computed(() => this.counting.speakResult() === 'no-local-voice');
 
   /** "Krok 1 z 2 · kolumna" (Step 1 of 2 · column) while giving a number. */
   protected readonly stepKey = computed(() =>
@@ -62,6 +73,21 @@ export class CountingPage implements AfterViewInit, OnDestroy {
 
   constructor() {
     this.counting.start();
+    const doc = inject(DOCUMENT);
+    // The keyboard mapping, only while this screen is shown and only when its setting is on (R6, SC 2.1.4).
+    const stopKeys = listenToKeys(
+      doc,
+      () => ({ enabled: this.settings().keyboard }),
+      (signal) => this.counting.send(signal),
+    );
+    // The screen stays on while he communicates (R8).
+    const wakeLock = (doc.defaultView?.navigator as { wakeLock?: WakeLockLike } | undefined)
+      ?.wakeLock;
+    const release = keepScreenAwake(wakeLock, doc);
+    inject(DestroyRef).onDestroy(() => {
+      stopKeys();
+      release();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -75,6 +101,10 @@ export class CountingPage implements AfterViewInit, OnDestroy {
 
   protected send(type: InputSignalType): void {
     this.counting.send({ type });
+  }
+
+  protected stopSpeaking(): void {
+    this.counting.stopSpeaking();
   }
 
   protected tapCell({ column, row }: CellPick): void {

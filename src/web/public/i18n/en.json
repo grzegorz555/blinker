@@ -67,6 +67,25 @@
         "clear": "Clear",
         "undo": "Undo"
       }
+    },
+    "signals": {
+      "title": "His signals",
+      "blink": "Blink",
+      "blinkShort": "+1",
+      "hand": "Hand",
+      "handShort": "+5",
+      "nod": "Nod:",
+      "nodShort": "yes",
+      "shake": "Shake:",
+      "shakeShort": "no",
+      "right": "Head right:",
+      "rightShort": "finish"
+    },
+    "voice": {
+      "speaking": "Reading aloud…",
+      "stop": "Stop",
+      "noLocalVoice": "No Polish voice on this device",
+      "noLocalVoiceHelp": "No Polish voice on this device, so nothing is read aloud. Install a Polish voice in the system text-to-speech settings."
     }
   },
   "common": {

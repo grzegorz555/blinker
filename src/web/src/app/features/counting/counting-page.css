@@ -184,6 +184,26 @@
   color: var(--primary);
 }
 
+/* No on-device voice (R7): an icon and words in the error color, never color alone. */
+.voice-error {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--error);
+  font-size: 1rem;
+}
+
+.voice-error svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.count-signals {
+  display: block;
+  margin-top: 0.5rem;
+}
+
 .pause-btn {
   white-space: nowrap;
 }
@@ -250,6 +270,13 @@
   }
 
   .action svg {
+    display: none;
+  }
+}
+
+/* With the signal buttons on a phone, the hint gives way to the board: the buttons say the same. */
+@media (max-width: 599px) {
+  .with-signals .count-hint {
     display: none;
   }
 }
