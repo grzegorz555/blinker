@@ -46,8 +46,6 @@
     "page": {
       "pause": "Pause",
       "resume": "Resume",
-      "stepColumn": "Step 1 of 2 · column",
-      "stepRow": "Step 2 of 2 · row",
       "hand": "hand +5",
       "blink": "+1",
       "tallyText": "Counted: {{hands}} × hand, {{blinks}} × blink, total {{n}}.",
