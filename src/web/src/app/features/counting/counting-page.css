@@ -1,0 +1,289 @@
+/*
+ * Liczenie (Counting) (spec 007 R4), from the spec 004 mock-up (design/design.css): the M3 supporting-pane layout
+ * (https://m3.material.io/foundations/layout/canonical-layouts/supporting-pane). Portrait: question, board, sentence
+ * from top to bottom. Landscape: the board on the left, the pane on the right. The shell gives this page the whole
+ * viewport height (shell-fit), so the board takes what is left and is never scrolled.
+ */
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.count {
+  display: grid;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'question' 'board' 'sentence';
+}
+
+@media (orientation: landscape) {
+  .count {
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 3fr) minmax(16rem, 2fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: 'board question' 'board sentence';
+  }
+}
+
+/* M3 filled cards: a tonal container, no border, no shadow. */
+.card {
+  border-radius: var(--radius-card);
+  background-color: var(--surface);
+  padding: 1rem;
+}
+
+.card-primary {
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.label-large {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* The question card; in landscape it fills the pane above the sentence. The question scales with the card width. */
+.count-question {
+  grid-area: question;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.question {
+  font-size: clamp(1.75rem, 11cqi, 4.5rem);
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.tally-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  font-size: 1.125rem;
+}
+
+/* The counter: how the number was built, readable without color (tonal tokens, not buttons). */
+.tally {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  border-radius: 0.5rem;
+  background-color: var(--bg);
+  padding-inline: 0.625rem;
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.tally-total {
+  font-weight: 700;
+}
+
+.notice {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.count-hint {
+  font-size: 1rem;
+}
+
+.count-board {
+  grid-area: board;
+  /* A size container, so the board sizes its cells from the space it really has. */
+  container-type: size;
+  display: flex;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.count-sentence {
+  grid-area: sentence;
+  align-self: end;
+  padding: 0.75rem;
+}
+
+.sentence-text {
+  min-height: 2.5rem;
+  margin-top: 0.25rem;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+}
+
+@media (min-width: 1024px) {
+  .sentence-text {
+    min-height: 3.75rem;
+    font-size: 3rem;
+    line-height: 3.75rem;
+  }
+}
+
+/* The newest letters matter most: a long sentence is clipped at the start, not at the end. */
+.sentence {
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
+  white-space: pre;
+}
+
+.count-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* An action with the icon above the label: three fit side by side on a phone, each at least 56 px high. */
+.action {
+  display: flex;
+  min-height: 3.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  border-radius: 1rem;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.action:focus-visible {
+  outline: 3px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+.action svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.action-primary {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.action-tonal {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+
+.action-outline {
+  border: 1px solid var(--border);
+  color: var(--primary);
+}
+
+.pause-btn {
+  white-space: nowrap;
+}
+
+.pause-btn svg {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-inline-end: 0.5rem;
+  vertical-align: middle;
+}
+
+/* A narrow phone held upright: the board gets the height; the step label goes, the hint is smaller. */
+@media (max-width: 599px) and (orientation: portrait) {
+  .count-question {
+    padding: 0.75rem;
+  }
+
+  .count-step {
+    display: none;
+  }
+
+  .count-hint {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+/*
+ * A phone held upright with little height (360 × 640): every pane is compact, so the board keeps at least five rows of
+ * 32 px letters. The sentence label stays for screen readers only; the actions put the label beside a hidden icon.
+ */
+@media (orientation: portrait) and (max-height: 760px) {
+  .question {
+    font-size: 1.75rem;
+    line-height: 2.25rem;
+  }
+
+  .count-step {
+    display: none;
+  }
+
+  .count-sentence h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .sentence-text {
+    min-height: 2rem;
+    margin-top: 0;
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .action {
+    min-height: 3rem;
+    flex-direction: row;
+    gap: 0.375rem;
+    padding-inline: 0.375rem;
+  }
+
+  .action svg {
+    display: none;
+  }
+}
+
+/* Short screens (a phone on its side): a compact pane, so it fits without overlapping. */
+@media (max-height: 520px) {
+  .count-question {
+    padding: 0.75rem;
+  }
+
+  .question {
+    font-size: 1.75rem;
+    line-height: 2.25rem;
+  }
+
+  .count-hint,
+  .count-step {
+    display: none;
+  }
+
+  .sentence-text {
+    min-height: 2rem;
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .action {
+    min-height: 3rem;
+    flex-direction: row;
+    gap: 0.375rem;
+    padding-inline: 0.375rem;
+  }
+
+  .action svg {
+    display: none;
+  }
+}

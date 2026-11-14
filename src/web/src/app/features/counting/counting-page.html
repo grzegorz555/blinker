@@ -1,0 +1,121 @@
+<!-- "Pauza" (Pause) in the top app bar (spec 007, R2, R4): a toggle, its state in aria-pressed and in the label. -->
+<ng-template cdkPortal>
+  <button
+    matButton="tonal"
+    type="button"
+    class="pause-btn"
+    [attr.aria-pressed]="paused()"
+    (click)="send('PAUSE')"
+  >
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      @if (paused()) {
+        <svg:path d="M7 5v14l11-7z" />
+      } @else {
+        <svg:path d="M8 5v14M16 5v14" />
+      }
+    </svg>
+    {{ (paused() ? 'counting.page.resume' : 'counting.page.pause') | transloco }}
+  </button>
+</ng-template>
+
+<div class="count" [attr.data-state]="state().name">
+  <!-- The question with the counter: what he reads after the board (M3 supporting pane). -->
+  <section class="count-question card card-primary" aria-labelledby="question">
+    <p class="count-step label-large">{{ stepKey() | transloco }}</p>
+    <p id="question" class="question" data-testid="question">
+      {{ prompt().key | transloco: prompt().params }}
+    </p>
+    @if (state().parts.length) {
+      <p class="tally-row" data-testid="tally">
+        <span class="sr-only">{{ 'counting.page.tallyText' | transloco: tallyParams() }}</span>
+        @for (part of state().parts; track $index) {
+          <span class="tally" aria-hidden="true">
+            {{ (part === 5 ? 'counting.page.hand' : 'counting.page.blink') | transloco }}
+          </span>
+        }
+        <span class="tally-total" aria-hidden="true">= {{ total() }}</span>
+      </p>
+    }
+    @if (notice(); as n) {
+      <p class="notice" data-testid="notice">{{ n.key | transloco: n.params }}</p>
+    }
+    @if (showHints()) {
+      <p class="count-hint" data-testid="hint">{{ 'counting.page.hint' | transloco }}</p>
+    }
+  </section>
+
+  <!-- The board, the main pane: never covered, never scrolled. -->
+  <div class="count-board">
+    <app-board-view [board]="board()" [pointer]="pointer()" (pick)="tapCell($event)" />
+  </div>
+
+  <!-- The sentence with its actions. -->
+  <section class="count-sentence card" aria-labelledby="sentence-title">
+    <h2 id="sentence-title" class="label-large text-muted">
+      {{ 'counting.page.sentence' | transloco }}
+    </h2>
+    <p class="sentence-text" [attr.lang]="board().locale" data-testid="sentence">
+      <span class="sentence"
+        ><span>{{ sentence() }}</span></span
+      >
+    </p>
+    <div class="count-actions">
+      <button type="button" class="action action-tonal" (click)="touch('undo')">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 14 4 9l5-5" />
+          <path d="M4 9h11a5 5 0 0 1 0 10h-3" />
+        </svg>
+        {{ 'counting.page.undo' | transloco }}
+      </button>
+      <button type="button" class="action action-outline" (click)="clear()">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+        </svg>
+        {{ 'counting.page.clear' | transloco }}
+      </button>
+      <button type="button" class="action action-primary" (click)="touch('speak')">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M11 5 6 9H3v6h3l5 4z" />
+          <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+          <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+        </svg>
+        {{ 'counting.page.read' | transloco }}
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- The one polite live region of the screen (SC 4.1.3): questions, added letters, rejections. -->
+<p class="sr-only" aria-live="polite" data-testid="announcer">{{ announcement() }}</p>

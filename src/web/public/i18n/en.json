@@ -45,7 +45,28 @@
     "paused": "Paused",
     "resumed": "Resumed",
     "page": {
-      "intro": "Give a column, then a row: Blinker asks, and a nod confirms. The board arrives in the next step of stage 2."
+      "pause": "Pause",
+      "resume": "Resume",
+      "stepColumn": "Step 1 of 2 · column",
+      "stepRow": "Step 2 of 2 · row",
+      "hand": "hand +5",
+      "blink": "+1",
+      "tallyText": "Counted: {{hands}} × hand, {{blinks}} × blink, total {{n}}.",
+      "hint": "Nod = yes · Shake your head = no",
+      "sentence": "Sentence",
+      "undo": "Undo letter",
+      "clear": "Clear",
+      "read": "Read aloud",
+      "clearTitle": "Clear the sentence?",
+      "clearMessage": "The whole sentence will be removed. Undo letter brings it back.",
+      "boardCaption": "Letter board: columns 1 to {{columns}}, rows 1 to {{rows}}. Tap a letter to add it to the sentence.",
+      "action": {
+        "space": "Space",
+        "delete": "Delete",
+        "speak": "Read aloud",
+        "clear": "Clear",
+        "undo": "Undo"
+      }
     }
   },
   "common": {
