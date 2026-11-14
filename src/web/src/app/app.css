@@ -3,20 +3,19 @@
  * classes (https://m3.material.io/foundations/layout/applying-layout/window-size-classes): a bar at the bottom below
  * 600 px, within thumb reach; a rail on the left from 600 px, so the board keeps the width.
  */
+/*
+ * The shell is exactly the viewport high and only <main> scrolls, so content never slides under the navigation bar
+ * (a control under it would be covered: axe target-size, SC 2.5.8 and 2.4.11).
+ */
 .shell {
   display: grid;
-  min-height: 100dvh;
+  height: 100dvh;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   grid-template-areas: 'top' 'main' 'nav';
 }
 
 /* A screen that must fit the viewport without scrolling (Liczenie (Counting), spec 007 R4). */
-.shell-fit {
-  height: 100dvh;
-  min-height: 0;
-}
-
 /* Small top app bar: the page color, no border (https://m3.material.io/components/top-app-bar/specs). */
 .shell-top {
   grid-area: top;
@@ -49,6 +48,7 @@
 .shell-main {
   grid-area: main;
   min-height: 0;
+  overflow-y: auto;
   padding: 0.5rem max(1rem, env(safe-area-inset-right)) 1.5rem max(1rem, env(safe-area-inset-left));
 }
 

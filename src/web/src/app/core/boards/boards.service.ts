@@ -1,0 +1,103 @@
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { CountingService, defaultBoard } from '../counting/counting.service';
+import { STORAGE, readStored, writeStored, type StoreProblem } from '../storage/local-store';
+import { BOARD_LIMITS, type Board } from './board';
+import { validateBoard, validateBoardData, type BoardError } from './validate-board';
+
+export const BOARDS_KEY = 'blinker.boards.v1';
+export const ACTIVE_BOARD_KEY = 'blinker.activeBoard.v1';
+
+/** The result of an import: the board, or every error with its path (SC 3.3.1). */
+export type ImportResult =
+  | { readonly ok: true; readonly board: Board; readonly replaced: boolean }
+  | { readonly ok: false; readonly errors: readonly BoardError[] };
+
+/** Imported boards read back from the device: each is validated again, like a new import. */
+function validateStoredBoards(data: unknown): Board[] | null {
+  if (!Array.isArray(data)) return null;
+  const boards: Board[] = [];
+  for (const item of data) {
+    const result = validateBoardData(item);
+    if (!result.ok) return null;
+    boards.push(result.board);
+  }
+  return boards;
+}
+
+const validateId = (data: unknown) =>
+  typeof data === 'string' && data.length <= BOARD_LIMITS.idLength ? data : null;
+
+/**
+ * Tablice (Boards) (spec 007, R10, R12): his built-in board and the imported ones, the active board, kept on the
+ * device. Imported files are untrusted input: the size is checked before the file is read, then the spec 006
+ * validator checks every field. The active board goes to the counting machine.
+ */
+@Injectable({ providedIn: 'root' })
+export class BoardsService {
+  private readonly storage = inject(STORAGE);
+  private readonly counting = inject(CountingService);
+
+  /** His board, built in: it can never be deleted. */
+  readonly builtIn = defaultBoard();
+  private readonly imported = signal<readonly Board[]>([]);
+  private readonly activeId = signal<string>(this.builtIn.id);
+
+  readonly boards = computed(() => [this.builtIn, ...this.imported()]);
+  readonly active = computed(
+    () => this.boards().find((b) => b.id === this.activeId()) ?? this.builtIn,
+  );
+  readonly problem = signal<StoreProblem | null>(null);
+
+  constructor() {
+    const boards = readStored(this.storage, BOARDS_KEY, validateStoredBoards);
+    const active = readStored(this.storage, ACTIVE_BOARD_KEY, validateId);
+    if (boards.value) this.imported.set(boards.value);
+    if (active.value) this.activeId.set(active.value);
+    this.problem.set(boards.problem ?? active.problem);
+
+    effect(() => this.counting.useBoard(this.active()));
+  }
+
+  isBuiltIn(board: Board): boolean {
+    return board.id === this.builtIn.id;
+  }
+
+  select(id: string): void {
+    if (!this.boards().some((b) => b.id === id)) return;
+    this.activeId.set(id);
+    this.save(ACTIVE_BOARD_KEY, id);
+  }
+
+  /**
+   * Imports a board from a file. The size is checked before reading (R10), then the text goes through the validator.
+   * A board with the id of an imported one replaces it (a corrected file); the id of his board is reserved.
+   */
+  async import(file: Pick<File, 'size' | 'text'>): Promise<ImportResult> {
+    if (file.size > BOARD_LIMITS.bytes) {
+      return { ok: false, errors: [{ path: '', code: 'too-large', limit: BOARD_LIMITS.bytes }] };
+    }
+    const result = validateBoard(await file.text());
+    if (!result.ok) return result;
+    const board = result.board;
+    if (board.id === this.builtIn.id) {
+      return { ok: false, errors: [{ path: 'id', code: 'reserved-id' }] };
+    }
+    const replaced = this.imported().some((b) => b.id === board.id);
+    this.imported.update((list) => [...list.filter((b) => b.id !== board.id), board]);
+    this.save(BOARDS_KEY, this.imported());
+    return { ok: true, board, replaced };
+  }
+
+  /** Deletes an imported board (after the page's confirmation); his board stays. */
+  remove(id: string): void {
+    if (id === this.builtIn.id) return;
+    this.imported.update((list) => list.filter((b) => b.id !== id));
+    this.save(BOARDS_KEY, this.imported());
+    if (this.activeId() === id) this.select(this.builtIn.id);
+  }
+
+  private save(key: string, value: unknown): void {
+    if (!writeStored(this.storage, key, value)) this.problem.set('unavailable');
+    else if (this.problem() === 'corrupted') this.problem.set(null);
+  }
+}

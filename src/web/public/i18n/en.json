@@ -101,7 +101,46 @@
     "empty": "No sentences yet."
   },
   "boards": {
-    "intro": "His board is the active board."
+    "intro": "His board is the active board.",
+    "active": "Active board",
+    "size": "{{columns}} columns × {{rows}} rows",
+    "builtInSize": "Built in · {{columns}} columns × {{rows}} rows",
+    "preview": "Preview: {{name}}",
+    "previewCaption": "Board preview: columns 1 to {{columns}}, rows 1 to {{rows}}.",
+    "import": "Import a board from a file",
+    "importHelp": "A JSON file in the board format v1 (docs/board-format.md): at most {{size}} columns and {{size}} rows, up to {{kb}} KB. The file is checked on this device and never sent anywhere.",
+    "file": "Board file (.json)",
+    "imported": "Imported the board \"{{name}}\". Choose it above to use it.",
+    "replaced": "Replaced the board \"{{name}}\" with the new file.",
+    "errorsTitle": "Error: the file was not imported ({{count}} problem(s)).",
+    "delete": "Delete",
+    "deleteNamed": "Delete the board {{name}}",
+    "deleteTitle": "Delete the board \"{{name}}\"?",
+    "deleteMessage": "The board will be removed from this device. His board stays.",
+    "problem": {
+      "corrupted": "The saved boards could not be read; only his board is available. Import the files again.",
+      "unavailable": "This browser does not let Blinker save on the device, so imported boards last only until the page is closed."
+    },
+    "errors": {
+      "too-large": "The file is larger than {{limit}} bytes.",
+      "not-json": "The file is not valid JSON.",
+      "not-object": "The file must contain one board object.",
+      "unknown-field": "An unknown field.",
+      "forbidden-key": "A forbidden key (__proto__, constructor, prototype).",
+      "missing": "A required field is missing.",
+      "wrong-type": "The value has the wrong type.",
+      "schema-version": "Only schemaVersion 1 is supported.",
+      "invalid-id": "The id may contain only lowercase letters, digits and hyphens.",
+      "invalid-locale": "The locale must be a language tag such as pl.",
+      "empty": "The value is empty.",
+      "too-long": "The value is longer than {{limit}} characters.",
+      "too-few": "There must be at least {{limit}}.",
+      "too-many": "There may be at most {{limit}}.",
+      "row-length": "The row must have one cell per column.",
+      "unknown-cell-type": "The cell type must be char, word or action.",
+      "unknown-action": "Unknown action; use space, delete, speak, clear or undo.",
+      "reserved-id": "This id belongs to his built-in board; give the board another id."
+    }
   },
   "settings": {
     "appearance": "Appearance",

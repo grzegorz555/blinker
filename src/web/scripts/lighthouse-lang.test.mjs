@@ -51,6 +51,18 @@ describe('findLanguageProblems', () => {
     );
   });
 
+  it('matches a text with parameters by its fixed start', () => {
+    const t = languageTexts(
+      { help: 'A JSON file, at most {{size}} columns' },
+      { help: 'Plik JSON, najwyżej {{size}} kolumn' },
+    );
+    assert.deepEqual(t, { en: ['A JSON file, at most'], pl: ['Plik JSON, najwyżej'] });
+    assert.deepEqual(
+      findLanguageProblems([{ name: 'p', lhr: lhr('Plik JSON, najwyżej 10 ko…') }], 'pl', t),
+      [],
+    );
+  });
+
   it('recognizes a truncated label', () => {
     const long = { en: ['Blinker is not a medical device. Keep the paper board.'], pl: [] };
     assert.deepEqual(

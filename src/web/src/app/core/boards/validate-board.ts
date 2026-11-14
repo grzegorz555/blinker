@@ -24,7 +24,9 @@ export type BoardErrorCode =
   | 'too-many'
   | 'row-length'
   | 'unknown-cell-type'
-  | 'unknown-action';
+  | 'unknown-action'
+  /** An import with the id of his built-in board (spec 007, R10). */
+  | 'reserved-id';
 
 export interface BoardError {
   /** Where the problem is, as a JSON path: "cells[3][0].value". */
