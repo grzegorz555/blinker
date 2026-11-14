@@ -1,5 +1,6 @@
 // Spec 007, T7: Tablice (Boards) (R10, R12): the active board, the preview, an import with every error in text,
 // and deleting an imported board after a confirmation.
+import fs from 'node:fs';
 import { expect, test, type Page } from './support/test';
 import { expectNoA11yViolations } from './support/a11y';
 
@@ -20,12 +21,14 @@ const yesNo = {
   ],
 };
 
-const choose = (page: Page, name: string, content: string) =>
-  page.getByLabel('Plik tablicy (.json)').setInputFiles({
-    name,
-    mimeType: 'application/json',
-    buffer: Buffer.from(content),
-  });
+// Through the button, as a helper would: it opens the system file picker (the native input stays hidden).
+const choose = async (page: Page, name: string, content: string) => {
+  const picker = page.waitForEvent('filechooser');
+  await page.getByRole('button', { name: 'Wybierz plik tablicy (.json)' }).click();
+  await (
+    await picker
+  ).setFiles({ name, mimeType: 'application/json', buffer: Buffer.from(content) });
+};
 
 test.describe('Tablice (Boards)', () => {
   test.beforeEach(async ({ page }) => {
@@ -39,6 +42,20 @@ test.describe('Tablice (Boards)', () => {
     await expect(page.getByTestId('preview').getByRole('columnheader')).toHaveCount(7);
     await expect(page.getByRole('button', { name: /Usuń tablicę/ })).toHaveCount(0);
     await expectNoA11yViolations(page);
+  });
+
+  test('shows an example file that downloads and imports as is', async ({ page }) => {
+    const example = page.getByTestId('board-example');
+    await example.getByText('Przykładowy plik').click();
+    await expect(example.locator('pre')).toContainText('"schemaVersion": 1');
+    await expectNoA11yViolations(page);
+    const download = page.waitForEvent('download');
+    await example.getByRole('button', { name: 'Pobierz przykład' }).click();
+    const file = await download;
+    expect(file.suggestedFilename()).toBe('przyklad-tablicy.json');
+    const text = fs.readFileSync((await file.path())!, 'utf8');
+    await choose(page, 'przyklad-tablicy.json', text);
+    await expect(page.getByTestId('import-ok')).toContainText('„Przykład”');
   });
 
   test('imports a valid board, which survives a reload and becomes the board on Liczenie (Counting)', async ({

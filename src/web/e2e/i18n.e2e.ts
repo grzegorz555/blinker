@@ -67,6 +67,23 @@ test.describe('i18n: language switch (R3, R4)', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Ustawienia' })).toBeVisible();
   });
 
+  test('a language button shows a pointer and changes on hover; the current one does not invite a click', async ({
+    page,
+  }) => {
+    await page.goto('/settings');
+    const polski = page.getByRole('button', { name: 'Polski' });
+    await expect(polski).toHaveCSS('cursor', 'pointer');
+    await expect(page.getByRole('button', { name: 'English' })).toHaveCSS('cursor', 'default');
+    // Hover styles apply only where a pointer can hover (Tailwind wraps hover: in @media (hover: hover)).
+    const canHover = await page.evaluate(() => matchMedia('(hover: hover)').matches);
+    test.skip(!canHover, 'a touch screen has no hover');
+    const before = await polski.evaluate((el) => getComputedStyle(el).backgroundColor);
+    await polski.hover();
+    await expect
+      .poll(() => polski.evaluate((el) => getComputedStyle(el).backgroundColor))
+      .not.toBe(before);
+  });
+
   test('the switch works with the keyboard', async ({ page }) => {
     await page.goto('/settings');
     await page.getByRole('button', { name: 'Polski' }).focus();

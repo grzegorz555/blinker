@@ -130,7 +130,7 @@
     "previewCaption": "Board preview: columns 1 to {{columns}}, rows 1 to {{rows}}.",
     "import": "Import a board from a file",
     "importHelp": "A JSON file in the board format v1 (docs/board-format.md): at most {{size}} columns and {{size}} rows, up to {{kb}} KB. The file is checked on this device and never sent anywhere.",
-    "file": "Board file (.json)",
+    "file": "Choose a board file (.json)",
     "imported": "Imported the board \"{{name}}\". Choose it above to use it.",
     "replaced": "Replaced the board \"{{name}}\" with the new file.",
     "errorsTitle": "Error: the file was not imported ({{count}} problem(s)).",
@@ -161,6 +161,11 @@
       "unknown-cell-type": "The cell type must be char, word or action.",
       "unknown-action": "Unknown action; use space, delete, speak, clear or undo.",
       "reserved-id": "This id belongs to his built-in board; give the board another id."
+    },
+    "example": {
+      "title": "Example file",
+      "help": "Columns and rows are the labels he counts; cells[row][column] holds a letter (char), a word or an action (space, delete, speak, clear, undo); null is an empty cell. Download it, edit it and import it.",
+      "download": "Download the example"
     }
   },
   "settings": {

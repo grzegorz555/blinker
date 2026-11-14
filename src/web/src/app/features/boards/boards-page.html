@@ -108,15 +108,39 @@
 <section class="group" aria-labelledby="boards-import">
   <h2 id="boards-import" class="group-title">{{ 'boards.import' | transloco }}</h2>
   <p class="muted">{{ 'boards.importHelp' | transloco: limits }}</p>
-  <label class="field-label" for="board-file">{{ 'boards.file' | transloco }}</label>
+  <details class="example" data-testid="board-example">
+    <summary>{{ 'boards.example.title' | transloco }}</summary>
+    <p class="muted">{{ 'boards.example.help' | transloco }}</p>
+    <!-- Code, not prose: no translation and no language of its own beyond the board's locale inside. -->
+    <pre
+      class="example-code"
+      translate="no"
+      tabindex="0"
+      [attr.aria-label]="'boards.example.title' | transloco"
+    ><code>{{ example() }}</code></pre>
+    <button matButton="outlined" type="button" (click)="downloadExample()">
+      {{ 'boards.example.download' | transloco }}
+    </button>
+  </details>
+  <!-- A Material button opens the system file picker; the native input stays hidden (its "no file chosen" text
+       looked foreign). The result below names the imported board. -->
   <input
-    id="board-file"
-    class="file"
+    #fileInput
+    hidden
     type="file"
     accept=".json,application/json"
-    aria-describedby="board-file-result"
+    data-testid="board-file"
     (change)="onFile($event)"
   />
+  <button
+    matButton="tonal"
+    type="button"
+    class="file-button"
+    aria-describedby="board-file-result"
+    (click)="fileInput.click()"
+  >
+    {{ 'boards.file' | transloco }}
+  </button>
   <div id="board-file-result">
     @if (imported(); as done) {
       <p class="success" role="status" data-testid="import-ok">
