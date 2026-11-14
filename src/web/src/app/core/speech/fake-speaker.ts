@@ -19,6 +19,10 @@ export class FakeSpeaker implements Speaker {
     return 'started';
   }
 
+  hasVoice(): boolean {
+    return this.result === 'started';
+  }
+
   cancel(): void {
     this.cancels++;
     this.set(false);

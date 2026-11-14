@@ -36,6 +36,8 @@ test.describe('Liczenie (Counting) with the signal buttons', () => {
   test('the full path: hand + 2 blinks, "Kolumna 7?" (Column 7?), yes, 3 blinks, "Wiersz 3?" (Row 3?), yes: W; finish, yes: read aloud', async ({
     page,
   }) => {
+    // Two pauses before a question and two axe scans: slow on WebKit when the whole suite runs in parallel.
+    test.slow();
     await signal(page, 'Ręka +5').click();
     await signal(page, 'Mrugnięcie +1').click();
     await signal(page, 'Mrugnięcie +1').click();

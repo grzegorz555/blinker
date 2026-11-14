@@ -1,14 +1,15 @@
-<a
-  href="#main"
-  class="sr-only rounded-md bg-primary px-4 py-3 text-on-primary focus:not-sr-only focus:m-2 focus:inline-block focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus-visible:outline-none"
-  (click)="skipToMain($event)"
->
-  {{ 'app.skipToMain' | transloco }}
-</a>
-
 <div class="shell" [class.shell-fit]="fit()">
   <!-- Small top app bar: the page heading and the page's own actions (spec 007 R2). -->
   <header class="shell-top">
+    <!-- The skip link, first in tab order. When focused it covers only the page title (not a target), so it never
+         overlaps a control (SC 2.5.8) and never pushes a full-height page down (docs/knowledge/skip-link-must-not-overlap.md). -->
+    <a
+      href="#main"
+      class="sr-only rounded-md bg-primary px-4 py-3 text-on-primary focus:not-sr-only focus:absolute focus:top-1/2 focus:left-4 focus:z-20 focus:-translate-y-1/2 focus:whitespace-nowrap focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus-visible:outline-none"
+      (click)="skipToMain($event)"
+    >
+      {{ 'app.skipToMain' | transloco }}
+    </a>
     <h1 #heading tabindex="-1" class="shell-title">{{ headingKey() | transloco }}</h1>
     <div class="flex items-center gap-2">
       <ng-template [cdkPortalOutlet]="actions()" />

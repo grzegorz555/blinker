@@ -1,0 +1,115 @@
+@if (problem(); as p) {
+  <p class="store-problem" role="status" data-testid="store-problem">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v6M12 16.5v.5" />
+    </svg>
+    <span>{{ 'settings.problem.' + p | transloco }}</span>
+  </p>
+}
+
+<!-- Liczenie (Counting) -->
+<section class="group" aria-labelledby="settings-counting">
+  <h2 id="settings-counting" class="group-title">{{ 'settings.counting.title' | transloco }}</h2>
+  <mat-form-field class="field">
+    <mat-label>{{ 'settings.counting.askAfter' | transloco }}</mat-label>
+    <input
+      matInput
+      type="number"
+      inputmode="numeric"
+      [min]="limits.min"
+      [max]="limits.max"
+      step="100"
+      [formControl]="askAfter"
+    />
+    <span matTextSuffix>ms</span>
+    <mat-hint>{{ 'settings.counting.askAfterHint' | transloco: limits }}</mat-hint>
+    @if (askAfter.invalid) {
+      <mat-error>{{ 'settings.counting.askAfterError' | transloco: limits }}</mat-error>
+    }
+  </mat-form-field>
+
+  <ul class="toggles">
+    @for (key of toggles; track key) {
+      <li>
+        <mat-slide-toggle
+          [checked]="settings()[key]"
+          (change)="set(key, $event.checked)"
+          [attr.data-testid]="'toggle-' + key"
+        >
+          <span class="toggle-label">{{ 'settings.counting.' + key | transloco }}</span>
+          <span class="toggle-hint">{{ 'settings.counting.' + key + 'Hint' | transloco }}</span>
+        </mat-slide-toggle>
+      </li>
+    }
+  </ul>
+</section>
+
+<!-- Głos (Voice) -->
+<section class="group" aria-labelledby="settings-voice">
+  <h2 id="settings-voice" class="group-title">{{ 'settings.voice.title' | transloco }}</h2>
+  <mat-form-field class="field">
+    <mat-label>{{ 'settings.voice.rate' | transloco }}</mat-label>
+    <mat-select [value]="settings().rate" (valueChange)="set('rate', $event)">
+      @for (rate of rates; track rate) {
+        <mat-option [value]="rate">{{ 'settings.voice.rate' + rate * 100 | transloco }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  @if (noVoice()) {
+    <p class="voice-error" data-testid="voice-help">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v6M12 16.5v.5" />
+      </svg>
+      <span>{{ 'counting.voice.noLocalVoiceHelp' | transloco }}</span>
+    </p>
+  } @else {
+    <p class="muted" data-testid="voice-ok">{{ 'settings.voice.ok' | transloco }}</p>
+  }
+  <button matButton="tonal" type="button" (click)="listen()">
+    {{ 'settings.voice.listen' | transloco }}
+  </button>
+</section>
+
+<!-- Wygląd (Appearance) -->
+<section class="group" aria-labelledby="settings-appearance">
+  <h2 id="settings-appearance" class="group-title">{{ 'settings.appearance' | transloco }}</h2>
+  <app-language-switch />
+  <p id="theme-label" class="field-label">{{ 'settings.theme.label' | transloco }}</p>
+  <mat-radio-group
+    class="radios"
+    aria-labelledby="theme-label"
+    [value]="settings().theme"
+    (change)="set('theme', $event.value)"
+  >
+    @for (theme of themes; track theme) {
+      <mat-radio-button [value]="theme">{{
+        'settings.theme.' + theme | transloco
+      }}</mat-radio-button>
+    }
+  </mat-radio-group>
+</section>
+
+<!-- O aplikacji (About) -->
+<section class="group" aria-labelledby="settings-about">
+  <h2 id="settings-about" class="group-title">{{ 'settings.about' | transloco }}</h2>
+  <p class="muted" data-testid="disclaimer">{{ 'app.disclaimer' | transloco }}</p>
+  <p class="muted">{{ 'settings.privacy' | transloco }}</p>
+</section>

@@ -30,13 +30,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/settings/settings-page').then((m) => m.SettingsPage),
   },
   {
-    // The Angular Material spike (spec 007, T1); removed in T6.
-    path: 'spike',
-    title: 'titles.spike',
-    data: { heading: 'spike.title' } satisfies ShellData,
-    loadComponent: () => import('./features/spike/spike').then((m) => m.Spike),
-  },
-  {
     path: '**',
     title: 'titles.notFound',
     data: { heading: 'notFound.heading' } satisfies ShellData,
