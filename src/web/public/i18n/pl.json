@@ -101,7 +101,46 @@
     "empty": "Nie ma jeszcze zdań."
   },
   "boards": {
-    "intro": "Aktywna jest jego tablica."
+    "intro": "Aktywna jest jego tablica.",
+    "active": "Aktywna tablica",
+    "size": "{{columns}} kolumn × {{rows}} wierszy",
+    "builtInSize": "Wbudowana · {{columns}} kolumn × {{rows}} wierszy",
+    "preview": "Podgląd: {{name}}",
+    "previewCaption": "Podgląd tablicy: kolumny od 1 do {{columns}}, wiersze od 1 do {{rows}}.",
+    "import": "Import tablicy z pliku",
+    "importHelp": "Plik JSON w formacie tablicy v1 (docs/board-format.md): najwyżej {{size}} kolumn i {{size}} wierszy, do {{kb}} KB. Plik jest sprawdzany na tym urządzeniu i nigdzie nie jest wysyłany.",
+    "file": "Plik tablicy (.json)",
+    "imported": "Zaimportowano tablicę „{{name}}”. Wybierz ją powyżej, żeby jej używać.",
+    "replaced": "Tablica „{{name}}” została zastąpiona nowym plikiem.",
+    "errorsTitle": "Błąd: plik nie został zaimportowany (problemów: {{count}}).",
+    "delete": "Usuń",
+    "deleteNamed": "Usuń tablicę {{name}}",
+    "deleteTitle": "Usunąć tablicę „{{name}}”?",
+    "deleteMessage": "Tablica zostanie usunięta z tego urządzenia. Jego tablica zostaje.",
+    "problem": {
+      "corrupted": "Nie udało się odczytać zapisanych tablic; dostępna jest tylko jego tablica. Zaimportuj pliki ponownie.",
+      "unavailable": "Ta przeglądarka nie pozwala Blinkerowi zapisywać na urządzeniu, więc zaimportowane tablice działają tylko do zamknięcia strony."
+    },
+    "errors": {
+      "too-large": "Plik jest większy niż {{limit}} bajtów.",
+      "not-json": "Plik nie jest poprawnym JSON-em.",
+      "not-object": "Plik musi zawierać jeden obiekt tablicy.",
+      "unknown-field": "Nieznane pole.",
+      "forbidden-key": "Zabroniony klucz (__proto__, constructor, prototype).",
+      "missing": "Brakuje wymaganego pola.",
+      "wrong-type": "Wartość ma zły typ.",
+      "schema-version": "Obsługiwana jest tylko schemaVersion 1.",
+      "invalid-id": "Identyfikator może zawierać tylko małe litery, cyfry i myślniki.",
+      "invalid-locale": "Język musi być znacznikiem, np. pl.",
+      "empty": "Wartość jest pusta.",
+      "too-long": "Wartość jest dłuższa niż {{limit}} znaków.",
+      "too-few": "Musi być co najmniej {{limit}}.",
+      "too-many": "Może być najwyżej {{limit}}.",
+      "row-length": "Wiersz musi mieć po jednym polu na każdą kolumnę.",
+      "unknown-cell-type": "Typ pola musi być char, word albo action.",
+      "unknown-action": "Nieznana akcja; użyj space, delete, speak, clear albo undo.",
+      "reserved-id": "Ten identyfikator należy do jego wbudowanej tablicy; nadaj tablicy inny."
+    }
   },
   "settings": {
     "appearance": "Wygląd",

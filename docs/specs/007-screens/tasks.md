@@ -41,7 +41,7 @@ Branch: `feat/007-screens` (from `main`, worktree `C:/Repozytorium/Blinker/wt/00
       applied at once; the disclaimer in "O aplikacji" (About). Tests: the store cases; e2e for a change that
       survives a reload and a range error, axe.
       _To understand:_ validating what you stored yourself, `color-scheme`, form errors in text (SC 3.3.1).
-- [ ] **T7 [sonnet]: Tablice (Boards).** The board list as a radio group, the preview, import with the size check and
+- [x] **T7 [sonnet]: Tablice (Boards).** The board list as a radio group, the preview, import with the size check and
       the validator errors in text, delete with a confirmation, the active board used by Liczenie (Counting) (R10).
       Tests: unit for the board store and import; e2e with a valid, an invalid and a too-big file, axe on the errors.
       _To understand:_ reading a file safely, an error summary pattern, focus management after an error.

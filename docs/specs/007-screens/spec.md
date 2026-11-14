@@ -40,7 +40,9 @@ signal source.
   (Settings). Below 600 px a bottom **navigation bar** (icons with labels, targets at least 44 px, safe-area
   padding); from 600 px a **navigation rail** on the left. Both are our components (`<nav>` with links), in portrait
   and landscape. **Kalibracja** (Calibration) joins the navigation in stage 4, when there is a camera to calibrate.
-  The skip link stays; the footer disclaimer moves to Ustawienia (Settings), section "O aplikacji" (About).
+  The shell is exactly the viewport high and only the main area scrolls, so nothing slides under the navigation bar.
+  The skip link stays, in the top app bar over the page title; the footer disclaimer moves to Ustawienia (Settings),
+  section "O aplikacji" (About).
 - **R3. Touch through the machine.** A new signal `TOUCH` with a target: a cell (`row`, `column`) or an action
   (`undo`, `clear`, `speak`). It is a deliberate choice by the person who taps, so it needs no nod:
   - a cell appends its value (R1 of spec 006) and says it, from any writing state; the number being given is dropped

@@ -1,0 +1,166 @@
+@if (problem(); as p) {
+  <p class="problem" role="status" data-testid="store-problem">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v6M12 16.5v.5" />
+    </svg>
+    <span>{{ 'boards.problem.' + p | transloco }}</span>
+  </p>
+}
+
+<!-- Aktywna tablica (Active board) -->
+<section class="group" aria-labelledby="boards-active">
+  <h2 id="boards-active" class="group-title">{{ 'boards.active' | transloco }}</h2>
+  <mat-radio-group
+    class="board-list"
+    aria-labelledby="boards-active"
+    [value]="active().id"
+    (change)="select($event.value)"
+  >
+    @for (board of boards(); track board.id) {
+      <div class="board-row">
+        <mat-radio-button [value]="board.id">
+          <span class="board-name">{{ board.name }}</span>
+          <span class="board-size">
+            {{
+              (isBuiltIn(board) ? 'boards.builtInSize' : 'boards.size')
+                | transloco: { columns: board.columns.length, rows: board.rows.length }
+            }}
+          </span>
+        </mat-radio-button>
+        @if (!isBuiltIn(board)) {
+          <button
+            matIconButton
+            type="button"
+            [attr.aria-label]="'boards.deleteNamed' | transloco: { name: board.name }"
+            (click)="remove(board)"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+            </svg>
+          </button>
+        }
+      </div>
+    }
+  </mat-radio-group>
+</section>
+
+<!-- Podgląd (Preview) -->
+<section class="group" aria-labelledby="boards-preview">
+  <h2 id="boards-preview" class="group-title">
+    {{ 'boards.preview' | transloco: { name: active().name } }}
+  </h2>
+  <div class="preview-scroll" tabindex="0" role="region" aria-labelledby="boards-preview">
+    <table class="preview" [attr.lang]="active().locale" data-testid="preview">
+      <caption class="sr-only">
+        {{
+          'boards.previewCaption'
+            | transloco: { columns: active().columns.length, rows: active().rows.length }
+        }}
+      </caption>
+      <thead>
+        <tr>
+          <td></td>
+          @for (label of active().columns; track $index) {
+            <th scope="col">{{ label }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of previewRows(); track $index; let r = $index) {
+          <tr>
+            <th scope="row">{{ active().rows[r] }}</th>
+            @for (cell of row; track $index) {
+              <td [class.empty]="!cell" [class.action]="cell?.action">
+                @if (cell) {
+                  @if (cell.action) {
+                    <span [attr.lang]="null">{{ cell.text | transloco }}</span>
+                  } @else {
+                    {{ cell.text }}
+                  }
+                }
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Import -->
+<section class="group" aria-labelledby="boards-import">
+  <h2 id="boards-import" class="group-title">{{ 'boards.import' | transloco }}</h2>
+  <p class="muted">{{ 'boards.importHelp' | transloco: limits }}</p>
+  <label class="field-label" for="board-file">{{ 'boards.file' | transloco }}</label>
+  <input
+    id="board-file"
+    class="file"
+    type="file"
+    accept=".json,application/json"
+    aria-describedby="board-file-result"
+    (change)="onFile($event)"
+  />
+  <div id="board-file-result">
+    @if (imported(); as done) {
+      <p class="success" role="status" data-testid="import-ok">
+        {{
+          (done.replaced ? 'boards.replaced' : 'boards.imported') | transloco: { name: done.name }
+        }}
+      </p>
+    }
+    @if (errors().length) {
+      <div
+        #errorSummary
+        class="errors"
+        tabindex="-1"
+        role="group"
+        aria-labelledby="board-errors-title"
+        data-testid="import-errors"
+      >
+        <p id="board-errors-title" class="errors-title">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v6M12 16.5v.5" />
+          </svg>
+          {{ 'boards.errorsTitle' | transloco: { count: errors().length } }}
+        </p>
+        <ul>
+          @for (error of errors(); track $index) {
+            <li>
+              @if (error.path) {
+                <code>{{ error.path }}</code
+                >:
+              }
+              {{ 'boards.errors.' + error.code | transloco: { limit: error.limit ?? '' } }}
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</section>

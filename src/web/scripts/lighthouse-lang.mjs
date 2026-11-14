@@ -34,15 +34,23 @@ function leaves(tree, found = []) {
 }
 
 /**
- * Texts that identify a language: translations that differ between en and pl, without parameters, at least 8
- * characters long (short words like "Blinker" or a letter could be on either page).
+ * Texts that identify a language: translations that differ between en and pl, at least 8 characters long (short
+ * words like "Blinker" or a letter could be on either page); a text with parameters counts by its fixed start.
  * @param {Record<string, unknown>} en
  * @param {Record<string, unknown>} pl
  */
 export function languageTexts(en, pl) {
+  // A text with parameters is matched by its fixed start, before the first {{ (if that start is long enough).
+  const fixed = (t) => (t.includes('{{') ? t.slice(0, t.indexOf('{{')).trim() : t);
   const pick = (own, other) => {
-    const others = new Set(leaves(other));
-    return leaves(own).filter((t) => t.length >= 8 && !t.includes('{{') && !others.has(t));
+    const others = new Set(leaves(other).map(fixed));
+    return [
+      ...new Set(
+        leaves(own)
+          .map(fixed)
+          .filter((t) => t.length >= 8 && !others.has(t)),
+      ),
+    ];
   };
   return { en: pick(en, pl), pl: pick(pl, en) };
 }

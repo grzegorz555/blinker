@@ -54,6 +54,9 @@ function layoutProblems(page: Page) {
       }
     }
     result['vertical scroll'] = Math.max(0, document.documentElement.scrollHeight - vh);
+    // Only <main> scrolls (the shell is the viewport high): on Liczenie (Counting) it must not need to.
+    const main = document.querySelector('main')!;
+    result['main scroll'] = Math.max(0, main.scrollHeight - main.clientHeight);
     result['horizontal scroll'] = Math.max(0, document.documentElement.scrollWidth - vw);
     const letter = document.querySelector('.cell-btn')!;
     result['letter below 32 px'] = Math.max(0, 32 - parseFloat(getComputedStyle(letter).fontSize));

@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { filter, map } from 'rxjs';
+import { BoardsService } from './core/boards/boards.service';
 import { SettingsService } from './core/settings/settings.service';
 import { AppNav } from './shell/nav';
 import { TopBar } from './shell/top-bar';
@@ -54,6 +55,8 @@ export class App {
   protected readonly actions = inject(TopBar).actions;
   /** Reads the stored settings at start, so the theme applies on every page (spec 007, R9). */
   private readonly settings = inject(SettingsService);
+  /** Reads the stored boards at start, so Liczenie (Counting) uses the active one (spec 007, R10). */
+  private readonly boardsService = inject(BoardsService);
 
   /** Moves focus to <main>, so the next Tab continues inside the page content. */
   protected skipToMain(event: Event): void {
