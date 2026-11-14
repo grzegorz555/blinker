@@ -27,3 +27,6 @@ by falling through. A repeated "no" must not escalate from "reject" to "delete".
   and its result; no default branch for signals that change the text.
 - Add a test for "the same signal twice in a row" for every signal that can delete or speak.
 - Undo removes only what this session added, never text it did not write.
+- Let the compiler hold the table (spec 006): `TRANSITIONS: Record<StateName, Record<SignalType, Handler>>` makes a
+  missing pair a type error, and the table test iterates `STATE_NAMES × SIGNAL_TYPES`, so a new state or signal
+  cannot be added without deciding every pair.
