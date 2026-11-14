@@ -65,7 +65,9 @@
         "speak": "Read aloud",
         "clear": "Clear",
         "undo": "Undo"
-      }
+      },
+      "space": "Space",
+      "hintColumn": "Nod without a number = space (end of a word) · Shake your head = undo the last letter"
     },
     "signals": {
       "title": "His signals",

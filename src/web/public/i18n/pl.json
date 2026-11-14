@@ -65,7 +65,9 @@
         "speak": "Przeczytaj",
         "clear": "Wyczyść",
         "undo": "Cofnij"
-      }
+      },
+      "space": "Spacja",
+      "hintColumn": "Kiwnij bez liczby = spacja (koniec słowa) · Pokręć głową = cofnij literę"
     },
     "signals": {
       "title": "Jego sygnały",

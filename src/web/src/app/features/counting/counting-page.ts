@@ -57,6 +57,16 @@ export class CountingPage implements AfterViewInit, OnDestroy {
   protected readonly speaking = this.counting.speaking;
   protected readonly noVoice = computed(() => this.counting.speakResult() === 'no-local-voice');
 
+  /**
+   * The hint for the moment: while Blinker waits for a column, a nod without a number is a space (the end of a word)
+   * and a shake undoes the last letter; on a question, a nod is yes and a shake is no.
+   */
+  protected readonly hintKey = computed(() =>
+    ['column.waiting', 'column.rejected'].includes(this.state().name)
+      ? 'counting.page.hintColumn'
+      : 'counting.page.hint',
+  );
+
   /** "Krok 1 z 2 · kolumna" (Step 1 of 2 · column) while giving a number. */
   protected readonly stepKey = computed(() =>
     this.state().name.startsWith('row.') ? 'counting.page.stepRow' : 'counting.page.stepColumn',

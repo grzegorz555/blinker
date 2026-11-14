@@ -395,6 +395,14 @@ describe('touch: a tap on the screen (spec 007, R3)', () => {
     ]);
   });
 
+  it('space (the button) follows the nod rule: after a word only, never twice', () => {
+    expect(run([tap({ kind: 'space' })], fixture('row.counting')).state.sentence.text).toBe('AB ');
+    const twice = run([tap({ kind: 'space' }), tap({ kind: 'space' })], fixture('column.waiting'));
+    expect(twice.state.sentence.text).toBe('AB ');
+    expect(texts(twice.effects, 'announce').at(-1)).toEqual({ key: 'counting.spaceNotAdded' });
+    expect(run([tap({ kind: 'space' })]).state.sentence.text).toBe('');
+  });
+
   it('a pause ignores every tap', () => {
     const before = fixture('paused');
     for (const target of [
@@ -402,6 +410,7 @@ describe('touch: a tap on the screen (spec 007, R3)', () => {
       { kind: 'undo' },
       { kind: 'clear' },
       { kind: 'speak' },
+      { kind: 'space' },
     ] as const) {
       const { state, effects } = run([tap(target)], before);
       expect(state).toEqual(before);
