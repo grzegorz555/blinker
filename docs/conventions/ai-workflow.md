@@ -61,7 +61,7 @@ Every step ends with `.local/summaries/YYYY-MM-DD-NN-topic.md` (template: `.loca
 # Repo tooling
 - Skills (`.claude/skills/`): `/plan`, `/work`, `/review`, `/compound`, `/new-adr`.
 - Agents (`.claude/agents/`): `code-reviewer`, `implementer-haiku`, `implementer-opus`.
-- MCP (`.mcp.json`, pinned versions): `angular-cli` (Angular docs and best practices) and `spartan-ui`.
+- MCP (`.mcp.json`, pinned versions): `angular-cli` (Angular docs and best practices; Angular Material docs are at https://material.angular.dev).
 
 # Rules of thumb
 - One task per session. Keep the context small: `CLAUDE.md` is short, and the details stay in `docs/`, loaded through the indexes.

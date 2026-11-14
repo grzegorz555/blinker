@@ -71,6 +71,10 @@ built on Angular Material, so the screens are written as Angular components eith
 - Must be checked in stage 2 before relying on it, with a spike and the existing e2e CSP guard: zoneless change
   detection, Trusted Types under our CSP, overlays (menus, dialogs) without inline styles that the CSP blocks.
 - Tailwind stays for layout utilities; component styles come from Angular Material.
+- **Spike done (spec 007, T1, 2026-11-14):** Angular Material 22.2 with a dialog, a slide toggle and a select runs
+  zoneless under the production CSP and Trusted Types with no violation, no axe finding and no third-party request,
+  in all three e2e device projects (desktop Chromium, Pixel Chromium, iPhone WebKit). The theme maps the M3 system
+  tokens to `tokens.css` (`src/web/src/material.scss`).
 
 ## Revisit when
 

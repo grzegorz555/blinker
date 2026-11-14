@@ -18,7 +18,7 @@ Source: the Angular Style Guide (https://angular.dev/style-guide) and the best p
 - Folders:
   - `core/`: singletons (vision, signals, input, scanning, boards, speech, i18n);
   - `features/<feature>/`: pages;
-  - `shared/`: presentational components, including spartan helm components in `shared/ui/`.
+  - `shared/`: presentational components (for example the confirmation dialog).
 - **Domain logic is plain TypeScript** (state machines, the signal detector, the board validator) with no Angular imports. A thin Angular service wraps it. This keeps the logic fast to unit-test and reusable in a Web Worker.
 - Heavy work (MediaPipe inference) runs in a **Web Worker** so the UI thread stays responsive (https://angular.dev/ecosystem/web-workers).
 

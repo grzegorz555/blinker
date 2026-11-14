@@ -14,7 +14,7 @@ them into sentences that are shown on screen and read aloud.
 
 **Stage 1: deploy** (spec [003](docs/specs/003-deploy/spec.md), in progress: security headers and a CSP-clean build are done, the Azure deploy follows; specs [001](docs/specs/001-app-skeleton/spec.md) and [002](docs/specs/002-ci-verify/spec.md) are done).
 **Stage 1.5: mock-ups** (spec [004](docs/specs/004-mockups/spec.md), done; outcome in [docs/design](docs/design/index.md): Material 3 style, Liczenie (Counting: the board) as the main screen with tappable letters, a navigation bar on phones and a rail from 600 px, Zdania (Sentences) and Kalibracja (Calibration); ADR-0005 (Angular Material where it has a component) is accepted. Every Liczenie (Counting) state can be opened from the catalog, and a signal simulator plays his signals by keys or by buttons. Kalibracja (Calibration) has a step-by-step wizard, Tablice (Boards) a JSON import with errors in text, Ustawienia (Settings) the timings, signals, voice, hints, language and theme. The final M3 tokens are in the app, with theme-color and separate any/maskable icons).
-**Stage 2: board and input without a camera** (spec [006](docs/specs/006-counting-core/spec.md) done: the board format v1 with a validator for imported files and his board as the default, the sentence with undo, the counting state machine (a nod without a number is a space), one input type with a keyboard mapping that is off by default, on-device speech, and CountingService; next: the screens in spec 007).
+**Stage 2: board and input without a camera** (spec [006](docs/specs/006-counting-core/spec.md) done: the board format v1 with a validator for imported files and his board as the default, the sentence with undo, the counting state machine (a nod without a number is a space), one input type with a keyboard mapping that is off by default, on-device speech, and CountingService; spec [007](docs/specs/007-screens/spec.md) in progress: the screens on Angular Material; T1 checked that its dialog, switch and select work under our CSP and Trusted Types).
 The app shell works in English and Polish (language switch, translated titles); there are no communication features yet. The stage plan is in [docs/backlog.md](docs/backlog.md).
 
 ## Tech stack
@@ -23,6 +23,7 @@ The app shell works in English and Polish (language switch, translated titles); 
 - Vitest for unit tests; Playwright + axe-core for e2e and accessibility tests
 - Installable PWA (web manifest, Angular service worker): the app shell works offline after the first visit
 - Transloco for UI translations (en, pl) in `src/web/public/i18n/`; the language comes from the saved choice, then the browser, then Polish
+- Angular Material (Material 3) and the CDK for standard components, themed from our tokens (`src/web/src/material.scss`, ADR-0005); no web fonts or icon fonts
 - Tailwind CSS v4 with design tokens in `src/web/src/styles/tokens.css` (light and dark, WCAG contrast checked)
 - Planned:
   - MediaPipe Face Landmarker, Web Speech API;

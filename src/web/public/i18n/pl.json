@@ -7,7 +7,8 @@
   },
   "titles": {
     "home": "Blinker",
-    "notFound": "Nie znaleziono strony · Blinker"
+    "notFound": "Nie znaleziono strony · Blinker",
+    "spike": "Sprawdzenie komponentów · Blinker"
   },
   "home": {
     "description": "Komunikuj się mrugnięciami: kamera śledzi twarz, aplikacja przechodzi po tablicy liter i zamienia Twoje sygnały na zdania, które czyta na głos.",
@@ -44,5 +45,21 @@
     "backToWriting": "Piszemy dalej",
     "paused": "Pauza",
     "resumed": "Wracamy"
+  },
+  "common": {
+    "cancel": "Anuluj"
+  },
+  "spike": {
+    "title": "Sprawdzenie komponentów",
+    "toggle": "Przełącznik",
+    "select": "Wybór",
+    "option": "Opcja {{n}}",
+    "open": "Otwórz okno",
+    "none": "Jeszcze nic nie wybrano.",
+    "yes": "Potwierdzono.",
+    "no": "Anulowano.",
+    "dialogTitle": "Wyczyścić zdanie?",
+    "dialogMessage": "Zdanie zostanie usunięte.",
+    "dialogConfirm": "Wyczyść"
   }
 }

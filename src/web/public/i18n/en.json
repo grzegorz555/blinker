@@ -7,7 +7,8 @@
   },
   "titles": {
     "home": "Blinker",
-    "notFound": "Page not found · Blinker"
+    "notFound": "Page not found · Blinker",
+    "spike": "Component check · Blinker"
   },
   "home": {
     "description": "Communicate by blinking: the camera follows your face, the app goes through a letter board and turns your signals into sentences that it reads aloud.",
@@ -44,5 +45,21 @@
     "backToWriting": "Back to writing",
     "paused": "Paused",
     "resumed": "Resumed"
+  },
+  "common": {
+    "cancel": "Cancel"
+  },
+  "spike": {
+    "title": "Component check",
+    "toggle": "A switch",
+    "select": "A choice",
+    "option": "Option {{n}}",
+    "open": "Open the dialog",
+    "none": "Nothing chosen yet.",
+    "yes": "Confirmed.",
+    "no": "Cancelled.",
+    "dialogTitle": "Clear the sentence?",
+    "dialogMessage": "The sentence will be removed.",
+    "dialogConfirm": "Clear"
   }
 }

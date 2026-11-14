@@ -35,7 +35,7 @@ Accessibility is part of "done". Angular guide: https://angular.dev/best-practic
 - **Language:** `lang` on `<html>` follows the UI language (SC 3.1.1). Each route has a translated title (SC 2.4.2).
 - **Status messages:** use `aria-live="polite"` (SC 4.1.3); a new letter is announced politely.
 - **Forms:** visible labels, errors shown in text and linked with `aria-describedby` (SC 3.3.1, 3.3.2).
-- **Native elements first.** spartan brain primitives provide the ARIA patterns.
+- **Native elements first**, then Angular Material components and the CDK a11y helpers, which implement the WAI-ARIA patterns (dialog, select, switch). Our own components (navigation, board) follow the APG patterns directly.
 
 # How we check
 - Automated: ESLint template accessibility rules (`@angular-eslint/template/accessibility`) and **axe-core in every Playwright e2e test**, with zero violations allowed.
