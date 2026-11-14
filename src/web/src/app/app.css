@@ -1,0 +1,72 @@
+/*
+ * The app shell (spec 007 R2), from the spec 004 mock-ups (design/design.css). Navigation follows the M3 window size
+ * classes (https://m3.material.io/foundations/layout/applying-layout/window-size-classes): a bar at the bottom below
+ * 600 px, within thumb reach; a rail on the left from 600 px, so the board keeps the width.
+ */
+.shell {
+  display: grid;
+  min-height: 100dvh;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: 'top' 'main' 'nav';
+}
+
+/* A screen that must fit the viewport without scrolling (Liczenie (Counting), spec 007 R4). */
+.shell-fit {
+  height: 100dvh;
+  min-height: 0;
+}
+
+/* Small top app bar: the page color, no border (https://m3.material.io/components/top-app-bar/specs). */
+.shell-top {
+  grid-area: top;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  min-height: 4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background-color: var(--bg);
+  padding: max(0.5rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 0.5rem
+    max(1rem, env(safe-area-inset-left));
+}
+
+.shell-fit .shell-top {
+  min-height: 3.5rem;
+  padding-block: max(0.25rem, env(safe-area-inset-top)) 0.25rem;
+}
+
+/* M3 title large. Focused after navigation (tabindex="-1"), so no focus ring on it. */
+.shell-title {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  outline: none;
+}
+
+.shell-main {
+  grid-area: main;
+  min-height: 0;
+  padding: 0.5rem max(1rem, env(safe-area-inset-right)) 1.5rem max(1rem, env(safe-area-inset-left));
+}
+
+.shell-fit .shell-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 max(0.5rem, env(safe-area-inset-right)) 0.5rem max(0.5rem, env(safe-area-inset-left));
+}
+
+app-nav {
+  grid-area: nav;
+}
+
+@media (min-width: 600px) {
+  .shell {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'nav top' 'nav main';
+  }
+}

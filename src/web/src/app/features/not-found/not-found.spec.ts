@@ -4,7 +4,7 @@ import { translocoTesting } from '../../../testing/transloco';
 import { NotFound } from './not-found';
 
 describe('NotFound', () => {
-  it('renders a heading and a link back to the home page', async () => {
+  it('explains the page is missing and links back to Liczenie (Counting); the heading is in the shell (spec 007, R2)', async () => {
     await TestBed.configureTestingModule({
       imports: [NotFound, translocoTesting()],
       providers: [provideRouter([])],
@@ -13,7 +13,8 @@ describe('NotFound', () => {
     await fixture.whenStable();
     const root = fixture.nativeElement as HTMLElement;
 
-    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Page not found');
+    expect(root.querySelector('h1')).toBeNull();
+    expect(root.textContent).toContain("This page doesn't exist.");
     expect(root.querySelector('a')?.getAttribute('href')).toBe('/');
   });
 });

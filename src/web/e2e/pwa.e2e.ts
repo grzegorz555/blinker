@@ -50,8 +50,9 @@ test.describe('PWA', () => {
     test('serves the app shell offline after the first visit', async ({ page, context }) => {
       await context.setOffline(true);
       await page.reload();
-      await expect(page.getByRole('heading', { level: 1, name: 'Blinker' })).toBeVisible();
-      await expect(page.getByRole('contentinfo')).toContainText('not a medical device');
+      await expect(page.getByRole('heading', { level: 1, name: 'Counting' })).toBeVisible();
+      await page.getByRole('link', { name: 'Settings' }).click();
+      await expect(page.getByTestId('disclaimer')).toContainText('not a medical device');
     });
 
     test('serves the not-found page offline (SPA fallback from the service worker)', async ({
@@ -66,8 +67,9 @@ test.describe('PWA', () => {
     test('switches to Polish offline (translations are prefetched)', async ({ page, context }) => {
       await context.setOffline(true);
       await page.reload();
+      await page.getByRole('link', { name: 'Settings' }).click();
       await page.getByRole('button', { name: 'Polski' }).click();
-      await expect(page.getByText('Tryb komunikacji pojawi się wkrótce.')).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1, name: 'Ustawienia' })).toBeVisible();
     });
   });
 });

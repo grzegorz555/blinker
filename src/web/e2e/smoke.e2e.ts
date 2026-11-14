@@ -3,9 +3,9 @@ import { expectNoA11yViolations } from './support/a11y';
 import { collectThirdPartyRequests } from './support/requests';
 
 test.describe('smoke', () => {
-  test('home page loads with the app name as the main heading', async ({ page }) => {
+  test('Liczenie (Counting) loads as the start page with its heading', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'Blinker' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Counting' })).toBeVisible();
   });
 
   test('home page has no WCAG A/AA violations detectable by axe', async ({ page }) => {

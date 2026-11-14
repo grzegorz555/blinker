@@ -6,13 +6,12 @@
     "disclaimer": "Blinker nie jest wyrobem medycznym. Zachowaj papierową tablicę jako zapas."
   },
   "titles": {
-    "home": "Blinker",
     "notFound": "Nie znaleziono strony · Blinker",
-    "spike": "Sprawdzenie komponentów · Blinker"
-  },
-  "home": {
-    "description": "Komunikuj się mrugnięciami: kamera śledzi twarz, aplikacja przechodzi po tablicy liter i zamienia Twoje sygnały na zdania, które czyta na głos.",
-    "comingSoon": "Tryb komunikacji pojawi się wkrótce."
+    "spike": "Sprawdzenie komponentów · Blinker",
+    "counting": "Liczenie · Blinker",
+    "sentences": "Zdania · Blinker",
+    "boards": "Tablice · Blinker",
+    "settings": "Ustawienia · Blinker"
   },
   "notFound": {
     "heading": "Nie znaleziono strony",
@@ -44,7 +43,10 @@
     "speaking": "Czytam na głos",
     "backToWriting": "Piszemy dalej",
     "paused": "Pauza",
-    "resumed": "Wracamy"
+    "resumed": "Wracamy",
+    "page": {
+      "intro": "Podaj kolumnę, potem wiersz: Blinker pyta, a skinienie potwierdza. Tablica pojawi się w kolejnym kroku etapu 2."
+    }
   },
   "common": {
     "cancel": "Anuluj"
@@ -61,5 +63,22 @@
     "dialogTitle": "Wyczyścić zdanie?",
     "dialogMessage": "Zdanie zostanie usunięte.",
     "dialogConfirm": "Wyczyść"
+  },
+  "nav": {
+    "label": "Menu główne",
+    "counting": "Liczenie",
+    "sentences": "Zdania",
+    "boards": "Tablice",
+    "settings": "Ustawienia"
+  },
+  "sentences": {
+    "empty": "Nie ma jeszcze zdań."
+  },
+  "boards": {
+    "intro": "Aktywna jest jego tablica."
+  },
+  "settings": {
+    "appearance": "Wygląd",
+    "about": "O aplikacji"
   }
 }

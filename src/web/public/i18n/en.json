@@ -6,13 +6,12 @@
     "disclaimer": "Blinker is not a medical device. Keep the paper board as a fallback."
   },
   "titles": {
-    "home": "Blinker",
     "notFound": "Page not found · Blinker",
-    "spike": "Component check · Blinker"
-  },
-  "home": {
-    "description": "Communicate by blinking: the camera follows your face, the app goes through a letter board and turns your signals into sentences that it reads aloud.",
-    "comingSoon": "The communication mode is coming soon."
+    "spike": "Component check · Blinker",
+    "counting": "Counting · Blinker",
+    "sentences": "Sentences · Blinker",
+    "boards": "Boards · Blinker",
+    "settings": "Settings · Blinker"
   },
   "notFound": {
     "heading": "Page not found",
@@ -44,7 +43,10 @@
     "speaking": "Reading aloud",
     "backToWriting": "Back to writing",
     "paused": "Paused",
-    "resumed": "Resumed"
+    "resumed": "Resumed",
+    "page": {
+      "intro": "Give a column, then a row: Blinker asks, and a nod confirms. The board arrives in the next step of stage 2."
+    }
   },
   "common": {
     "cancel": "Cancel"
@@ -61,5 +63,22 @@
     "dialogTitle": "Clear the sentence?",
     "dialogMessage": "The sentence will be removed.",
     "dialogConfirm": "Clear"
+  },
+  "nav": {
+    "label": "Main menu",
+    "counting": "Counting",
+    "sentences": "Sentences",
+    "boards": "Boards",
+    "settings": "Settings"
+  },
+  "sentences": {
+    "empty": "No sentences yet."
+  },
+  "boards": {
+    "intro": "His board is the active board."
+  },
+  "settings": {
+    "appearance": "Appearance",
+    "about": "About"
   }
 }
