@@ -65,7 +65,8 @@
         "undo": "Cofnij"
       },
       "space": "Spacja",
-      "hintColumn": "Kiwnij bez liczby = spacja (koniec słowa) · Pokręć głową = cofnij literę"
+      "hintColumn": "Kiwnij bez liczby = spacja (koniec słowa) · Pokręć głową = cofnij literę",
+      "hintPause": "Przerwa = dalej · Pokręć głową = od nowa"
     },
     "signals": {
       "title": "Jego sygnały",
@@ -181,8 +182,10 @@
       "askAfter": "Pauza przed pytaniem",
       "askAfterHint": "Od {{min}} do {{max}} ms. Blinker pyta po takiej przerwie bez sygnału.",
       "askAfterError": "Błąd: wpisz liczbę całkowitą od {{min}} do {{max}} ms.",
-      "speakQuestions": "Mów pytania na głos",
-      "speakQuestionsHint": "„Kolumna 7?” jest też wypowiadana, nie tylko pokazana.",
+      "confirmByNod": "Potwierdzaj kolumnę i wiersz skinieniem",
+      "confirmByNodHint": "Blinker pyta „Kolumna 7?” i czeka na skinienie. Wyłączone: przerwa po mruganiu przechodzi dalej, a kręcenie głową cofa literę.",
+      "speakPrompts": "Mów pytania i komunikaty",
+      "speakPromptsHint": "Wyłączone: Blinker mówi tylko wybraną literę i całe zdanie, gdy on o to poprosi.",
       "signalButtons": "Przyciski sygnałów",
       "signalButtonsHint": "Przyciski jego sygnałów pod tablicą (kamery jeszcze nie ma).",
       "keyboard": "Skróty klawiszowe",

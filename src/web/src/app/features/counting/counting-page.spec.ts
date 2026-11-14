@@ -67,14 +67,14 @@ describe('CountingPage (spec 007, R4, R5)', () => {
     expect(topBar.actions()).toBeNull();
   });
 
-  it('the hint says what a nod and a shake do now: a space and undo at the columns, yes and no on a question', async () => {
+  it('the hint says what a nod and a shake do now: a space and undo at the columns, a pause or start over while he counts (spec 009)', async () => {
     const { fixture, button, text } = await render();
     expect(text('hint')).toBe(
       'Nod without a number = space (end of a word) · Shake your head = undo the last letter',
     );
     button('Blink +1').click();
     await fixture.whenStable();
-    expect(text('hint')).toBe('Nod = yes · Shake your head = no');
+    expect(text('hint')).toBe('A pause = go on · Shake your head = start over');
   });
 
   it('Space adds a space after a word, never at the start or twice (author, 2026-11-13)', async () => {

@@ -59,13 +59,19 @@ export class CountingPage implements AfterViewInit, OnDestroy {
 
   /**
    * The hint for the moment: while Blinker waits for a column, a nod without a number is a space (the end of a word)
-   * and a shake undoes the last letter; on a question, a nod is yes and a shake is no.
+   * and a shake undoes the last letter; while he gives a number with no nod to confirm (spec 009), a pause goes on and
+   * a shake starts over; on a question, a nod is yes and a shake is no.
    */
-  protected readonly hintKey = computed(() =>
-    ['column.waiting', 'column.rejected'].includes(this.state().name)
-      ? 'counting.page.hintColumn'
-      : 'counting.page.hint',
-  );
+  protected readonly hintKey = computed(() => {
+    const name = this.state().name;
+    if (name === 'column.waiting' || name === 'column.rejected') return 'counting.page.hintColumn';
+    const giving = ['column.counting', 'row.waiting', 'row.counting', 'row.rejected'].includes(
+      name,
+    );
+    return giving && !this.counting.config().confirmByNod
+      ? 'counting.page.hintPause'
+      : 'counting.page.hint';
+  });
 
   protected readonly tallyParams = computed(() => {
     const parts = this.state().parts;

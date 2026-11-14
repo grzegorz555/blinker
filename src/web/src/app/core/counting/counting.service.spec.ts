@@ -30,7 +30,8 @@ class FakeScheduler implements TickScheduler {
   }
 }
 
-function setup() {
+/** asBefore: both spec 009 settings on, the questions and notices of specs 006–008. */
+function setup(asBefore = false) {
   const speaker = new FakeSpeaker();
   const scheduler = new FakeScheduler();
   TestBed.configureTestingModule({
@@ -43,6 +44,7 @@ function setup() {
     ],
   });
   const service = TestBed.inject(CountingService);
+  if (asBefore) service.configure({ speakPrompts: true, confirmByNod: true });
   service.start();
   return { service, speaker, scheduler };
 }
@@ -58,7 +60,7 @@ describe('CountingService', () => {
   });
 
   it('a full path: hand + 2 blinks, "Kolumna 7?" (Column 7?), yes, 3 blinks, "Wiersz 3?" (Row 3?), yes: W is added and said', () => {
-    const { service, speaker, scheduler } = setup();
+    const { service, speaker, scheduler } = setup(true);
     scheduler.at(0);
     service.send({ type: 'HAND' });
     service.send({ type: 'BLINK' });
@@ -117,7 +119,7 @@ describe('CountingService', () => {
   });
 
   it('when a reading ends by itself it asks "Nowe zdanie?" (New sentence?); a nod clears, a shake undoes it (spec 008, R3)', () => {
-    const { service, speaker } = setup();
+    const { service, speaker } = setup(true);
     service.touch({ kind: 'cell', column: 1, row: 1 });
     speaker.finish();
     service.touch({ kind: 'speak' });
@@ -154,7 +156,7 @@ describe('CountingService', () => {
   });
 
   it('reports no-local-voice when the device has no voice for the language', () => {
-    const { service, speaker } = setup();
+    const { service, speaker } = setup(true);
     speaker.result = 'no-local-voice';
     service.send({ type: 'NOD' }); // "Bez spacji…" is said
     expect(service.speakResult()).toBe('no-local-voice');
@@ -166,13 +168,14 @@ describe('CountingService', () => {
     expect(service.config().askAfterMs).toBe(ASK_AFTER.min);
     service.configure({ askAfterMs: 99999 });
     expect(service.config().askAfterMs).toBe(ASK_AFTER.max);
-    service.configure({ speakQuestions: false });
-    expect(service.config().speakQuestions).toBe(false);
+    service.configure({ speakPrompts: true, confirmByNod: true });
+    expect(service.config().speakPrompts).toBe(true);
+    expect(service.config().confirmByNod).toBe(true);
   });
 
-  it('does not say the questions when speakQuestions is off', () => {
+  it('does not say the questions when speakPrompts is off', () => {
     const { service, speaker, scheduler } = setup();
-    service.configure({ speakQuestions: false });
+    service.configure({ speakPrompts: false, confirmByNod: true });
     scheduler.at(0);
     service.send({ type: 'BLINK' });
     scheduler.at(ASK_AFTER.default);

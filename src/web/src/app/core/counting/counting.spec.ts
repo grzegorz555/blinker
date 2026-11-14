@@ -27,7 +27,13 @@ import {
 const parsed = validateBoardData(friendBoard);
 if (!parsed.ok) throw new Error('friend board invalid');
 const board: Board = parsed.board;
-const config: CountingConfig = { board, askAfterMs: ASK_AFTER.default, speakQuestions: true };
+// Most tests run with both spec 009 settings on, the behaviour of specs 006–008; the defaults have their own tests.
+const config: CountingConfig = {
+  board,
+  askAfterMs: ASK_AFTER.default,
+  speakPrompts: true,
+  confirmByNod: true,
+};
 
 /** TOUCH in the table: a tap on the first cell of his board, "A" (spec 007, R3). */
 const signal = (type: SignalType, now = 0): Signal =>
@@ -121,6 +127,30 @@ describe('the transition table (R4)', () => {
       }
     }
   });
+});
+
+/** The defaults of spec 009: no questions or notices said, a pause moves on (R1, R3). */
+const quiet: CountingConfig = { ...config, speakPrompts: false, confirmByNod: false };
+
+describe('the transition table with the defaults (spec 009, R3)', () => {
+  // The same table, but only the chosen letter is said: a nod on the row ("W") and a tap on "A".
+  const LETTER_SAID = new Set([
+    'row.asking NOD',
+    ...STATE_NAMES.filter((name) => name !== 'paused').map((name) => `${name} TOUCH`),
+  ]);
+  for (const name of STATE_NAMES) {
+    SIGNAL_TYPES.forEach((type, i) => {
+      const [expectedName, withPrompts] = TABLE[name][i];
+      const expected = LETTER_SAID.has(`${name} ${type}`)
+        ? withPrompts
+        : withPrompts.filter((t) => t !== S);
+      it(`${name} + ${type} → ${expectedName} [${expected.join(', ')}]`, () => {
+        const { state, effects } = next(fixture(name), signal(type, 500), quiet);
+        expect(state.name).toBe(expectedName);
+        expect(effects.map((e) => e.type)).toEqual(expected);
+      });
+    });
+  }
 });
 
 /** Runs signals from a state and returns the end state and every effect. */
@@ -433,5 +463,67 @@ describe('touch: a tap on the screen (spec 007, R3)', () => {
       board: speakBoard,
     });
     expect(state.name).toBe('speaking');
+  });
+});
+
+describe('the letter by ear: the defaults (spec 009)', () => {
+  const later = (ms: number) => T(ms);
+
+  it('a pause after the column moves on to the row; a pause after the row adds the letter and says only it (R1, R3)', () => {
+    // hand + 2 blinks = column 7, a pause; 3 blinks = row 3, a pause: W
+    let { state, effects } = run(
+      [T(0), H, T(100), B, T(200), B, later(200 + ASK_AFTER.default)],
+      initialState(),
+      quiet,
+    );
+    expect(state.name).toBe('row.waiting');
+    expect(state.column).toBe(7);
+    expect(texts(effects, 'say')).toEqual([]);
+    const at = 200 + ASK_AFTER.default;
+    ({ state, effects } = run(
+      [B, T(at + 100), B, T(at + 200), B, later(at + 200 + ASK_AFTER.default)],
+      state,
+      quiet,
+    ));
+    expect(state.name).toBe('column.waiting');
+    expect(state.sentence.text).toBe('W');
+    expect(texts(effects, 'say')).toEqual([{ key: 'counting.letter', params: { letter: 'W' } }]);
+    expect(effects.some((e) => e.type === 'ask')).toBe(false);
+  });
+
+  it('a shake right after the letter undoes it, silently; blinks right after it start the next letter (R2)', () => {
+    const withA = { ...initialState(append(createSentence(), 'A')) };
+    const undone = run([X], withA, quiet);
+    expect(undone.state.sentence.text).toBe('');
+    expect(texts(undone.effects, 'say')).toEqual([]);
+    const nextLetter = run([B], withA, quiet);
+    expect(nextLetter.state.name).toBe('column.counting');
+    expect(nextLetter.state.sentence.text).toBe('A');
+  });
+
+  it('a shake while he gives the row goes back to the columns: the letter starts over (R2)', () => {
+    const giving = {
+      ...initialState(),
+      name: 'row.counting' as const,
+      column: 7,
+      parts: [1] as (1 | 5)[],
+      lastCountAt: 0,
+    };
+    const { state } = run([X], giving, quiet);
+    expect(state.name).toBe('row.rejected');
+    expect(run([X], { ...giving, name: 'row.waiting', parts: [] }, quiet).state.name).toBe(
+      'column.waiting',
+    );
+  });
+
+  it('a number with no column is rejected without a word; it is shown and announced (R3)', () => {
+    const { state, effects } = run(
+      [T(0), H, T(100), H, later(100 + ASK_AFTER.default)],
+      initialState(),
+      quiet,
+    );
+    expect(state.name).toBe('column.rejected');
+    expect(texts(effects, 'announce')).toEqual([{ key: 'counting.noColumn', params: { n: 10 } }]);
+    expect(texts(effects, 'say')).toEqual([]);
   });
 });

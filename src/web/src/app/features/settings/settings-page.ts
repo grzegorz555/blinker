@@ -13,7 +13,7 @@ import { RATES, THEMES, validAskAfter, type Settings } from '../../core/settings
 import { SettingsService } from '../../core/settings/settings.service';
 import { LanguageSwitch } from '../../shared/language-switch/language-switch';
 
-type Toggle = 'speakQuestions' | 'signalButtons' | 'keyboard' | 'hints';
+type Toggle = 'confirmByNod' | 'speakPrompts' | 'signalButtons' | 'keyboard' | 'hints';
 
 /**
  * Ustawienia (Settings) (spec 007, R9): Angular Material form controls with visible labels; every change applies at
@@ -53,7 +53,8 @@ export class SettingsPage {
   protected readonly rates = RATES;
   protected readonly themes = THEMES;
   protected readonly toggles: readonly Toggle[] = [
-    'speakQuestions',
+    'confirmByNod',
+    'speakPrompts',
     'signalButtons',
     'keyboard',
     'hints',

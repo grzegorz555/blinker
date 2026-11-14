@@ -1,7 +1,8 @@
 // The counting machine (spec 006, R4–R6; docs/interaction-model.md, mode B). Plain TypeScript, no Angular imports.
 //
-// Blinker plays the caregiver's role: he gives a number (a long blink = 1, a look at his hand = 5), Blinker asks
-// "Kolumna 7?" (Column 7?), he nods (yes) or shakes his head (no); then the row the same way, and the letter is added and said.
+// Blinker plays the caregiver's role: he gives a number (a long blink = 1, a look at his hand = 5) for the column, a
+// pause, then the row, a pause: the letter is added and said (spec 009). Blinking again is the next letter; a shake
+// undoes it. With confirmByNod on, Blinker asks "Kolumna 7?" (Column 7?) and he nods or shakes his head (spec 006).
 //
 // - `next(state, signal, config)` is a pure function: the same input always gives the same output, and it never reads
 //   the clock or sets a timer. Time comes in only as the TICK signal (R6).
@@ -76,7 +77,7 @@ export interface Message {
 export type Effect =
   /** A new question: show it and announce it (polite live region). */
   | { readonly type: 'ask'; readonly message: Message }
-  /** Say a short text aloud (a question when speakQuestions is on, an added letter, "Spacja" (Space)). */
+  /** Say a short text aloud: the chosen letter always; questions and notices only when speakPrompts is on. */
   | { readonly type: 'say'; readonly message: Message }
   /** Announce a change to screen readers, and show it as the notice. */
   | { readonly type: 'announce'; readonly message: Message }
@@ -89,8 +90,10 @@ export interface CountingConfig {
   readonly board: Board;
   /** How long Blinker waits after the last blink before it asks; 500–5000 ms (SC 2.2.1). */
   readonly askAfterMs: number;
-  /** Say the questions aloud ("Kolumna 7?" (Column 7?)), not only show them. */
-  readonly speakQuestions: boolean;
+  /** Say the questions and notices aloud, not only show them; off: only the letter and the reading (spec 009, R3). */
+  readonly speakPrompts: boolean;
+  /** Ask "Kolumna 7?" (Column 7?) and wait for a nod; off: the pause after a number moves on (spec 009, R1). */
+  readonly confirmByNod: boolean;
 }
 
 export const ASK_AFTER = { min: 500, max: 5000, default: 1200 } as const;
@@ -190,14 +193,24 @@ const go = (
   effects,
 });
 
-/** A question: shown and announced; also said aloud when speakQuestions is on. */
+/** A question: shown and announced; also said aloud when speakPrompts is on. */
 function ask(config: CountingConfig, message: Message): Effect[] {
-  return config.speakQuestions
+  return config.speakPrompts
     ? [
         { type: 'ask', message },
         { type: 'say', message },
       ]
     : [{ type: 'ask', message }];
+}
+
+/** A notice: shown and announced to screen readers; also said aloud when speakPrompts is on (spec 009, R3). */
+function notify(config: CountingConfig, notice: Message): Effect[] {
+  return config.speakPrompts
+    ? [
+        { type: 'announce', message: notice },
+        { type: 'say', message: notice },
+      ]
+    : [{ type: 'announce', message: notice }];
 }
 
 /** Start or continue giving a number. */
@@ -235,26 +248,27 @@ function pause(resume: StateName, stopSpeaking = false): Handler {
 // ---- column step -----------------------------------------------------------------------------------------------
 
 /** A nod without a number while waiting for a column: a space, the end of a word (author, 2026-11-13). */
-const nodForSpace: Handler = (state) => {
+const nodForSpace: Handler = (state, config) => {
   const text = state.sentence.text;
   if (!text || text.endsWith(' ')) {
     const notice = msg('counting.spaceNotAdded');
-    return go(state, { name: 'column.waiting', notice }, [
-      { type: 'announce', message: notice },
-      { type: 'say', message: notice },
-    ]);
+    return go(state, { name: 'column.waiting', notice }, notify(config, notice));
   }
-  // He builds words by ear (spec 008, R2): say the word just finished, not "Spacja" (Space).
+  // With speakPrompts on (spec 008, R2), say the word just finished, not "Spacja" (Space); off, nothing (spec 009, R3).
   const word = text.split(' ').at(-1) ?? '';
   const notice = msg('counting.space');
-  return go(state, { name: 'column.waiting', sentence: append(state.sentence, ' '), notice }, [
-    { type: 'announce', message: notice },
-    { type: 'say', message: msg('counting.letter', { letter: word }) },
-  ]);
+  const effects: Effect[] = [{ type: 'announce', message: notice }];
+  if (config.speakPrompts)
+    effects.push({ type: 'say', message: msg('counting.letter', { letter: word }) });
+  return go(
+    state,
+    { name: 'column.waiting', sentence: append(state.sentence, ' '), notice },
+    effects,
+  );
 };
 
 /** A shake while waiting for a column: undo the last step this session made (a letter, a space, a deletion). */
-const shakeToUndo: Handler = (state) => {
+const shakeToUndo: Handler = (state, config) => {
   const notice = describeUndo(state.sentence.history.at(-1));
   return go(
     state,
@@ -263,10 +277,7 @@ const shakeToUndo: Handler = (state) => {
       sentence: canUndo(state.sentence) ? undo(state.sentence) : state.sentence,
       notice,
     },
-    [
-      { type: 'announce', message: notice },
-      { type: 'say', message: notice }, // he listens: "Cofnięto A" (Undid A) (spec 008, R1)
-    ],
+    notify(config, notice), // "Cofnięto A" (Undid A): said only with speakPrompts on (spec 009, R3)
   );
 };
 
@@ -284,20 +295,27 @@ const finish: Handler = (state, config) => {
 };
 
 /** A number was refused: back to giving it, with the reason shown and said. */
-function reject(state: CountingState, step: 'column' | 'row', notice: Message): Transition {
-  return go(state, { name: `${step}.rejected`, parts: [], lastCountAt: null, notice }, [
-    { type: 'announce', message: notice },
-    { type: 'say', message: notice },
-  ]);
+function reject(
+  state: CountingState,
+  config: CountingConfig,
+  step: 'column' | 'row',
+  notice: Message,
+): Transition {
+  const patch = { name: `${step}.rejected` as const, parts: [], lastCountAt: null, notice };
+  return go(state, patch, notify(config, notice));
 }
 
-/** After the pause with no new signal, ask about the number (or reject it with the reason). */
+/**
+ * After the pause with no new signal: reject the number with the reason; or ask about it (confirmByNod on); or take
+ * it at once (off, the default: spec 009, R1).
+ */
 const askColumnWhenReady: Handler = (state, config, signal) => {
   if (state.lastCountAt === null || state.now - state.lastCountAt < config.askAfterMs)
     return stay(state, config, signal);
   const n = total(state);
   if (n > config.board.columns.length)
-    return reject(state, 'column', msg('counting.noColumn', { n }));
+    return reject(state, config, 'column', msg('counting.noColumn', { n }));
+  if (!config.confirmByNod) return confirmColumn(state, config, signal);
   return go(state, { name: 'column.asking' }, ask(config, msg('counting.askColumn', { n })));
 };
 
@@ -306,10 +324,12 @@ const askRowWhenReady: Handler = (state, config, signal) => {
     return stay(state, config, signal);
   const n = total(state);
   const column = state.column ?? 0;
-  if (n > config.board.rows.length) return reject(state, 'row', msg('counting.noRow', { n }));
+  if (n > config.board.rows.length)
+    return reject(state, config, 'row', msg('counting.noRow', { n }));
   if (!cellAt(config.board, column, n)) {
-    return reject(state, 'row', msg('counting.emptyCell', { column, row: n }));
+    return reject(state, config, 'row', msg('counting.emptyCell', { column, row: n }));
   }
+  if (!config.confirmByNod) return confirmRow(state, config, signal);
   return go(state, { name: 'row.asking' }, ask(config, msg('counting.askRow', { n })));
 };
 
@@ -323,18 +343,22 @@ const confirmColumn: Handler = (state) => {
 
 const shakeNumber =
   (step: 'column' | 'row'): Handler =>
-  (state) =>
-    reject(state, step, msg('counting.rejectedNo', { n: total(state) }));
+  (state, config) =>
+    reject(state, config, step, msg('counting.rejectedNo', { n: total(state) }));
 
 // ---- row step --------------------------------------------------------------------------------------------------
 
 const BACK = { name: 'column.waiting', column: null, parts: [], lastCountAt: null } as const;
 
-/** A nod on "Wiersz N?" (Row N?): the cell is chosen. A letter or word is added and said; an action is carried out. */
+/**
+ * A nod on "Wiersz N?" (Row N?), or the pause after the row (spec 009): the cell is chosen. A letter or word is added
+ * and said; an action is carried out.
+ */
 const confirmRow: Handler = (state, config, signal) => {
   const column = state.column ?? 0;
   const cell = cellAt(config.board, column, total(state));
-  if (!cell) return reject(state, 'row', msg('counting.emptyCell', { column, row: total(state) }));
+  if (!cell)
+    return reject(state, config, 'row', msg('counting.emptyCell', { column, row: total(state) }));
   if (cell.type === 'action' && cell.value === 'speak') {
     return finish({ ...state, ...BACK }, config, signal);
   }
@@ -353,23 +377,20 @@ function useCell(
 ): Transition {
   if (cell.type === 'action' && cell.value === 'undo') return shakeToUndo(state, config, signal);
   const sentence = applyCell(state.sentence, cell);
-  let notice: Message;
-  let spoken: Message;
   if (cell.type === 'action') {
-    notice =
+    const notice =
       cell.value === 'space'
         ? msg('counting.space')
         : cell.value === 'clear'
           ? msg('counting.cleared')
           : msg('counting.deleted', { text: state.sentence.text.slice(-1) });
-    spoken = notice;
-  } else {
-    notice = msg('counting.added', { letter: cell.value });
-    spoken = msg('counting.letter', { letter: cell.value });
+    return go(state, { sentence, notice }, notify(config, notice));
   }
+  // The chosen letter or word is always said: he builds words by ear (spec 009, R3).
+  const notice = msg('counting.added', { letter: cell.value });
   return go(state, { sentence, notice }, [
     { type: 'announce', message: notice },
-    { type: 'say', message: spoken },
+    { type: 'say', message: msg('counting.letter', { letter: cell.value }) },
   ]);
 }
 
@@ -402,21 +423,16 @@ const afterReading: Handler = (state, config) =>
   go(state, { name: 'clear.asking', notice: null }, ask(config, msg('counting.askNewSentence')));
 
 /** A nod on "Nowe zdanie?" (New sentence?): clear the sentence; one undo at the columns brings it back. */
-const newSentence: Handler = (state) => {
+const newSentence: Handler = (state, config) => {
   const notice = msg('counting.newSentence');
-  return go(state, { name: 'column.waiting', sentence: clear(state.sentence), notice }, [
-    { type: 'announce', message: notice },
-    { type: 'say', message: notice },
-  ]);
+  const patch = { name: 'column.waiting' as const, sentence: clear(state.sentence), notice };
+  return go(state, patch, notify(config, notice));
 };
 
 /** A shake on "Nowe zdanie?" (New sentence?): keep the sentence and go on writing. */
-const keepSentence: Handler = (state) => {
+const keepSentence: Handler = (state, config) => {
   const notice = msg('counting.kept');
-  return go(state, { name: 'column.waiting', notice }, [
-    { type: 'announce', message: notice },
-    { type: 'say', message: notice },
-  ]);
+  return go(state, { name: 'column.waiting', notice }, notify(config, notice));
 };
 
 // ---- pause -------------------------------------------------------------------------------------------------------
@@ -452,10 +468,7 @@ const touchWhileWriting: Handler = (state, config, signal) => {
       return nodForSpace(back, config, signal);
     case 'clear': {
       const notice = msg('counting.cleared');
-      return go(back, { sentence: clear(state.sentence), notice }, [
-        { type: 'announce', message: notice },
-        { type: 'say', message: notice },
-      ]);
+      return go(back, { sentence: clear(state.sentence), notice }, notify(config, notice));
     }
     case 'speak':
       return speakIfAny(back, config, signal);

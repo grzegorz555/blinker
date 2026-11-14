@@ -80,10 +80,21 @@ test.describe('Ustawienia (Settings)', () => {
     await expect(page.getByTestId('hint')).toHaveCount(0);
   });
 
-  test('with the keyboard shortcuts on, keys give his signals on Liczenie (Counting) (spec 006 R7)', async ({
+  test('the voice is quiet and a pause moves on by default; both switches are off (spec 009)', async ({
+    page,
+  }) => {
+    await expect(toggle(page, /Potwierdzaj kolumnę i wiersz skinieniem/)).toHaveAttribute(
+      'aria-checked',
+      'false',
+    );
+    await expect(toggle(page, /Mów pytania i komunikaty/)).toHaveAttribute('aria-checked', 'false');
+  });
+
+  test('with the keyboard shortcuts and the nod confirmation on, keys give his signals and Blinker asks (spec 006 R7, spec 009 R1)', async ({
     page,
   }) => {
     await toggle(page, /Skróty klawiszowe/).click();
+    await toggle(page, /Potwierdzaj kolumnę i wiersz skinieniem/).click();
     await page.getByRole('link', { name: 'Liczenie' }).click();
     // The screen is loaded lazily: wait for it, so its key listener is attached.
     await expect(page.getByRole('heading', { level: 1, name: 'Liczenie' })).toBeVisible();

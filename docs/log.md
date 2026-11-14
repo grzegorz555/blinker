@@ -1,5 +1,9 @@
 # Log
 
+## 2026-11-14 (spec 009, the letter by ear; fixes, PR #18)
+- The author after trying spec 008: the voice says too much. Blinker now says only the chosen letter and the sentence when he reads it; a pause takes the column and then the letter, blinking again starts the next letter, a shake undoes it. The nod per number and the spoken questions and notices are settings, both off by default.
+- Fixes: space between the pause hint and the switches in Ustawienia (Settings); a Material button and an example file for the board import; a pointer and hover on the language buttons.
+
 ## 2026-11-14 (spec 008, he listens)
 - The author: he knows the digits and the letter under each column and row, but builds words by ear, not by reading. Head shortcuts are said aloud: a space says the finished word, an undo says what it removed, and after reading Blinker asks "Nowe zdanie?" (New sentence?) - a nod clears, a shake keeps. The sentence is big above the board, the prompts small. A "Spacja" (Space) button for taps; the hint says the shortcuts of the moment.
 

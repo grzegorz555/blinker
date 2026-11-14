@@ -13,8 +13,10 @@ export const RATES = [0.75, 1, 1.25, 1.5] as const;
 export interface Settings {
   /** The pause before "Kolumna N?" (Column N?), 500–5000 ms (SC 2.2.1). */
   readonly askAfterMs: number;
-  /** Say the questions aloud, not only show them. */
-  readonly speakQuestions: boolean;
+  /** Say the questions and notices aloud; off: only the chosen letter and the reading (spec 009, R3). */
+  readonly speakPrompts: boolean;
+  /** Ask "Kolumna 7?" (Column 7?) and wait for a nod; off: a pause moves on (spec 009, R1). */
+  readonly confirmByNod: boolean;
   /** The buttons for his signals on Liczenie (Counting): on in stage 2, there is no camera yet (R6). */
   readonly signalButtons: boolean;
   /** Single-key shortcuts for his signals: off by default (SC 2.1.4). */
@@ -30,7 +32,8 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   askAfterMs: ASK_AFTER.default,
-  speakQuestions: true,
+  speakPrompts: false,
+  confirmByNod: false,
   signalButtons: true,
   keyboard: false,
   hints: true,
@@ -50,7 +53,8 @@ export const validAskAfter = (value: unknown): value is number =>
 
 const CHECKS: { readonly [K in keyof Settings]: (value: unknown) => boolean } = {
   askAfterMs: validAskAfter,
-  speakQuestions: (v) => typeof v === 'boolean',
+  speakPrompts: (v) => typeof v === 'boolean',
+  confirmByNod: (v) => typeof v === 'boolean',
   signalButtons: (v) => typeof v === 'boolean',
   keyboard: (v) => typeof v === 'boolean',
   hints: (v) => typeof v === 'boolean',

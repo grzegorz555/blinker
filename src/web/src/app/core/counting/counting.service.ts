@@ -69,7 +69,8 @@ export class CountingService {
   private readonly settings = signal<CountingConfig>({
     board: defaultBoard(),
     askAfterMs: ASK_AFTER.default,
-    speakQuestions: true,
+    speakPrompts: false,
+    confirmByNod: false,
   });
 
   /** The machine state (spec 007 renders it). */
