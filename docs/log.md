@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-14 (spec 008, he listens)
+- The author: he knows the digits and the letter under each column and row, but builds words by ear, not by reading. Head shortcuts are said aloud: a space says the finished word, an undo says what it removed, and after reading Blinker asks "Nowe zdanie?" (New sentence?) - a nod clears, a shake keeps. The sentence is big above the board, the prompts small. A "Spacja" (Space) button for taps; the hint says the shortcuts of the moment.
+
 ## 2026-11-14 (spec 007, T1–T8, PR #16)
 - The screens on Angular Material (spike passed under the CSP and Trusted Types): the shell with our navigation bar and rail, Liczenie (Counting) with signal buttons, taps through the machine (TOUCH), voice status and wake lock, Ustawienia (Settings), Tablice (Boards) with import, Zdania (Sentences) with the history; everything stored on the device and validated when read back. Stage 2 is done.
 - CI: the Lighthouse language guard now reads the page text (the language switch moved to the settings); the board fits a short phone with the wider CI font; the skip link and the sticky navigation no longer cover controls on the full-height Liczenie (Counting), and only main scrolls.
