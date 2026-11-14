@@ -130,7 +130,7 @@
     "previewCaption": "Podgląd tablicy: kolumny od 1 do {{columns}}, wiersze od 1 do {{rows}}.",
     "import": "Import tablicy z pliku",
     "importHelp": "Plik JSON w formacie tablicy v1 (docs/board-format.md): najwyżej {{size}} kolumn i {{size}} wierszy, do {{kb}} KB. Plik jest sprawdzany na tym urządzeniu i nigdzie nie jest wysyłany.",
-    "file": "Plik tablicy (.json)",
+    "file": "Wybierz plik tablicy (.json)",
     "imported": "Zaimportowano tablicę „{{name}}”. Wybierz ją powyżej, żeby jej używać.",
     "replaced": "Tablica „{{name}}” została zastąpiona nowym plikiem.",
     "errorsTitle": "Błąd: plik nie został zaimportowany (problemów: {{count}}).",
@@ -161,6 +161,11 @@
       "unknown-cell-type": "Typ pola musi być char, word albo action.",
       "unknown-action": "Nieznana akcja; użyj space, delete, speak, clear albo undo.",
       "reserved-id": "Ten identyfikator należy do jego wbudowanej tablicy; nadaj tablicy inny."
+    },
+    "example": {
+      "title": "Przykładowy plik",
+      "help": "Kolumny i wiersze to etykiety, które on liczy; cells[wiersz][kolumna] to litera (char), słowo (word) albo akcja (action: space, delete, speak, clear, undo); null to puste pole. Pobierz go, zmień i zaimportuj.",
+      "download": "Pobierz przykład"
     }
   },
   "settings": {

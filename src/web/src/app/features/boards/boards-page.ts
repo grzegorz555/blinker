@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -8,11 +9,13 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { MatIconButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { BOARD_LIMITS, type Board } from '../../core/boards/board';
 import { BoardsService } from '../../core/boards/boards.service';
+import { exampleBoardJson } from '../../core/boards/example-board';
+import { LanguageService } from '../../core/i18n/language.service';
 import type { BoardError } from '../../core/boards/validate-board';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 
@@ -23,7 +26,7 @@ import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
  */
 @Component({
   selector: 'app-boards-page',
-  imports: [MatIconButton, MatRadioButton, MatRadioGroup, TranslocoPipe],
+  imports: [MatButton, MatIconButton, MatRadioButton, MatRadioGroup, TranslocoPipe],
   templateUrl: './boards-page.html',
   styleUrl: './boards-page.css',
 })
@@ -31,6 +34,8 @@ export class BoardsPage {
   private readonly service = inject(BoardsService);
   private readonly confirmService = inject(ConfirmService);
   private readonly injector = inject(Injector);
+  private readonly document = inject(DOCUMENT);
+  private readonly language = inject(LanguageService).language;
   private readonly errorSummary = viewChild<ElementRef<HTMLElement>>('errorSummary');
 
   protected readonly boards = this.service.boards;
@@ -42,6 +47,18 @@ export class BoardsPage {
   protected readonly previewRows = computed(() =>
     this.active().cells.map((row) => row.map((cell) => this.label(cell))),
   );
+
+  /** An example file in the language of the screen, to read or download and edit (the format, docs/board-format.md). */
+  protected readonly example = computed(() => exampleBoardJson(this.language()));
+
+  protected downloadExample(): void {
+    const url = URL.createObjectURL(new Blob([this.example()], { type: 'application/json' }));
+    const link = this.document.createElement('a');
+    link.href = url;
+    link.download = this.language() === 'pl' ? 'przyklad-tablicy.json' : 'example-board.json';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url));
+  }
 
   protected isBuiltIn(board: Board): boolean {
     return this.service.isBuiltIn(board);

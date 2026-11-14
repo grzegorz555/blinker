@@ -99,20 +99,46 @@
   font-weight: 600;
 }
 
-/* A native file input: Angular Material has none. 44 px high, a visible outline (SC 1.4.11). */
-.file {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
+/* The file picker button: 44 px high at least (SC 2.5.8 is 24 px; 44 px suits his helpers' fingers). */
+.file-button {
   min-height: 2.75rem;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  padding: 0.5rem;
 }
 
-.file:focus-visible {
+/* The example file: a disclosure (native details), the JSON scrolls sideways on a phone instead of the page. */
+.example {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.example summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.example summary:hover {
+  color: var(--highlight);
+}
+
+.example summary:focus-visible,
+.example-code:focus-visible {
   outline: 3px solid var(--highlight);
   outline-offset: 2px;
+}
+
+.example-code {
+  overflow-x: auto;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 .success {
