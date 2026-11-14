@@ -20,4 +20,4 @@ button and the hint of the moment (commit before this spec). Gates: `npm run ver
       board, the actions with it (R4, R5). Tests: e2e fit at every size and with the wide font, the "Nowe zdanie?"
       path, axe.
       _To understand:_ designing for a person who listens: what the screen is for, and for whom.
-- [ ] **T3 [haiku]: Docs.** Interaction model (the shortcuts by head), design, README, log, specs index, Polish copies.
+- [x] **T3 [haiku]: Docs.** Interaction model (the shortcuts by head), design, README, log, specs index, Polish copies.

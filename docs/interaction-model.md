@@ -56,6 +56,18 @@ his hand can never make the scan jump.
 confirms it** (says it aloud and waits for his answer). In Blinker the confirmation should be done **with his head**
 (`HEAD_NOD` / `HEAD_SHAKE`, steps 3–4 above), so no caregiver is needed.
 
+**He listens, he does not read (author, 2026-11-14):** he knows the digits and which letter is under each column and
+row, and he **puts words together by ear**, not by reading. So everything that reaches him is said aloud: the
+questions, each letter added, **the word just finished when he adds a space**, and what an undo removed. The screen
+shows the sentence in big letters for the people around him, and the prompts small (spec 008).
+
+**Shortcuts by head (spec 008):**
+- **space** = a nod without a number while Blinker waits for a column (it says the finished word);
+- **undo** = a shake while Blinker waits for a column (it says what it removed; it also brings back a cleared sentence);
+- **read aloud** = head right, then a nod on "Przeczytać na głos?" (Read it aloud?);
+- **new sentence** = a nod on "Nowe zdanie?" (New sentence?), which Blinker asks when a reading ends; a shake keeps
+  the sentence, a blink or a hand goes on with it.
+
 **Still open:**
 - The pace and the pauses between signals, and what happens after a miscount: tuned during the trial (stage 6).
 - How long the pause before "Column 4?" should be: we tune it during the trial with him (stage 6).
@@ -69,7 +81,7 @@ confirms it** (says it aloud and waits for his answer). In Blinker the confirmat
 | `LOOK_AT_HAND` | +5 (counting only; ignored in scanning) | — |
 | `HEAD_NOD` | confirm the number or letter Blinker asked about; **without a number, while Blinker waits for a column: a space** (the end of a word; author, 2026-11-13) | **yes** |
 | `HEAD_SHAKE` or `HEAD_LEFT` | **no / back one step (−1)**: in counting, discard the number Blinker asked about; otherwise from rows back to columns, and at columns delete the last character | **no** |
-| `HEAD_RIGHT` | finish the sentence and ask "Read it aloud?" | — |
+| `HEAD_RIGHT` | finish the sentence and ask "Read it aloud?"; after reading, Blinker asks "New sentence?" | — |
 | `VERY_LONG_CLOSE` | pause or resume input (rest mode) | — |
 
 The board can also contain **action cells** (space, delete, read aloud, clear). That way he can do everything

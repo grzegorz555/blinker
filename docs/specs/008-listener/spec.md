@@ -45,13 +45,13 @@ column) "małym druczkiem u góry, a dużymi literami zdanie" (small print at th
 
 # Acceptance criteria
 
-- [ ] The table test covers 12 × 9 pairs; SPOKEN changes nothing outside `speaking` (R3).
-- [ ] Head right, nod: read aloud; when it ends: "Nowe zdanie?" is said; nod clears and a shake at the columns brings
+- [x] The table test covers 12 × 9 pairs; SPOKEN changes nothing outside `speaking` (R3).
+- [x] Head right, nod: read aloud; when it ends: "Nowe zdanie?" is said; nod clears and a shake at the columns brings
       it back; shake keeps the sentence (R3).
-- [ ] A space after "TAK" says "TAK"; an undo says what it removed (R1, R2).
-- [ ] The sentence is the biggest text on Liczenie (Counting), above the board; the prompt is small at the top; the
+- [x] A space after "TAK" says "TAK"; an undo says what it removed (R1, R2).
+- [x] The sentence is the biggest text on Liczenie (Counting), above the board; the prompt is small at the top; the
       board fits at 360 × 640 … 1280 × 800 in both orientations, also with a wide font (R4).
-- [ ] `npm run verify -- --lighthouse` passes.
+- [x] `npm run verify -- --lighthouse` passes.
 
 # Test plan
 

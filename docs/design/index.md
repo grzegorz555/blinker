@@ -86,6 +86,9 @@ under the navigation bar; the skip link appears in the top app bar over the page
 - Below 600 px: an M3 **navigation bar** at the bottom (icons with labels, 44 px targets, safe-area padding).
 - From 600 px: an M3 **navigation rail** on the left, so the board keeps the width.
 
+**Spec 008 (he listens, he does not read):** on Liczenie (Counting) the prompt and the counter are a small status line at
+the top, **the sentence is the biggest text, above the board** (beside it in landscape), and the step label is gone.
+
 **Liczenie** (Counting), the main screen, uses the M3 supporting-pane layout: the board is the main pane and is never covered or
 scrolled; the question with the counter and the sentence with its actions are the supporting pane. Portrait:
 question, board, sentence from top to bottom. Landscape: the board on the left, the pane on the right. It runs on his
