@@ -302,8 +302,12 @@
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 1fr);
   }
 
+  /* One row: the prompt, then the counter beside it, so the sentence and its actions keep the height. */
   .count-question {
-    padding: 0.75rem;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+    padding: 0.375rem 0.75rem;
   }
 
   .question {
@@ -313,6 +317,10 @@
 
   .count-hint {
     display: none;
+  }
+
+  .count-sentence {
+    padding: 0.5rem;
   }
 
   .sentence-text {

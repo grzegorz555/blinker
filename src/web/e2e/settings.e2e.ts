@@ -41,6 +41,8 @@ test.describe('Ustawienia (Settings)', () => {
     await pauseField(page).blur();
     await expect(page.getByText('Błąd: wpisz liczbę całkowitą od 500 do 5000 ms.')).toBeVisible();
     await expect(pauseField(page)).toHaveAttribute('aria-invalid', 'true');
+    // The error fades in; measure its contrast at full opacity.
+    await expect(page.locator('.mat-mdc-form-field-error-wrapper')).toHaveCSS('opacity', '1');
     await expectNoA11yViolations(page);
     await pauseField(page).fill('2500');
     await expect(page.getByText(/^Błąd:/)).toHaveCount(0);
