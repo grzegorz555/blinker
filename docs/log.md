@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (privacy review)
+- A review of every tracked file and the history for personal data (GDPR): none found (no names, contact details, ID numbers or health records; the board photo has no metadata; commits use GitHub noreply addresses). A script test now guards it.
+
 ## 2026-11-15 (spec 010, face-tracking spike)
 - MediaPipe Face Landmarker runs in a module worker under the production CSP and Trusted Types (GPU in Chromium); the wasm and model are self-hosted, the model hash pinned. The library sends usage metrics to Google: blocked by the CSP and a fetch guard in the worker. Diagnostyka (Diagnostics) shows the eye and head values, FPS and analysis time; ADR-0006 proposed, waiting for the measurements on his devices.
 

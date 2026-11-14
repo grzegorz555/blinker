@@ -29,6 +29,9 @@ There are no accounts, no server and no shared data. The main risks are:
   - **Never commit** the user's name, photos, face videos or real conversation logs.
   - Recordings used to tune detection live only in `.local/` (git-ignored), and only with his consent.
   - Docs refer to him only as "the user" or "the friend".
+  - The repository holds no personal data (GDPR): no names, contact details, ID numbers or health records of him,
+    and no image metadata (EXIF can hold GPS). `scripts/privacy.test.mjs` checks every tracked file on each run (images
+    without EXIF, XMP or GPS; no e-mail addresses but GitHub noreply ones; no PESEL or phone numbers).
 
 # Response headers (set by the host, see ADR-0003)
 ```
