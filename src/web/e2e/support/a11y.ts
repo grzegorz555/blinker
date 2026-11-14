@@ -10,6 +10,16 @@ export const WCAG_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22
  * Docs: https://playwright.dev/docs/accessibility-testing
  */
 export async function expectNoA11yViolations(page: Page): Promise<void> {
+  // Let running animations finish first: axe measures contrast as it is now, and a fading-in error text (Angular
+  // Material form field) or dialog is not yet at full opacity on a slow CI machine. Endless animations are skipped.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.playState === 'running' && a.effect?.getTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => undefined)),
+    ),
+  );
   const results = await new AxeBuilder({ page }).withTags(WCAG_AA_TAGS).analyze();
   const summary = results.violations.map(
     (v) =>
