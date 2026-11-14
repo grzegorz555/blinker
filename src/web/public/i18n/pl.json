@@ -87,7 +87,10 @@
       "stop": "Zatrzymaj",
       "noLocalVoice": "Brak polskiego głosu na urządzeniu",
       "noLocalVoiceHelp": "Na tym urządzeniu nie ma polskiego głosu, więc nic nie zostanie przeczytane. Zainstaluj polski głos w ustawieniach syntezy mowy systemu."
-    }
+    },
+    "askNewSentence": "Nowe zdanie?",
+    "newSentence": "Nowe zdanie",
+    "kept": "Zostawiam zdanie"
   },
   "common": {
     "cancel": "Anuluj"

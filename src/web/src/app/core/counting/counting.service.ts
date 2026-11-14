@@ -61,6 +61,8 @@ export class CountingService {
   private readonly speaker = inject(SPEAKER);
   private readonly scheduler = inject(TICK_SCHEDULER);
   private stopTicks: (() => void) | null = null;
+  /** True while his sentence is being read aloud; a cancel clears it first, so only a natural end sends SPOKEN. */
+  private reading = false;
 
   private readonly current = signal<CountingState>(initialState());
   private readonly rate = signal<number>(RATE.default);
@@ -87,7 +89,14 @@ export class CountingService {
   readonly speakResult = signal<SpeakResult | null>(null);
 
   constructor() {
-    const unsubscribe = this.speaker.subscribe((speaking) => this.speaking.set(speaking));
+    const unsubscribe = this.speaker.subscribe((speaking) => {
+      this.speaking.set(speaking);
+      // A reading of his sentence ended by itself (not cancelled): tell the machine (spec 008, R3).
+      if (!speaking && this.reading) {
+        this.reading = false;
+        if (this.current().name === 'speaking') this.apply({ type: 'SPOKEN' });
+      }
+    });
     inject(DestroyRef).onDestroy(() => {
       unsubscribe();
       this.stop();
@@ -118,6 +127,7 @@ export class CountingService {
 
   /** "Zatrzymaj" (Stop): stops reading aloud at once; the text does not change (spec 007, R7). */
   stopSpeaking(): void {
+    this.reading = false;
     this.speaker.cancel();
   }
 
@@ -142,6 +152,7 @@ export class CountingService {
    * "Powiedz jeszcze raz" (Say again) in Zdania (Sentences). Not added to the history again.
    */
   listen(text: string, lang = this.settings().board.locale): void {
+    this.reading = false;
     this.speakResult.set(this.speaker.say(text, { lang, rate: this.rate() }));
   }
 
@@ -171,6 +182,7 @@ export class CountingService {
         this.announcement.set(this.text(effect.message));
         return;
       case 'say':
+        this.reading = false; // a short text replaces the reading
         // A question or a short notice, in the UI language.
         this.speakResult.set(
           this.speaker.say(this.text(effect.message), {
@@ -182,13 +194,16 @@ export class CountingService {
       case 'speak': {
         // His sentence, in the language of the board.
         const lang = this.settings().board.locale;
+        this.reading = false; // say() cancels the reading in progress first
         const result = this.speaker.say(effect.text, { lang, rate: this.rate() });
+        this.reading = result === 'started';
         this.speakResult.set(result);
         // Zdania (Sentences) keeps what was really read aloud (spec 007, R11).
         if (result === 'started') this.spoken.set({ text: effect.text, lang });
         return;
       }
       case 'stopSpeaking':
+        this.reading = false;
         this.speaker.cancel();
         return;
     }

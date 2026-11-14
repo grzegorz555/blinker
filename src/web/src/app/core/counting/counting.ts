@@ -32,6 +32,7 @@ export const STATE_NAMES = [
   'row.rejected',
   'speak.asking',
   'speaking',
+  'clear.asking',
   'paused',
 ] as const;
 export type StateName = (typeof STATE_NAMES)[number];
@@ -45,6 +46,7 @@ export const SIGNAL_TYPES = [
   'PAUSE',
   'TICK',
   'TOUCH',
+  'SPOKEN',
 ] as const;
 export type SignalType = (typeof SIGNAL_TYPES)[number];
 
@@ -142,6 +144,9 @@ export const COUNTING_KEYS = [
   'counting.backToWriting',
   'counting.paused',
   'counting.resumed',
+  'counting.askNewSentence',
+  'counting.newSentence',
+  'counting.kept',
 ] as const;
 type Key = (typeof COUNTING_KEYS)[number];
 
@@ -239,10 +244,12 @@ const nodForSpace: Handler = (state) => {
       { type: 'say', message: notice },
     ]);
   }
+  // He builds words by ear (spec 008, R2): say the word just finished, not "Spacja" (Space).
+  const word = text.split(' ').at(-1) ?? '';
   const notice = msg('counting.space');
   return go(state, { name: 'column.waiting', sentence: append(state.sentence, ' '), notice }, [
     { type: 'announce', message: notice },
-    { type: 'say', message: notice },
+    { type: 'say', message: msg('counting.letter', { letter: word }) },
   ]);
 };
 
@@ -256,7 +263,10 @@ const shakeToUndo: Handler = (state) => {
       sentence: canUndo(state.sentence) ? undo(state.sentence) : state.sentence,
       notice,
     },
-    [{ type: 'announce', message: notice }],
+    [
+      { type: 'announce', message: notice },
+      { type: 'say', message: notice }, // he listens: "Cofnięto A" (Undid A) (spec 008, R1)
+    ],
   );
 };
 
@@ -385,6 +395,30 @@ const backToWriting: Handler = (state) => {
   ]);
 };
 
+// ---- after reading (spec 008, R3) ------------------------------------------------------------------------------
+
+/** The reading ended (SPOKEN from the speaker): ask whether to start a new sentence. */
+const afterReading: Handler = (state, config) =>
+  go(state, { name: 'clear.asking', notice: null }, ask(config, msg('counting.askNewSentence')));
+
+/** A nod on "Nowe zdanie?" (New sentence?): clear the sentence; one undo at the columns brings it back. */
+const newSentence: Handler = (state) => {
+  const notice = msg('counting.newSentence');
+  return go(state, { name: 'column.waiting', sentence: clear(state.sentence), notice }, [
+    { type: 'announce', message: notice },
+    { type: 'say', message: notice },
+  ]);
+};
+
+/** A shake on "Nowe zdanie?" (New sentence?): keep the sentence and go on writing. */
+const keepSentence: Handler = (state) => {
+  const notice = msg('counting.kept');
+  return go(state, { name: 'column.waiting', notice }, [
+    { type: 'announce', message: notice },
+    { type: 'say', message: notice },
+  ]);
+};
+
 // ---- pause -------------------------------------------------------------------------------------------------------
 
 const resume: Handler = (state) => {
@@ -449,6 +483,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('column.waiting'),
     TICK: stay,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   'column.counting': {
     BLINK: count(1, 'column', true),
@@ -459,6 +494,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('column.waiting'),
     TICK: askColumnWhenReady,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   'column.asking': {
     BLINK: count(1, 'column', true), // he was not done: keep counting
@@ -469,6 +505,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('column.waiting'),
     TICK: stay,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   'column.rejected': {
     BLINK: count(1, 'column', false),
@@ -479,6 +516,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('column.waiting'),
     TICK: stay,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   'row.waiting': {
     BLINK: count(1, 'row', false),
@@ -489,6 +527,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('row.waiting'),
     TICK: stay,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   'row.counting': {
     BLINK: count(1, 'row', true),
@@ -499,6 +538,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('row.waiting'),
     TICK: askRowWhenReady,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   'row.asking': {
     BLINK: count(1, 'row', true),
@@ -509,6 +549,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('row.waiting'),
     TICK: stay,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   'row.rejected': {
     BLINK: count(1, 'row', false),
@@ -519,6 +560,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('row.waiting'),
     TICK: stay,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   'speak.asking': {
     BLINK: stay, // only yes or no answers the question
@@ -529,6 +571,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('column.waiting'),
     TICK: stay,
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
   },
   speaking: {
     BLINK: count(1, 'column', false), // he starts the next letter
@@ -539,6 +582,18 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: pause('column.waiting', true),
     TICK: stay,
     TOUCH: touchWhileWriting, // like a blink: he goes on writing (the reading is not stopped)
+    SPOKEN: afterReading, // the reading ended: "Nowe zdanie?" (New sentence?)
+  },
+  'clear.asking': {
+    BLINK: count(1, 'column', false), // he goes on with the sentence
+    HAND: count(5, 'column', false),
+    NOD: newSentence,
+    SHAKE: keepSentence,
+    RIGHT: finish, // read it again (asks first)
+    PAUSE: pause('column.waiting'),
+    TICK: stay,
+    TOUCH: touchWhileWriting,
+    SPOKEN: stay,
   },
   paused: {
     BLINK: stay,
@@ -549,6 +604,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     PAUSE: resume,
     TICK: stay,
     TOUCH: stay, // a pause stops every input but PAUSE, taps included
+    SPOKEN: stay, // only the end of a reading means something
   },
 };
 
@@ -573,6 +629,8 @@ export function prompt(state: CountingState): Message {
       return msg('counting.askSpeak');
     case 'speaking':
       return msg('counting.speaking');
+    case 'clear.asking':
+      return msg('counting.askNewSentence');
     case 'paused':
       return msg('counting.paused');
   }

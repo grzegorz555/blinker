@@ -87,7 +87,10 @@
       "stop": "Stop",
       "noLocalVoice": "No Polish voice on this device",
       "noLocalVoiceHelp": "No Polish voice on this device, so nothing is read aloud. Install a Polish voice in the system text-to-speech settings."
-    }
+    },
+    "askNewSentence": "New sentence?",
+    "newSentence": "New sentence",
+    "kept": "Keeping the sentence"
   },
   "common": {
     "cancel": "Cancel"

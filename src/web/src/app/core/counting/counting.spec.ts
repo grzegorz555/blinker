@@ -60,19 +60,20 @@ function fixture(name: StateName): CountingState {
 const A = 'announce';
 const S = 'say';
 // prettier-ignore
-/** Expected next state and effect types, per signal in SIGNAL_TYPES order: BLINK HAND NOD SHAKE RIGHT PAUSE TICK TOUCH. */
+/** Expected next state and effect types, per signal in SIGNAL_TYPES order: BLINK HAND NOD SHAKE RIGHT PAUSE TICK TOUCH SPOKEN. */
 const TABLE: Record<StateName, readonly (readonly [StateName, readonly Effect['type'][]])[]> = {
-  'column.waiting':  [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.waiting', [A]], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.waiting', []], ['column.waiting', [A, S]]],
-  'column.counting': [['column.counting', []], ['column.counting', []], ['column.counting', []], ['column.rejected', [A, S]], ['column.counting', []], ['paused', [A]], ['column.counting', []], ['column.waiting', [A, S]]],
-  'column.asking':   [['column.counting', []], ['column.counting', []], ['row.waiting', [A]], ['column.rejected', [A, S]], ['column.asking', []], ['paused', [A]], ['column.asking', []], ['column.waiting', [A, S]]],
-  'column.rejected': [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.rejected', []], ['column.waiting', [A, S]]],
-  'row.waiting':     [['row.counting', []], ['row.counting', []], ['row.waiting', []], ['column.waiting', [A]], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.waiting', []], ['column.waiting', [A, S]]],
-  'row.counting':    [['row.counting', []], ['row.counting', []], ['row.counting', []], ['row.rejected', [A, S]], ['row.counting', []], ['paused', [A]], ['row.counting', []], ['column.waiting', [A, S]]],
-  'row.asking':      [['row.counting', []], ['row.counting', []], ['column.waiting', [A, S]], ['row.rejected', [A, S]], ['row.asking', []], ['paused', [A]], ['row.asking', []], ['column.waiting', [A, S]]],
-  'row.rejected':    [['row.counting', []], ['row.counting', []], ['row.rejected', []], ['row.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.rejected', []], ['column.waiting', [A, S]]],
-  'speak.asking':    [['speak.asking', []], ['speak.asking', []], ['speaking', ['speak']], ['column.waiting', ['stopSpeaking', A]], ['speak.asking', []], ['paused', [A]], ['speak.asking', []], ['column.waiting', [A, S]]],
-  speaking:          [['column.counting', []], ['column.counting', []], ['speaking', ['speak']], ['column.waiting', ['stopSpeaking', A]], ['speaking', []], ['paused', ['stopSpeaking', A]], ['speaking', []], ['column.waiting', [A, S]]],
-  paused:            [['paused', []], ['paused', []], ['paused', []], ['paused', []], ['paused', []], ['column.waiting', [A]], ['paused', []], ['paused', []]],
+  'column.waiting':  [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.waiting', [A, S]], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.waiting', []], ['column.waiting', [A, S]], ['column.waiting', []]],
+  'column.counting': [['column.counting', []], ['column.counting', []], ['column.counting', []], ['column.rejected', [A, S]], ['column.counting', []], ['paused', [A]], ['column.counting', []], ['column.waiting', [A, S]], ['column.counting', []]],
+  'column.asking':   [['column.counting', []], ['column.counting', []], ['row.waiting', [A]], ['column.rejected', [A, S]], ['column.asking', []], ['paused', [A]], ['column.asking', []], ['column.waiting', [A, S]], ['column.asking', []]],
+  'column.rejected': [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.rejected', []], ['column.waiting', [A, S]], ['column.rejected', []]],
+  'row.waiting':     [['row.counting', []], ['row.counting', []], ['row.waiting', []], ['column.waiting', [A]], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.waiting', []], ['column.waiting', [A, S]], ['row.waiting', []]],
+  'row.counting':    [['row.counting', []], ['row.counting', []], ['row.counting', []], ['row.rejected', [A, S]], ['row.counting', []], ['paused', [A]], ['row.counting', []], ['column.waiting', [A, S]], ['row.counting', []]],
+  'row.asking':      [['row.counting', []], ['row.counting', []], ['column.waiting', [A, S]], ['row.rejected', [A, S]], ['row.asking', []], ['paused', [A]], ['row.asking', []], ['column.waiting', [A, S]], ['row.asking', []]],
+  'row.rejected':    [['row.counting', []], ['row.counting', []], ['row.rejected', []], ['row.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.rejected', []], ['column.waiting', [A, S]], ['row.rejected', []]],
+  'speak.asking':    [['speak.asking', []], ['speak.asking', []], ['speaking', ['speak']], ['column.waiting', ['stopSpeaking', A]], ['speak.asking', []], ['paused', [A]], ['speak.asking', []], ['column.waiting', [A, S]], ['speak.asking', []]],
+  speaking:          [['column.counting', []], ['column.counting', []], ['speaking', ['speak']], ['column.waiting', ['stopSpeaking', A]], ['speaking', []], ['paused', ['stopSpeaking', A]], ['speaking', []], ['column.waiting', [A, S]], ['clear.asking', ['ask', S]]],
+  'clear.asking':    [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.waiting', [A, S]], ['speak.asking', ['ask', S]], ['paused', [A]], ['clear.asking', []], ['column.waiting', [A, S]], ['clear.asking', []]],
+  paused:            [['paused', []], ['paused', []], ['paused', []], ['paused', []], ['paused', []], ['column.waiting', [A]], ['paused', []], ['paused', []], ['paused', []]],
 };
 
 /** The only pairs that change the text (everything else must leave the sentence as it was). */
@@ -81,17 +82,18 @@ const TEXT_CHANGES = new Set([
   'column.waiting SHAKE', // undo
   'column.rejected NOD', // a space
   'row.asking NOD', // the letter W
+  'clear.asking NOD', // a new sentence: cleared (spec 008, R3)
   // a tap on "A" adds it in every state but the pause (spec 007, R3)
   ...STATE_NAMES.filter((name) => name !== 'paused').map((name) => `${name} TOUCH`),
 ]);
 
 describe('the transition table (R4)', () => {
-  it('has an entry for every state and every signal: 11 × 8 = 88', () => {
+  it('has an entry for every state and every signal: 12 × 9 = 108', () => {
     expect(Object.keys(TRANSITIONS).sort()).toEqual([...STATE_NAMES].sort());
     for (const name of STATE_NAMES) {
       expect(Object.keys(TRANSITIONS[name]).sort(), name).toEqual([...SIGNAL_TYPES].sort());
     }
-    expect(STATE_NAMES.length * SIGNAL_TYPES.length).toBe(88);
+    expect(STATE_NAMES.length * SIGNAL_TYPES.length).toBe(108);
   });
 
   for (const name of STATE_NAMES) {
@@ -215,12 +217,13 @@ describe('counting paths (R5)', () => {
 });
 
 describe('the space: a nod without a number (author, 2026-11-13)', () => {
-  it('adds a space, says "Spacja" (Space), and a shake removes it', () => {
+  it('adds a space, says the word just finished (spec 008, R2), and a shake removes it', () => {
     const first = run([N], fixture('column.waiting'));
     let { state } = first;
     const { effects } = first;
     expect(state.sentence.text).toBe('AB ');
-    expect(texts(effects, 'say')).toEqual([{ key: 'counting.space' }]);
+    expect(texts(effects, 'say')).toEqual([{ key: 'counting.letter', params: { letter: 'AB' } }]);
+    expect(state.notice).toEqual({ key: 'counting.space' });
     ({ state } = run([X], state));
     expect(state.sentence.text).toBe('AB');
     expect(state.notice).toEqual({ key: 'counting.undoneSpace' });
