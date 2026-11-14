@@ -50,6 +50,26 @@ test.describe('Ustawienia (Settings)', () => {
     await expect(pauseField(page)).toHaveValue('2500');
   });
 
+  test('the pause hint and its error keep clear space above the first switch, also on a narrow phone', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 640 });
+    const gapAbove = async () => {
+      const subscript = (await page
+        .locator('.mat-mdc-form-field-subscript-wrapper')
+        .first()
+        .boundingBox())!;
+      const firstSwitch = (await page.locator('.toggles li').first().boundingBox())!;
+      return firstSwitch.y - (subscript.y + subscript.height);
+    };
+    await expect(page.getByText(/Od 500 do 5000 ms/)).toBeVisible();
+    expect(await gapAbove()).toBeGreaterThanOrEqual(8);
+    await pauseField(page).fill('100');
+    await pauseField(page).blur();
+    await expect(page.locator('.mat-mdc-form-field-error-wrapper')).toHaveCSS('opacity', '1');
+    expect(await gapAbove()).toBeGreaterThanOrEqual(8);
+  });
+
   test('switches survive a reload and change Liczenie (Counting)', async ({ page }) => {
     await toggle(page, /Przyciski sygnałów/).click();
     await toggle(page, /Podpowiedzi w Liczeniu/).click();

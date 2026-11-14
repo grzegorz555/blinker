@@ -19,7 +19,8 @@
 <!-- Liczenie (Counting) -->
 <section class="group" aria-labelledby="settings-counting">
   <h2 id="settings-counting" class="group-title">{{ 'settings.counting.title' | transloco }}</h2>
-  <mat-form-field class="field">
+  <!-- Dynamic subscript: a hint or error wrapped to two lines pushes the switches down instead of touching them. -->
+  <mat-form-field class="field" subscriptSizing="dynamic">
     <mat-label>{{ 'settings.counting.askAfter' | transloco }}</mat-label>
     <input
       matInput
