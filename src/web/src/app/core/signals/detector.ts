@@ -15,8 +15,10 @@ export interface DetectorState {
   /** When both eyes closed, and whether he was looking down then (the look at his hand lowers the lids). */
   readonly closedSince: number | null;
   readonly closedWhileDown: boolean;
-  /** The strongest squeeze of the lids during the current closure. */
+  /** The strongest squeeze of the lids, the deepest closure and the lowest look during the current closure. */
   readonly closedSqueeze: number;
+  readonly closedPeak: number;
+  readonly closedDown: number;
   /** When the eyes went down, and whether HAND was already sent for this look. */
   readonly downSince: number | null;
   readonly handSent: boolean;
@@ -34,6 +36,8 @@ export const INITIAL_DETECTOR: DetectorState = {
   closedSince: null,
   closedWhileDown: false,
   closedSqueeze: 0,
+  closedPeak: 0,
+  closedDown: 0,
   downSince: null,
   handSent: false,
   nodSince: null,
@@ -45,9 +49,23 @@ export const INITIAL_DETECTOR: DetectorState = {
 /** Hysteresis: a state that started at a threshold ends below this share of it. */
 export const RELEASE = 0.8;
 
+/** Why a closure of the eyes was or was not his blink (Diagnostyka (Diagnostics) shows it, to tune with him). */
+export type ClosureVerdict = 'blink' | 'weak' | 'tooLong' | 'lookingDown';
+
+/** One closure of the eyes, reported when the eyes open: its length and peaks, and the verdict. */
+export interface ClosureReport {
+  readonly ms: number;
+  readonly closure: number;
+  readonly squeeze: number;
+  readonly down: number;
+  readonly verdict: ClosureVerdict;
+}
+
 export interface Detection {
   readonly state: DetectorState;
   readonly signals: readonly FaceSignal[];
+  /** Set on the frame where a closure ends. */
+  readonly closure?: ClosureReport;
 }
 
 /** Without a face: every half-done signal is dropped (only the refractory time is kept). */
@@ -65,24 +83,50 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
   const down = Math.max(e.eyeLookDownLeft ?? 0, e.eyeLookDownRight ?? 0);
   const looksDown = down >= profile.hand.threshold;
   const fired: FaceSignal[] = [];
+  let report: ClosureReport | undefined;
   let s: DetectorState = state;
 
   // His blink: fires when the eyes open again, if the closure was long enough or strong enough, and not too long.
+  // Closing the eyes also lowers them (MediaPipe's eyeLookDown rises with eyeBlink), so a closure is a look at his hand
+  // only if he was already looking down when it began, or if the look lasted long enough to send HAND (below).
   if (s.closedSince === null) {
     if (closure >= profile.blink.threshold) {
-      s = { ...s, closedSince: t, closedWhileDown: looksDown, closedSqueeze: squeeze };
+      s = {
+        ...s,
+        closedSince: t,
+        closedWhileDown: s.downSince !== null,
+        closedSqueeze: squeeze,
+        closedPeak: closure,
+        closedDown: down,
+      };
     }
   } else if (closure < profile.blink.threshold * RELEASE) {
     const ms = t - s.closedSince;
     const long = ms >= profile.blink.minMs;
     const strong = s.closedSqueeze >= profile.blink.squeeze;
-    if (!s.closedWhileDown && (long || strong) && ms <= profile.blink.maxMs) fired.push('BLINK');
-    s = { ...s, closedSince: null, closedWhileDown: false, closedSqueeze: 0 };
+    const verdict: ClosureVerdict = s.closedWhileDown
+      ? 'lookingDown'
+      : ms > profile.blink.maxMs
+        ? 'tooLong'
+        : long || strong
+          ? 'blink'
+          : 'weak';
+    if (verdict === 'blink') fired.push('BLINK');
+    report = { ms, closure: s.closedPeak, squeeze: s.closedSqueeze, down: s.closedDown, verdict };
+    s = {
+      ...s,
+      closedSince: null,
+      closedWhileDown: false,
+      closedSqueeze: 0,
+      closedPeak: 0,
+      closedDown: 0,
+    };
   } else {
     s = {
       ...s,
-      closedWhileDown: s.closedWhileDown || looksDown,
       closedSqueeze: Math.max(s.closedSqueeze, squeeze),
+      closedPeak: Math.max(s.closedPeak, closure),
+      closedDown: Math.max(s.closedDown, down),
     };
   }
 
@@ -93,7 +137,8 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
     s = { ...s, downSince: null, handSent: false };
   } else if (!s.handSent && t - s.downSince >= profile.hand.holdMs) {
     fired.push('HAND');
-    s = { ...s, handSent: true };
+    // A look long enough to count is not also a blink when the lids come back up.
+    s = { ...s, handSent: true, closedWhileDown: s.closedSince !== null || s.closedWhileDown };
   }
 
   const head = frame.head;
@@ -139,8 +184,11 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
   }
 
   // One signal at a time, and a quiet time after it.
-  if (!fired.length || t - s.lastSignalAt < profile.refractoryMs) return { state: s, signals: [] };
-  return { state: { ...s, lastSignalAt: t }, signals: [fired[0]] };
+  const extra = report ? { closure: report } : {};
+  if (!fired.length || t - s.lastSignalAt < profile.refractoryMs) {
+    return { state: s, signals: [], ...extra };
+  }
+  return { state: { ...s, lastSignalAt: t }, signals: [fired[0]], ...extra };
 }
 
 /** Runs the detector over a recording (calibration, tests). */
