@@ -54,6 +54,37 @@
   </ul>
 </section>
 
+<!-- Kamera (Camera), spec 012 -->
+<section class="group" aria-labelledby="settings-camera">
+  <h2 id="settings-camera" class="group-title">{{ 'settings.camera.title' | transloco }}</h2>
+  <ul class="toggles">
+    @for (key of cameraToggles; track key) {
+      <li>
+        <mat-slide-toggle
+          [checked]="settings()[key]"
+          (change)="set(key, $event.checked)"
+          [attr.data-testid]="'toggle-' + key"
+        >
+          <span class="toggle-label">{{ 'settings.camera.' + key | transloco }}</span>
+          <span class="toggle-hint">{{ 'settings.camera.' + key + 'Hint' | transloco }}</span>
+        </mat-slide-toggle>
+      </li>
+    }
+  </ul>
+  <p id="facing-label" class="field-label">{{ 'settings.camera.facing' | transloco }}</p>
+  <mat-radio-group
+    class="radios"
+    aria-labelledby="facing-label"
+    [value]="settings().cameraFacing"
+    (change)="set('cameraFacing', $event.value)"
+  >
+    <mat-radio-button value="user">{{ 'settings.camera.facingUser' | transloco }}</mat-radio-button>
+    <mat-radio-button value="environment">{{
+      'settings.camera.facingEnvironment' | transloco
+    }}</mat-radio-button>
+  </mat-radio-group>
+</section>
+
 <!-- Głos (Voice) -->
 <section class="group" aria-labelledby="settings-voice">
   <h2 id="settings-voice" class="group-title">{{ 'settings.voice.title' | transloco }}</h2>

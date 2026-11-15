@@ -55,6 +55,8 @@ export class SettingsPage {
   protected readonly limits = ASK_AFTER;
   protected readonly rates = RATES;
   protected readonly themes = THEMES;
+  /** Spec 012: the camera switches, in their own group. */
+  protected readonly cameraToggles = ['camera', 'cameraPreview', 'signalSound'] as const;
   protected readonly toggles: readonly Toggle[] = [
     'confirmByNod',
     'speakPrompts',

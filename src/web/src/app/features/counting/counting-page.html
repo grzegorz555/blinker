@@ -1,5 +1,14 @@
 <!-- "Pauza" (Pause) in the top app bar (spec 007, R2, R4): a toggle, its state in aria-pressed and in the label. -->
 <ng-template cdkPortal>
+  @if (cameraOn()) {
+    <app-camera-chip
+      [statusKey]="cameraStatusKey()"
+      [problem]="cameraProblem()"
+      [preview]="cameraPreview()"
+      [mirrored]="cameraMirrored()"
+      (ready)="startCamera($event)"
+    />
+  }
   <button
     matButton="tonal"
     type="button"
