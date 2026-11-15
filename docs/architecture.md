@@ -74,6 +74,10 @@ signal)` → effects (the text for the screen and the live region, `Speaker.say(
 action is the `TOUCH` signal (`CountingService.touch()`, spec 007), so every change of the text goes through the
 machine. Stage 4 adds his face signals as one more source of `InputSignal`.
 
+- `core/vision/camera-input.service.ts` (spec 012): frames → detector → the same sink as the buttons; the face-in-view
+  status with a 1.5 s grace. `core/sound/cue.ts`: a tone per signal with the Web Audio API (no audio files).
+  Liczenie (Counting) provides the tracker, so the camera lives exactly as long as the screen; the video plays inside
+  the camera chip in the top bar.
 - `core/signals/` (spec 011): `detector.ts` (a pure detector of his five face signals), `profile.ts` and
   `ProfileService` (his thresholds, `blinker.profile.v1`, validated when read back), `fit.ts` (the profile from
   calibration recordings), `synthetic.ts` (recordings for tests only).

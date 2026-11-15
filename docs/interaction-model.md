@@ -34,6 +34,12 @@ without a face every half-done signal is dropped.
 - `HEAD_SHAKE` → `SHAKE`: yaw past 10° to one side and then the other within 1.5 s.
 - `HEAD_RIGHT` → `RIGHT`: yaw past 20° to his right held for 300 ms, sent when the head comes back; the side is learnt.
 
+**From the camera to Liczenie (Counting) (spec 012):** with "Sterowanie kamerą w Liczeniu" (Camera control in
+Counting) on, each detected signal goes to the counting machine exactly like a button press, and a short tone confirms
+it (a high blip for +1, a lower one for +5, rising for yes, falling for no, a long one for finish), so he hears that
+Blinker counted it. The top bar says whether the camera sees his face ("Brak twarzy" (No face) after 1.5 s). A
+caregiver holding the phone towards him chooses the rear camera.
+
 Kalibracja (Calibration) learns his thresholds (`core/signals/fit.ts`): halfway between his value at rest and the
 median of his deliberate movements, clamped to safe ranges; a step without a clear movement keeps the old value. The
 numbers in brackets are the defaults until he is calibrated; the first session with him (stage 6) checks them.

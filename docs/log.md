@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (spec 012, the camera drives Liczenie (Counting))
+- With the camera switch on (off by default), his face signals go to the counting machine like the buttons, each confirmed by a short tone; the top bar says whether his face is in view; a caregiver can use the rear camera. Stage 5 is built; everything waits for the first session with him (calibration, thresholds, the tones).
+
 ## 2026-11-15 (spec 011, his signals from the camera)
 - A pure detector turns face frames into his signals (long blink, look at his hand, nod, shake, head right), with hysteresis and a quiet time; a profile of his thresholds is kept on the device. Diagnostyka (Diagnostics) lists the detected signals; Kalibracja (Calibration) learns his thresholds step by step and joined the navigation. The defaults are guesses until the first session with him.
 

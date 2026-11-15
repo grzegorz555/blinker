@@ -24,8 +24,8 @@ alone. Everything else stays as it is: the counting machine of specs 006–009 d
 - **R3. He hears each signal.** A short sound per detected signal (a different tone per kind: blink, hand, nod,
   shake, head right), made on the device with the Web Audio API (no audio files), so he knows Blinker counted it.
   "Dźwięk przy sygnale" (A sound for each signal), on by default. The chosen letter is still said (spec 009).
-- **R4. Face in view, in words.** A small status in the status line: "Kamera: widzę twarz" (Camera: face in view) or
-  "Kamera: nie widzę twarzy" (Camera: no face in view) after 1.5 s without a face; the change is announced politely.
+- **R4. Face in view, in words.** A small status: "Widzę twarz" (Face in view) or "Brak twarzy" (No face) after
+  1.5 s without a face, as a chip in the top app bar next to "Pauza" (Pause), so the board keeps its height; the change is announced politely.
   A small preview can be shown or hidden ("Podgląd kamery" (Camera preview)), off by default so the board keeps its
   size; errors (no permission, no camera) are said in text and the buttons keep working.
 - **R5. Rear camera.** "Kamera" (Camera): "przednia" (front) or "tylna" (rear), for a caregiver holding the phone
@@ -34,12 +34,12 @@ alone. Everything else stays as it is: the counting machine of specs 006–009 d
 
 # Acceptance criteria
 
-- [ ] Unit: frames → signals → `send()` (a fake tracker with synthetic frames); "no face" after 1.5 s and back; the
+- [x] Unit: frames → signals → `send()` (a fake tracker with synthetic frames); "no face" after 1.5 s and back; the
       sound per signal (a fake audio context); the settings (validated, defaults off/on).
-- [ ] e2e (Chromium, fake camera): the switch in Ustawienia (Settings) → Liczenie (Counting) shows "Kamera: nie widzę
-      twarzy" (the test pattern), the buttons still work, no third-party request, no CSP violation, axe; the board
+- [x] e2e (Chromium, fake camera): the switch in Ustawienia (Settings) → Liczenie (Counting) shows "Brak twarzy" (No face,
+      the test pattern), the buttons still work, no third-party request, no CSP violation, axe; the board
       still fits at 360 × 640 with the camera status; the camera stops when leaving.
-- [ ] `npm run verify -- --lighthouse` passes.
+- [x] `npm run verify -- --lighthouse` passes.
 
 # Out of scope
 

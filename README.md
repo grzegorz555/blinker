@@ -22,6 +22,10 @@ them into sentences that are shown on screen and read aloud.
 - **Ustawienia (Settings)**: the pause before the question, the nod confirmation, spoken questions and notices, signal buttons, keyboard shortcuts, hints, speech rate with a voice check, language and theme.
 - A navigation bar on phones and a rail from 600 px; English and Polish; everything is kept on the device only (localStorage, validated when read back).
 
+**Stage 5: the camera drives Liczenie (Counting)** (spec [012](docs/specs/012-camera-counting/spec.md), built; to try with him):
+
+- In Ustawienia (Settings), "Kamera" (Camera): "Sterowanie kamerą w Liczeniu" (Camera control in Counting, off by default), a small preview, "Dźwięk przy sygnale" (A sound for each signal, on), and the front or rear camera. With it on, Liczenie (Counting) watches his face: each signal works like its button and plays a short tone; the top bar says whether his face is in view.
+
 **Stage 4: his signals from the camera** (spec [011](docs/specs/011-signals/spec.md), built; the thresholds are defaults until he is calibrated):
 
 - **Kalibracja (Calibration)**, in the navigation: a step-by-step wizard (at rest, 3 long blinks, a look at each hand, a nod, a shake, head right), each step said aloud and showing "Wykryto n z k" (Detected n of k); "Zapisz kalibrację" (Save the calibration) keeps his thresholds on the device (numbers only, never a picture).
