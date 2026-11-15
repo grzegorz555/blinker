@@ -264,6 +264,19 @@
     "roll": "Tilt",
     "blocked": "Blocked sending to: {{origins}}",
     "copy": "Copy the results",
-    "copied": "Results copied (no picture)."
+    "copied": "Results copied (no picture).",
+    "signals": {
+      "title": "Detected signals",
+      "calibrated": "By his calibration.",
+      "defaults": "By the default settings: calibrate to recognize his signals better.",
+      "none": "None yet."
+    },
+    "signal": {
+      "BLINK": "Long blink (+1)",
+      "HAND": "Look at his hand (+5)",
+      "NOD": "Nod (yes)",
+      "SHAKE": "Head shake (no)",
+      "RIGHT": "Head right (finish)"
+    }
   }
 }

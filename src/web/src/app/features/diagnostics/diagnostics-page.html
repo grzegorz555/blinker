@@ -107,6 +107,26 @@
     </div>
   </dl>
 
+  <h3 class="sub-title">{{ 'diagnostics.signals.title' | transloco }}</h3>
+  <p class="muted" data-testid="profile-kind">
+    {{
+      (calibrated() ? 'diagnostics.signals.calibrated' : 'diagnostics.signals.defaults') | transloco
+    }}
+  </p>
+  <!-- Deliberate signals are rare events, so the list is a log (announced politely), unlike the live values. -->
+  <div role="log" data-testid="signals">
+    <ol class="signals">
+      @for (item of detected(); track item.id) {
+        <li>
+          {{ 'diagnostics.signal.' + item.signal | transloco }}
+          <span class="muted">{{ item.at }}</span>
+        </li>
+      } @empty {
+        <li class="muted">{{ 'diagnostics.signals.none' | transloco }}</li>
+      }
+    </ol>
+  </div>
+
   @if (blocked().length) {
     <p class="muted" data-testid="blocked">
       {{ 'diagnostics.blocked' | transloco: { origins: blocked().join(', ') } }}

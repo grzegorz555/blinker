@@ -44,6 +44,9 @@ test.describe('Diagnostyka (Diagnostics)', () => {
       })
       .toBeGreaterThan(0);
     await expect(page.getByTestId('face')).toHaveText('nie');
+    // No face, no signals; the detector runs with the default profile until he is calibrated (spec 011).
+    await expect(page.getByTestId('signals')).toHaveText('Jeszcze żadnego.');
+    await expect(page.getByTestId('profile-kind')).toContainText('Według ustawień domyślnych');
     await expectNoA11yViolations(page);
 
     await page.getByRole('button', { name: 'Wyłącz kamerę' }).click();

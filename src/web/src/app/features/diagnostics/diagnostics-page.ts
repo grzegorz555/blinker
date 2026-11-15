@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { detect, INITIAL_DETECTOR, type FaceSignal } from '../../core/signals/detector';
+import { ProfileService } from '../../core/signals/profile.service';
 import { EYE_SHAPES, type EyeShape } from '../../core/vision/face-frame';
 import { FACE_WORKER, FaceTrackerService } from '../../core/vision/face-tracker.service';
 import { createFaceWorker } from '../../core/vision/face-worker';
@@ -35,6 +37,9 @@ interface BatteryLike extends EventTarget {
 export class DiagnosticsPage {
   private readonly tracker = inject(FaceTrackerService);
   private readonly transloco = inject(TranslocoService);
+  private readonly profiles = inject(ProfileService);
+  private detector = INITIAL_DETECTOR;
+  private nextId = 0;
   private readonly video = viewChild.required<ElementRef<HTMLVideoElement>>('video');
 
   protected readonly shapes = EYE_SHAPES;
@@ -47,6 +52,12 @@ export class DiagnosticsPage {
   protected readonly on = computed(() => ['starting', 'running'].includes(this.status()));
   protected readonly battery = signal<{ start: number; now: number } | null>(null);
   protected readonly copied = signal(false);
+  /** Whether his own calibration is used, or the defaults (spec 011, R3). */
+  protected readonly calibrated = this.profiles.calibrated;
+  /** The last signals the detector found, newest first (spec 011, R3). */
+  protected readonly detected = signal<readonly { id: number; signal: FaceSignal; at: string }[]>(
+    [],
+  );
 
   /** Frames analysed and frames with a face, since the camera was turned on. */
   private readonly counts = signal({ frames: 0, faces: 0, since: 0 });
@@ -59,6 +70,18 @@ export class DiagnosticsPage {
     effect(() => {
       const frame = this.frame();
       if (!frame) return;
+      // His signals, as Liczenie (Counting) would get them with the camera (spec 011, R3).
+      const found = detect(this.detector, frame, this.profiles.profile());
+      this.detector = found.state;
+      if (found.signals.length) {
+        const at = new Date().toLocaleTimeString(this.transloco.getActiveLang());
+        this.detected.update((list) =>
+          [...found.signals.map((signal) => ({ id: this.nextId++, signal, at })), ...list].slice(
+            0,
+            8,
+          ),
+        );
+      }
       this.counts.update((c) => ({
         ...c,
         frames: c.frames + 1,
@@ -70,6 +93,8 @@ export class DiagnosticsPage {
 
   protected async start(): Promise<void> {
     this.copied.set(false);
+    this.detector = INITIAL_DETECTOR;
+    this.detected.set([]);
     this.counts.set({ frames: 0, faces: 0, since: performance.now() });
     void this.watchBattery();
     await this.tracker.start(this.video().nativeElement);
