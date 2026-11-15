@@ -148,6 +148,9 @@ export class CalibrationPage {
     }
     this.saved.set(false);
     this.index.set(target);
+    // The camera page asks for the camera at once (the click on Dalej (Next) is the user's gesture); the button
+    // there is only for a retry after a refusal or an error.
+    if (page === 'camera' && !this.cameraOn()) void this.startCamera();
     // Focus the new step's heading, so a screen reader starts there (like a page change).
     queueMicrotask(() => this.heading()?.nativeElement.focus());
   }

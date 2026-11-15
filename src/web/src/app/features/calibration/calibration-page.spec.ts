@@ -68,14 +68,16 @@ describe('CalibrationPage (spec 011, R4)', () => {
     return { fixture, root, tracker, text, heading, click, feed, data, listen };
   }
 
-  it('walks the steps; the camera starts only on the button; each step is said aloud', async () => {
+  it('walks the steps; the camera starts when its page opens; each step is said aloud', async () => {
     const { heading, click, tracker, text, listen } = await render();
     expect(heading()).toBe('What will happen');
+    expect(tracker.start).not.toHaveBeenCalled();
     await click('Next');
     expect(heading()).toBe('Camera');
-    expect(tracker.start).not.toHaveBeenCalled();
+    expect(tracker.start).toHaveBeenCalledTimes(1);
+    // While it starts (or after a refusal) the button is there to try again.
     await click('Turn on the camera');
-    expect(tracker.start).toHaveBeenCalled();
+    expect(tracker.start).toHaveBeenCalledTimes(2);
     tracker.status.set('running');
     await click('Next');
     expect(heading()).toBe('At rest, facing the screen');

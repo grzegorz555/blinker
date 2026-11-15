@@ -32,6 +32,11 @@
   outline-offset: 2px;
 }
 
+/* The card is a grid: without this the button would stretch across it. */
+.start {
+  justify-self: start;
+}
+
 .preview {
   aspect-ratio: 4 / 3;
   width: 100%;
