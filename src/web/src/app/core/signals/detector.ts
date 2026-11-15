@@ -3,7 +3,8 @@
 //
 // Each signal is a small state machine with hysteresis (it starts at the threshold and ends a little below it, so noise
 // around the threshold can't make it flicker) and fires once, mostly on release (a long blink when the eyes open, a head
-// right when the head comes back), so holding a position never repeats a signal.
+// right when the head comes back), so holding a position never repeats a signal. His blink is strong rather than long:
+// a closure counts if it is long enough or if the lids squeeze hard enough while it lasts.
 import type { FaceFrame } from '../vision/face-frame';
 import type { SignalProfile } from './profile';
 
@@ -14,6 +15,8 @@ export interface DetectorState {
   /** When both eyes closed, and whether he was looking down then (the look at his hand lowers the lids). */
   readonly closedSince: number | null;
   readonly closedWhileDown: boolean;
+  /** The strongest squeeze of the lids during the current closure. */
+  readonly closedSqueeze: number;
   /** When the eyes went down, and whether HAND was already sent for this look. */
   readonly downSince: number | null;
   readonly handSent: boolean;
@@ -30,6 +33,7 @@ export interface DetectorState {
 export const INITIAL_DETECTOR: DetectorState = {
   closedSince: null,
   closedWhileDown: false,
+  closedSqueeze: 0,
   downSince: null,
   handSent: false,
   nodSince: null,
@@ -57,24 +61,29 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
   const t = frame.timestamp;
   const e = frame.eyes;
   const closure = Math.min(e.eyeBlinkLeft ?? 0, e.eyeBlinkRight ?? 0);
+  const squeeze = Math.min(e.eyeSquintLeft ?? 0, e.eyeSquintRight ?? 0);
   const down = Math.max(e.eyeLookDownLeft ?? 0, e.eyeLookDownRight ?? 0);
   const looksDown = down >= profile.hand.threshold;
   const fired: FaceSignal[] = [];
   let s: DetectorState = state;
 
-  // Long blink: fires when the eyes open again, if the closure was long enough and not too long.
+  // His blink: fires when the eyes open again, if the closure was long enough or strong enough, and not too long.
   if (s.closedSince === null) {
     if (closure >= profile.blink.threshold) {
-      s = { ...s, closedSince: t, closedWhileDown: looksDown };
+      s = { ...s, closedSince: t, closedWhileDown: looksDown, closedSqueeze: squeeze };
     }
   } else if (closure < profile.blink.threshold * RELEASE) {
     const ms = t - s.closedSince;
-    if (!s.closedWhileDown && ms >= profile.blink.minMs && ms <= profile.blink.maxMs) {
-      fired.push('BLINK');
-    }
-    s = { ...s, closedSince: null, closedWhileDown: false };
-  } else if (looksDown) {
-    s = { ...s, closedWhileDown: true };
+    const long = ms >= profile.blink.minMs;
+    const strong = s.closedSqueeze >= profile.blink.squeeze;
+    if (!s.closedWhileDown && (long || strong) && ms <= profile.blink.maxMs) fired.push('BLINK');
+    s = { ...s, closedSince: null, closedWhileDown: false, closedSqueeze: 0 };
+  } else {
+    s = {
+      ...s,
+      closedWhileDown: s.closedWhileDown || looksDown,
+      closedSqueeze: Math.max(s.closedSqueeze, squeeze),
+    };
   }
 
   // Look at his hand: fires once when the eyes have been down long enough.

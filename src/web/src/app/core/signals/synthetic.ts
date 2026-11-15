@@ -27,6 +27,8 @@ export function record(ms: number, motion: Motion = {}, start = 0): FaceFrame[] 
         ? {
             eyeBlinkLeft: 0.05,
             eyeBlinkRight: 0.05,
+            eyeSquintLeft: 0.05,
+            eyeSquintRight: 0.05,
             eyeLookDownLeft: 0.05,
             eyeLookDownRight: 0.05,
             ...motion.eyes?.(t),
@@ -49,6 +51,15 @@ export const pulses =
   (list: readonly (readonly [number, number, number])[], rest = 0) =>
   (t: number) =>
     list.find(([from, to]) => t >= from && t < to)?.[2] ?? rest;
+
+/** Both eyes closed hard (blink 0.9, lids squeezed to `squeezeTo`) between `from` and `to`. */
+export const squeezed =
+  (from: number, to: number, squeezeTo = 0.8) =>
+  (t: number) => {
+    const v = pulse(from, to, 0.9, 0.05)(t);
+    const q = pulse(from, to, squeezeTo, 0.05)(t);
+    return { eyeBlinkLeft: v, eyeBlinkRight: v, eyeSquintLeft: q, eyeSquintRight: q };
+  };
 
 /** Both eyes closed (blink 0.9) between `from` and `to`. */
 export const closed = (from: number, to: number) => (t: number) => {

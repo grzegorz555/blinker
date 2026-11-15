@@ -11,7 +11,7 @@ generated:
 
 # Problem
 A friend of the author can't speak or use his hands. He communicates with a paper letter board: another person
-points at the board **column by column**, he confirms the right column with a long blink, then the person points
+points at the board **column by column**, he confirms the right column with a strong blink, then the person points
 **row by row** inside that column and he confirms the letter. He also uses shortcuts, such as a head nod or a
 look at his hand, so he doesn't have to blink many times (see [interaction model](interaction-model.md)).
 This works, but it is slow, needs a trained partner and is tiring for both sides.

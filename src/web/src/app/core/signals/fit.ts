@@ -39,7 +39,7 @@ export const STEP_REPEATS: Record<Exclude<CalibrationStep, 'neutral'>, number> =
 };
 
 /** The smallest difference from rest that counts as a deliberate movement. */
-export const MIN_CONTRAST = { eyes: 0.2, angle: 6 } as const;
+export const MIN_CONTRAST = { eyes: 0.2, squeeze: 0.1, angle: 6 } as const;
 
 export interface Fit {
   readonly profile: SignalProfile;
@@ -59,17 +59,30 @@ export function percentile(values: readonly number[], p: number): number {
 
 const withFace = (frames: readonly FaceFrame[] | undefined) => (frames ?? []).filter((f) => f.face);
 const closure = (f: FaceFrame) => Math.min(f.eyes.eyeBlinkLeft ?? 0, f.eyes.eyeBlinkRight ?? 0);
+const squeeze = (f: FaceFrame) => Math.min(f.eyes.eyeSquintLeft ?? 0, f.eyes.eyeSquintRight ?? 0);
 const down = (f: FaceFrame) => Math.max(f.eyes.eyeLookDownLeft ?? 0, f.eyes.eyeLookDownRight ?? 0);
 
-/** The durations (ms) of the runs where `above` holds. */
-function runs(frames: readonly FaceFrame[], above: (f: FaceFrame) => boolean): number[] {
-  const out: number[] = [];
-  let start: number | null = null;
+interface Closure {
+  readonly ms: number;
+  readonly closure: number;
+  readonly squeeze: number;
+}
+
+/** Each closure of the eyes (both at or above `threshold`): how long, how far closed, how hard squeezed at most. */
+function closures(frames: readonly FaceFrame[], threshold: number): Closure[] {
+  const out: Closure[] = [];
+  let open: { start: number; closure: number; squeeze: number } | null = null;
   for (const f of frames) {
-    if (above(f) && start === null) start = f.timestamp;
-    if (!above(f) && start !== null) {
-      out.push(f.timestamp - start);
-      start = null;
+    const c = closure(f);
+    if (c < threshold) {
+      if (open)
+        out.push({ ms: f.timestamp - open.start, closure: open.closure, squeeze: open.squeeze });
+      open = null;
+    } else if (open) {
+      open.closure = Math.max(open.closure, c);
+      open.squeeze = Math.max(open.squeeze, squeeze(f));
+    } else {
+      open = { start: f.timestamp, closure: c, squeeze: squeeze(f) };
     }
   }
   return out;
@@ -91,6 +104,7 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
   // Rest: his head pose, and his eyes open and looking at the screen.
   const rest = withFace(recordings.neutral);
   let restClosure = 0.1;
+  let restSqueeze = 0.1;
   let restDown = 0.1;
   if (rest.length) {
     const yaw = percentile(
@@ -106,21 +120,42 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
       neutral: { yaw: round(clamp(yaw, L.angle), 1), pitch: round(clamp(pitch, L.angle), 1) },
     };
     restClosure = percentile(rest.map(closure), 50);
+    restSqueeze = percentile(rest.map(squeeze), 50);
     restDown = percentile(rest.map(down), 50);
     learnt.push('neutral');
   }
 
+  // His blinks, one closure at a time: a short blink is only a few frames of a recording, so a percentile of all
+  // frames would miss it. A closure is anything clearly more closed than his rest.
   const blink = withFace(recordings.blink);
-  const blinkPeak = percentile(blink.map(closure), 90);
-  if (blinkPeak - restClosure >= MIN_CONTRAST.eyes) {
+  const deliberate = closures(blink, restClosure + MIN_CONTRAST.eyes);
+  if (deliberate.length) {
+    const blinkPeak = percentile(
+      deliberate.map((c) => c.closure),
+      50,
+    );
     const threshold = clamp(restClosure + (blinkPeak - restClosure) / 2, L.threshold);
-    const lengths = runs(blink, (f) => closure(f) >= threshold);
-    const typical = percentile(lengths, 50);
+    const typical = percentile(
+      closures(blink, threshold).map((c) => c.ms),
+      50,
+    );
     // His long blinks, minus a margin; never so short that an involuntary blink (100–300 ms) passes.
     const minMs = Number.isNaN(typical)
       ? p.blink.minMs
       : Math.round(clamp(Math.min(p.blink.minMs, typical * 0.6), [350, L.blinkMinMs[1]]));
-    p = { ...p, blink: { ...p.blink, threshold: round(threshold), minMs } };
+    // His strong blinks: halfway between the squeeze of his ordinary blinks (those in the rest recording, or the
+    // resting lids if he did not blink then) and the median squeeze of his deliberate ones.
+    const ordinary = closures(rest, threshold).map((c) => c.squeeze);
+    const floor = Math.max(restSqueeze, ...ordinary);
+    const strong = percentile(
+      deliberate.map((c) => c.squeeze),
+      50,
+    );
+    const squeezeAt =
+      strong - floor >= MIN_CONTRAST.squeeze
+        ? round(clamp(floor + (strong - floor) / 2, L.threshold))
+        : p.blink.squeeze;
+    p = { ...p, blink: { ...p.blink, threshold: round(threshold), minMs, squeeze: squeezeAt } };
     learnt.push('blink');
   }
 

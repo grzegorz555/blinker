@@ -27,7 +27,9 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
 
 - [ ] Phone on the stand, facing him as for talking; Diagnostyka (Diagnostics) → "Włącz kamerę" (Turn on the camera).
 - [ ] Note: "Twarz w kadrze" (Face in view) yes most of the time? FPS, analysis median and p95, engine (GPU or CPU).
-- [ ] Ask for a few long blinks, a look at his hand, a nod, a shake, head right; watch the eye meters and the head
+- [ ] Ask for a few strong blinks and watch both meters: "Mrugnięcie" (Blink) and "Zaciśnięcie powiek" (Lids squeezed). Then let him
+      blink normally for a while: his ordinary blinks should squeeze clearly less. Note both levels.
+- [ ] Ask for a look at his hand, a nod, a shake, head right; watch the eye meters and the head
       angles move, and the "Wykryte sygnały" (Detected signals) list.
 - [ ] After 10 minutes: "Kopiuj wyniki" (Copy the results) → paste into the ADR-0006 table (device, browser, light).
 - [ ] Repeat with other light (evening lamp) and, if he wears them, with glasses.

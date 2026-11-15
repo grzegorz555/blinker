@@ -15,7 +15,7 @@ Blendshape names come from MediaPipe Face Landmarker (https://ai.google.dev/edge
 
 | Signal | How it is detected | Status |
 |---|---|---|
-| `LONG_BLINK` | both `eyeBlinkLeft/Right` above the threshold for at least ~0.6 s (calibrated). Shorter closures are **ignored as involuntary**. | confirmed |
+| `BLINK` (strong) | both `eyeBlinkLeft/Right` above the threshold, and either **strong** (`eyeSquintLeft/Right` squeezed past his calibrated level at some moment of the closure) or long (at least ~0.6 s, calibrated). His deliberate blink is strong rather than long (the author, 2026-11-15); an ordinary blink (short, lids not squeezed) is **ignored as involuntary**. | confirmed; the squeeze level to measure with him |
 | `VERY_LONG_CLOSE` | eyes closed for at least ~3 s | to confirm with him |
 | `HEAD_NOD` | head pitch down and back up within a time window (facial transformation matrix) | **confirmed: he uses it today to confirm ("yes")** |
 | `HEAD_LEFT` / `HEAD_RIGHT` | head yaw past the threshold, then back to neutral | possible |

@@ -277,6 +277,8 @@
     "shape": {
       "eyeBlinkLeft": "Blink, his left eye",
       "eyeBlinkRight": "Blink, his right eye",
+      "eyeSquintLeft": "Lids squeezed, his left eye",
+      "eyeSquintRight": "Lids squeezed, his right eye",
       "eyeLookDownLeft": "Looks down, left eye",
       "eyeLookDownRight": "Looks down, right eye",
       "eyeLookInLeft": "Left eye towards the nose",
@@ -298,7 +300,7 @@
       "none": "None yet."
     },
     "signal": {
-      "BLINK": "Long blink (+1)",
+      "BLINK": "Strong blink (+1)",
       "HAND": "Look at his hand (+5)",
       "NOD": "Nod (yes)",
       "SHAKE": "Head shake (no)",
@@ -309,11 +311,11 @@
   "calibration": {
     "stepOf": "Step {{n}} of {{total}}",
     "intro": {
-      "what": "Blinker will learn his signals: a long blink, a look at his hand, a nod, a head shake and head right. A few short steps, about 2 minutes. No step has a time limit.",
+      "what": "Blinker will learn his signals: a strong blink, a look at his hand, a nod, a head shake and head right. A few short steps, about 2 minutes. No step has a time limit.",
       "setup": "Place the phone as for talking: on a stand, facing him, in ordinary light."
     },
     "camera": {
-      "ask": "The browser will ask for the camera. Choose “Allow”."
+      "ask": "The browser asks for the camera. Choose “Allow”."
     },
     "step": {
       "intro": {
@@ -331,9 +333,9 @@
         "say": "Look calmly at the screen."
       },
       "blink": {
-        "title": "Long blink (+1)",
-        "do": "Ask him for 3 long blinks, at his own pace.",
-        "say": "Three long blinks."
+        "title": "Strong blink (+1)",
+        "do": "Ask him for 3 strong blinks (stronger than usual), at his own pace.",
+        "say": "Three strong blinks."
       },
       "handLeft": {
         "title": "Look at his left hand (+5)",

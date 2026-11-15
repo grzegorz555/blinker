@@ -277,6 +277,8 @@
     "shape": {
       "eyeBlinkLeft": "Mrugnięcie, jego lewe oko",
       "eyeBlinkRight": "Mrugnięcie, jego prawe oko",
+      "eyeSquintLeft": "Zaciśnięcie powiek, jego lewe oko",
+      "eyeSquintRight": "Zaciśnięcie powiek, jego prawe oko",
       "eyeLookDownLeft": "Patrzy w dół, lewe oko",
       "eyeLookDownRight": "Patrzy w dół, prawe oko",
       "eyeLookInLeft": "Lewe oko do nosa",
@@ -298,7 +300,7 @@
       "none": "Jeszcze żadnego."
     },
     "signal": {
-      "BLINK": "Długie mrugnięcie (+1)",
+      "BLINK": "Mocne mrugnięcie (+1)",
       "HAND": "Spojrzenie na rękę (+5)",
       "NOD": "Skinienie (tak)",
       "SHAKE": "Kręcenie głową (nie)",
@@ -309,11 +311,11 @@
   "calibration": {
     "stepOf": "Krok {{n}} z {{total}}",
     "intro": {
-      "what": "Blinker pozna jego sygnały: długie mrugnięcie, spojrzenie na rękę, skinienie, kręcenie głową i głowę w prawo. To kilka krótkich kroków, razem około 2 minut. Żaden krok nie ma limitu czasu.",
+      "what": "Blinker pozna jego sygnały: mocne mrugnięcie, spojrzenie na rękę, skinienie, kręcenie głową i głowę w prawo. To kilka krótkich kroków, razem około 2 minut. Żaden krok nie ma limitu czasu.",
       "setup": "Ustaw telefon tak jak do rozmowy: na statywie, na wprost twarzy, w zwykłym świetle."
     },
     "camera": {
-      "ask": "Za chwilę przeglądarka zapyta o dostęp do kamery. Wybierz „Zezwól”."
+      "ask": "Przeglądarka pyta o dostęp do kamery. Wybierz „Zezwól”."
     },
     "step": {
       "intro": {
@@ -331,9 +333,9 @@
         "say": "Patrz spokojnie na ekran."
       },
       "blink": {
-        "title": "Długie mrugnięcie (+1)",
-        "do": "Poproś go o 3 długie mrugnięcia, w swoim tempie.",
-        "say": "Trzy długie mrugnięcia."
+        "title": "Mocne mrugnięcie (+1)",
+        "do": "Poproś go o 3 mocne mrugnięcia (mocniejsze niż zwykłe), w swoim tempie.",
+        "say": "Trzy mocne mrugnięcia."
       },
       "handLeft": {
         "title": "Spojrzenie na lewą rękę (+5)",

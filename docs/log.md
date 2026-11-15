@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (his blink is strong, not long)
+- The author saw that his deliberate blink is strong rather than long. A blink now counts when the lids squeeze hard (`eyeSquint`, calibrated against his ordinary blinks at rest) or when it is long; Kalibracja (Calibration) finds short blinks in a long recording. The camera page of Kalibracja asks for the camera at once. Tablice (Boards): space between the example file and its button.
+
 ## 2026-11-15 (the repo is public)
 - The author made the repo public. `main` is protected by the required CI checks; auto-merge is available per PR; secret scanning with push protection is on; CodeQL runs on PRs, on main and weekly.
 
