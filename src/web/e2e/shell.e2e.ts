@@ -90,6 +90,7 @@ const pages = [
   { name: 'Counting', path: '/', title: 'Counting · Blinker' },
   { name: 'Sentences', path: '/sentences', title: 'Sentences · Blinker' },
   { name: 'Boards', path: '/boards', title: 'Boards · Blinker' },
+  { name: 'Calibration', path: '/calibration', title: 'Calibration · Blinker' },
   { name: 'Settings', path: '/settings', title: 'Settings · Blinker' },
 ] as const;
 
@@ -130,7 +131,7 @@ test.describe('navigation bar and rail (spec 007, R2)', () => {
     });
   }
 
-  test('the same four links in the same order on every page, the current one marked', async ({
+  test('the same five links in the same order on every page, the current one marked', async ({
     page,
   }) => {
     for (const { name, path, title } of pages) {

@@ -1,0 +1,120 @@
+<section class="card" aria-labelledby="step-heading">
+  <p class="muted step-count" data-testid="step-count">
+    {{ 'calibration.stepOf' | transloco: { n: index() + 1, total: pages.length } }}
+  </p>
+  <h2 id="step-heading" class="step-title" tabindex="-1" #stepHeading>
+    {{ stepTitle(page()) | transloco }}
+  </h2>
+
+  @switch (page()) {
+    @case ('intro') {
+      <p>{{ 'calibration.intro.what' | transloco }}</p>
+      <p>{{ 'calibration.intro.setup' | transloco }}</p>
+    }
+    @case ('camera') {
+      <p>{{ 'calibration.camera.ask' | transloco }}</p>
+      <p class="muted">{{ 'diagnostics.privacy' | transloco }}</p>
+      @if (!cameraOn()) {
+        <button matButton="filled" type="button" (click)="startCamera()">
+          {{ 'diagnostics.start' | transloco }}
+        </button>
+      }
+    }
+    @case ('result') {
+      <ul class="results" data-testid="results">
+        <li>
+          <span>{{ 'calibration.step.neutral.title' | transloco }}</span>
+          <span class="value">
+            {{
+              (fit().learnt.includes('neutral') ? 'calibration.learnt' : 'calibration.notLearnt')
+                | transloco
+            }}
+          </span>
+        </li>
+        @for (step of movements; track step) {
+          <li>
+            <span>{{ stepTitle(step) | transloco }}</span>
+            <span class="value">
+              @if (skipped().has(step)) {
+                {{ 'calibration.skipped' | transloco }}
+              } @else {
+                {{ 'calibration.detected' | transloco: { n: detected(step), k: repeats(step) } }}
+              }
+            </span>
+          </li>
+        }
+      </ul>
+      @if (!fit().learnt.length) {
+        <p class="problem" data-testid="nothing-learnt">
+          {{ 'calibration.nothingLearnt' | transloco }}
+        </p>
+      }
+    }
+    @default {
+      <p data-testid="instruction">{{ 'calibration.step.' + page() + '.do' | transloco }}</p>
+    }
+  }
+
+  <!-- The camera preview stays in the page from the camera step on, so the stream is not restarted per step. -->
+  <div class="preview" [hidden]="page() === 'intro' || page() === 'result'">
+    <video #video playsinline muted [attr.aria-label]="'diagnostics.preview' | transloco"></video>
+  </div>
+
+  @if (page() !== 'intro' && page() !== 'result') {
+    <p
+      class="status"
+      role="status"
+      data-testid="calibration-status"
+      [class.problem]="status() === 'error'"
+    >
+      @if (status() === 'error') {
+        {{ 'diagnostics.error.' + error() | transloco }}
+      } @else if (status() === 'running') {
+        {{ (face() ? 'calibration.faceYes' : 'calibration.faceNo') | transloco }}
+        @if (isMovement(page())) {
+          ·
+          <span data-testid="detected">{{
+            'calibration.detected'
+              | transloco: { n: detected($any(page())), k: repeats($any(page())) }
+          }}</span>
+        }
+      } @else if (status() === 'starting') {
+        {{ 'diagnostics.status.starting' | transloco }}
+      } @else {
+        {{ 'diagnostics.status.idle' | transloco }}
+      }
+    </p>
+  }
+
+  @if (page() === 'result' && saved()) {
+    <p role="status" class="saved" data-testid="saved">{{ 'calibration.saved' | transloco }}</p>
+  }
+
+  <div class="actions">
+    @if (index() > 0) {
+      <button matButton="outlined" type="button" (click)="back()">
+        {{ 'calibration.back' | transloco }}
+      </button>
+    }
+    @if (isMovement(page())) {
+      <button matButton="text" type="button" (click)="skip()">
+        {{ 'calibration.skip' | transloco }}
+      </button>
+    }
+    @if (page() === 'result') {
+      <button matButton="outlined" type="button" (click)="restart()">
+        {{ 'calibration.restart' | transloco }}
+      </button>
+      <button matButton="filled" type="button" (click)="save()" [disabled]="!fit().learnt.length">
+        {{ 'calibration.save' | transloco }}
+      </button>
+    } @else {
+      <button matButton="filled" type="button" (click)="next()">
+        {{ 'calibration.next' | transloco }}
+      </button>
+    }
+  </div>
+  @if (page() === 'result' && saved()) {
+    <a routerLink="/diagnostics">{{ 'calibration.tryIt' | transloco }}</a>
+  }
+</section>

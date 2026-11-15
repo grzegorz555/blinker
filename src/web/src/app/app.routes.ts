@@ -30,6 +30,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/settings/settings-page').then((m) => m.SettingsPage),
   },
   {
+    // Spec 011: his signals learnt step by step; in the navigation from stage 4.
+    path: 'calibration',
+    title: 'titles.calibration',
+    data: { heading: 'nav.calibration' } satisfies ShellData,
+    loadComponent: () =>
+      import('./features/calibration/calibration-page').then((m) => m.CalibrationPage),
+  },
+  {
     // Spec 010: the face-tracking spike, linked from Ustawienia (Settings), not from the navigation.
     path: 'diagnostics',
     title: 'titles.diagnostics',

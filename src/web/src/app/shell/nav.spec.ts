@@ -23,37 +23,51 @@ describe('AppNav (spec 007, R2)', () => {
     return { root, links };
   }
 
-  it('is a labelled navigation landmark with four links in a fixed order (SC 3.2.3)', async () => {
+  it('is a labelled navigation landmark with five links in a fixed order (SC 3.2.3)', async () => {
     const { root, links } = await render('/');
     expect(root.querySelector('nav')?.getAttribute('aria-label')).toBe('Main menu');
     expect(links.map((a) => a.textContent?.trim())).toEqual([
       'Counting',
       'Sentences',
       'Boards',
+      'Calibration',
       'Settings',
     ]);
     expect(links.map((a) => a.getAttribute('href'))).toEqual([
       '/',
       '/sentences',
       '/boards',
+      '/calibration',
       '/settings',
     ]);
   });
 
   it('marks only the current page with aria-current="page"', async () => {
     const { links } = await render('/boards');
-    expect(links.map((a) => a.getAttribute('aria-current'))).toEqual([null, null, 'page', null]);
+    expect(links.map((a) => a.getAttribute('aria-current'))).toEqual([
+      null,
+      null,
+      'page',
+      null,
+      null,
+    ]);
   });
 
   it('marks Liczenie (Counting) only on its own exact path', async () => {
     const { links } = await render('/');
-    expect(links.map((a) => a.getAttribute('aria-current'))).toEqual(['page', null, null, null]);
+    expect(links.map((a) => a.getAttribute('aria-current'))).toEqual([
+      'page',
+      null,
+      null,
+      null,
+      null,
+    ]);
   });
 
   it('hides the icons from assistive technology', async () => {
     const { root } = await render('/');
     const icons = [...root.querySelectorAll('nav > ul svg')];
-    expect(icons).toHaveLength(4);
+    expect(icons).toHaveLength(5);
     for (const svg of icons) expect(svg.getAttribute('aria-hidden')).toBe('true');
   });
 });

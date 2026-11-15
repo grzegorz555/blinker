@@ -1,0 +1,94 @@
+/* Kalibracja (Calibration) (spec 011, R4): one card per step, mobile first (like the mock-up). */
+:host {
+  display: grid;
+  max-width: 40rem;
+}
+
+.card {
+  display: grid;
+  gap: 0.75rem;
+  border-radius: var(--radius-card);
+  background-color: var(--surface);
+  padding: 1rem;
+}
+
+.step-count,
+.muted {
+  color: var(--muted);
+}
+
+.step-title {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+.step-title:focus {
+  outline: none;
+}
+
+.step-title:focus-visible {
+  outline: 3px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+.preview {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  max-width: 22rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background-color: var(--bg);
+}
+
+.preview[hidden] {
+  display: none;
+}
+
+.preview video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.status,
+.saved {
+  font-weight: 600;
+}
+
+/* A problem: words and a thick border, never color alone (SC 1.4.1). */
+.problem {
+  border: 2px solid var(--error);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  color: var(--error);
+  font-weight: 600;
+}
+
+.results {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.results li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+.value {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
