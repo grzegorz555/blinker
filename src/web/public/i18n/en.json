@@ -328,6 +328,17 @@
       "eyeSquint": "squeeze of the lids",
       "cheekSquint": "raise of the cheeks",
       "browDown": "pull of the brows"
+    },
+    "look": {
+      "title": "The last look down",
+      "values": "{{ms}} ms; down {{down}}, left {{left}}, right {{right}}; head: turn {{yaw}}°, tilt {{pitch}}°:",
+      "verdict": {
+        "hand": "counted as a look at his hand",
+        "short": "too short",
+        "wrongSide": "not towards his hand",
+        "nodding": "during a nod"
+      },
+      "profile": "A look at his hand counts when down reaches {{down}} for {{holdMs}} ms, towards his hand: left from {{left}}, right from {{right}} (“–” = that side not required, both “–” = any side)."
     }
   },
   "calibration": {
@@ -404,6 +415,7 @@
     "separation": {
       "noOrdinary": "There was no ordinary blink in the step “At rest, facing the screen”, so the strong-blink threshold is a guess and an ordinary blink may count. Calibrate again and let him blink as usual in that step.",
       "overlap": "His strong and ordinary blinks look alike to the camera, so only long blinks count. Repeat the blink step with the lids squeezed harder."
-    }
+    },
+    "looks": "His last looks down (newest first), judged by the thresholds of this calibration:"
   }
 }

@@ -14,6 +14,7 @@ import {
   detect,
   INITIAL_DETECTOR,
   type ClosureReport,
+  type LookReport,
   type FaceSignal,
 } from '../../core/signals/detector';
 import { ProfileService } from '../../core/signals/profile.service';
@@ -69,6 +70,10 @@ export class DiagnosticsPage {
   protected readonly lastClosure = signal<ClosureReport | null>(null);
   /** The last 10 closures, newest first, for "Kopiuj wyniki" (Copy the results). */
   private closures: ClosureReport[] = [];
+  /** The last look down and why it was or was not a look at his hand; the last 10 for the copy. */
+  protected readonly lastLook = signal<LookReport | null>(null);
+  private looks: LookReport[] = [];
+  protected readonly handProfile = computed(() => this.profiles.profile().hand);
   protected readonly blinkProfile = computed(() => this.profiles.profile().blink);
 
   /** Frames analysed and frames with a face, since the camera was turned on. */
@@ -88,6 +93,10 @@ export class DiagnosticsPage {
       if (found.closure) {
         this.lastClosure.set(found.closure);
         this.closures = [found.closure, ...this.closures].slice(0, 10);
+      }
+      if (found.look) {
+        this.lastLook.set(found.look);
+        this.looks = [found.look, ...this.looks].slice(0, 10);
       }
       if (found.signals.length) {
         const at = new Date().toLocaleTimeString(this.transloco.getActiveLang());
@@ -113,6 +122,8 @@ export class DiagnosticsPage {
     this.detected.set([]);
     this.lastClosure.set(null);
     this.closures = [];
+    this.lastLook.set(null);
+    this.looks = [];
     this.counts.set({ frames: 0, faces: 0, since: performance.now() });
     void this.watchBattery();
     await this.tracker.start(this.video().nativeElement);
@@ -150,6 +161,11 @@ export class DiagnosticsPage {
       ...this.closures.map(
         (c) =>
           `  ${Math.round(c.ms)}, ${c.closure.toFixed(2)}, ${c.cues.eyeSquint.toFixed(2)}, ${c.cues.cheekSquint.toFixed(2)}, ${c.cues.browDown.toFixed(2)}, ${c.down.toFixed(2)}, ${c.verdict}`,
+      ),
+      'Last looks down (newest first): ms, down, left, right, |yaw|, |pitch|, verdict',
+      ...this.looks.map(
+        (l) =>
+          `  ${Math.round(l.ms)}, ${l.down.toFixed(2)}, ${l.left.toFixed(2)}, ${l.right.toFixed(2)}, ${Math.round(l.yaw)}, ${Math.round(l.pitch)}, ${l.verdict}`,
       ),
       `Signals (newest first): ${
         this.detected()

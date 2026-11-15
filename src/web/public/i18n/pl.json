@@ -328,6 +328,17 @@
       "eyeSquint": "zaciśnięcie powiek",
       "cheekSquint": "uniesienie policzków",
       "browDown": "ściągnięcie brwi"
+    },
+    "look": {
+      "title": "Ostatnie spojrzenie w dół",
+      "values": "{{ms}} ms; w dół {{down}}, w lewo {{left}}, w prawo {{right}}; głowa: obrót {{yaw}}°, skłon {{pitch}}°:",
+      "verdict": {
+        "hand": "spojrzenie na rękę zaliczone",
+        "short": "za krótkie",
+        "wrongSide": "nie w stronę jego ręki",
+        "nodding": "w trakcie skinienia"
+      },
+      "profile": "Spojrzenie na rękę się liczy, gdy w dół sięga {{down}} przez {{holdMs}} ms, w stronę ręki: w lewo od {{left}}, w prawo od {{right}} („–” = ta strona niewymagana, oba „–” = dowolna strona)."
     }
   },
   "calibration": {
@@ -404,6 +415,7 @@
     "separation": {
       "noOrdinary": "W kroku „Spokojnie, na wprost” nie było zwykłego mrugnięcia, więc próg mocnego mrugnięcia jest przybliżony i zwykłe mrugnięcie może się liczyć. Powtórz kalibrację: niech w tym kroku mruga zwyczajnie.",
       "overlap": "Jego mocne i zwykłe mrugnięcia wyglądają dla kamery podobnie, więc liczą się tylko długie mrugnięcia. Powtórz krok mrugnięcia: mocniej zaciśnięte powieki."
-    }
+    },
+    "looks": "Jego ostatnie spojrzenia w dół (od najnowszego), oceniane progami z tej kalibracji:"
   }
 }

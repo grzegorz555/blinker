@@ -20,7 +20,7 @@ Blendshape names come from MediaPipe Face Landmarker (https://ai.google.dev/edge
 | `HEAD_NOD` | head pitch down and back up within a time window (facial transformation matrix) | **confirmed: he uses it today to confirm ("yes")** |
 | `HEAD_LEFT` / `HEAD_RIGHT` | head yaw past the threshold, then back to neutral | possible |
 | `HEAD_SHAKE` | yaw left-right-left | **confirmed: he uses it today for "no"** |
-| `LOOK_AT_HAND` | gaze held down towards his hand: down and to his left (to his palm), sometimes to his right (`eyeLookDown*` and `eyeLookOut*`/`eyeLookIn*`, the sides calibrated), with the head still (a nod moves the eyes against the head) | **confirmed: he uses it today, it means "5" (counting only)** |
+| `LOOK_AT_HAND` | gaze held down towards his hand: down and to his left (to his palm), sometimes to his right (`eyeLookDown*` and `eyeLookOut*`/`eyeLookIn*`, the sides calibrated), not during a nod (a nod moves the eyes against the head); the head may turn towards the hand | **confirmed: he uses it today, it means "5" (counting only)** |
 | `GAZE_UP` | `eyeLookUp*` held | possible |
 
 **How Blinker detects them (spec 011, `core/signals/detector.ts`):** a pure function over the camera frames, with
@@ -29,8 +29,9 @@ without a face every half-done signal is dropped.
 - `BLINK`: both eyes closed, strong or for at least 600 ms, at most 2500 ms, sent when they open. A closure that starts
   while he already looks down is the look at his hand (looking down lowers the lids); a closed eye also reads as looking
   down, so that alone does not make a blink a look.
-- `LOOK_AT_HAND` → `HAND`: either eye down past the threshold for 400 ms, once per look, with the head within the nod
-  and shake amplitudes of neutral; once calibrated, also to the side of a learnt hand.
+- `LOOK_AT_HAND` → `HAND`: either eye down past the threshold for 400 ms, once per look, not while a nod is under
+  way (a nod moves the eyes against the head); turning or tilting the head towards his hand is part of the look. Once
+  calibrated, the look must also go to the side of a learnt hand.
 - `HEAD_NOD` → `NOD`: pitch away from his neutral by the amplitude (12°) and back within 1.2 s; the direction is
   learnt in calibration.
 - `HEAD_SHAKE` → `SHAKE`: yaw past 10° to one side and then the other within 1.5 s.

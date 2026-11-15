@@ -169,6 +169,39 @@
     }}
   </p>
 
+  <h3 class="sub-title">{{ 'diagnostics.look.title' | transloco }}</h3>
+  <p data-testid="last-look">
+    @if (lastLook(); as l) {
+      {{
+        'diagnostics.look.values'
+          | transloco
+            : {
+                ms: round(l.ms),
+                down: round(l.down, 2),
+                left: round(l.left, 2),
+                right: round(l.right, 2),
+                yaw: round(l.yaw),
+                pitch: round(l.pitch),
+              }
+      }}
+      <strong>{{ 'diagnostics.look.verdict.' + l.verdict | transloco }}</strong>
+    } @else {
+      <span class="muted">{{ 'diagnostics.closure.none' | transloco }}</span>
+    }
+  </p>
+  <p class="muted" data-testid="hand-profile">
+    {{
+      'diagnostics.look.profile'
+        | transloco
+          : {
+              down: handProfile().threshold,
+              holdMs: handProfile().holdMs,
+              left: handProfile().left ?? '–',
+              right: handProfile().right ?? '–',
+            }
+    }}
+  </p>
+
   @if (blocked().length) {
     <p class="muted" data-testid="blocked">
       {{ 'diagnostics.blocked' | transloco: { origins: blocked().join(', ') } }}
