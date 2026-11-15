@@ -108,11 +108,15 @@ describe('CalibrationPage (spec 011, R4)', () => {
       2000,
     );
     expect(text('detected')).toBe('Detected 3 of 3');
+    // Each blink with its numbers and why it counted, newest first (the last 3).
+    expect(text('blink-closures')).toContain('closure 0.70');
+    expect(text('blink-closures')?.match(/counted as a blink/g)).toHaveLength(3);
     // Keep the blinks, skip the rest.
     await click('Next');
     for (let i = 0; i < 5; i++) await click('Skip this step');
     expect(text('results')).toContain('Detected 3 of 3');
     expect(text('results')).toContain('Skipped');
+    expect(text('blink-profile')).toContain('closure reaches 0.45');
     expect(data.has(PROFILE_KEY)).toBe(false);
     await click('Save the calibration');
     expect(text('saved')).toBe('Calibration saved. Blinker uses it from now on.');

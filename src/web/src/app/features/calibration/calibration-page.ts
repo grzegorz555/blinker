@@ -21,6 +21,7 @@ import {
   type CalibrationStep,
   type Recordings,
 } from '../../core/signals/fit';
+import { closureReports } from '../../core/signals/detector';
 import { ProfileService } from '../../core/signals/profile.service';
 import type { FaceFrame } from '../../core/vision/face-frame';
 import { FACE_WORKER, FaceTrackerService } from '../../core/vision/face-tracker.service';
@@ -78,6 +79,15 @@ export class CalibrationPage {
   });
 
   protected readonly repeats = (step: Movement) => STEP_REPEATS[step];
+
+  /** His last 3 closures in the blink step, newest first, judged by the profile fitted so far: why each one counted or not. */
+  protected readonly blinkClosures = computed(() => {
+    this.revision();
+    return closureReports(this.recordings().blink ?? [], this.fit().profile)
+      .slice(-3)
+      .reverse();
+  });
+  protected readonly round = (value: number, digits = 0) => value.toFixed(digits);
 
   /** "Wykryto n z k" (Detected n of k) for a movement step, with the profile fitted so far. */
   protected detected(step: Movement): number {

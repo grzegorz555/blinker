@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detect, detectAll, INITIAL_DETECTOR, type ClosureReport } from './detector';
+import { closureReports, detectAll } from './detector';
 import { DEFAULT_PROFILE as P } from './profile';
 import { closed, pulse, pulses, record, squeezed } from './synthetic';
 
@@ -186,16 +186,7 @@ describe('detector: head signals', () => {
 });
 
 describe('detector: why a closure was or was not his blink (Diagnostyka (Diagnostics))', () => {
-  const reports = (frames: Parameters<typeof detectAll>[0]) => {
-    let state = INITIAL_DETECTOR;
-    const out: ClosureReport[] = [];
-    for (const frame of frames) {
-      const d = detect(state, frame, P);
-      state = d.state;
-      if (d.closure) out.push(d.closure);
-    }
-    return out;
-  };
+  const reports = (frames: Parameters<typeof detectAll>[0]) => closureReports(frames, P);
 
   it('reports each closure once, when the eyes open, with its length, peaks and verdict', () => {
     const [r] = reports(record(2000, { eyes: squeezed(500, 750) }));

@@ -86,6 +86,44 @@
     </p>
   }
 
+  @if (page() === 'blink' && status() === 'running' && blinkClosures().length) {
+    <div class="closures" data-testid="blink-closures">
+      <p class="muted">{{ 'calibration.closures' | transloco }}</p>
+      <ul>
+        @for (c of blinkClosures(); track $index) {
+          <li>
+            {{
+              'diagnostics.closure.values'
+                | transloco
+                  : {
+                      ms: round(c.ms),
+                      closure: round(c.closure, 2),
+                      squeeze: round(c.squeeze, 2),
+                      down: round(c.down, 2),
+                    }
+            }}
+            <strong>{{ 'diagnostics.closure.verdict.' + c.verdict | transloco }}</strong>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (page() === 'result' && fit().learnt.includes('blink')) {
+    <p class="muted" data-testid="blink-profile">
+      {{
+        'diagnostics.closure.profile'
+          | transloco
+            : {
+                threshold: fit().profile.blink.threshold,
+                squeeze: fit().profile.blink.squeeze,
+                minMs: fit().profile.blink.minMs,
+                maxMs: fit().profile.blink.maxMs,
+              }
+      }}
+    </p>
+  }
+
   @if (page() === 'result' && saved()) {
     <p role="status" class="saved" data-testid="saved">{{ 'calibration.saved' | transloco }}</p>
   }

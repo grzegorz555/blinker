@@ -388,6 +388,7 @@
     "skip": "Skip this step",
     "next": "Next",
     "restart": "Start again",
-    "save": "Save the calibration"
+    "save": "Save the calibration",
+    "closures": "His last blinks (newest first), judged by the thresholds of this calibration:"
   }
 }

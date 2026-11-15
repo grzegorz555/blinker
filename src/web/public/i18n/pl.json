@@ -388,6 +388,7 @@
     "skip": "Pomiń ten krok",
     "next": "Dalej",
     "restart": "Powtórz od początku",
-    "save": "Zapisz kalibrację"
+    "save": "Zapisz kalibrację",
+    "closures": "Jego ostatnie mrugnięcia (od najnowszego), oceniane progami z tej kalibracji:"
   }
 }
