@@ -43,6 +43,9 @@ test.describe('Ustawienia (Settings)', () => {
     await expect(pauseField(page)).toHaveAttribute('aria-invalid', 'true');
     // The error fades in; measure its contrast at full opacity.
     await expect(page.locator('.mat-mdc-form-field-error-wrapper')).toHaveCSS('opacity', '1');
+    // WebKit animates the error element itself too (opacity and a slide): measure it at rest.
+    await expect(page.locator('mat-error')).toHaveCSS('opacity', '1');
+    await expect(page.locator('mat-error')).toHaveCSS('transform', 'none');
     await expectNoA11yViolations(page);
     await pauseField(page).fill('2500');
     await expect(page.getByText(/^Błąd:/)).toHaveCount(0);

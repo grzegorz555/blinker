@@ -40,9 +40,16 @@ async function init(): Promise<void> {
     new URL(VISION_PATHS.wasm, self.location.origin).href,
     true,
   );
+  // MediaPipe reads the wasm factory from self.ModuleFactory after importing the loader, then clears it. A second
+  // attempt (CPU after a failed GPU) imports the same module again, which a browser does not run twice, so the factory
+  // would be missing ("ModuleFactory not set.", seen in WebKit). We import the loader once and set it before each try.
+  // The URL is our own: the same-origin /mediapipe/ path from VISION_PATHS, built by FilesetResolver above.
+  // eslint-disable-next-line no-unsanitized/method
+  const loader = (await import(/* @vite-ignore */ fileset.wasmLoaderPath)) as { default: unknown };
   let lastError: unknown;
   for (const delegate of ['GPU', 'CPU'] as const satisfies readonly Delegate[]) {
     try {
+      (self as unknown as { ModuleFactory?: unknown }).ModuleFactory = loader.default;
       landmarker = await FaceLandmarker.createFromOptions(fileset, {
         // Our own canvas: MediaPipe guesses OffscreenCanvas support from the Safari version in the user agent and, when
         // it can't tell, creates a page canvas through `document`, which a worker doesn't have.
