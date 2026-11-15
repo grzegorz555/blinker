@@ -234,8 +234,9 @@
  * 32 px letters. The sentence label stays for screen readers only; the actions put the label beside a hidden icon.
  */
 @media (orientation: portrait) and (max-height: 760px) {
+  /* 4 px tighter than 0.375rem: room for a fifth navigation item and the CI font (spec 011). */
   .count {
-    gap: 0.375rem;
+    gap: 0.25rem;
   }
 
   .count-question {
