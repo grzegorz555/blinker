@@ -15,7 +15,7 @@
       <p>{{ 'calibration.camera.ask' | transloco }}</p>
       <p class="muted">{{ 'diagnostics.privacy' | transloco }}</p>
       @if (!cameraOn()) {
-        <button matButton="filled" type="button" (click)="startCamera()">
+        <button class="start" matButton="filled" type="button" (click)="startCamera()">
           {{ 'diagnostics.start' | transloco }}
         </button>
       }
