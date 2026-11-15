@@ -17,7 +17,7 @@ generated:
 | 1.5 | Mock-ups: spec **004-mockups** | Clickable HTML/Tailwind mock-ups in `docs/design/`, viewed on a real phone; we iterate on them with the author. Output: the visual direction and the final tokens. Free: no design tool is needed. |
 | 2 | Board and input **without a camera** ✅: specs **006-counting-core**, **007-screens** | board model and import, the friend's board, the **counting** machine (the default and the PoC mode; scanning comes after the PoC), Space/button input, text and TTS. Already usable with a switch. |
 | 3 | Face-tracking spike | MediaPipe in a worker, a diagnostic screen with live blendshapes and head pose, measurements on Android Chrome and iOS Safari (FPS, battery, light, glasses). Ends with an ADR. Built (spec 010); ADR-0006 proposed, measurements on his devices pending. |
-| 4 | Signal detection + calibration | PoC signals first: LONG_BLINK, LOOK_AT_HAND, HEAD_NOD, HEAD_SHAKE; other head turns later; calibration wizard; profiles |
+| 4 | Signal detection + calibration | PoC signals first: LONG_BLINK, LOOK_AT_HAND, HEAD_NOD, HEAD_SHAKE; other head turns later; calibration wizard; profiles. Built (spec 011): the five signals incl. head right, one profile; thresholds to check with him. |
 | 5 | Integration and UX | signals → actions, undo, confirmations, pause, audio mode for the "caregiver holds the phone" setup |
 | 6 | Trial with the friend | tune the thresholds, capture learnings |
 

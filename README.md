@@ -22,6 +22,11 @@ them into sentences that are shown on screen and read aloud.
 - **Ustawienia (Settings)**: the pause before the question, the nod confirmation, spoken questions and notices, signal buttons, keyboard shortcuts, hints, speech rate with a voice check, language and theme.
 - A navigation bar on phones and a rail from 600 px; English and Polish; everything is kept on the device only (localStorage, validated when read back).
 
+**Stage 4: his signals from the camera** (spec [011](docs/specs/011-signals/spec.md), built; the thresholds are defaults until he is calibrated):
+
+- **Kalibracja (Calibration)**, in the navigation: a step-by-step wizard (at rest, 3 long blinks, a look at each hand, a nod, a shake, head right), each step said aloud and showing "Wykryto n z k" (Detected n of k); "Zapisz kalibrację" (Save the calibration) keeps his thresholds on the device (numbers only, never a picture).
+- **Diagnostyka (Diagnostics)** also lists the signals Blinker detects, with his calibration or the defaults.
+
 **Stage 3: face-tracking spike** (spec [010](docs/specs/010-face-spike/spec.md), built; ADR-[0006](docs/adr/0006-face-tracking-mediapipe-worker.md) proposed, waiting for the measurements on his devices):
 
 - **Diagnostyka (Diagnostics)**, linked from Ustawienia (Settings): the front camera, analysed on the device by MediaPipe Face Landmarker in a Web Worker (GPU, or CPU as a fallback), with the eye values (blinks, where the eyes look), the head angles, frames per second, the analysis time, the share of frames with a face and the battery; "Kopiuj wyniki" (Copy the results) copies a short text for the ADR. The wasm runtime and the model are served from our origin (the model hash is pinned); MediaPipe's usage metrics to Google are blocked.

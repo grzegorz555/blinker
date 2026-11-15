@@ -19,5 +19,5 @@ Branch: `feat/011-signals` on top of `feat/010-face-spike` (PR #19). Gates: `npm
 - [x] **T3 [opus]: Kalibracja (Calibration).** `fitProfile()` (R5) and the wizard page (R4), in the navigation. Tests:
       fitting with synthetic steps, the page with a fake tracker, e2e with the fake camera, axe.
       _To understand:_ a threshold halfway between rest and a deliberate peak; medians against outliers.
-- [ ] **T4 [haiku]: Docs.** Interaction model (how each signal is detected), architecture, README, log, specs index,
+- [x] **T4 [haiku]: Docs.** Interaction model (how each signal is detected), architecture, README, log, specs index,
       Polish copies.
