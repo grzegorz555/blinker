@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (the repo is public)
+- The author made the repo public. `main` is protected by the required CI checks; auto-merge is available per PR; secret scanning with push protection is on; CodeQL runs on PRs, on main and weekly.
+
 ## 2026-11-15 (stage 6 preparation)
 - A checklist for the first session with him (`docs/trial/first-session.md`): Diagnostyka (Diagnostics) for ADR-0006, Kalibracja (Calibration), Liczenie (Counting) with the camera, the open questions. Learnings from specs 011-012 (drafts). Local e2e runs no longer reuse a server another worktree left behind.
 
