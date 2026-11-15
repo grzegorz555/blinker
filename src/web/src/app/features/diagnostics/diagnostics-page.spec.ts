@@ -96,7 +96,7 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
   });
 
   it('says why the last closure of his eyes was or was not a blink, with the thresholds', async () => {
-    const { fixture, tracker, text } = await render();
+    const { fixture, tracker, text, button } = await render();
     expect(text('last-closure')).toBe('None yet.');
     expect(text('blink-profile')).toContain('0.5');
     const feed = async (frames: FaceFrame[]) => {
@@ -110,6 +110,18 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     expect(text('last-closure')).toContain('squeeze 0.30');
     await feed(record(1000, { eyes: squeezed(300, 550) }, 2000));
     expect(text('last-closure')).toContain('counted as a blink');
+    // "Kopiuj wyniki" (Copy the results) carries the thresholds and the closures, newest first.
+    const writeText = vi.fn(async () => undefined);
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
+    tracker.stats.set({ ...tracker.stats(), frames: 10 });
+    await fixture.whenStable();
+    button('Copy the results')!.click();
+    await fixture.whenStable();
+    const copied = (writeText.mock.calls[0] as unknown as [string])[0];
+    expect(copied).toContain('blink {"threshold":0.5');
+    expect(copied).toMatch(
+      /\n {2}\d+, 0\.90, 0\.80, 0\.05, blink\n {2}\d+, 0\.90, 0\.30, 0\.05, weak\n/,
+    );
   });
 
   it('says why the camera stopped, in text', async () => {
