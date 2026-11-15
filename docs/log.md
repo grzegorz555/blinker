@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (spec 011, his signals from the camera)
+- A pure detector turns face frames into his signals (long blink, look at his hand, nod, shake, head right), with hysteresis and a quiet time; a profile of his thresholds is kept on the device. Diagnostyka (Diagnostics) lists the detected signals; Kalibracja (Calibration) learns his thresholds step by step and joined the navigation. The defaults are guesses until the first session with him.
+
 ## 2026-11-15 (privacy review)
 - A review of every tracked file and the history for personal data (GDPR): none found (no names, contact details, ID numbers or health records; the board photo has no metadata; commits use GitHub noreply addresses). A script test now guards it.
 

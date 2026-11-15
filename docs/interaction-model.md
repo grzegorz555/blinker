@@ -22,6 +22,21 @@ Blendshape names come from MediaPipe Face Landmarker (https://ai.google.dev/edge
 | `HEAD_SHAKE` | yaw left-right-left | **confirmed: he uses it today for "no"** |
 | `LOOK_AT_HAND` | gaze held down towards his hand, usually to his left, sometimes to his right (`eyeLook*` blendshapes, both directions calibrated) | **confirmed: he uses it today, it means "5" (counting only)** |
 | `GAZE_UP` | `eyeLookUp*` held | possible |
+
+**How Blinker detects them (spec 011, `core/signals/detector.ts`):** a pure function over the camera frames, with
+hysteresis (a signal starts at its threshold and ends below 80 % of it) and a quiet time of 400 ms after each signal;
+without a face every half-done signal is dropped.
+- `LONG_BLINK` → `BLINK`: both eyes closed for 600–2500 ms, sent when they open. A closure that starts while he looks
+  down is the look at his hand (looking down lowers the lids).
+- `LOOK_AT_HAND` → `HAND`: either eye down past the threshold for 400 ms, once per look (left or right hand alike).
+- `HEAD_NOD` → `NOD`: pitch away from his neutral by the amplitude (12°) and back within 1.2 s; the direction is
+  learnt in calibration.
+- `HEAD_SHAKE` → `SHAKE`: yaw past 10° to one side and then the other within 1.5 s.
+- `HEAD_RIGHT` → `RIGHT`: yaw past 20° to his right held for 300 ms, sent when the head comes back; the side is learnt.
+
+Kalibracja (Calibration) learns his thresholds (`core/signals/fit.ts`): halfway between his value at rest and the
+median of his deliberate movements, clamped to safe ranges; a step without a clear movement keeps the old value. The
+numbers in brackets are the defaults until he is calibrated; the first session with him (stage 6) checks them.
 | `SWITCH` | Space key, on-screen button or Bluetooth switch | always available (caregiver, tests, accessibility) |
 
 # Input modes

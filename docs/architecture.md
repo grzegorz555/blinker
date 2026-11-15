@@ -74,6 +74,9 @@ signal)` → effects (the text for the screen and the live region, `Speaker.say(
 action is the `TOUCH` signal (`CountingService.touch()`, spec 007), so every change of the text goes through the
 machine. Stage 4 adds his face signals as one more source of `InputSignal`.
 
+- `core/signals/` (spec 011): `detector.ts` (a pure detector of his five face signals), `profile.ts` and
+  `ProfileService` (his thresholds, `blinker.profile.v1`, validated when read back), `fit.ts` (the profile from
+  calibration recordings), `synthetic.ts` (recordings for tests only).
 - `core/vision/` (spec 010): `FaceTrackerService` (camera, one frame in flight to the worker), `face.worker.ts` (MediaPipe Face Landmarker, GPU or CPU; a fetch guard refuses every other origin), and pure functions: `head-pose` (angles from the transform matrix), `face-frame` (the values stage 4 needs), `frame-stats`. The model is served from `/models/` (in `public/models/`, hash pinned) and the wasm from `/mediapipe/` (copied from the pinned package at build), never from a CDN (ADR-0006).
 - `core/signals/`: the signal detector, the calibration profile and the thresholds.
 - `core/input/`: the signal-to-action mapping and the input modes.

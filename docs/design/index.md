@@ -79,7 +79,8 @@ current page marked by `aria-current="page"`:
 
 **Liczenie** (Counting) · **Zdania** (Sentences) · **Tablice** (Boards) · **Kalibracja** (Calibration) · **Ustawienia** (Settings)
 
-In the app (spec 007) Kalibracja (Calibration) joins the navigation in stage 4, when there is a camera; until then the
+In the app Kalibracja (Calibration) joined the navigation in spec 011 (stage 4), between Tablice (Boards) and
+Ustawienia (Settings). Before that (spec 007) the
 navigation has four items. The shell is exactly the viewport high and only the main area scrolls, so nothing slides
 under the navigation bar; the skip link appears in the top app bar over the page title.
 

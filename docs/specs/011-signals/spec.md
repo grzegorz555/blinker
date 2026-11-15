@@ -56,13 +56,13 @@ Diagnostyka (Diagnostics) signal log make the first session with him productive.
 
 # Acceptance criteria
 
-- [ ] Unit: each signal from synthetic frame streams, including what must not fire (short blink, look down with
+- [x] Unit: each signal from synthetic frame streams, including what must not fire (short blink, look down with
       closing lids, a slow turn, a face lost halfway); the refractory time; fitting from synthetic steps.
-- [ ] The profile is validated when read back; a broken one falls back to the defaults with a notice.
-- [ ] Diagnostyka (Diagnostics) lists detected signals (unit with a fake tracker).
-- [ ] Kalibracja (Calibration): the steps, skip, back, save; without a face "Wykryto 0 z 3" (Detected 0 of 3) and the
+- [x] The profile is validated when read back; a broken one falls back to the defaults with a notice.
+- [x] Diagnostyka (Diagnostics) lists detected signals (unit with a fake tracker).
+- [x] Kalibracja (Calibration): the steps, skip, back, save; without a face "Wykryto 0 z 3" (Detected 0 of 3) and the
       step can be skipped; e2e with the fake camera in Chromium; axe on every step.
-- [ ] `npm run verify -- --lighthouse` passes.
+- [x] `npm run verify -- --lighthouse` passes.
 
 # Out of scope
 
