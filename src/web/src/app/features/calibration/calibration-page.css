@@ -88,6 +88,13 @@
   gap: 0.25rem 1rem;
 }
 
+.closures ul {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+
 .value {
   font-weight: 600;
 }

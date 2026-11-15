@@ -205,3 +205,18 @@ export function detectAll(
   }
   return out;
 }
+
+/** Every closure of the eyes in a recording, oldest first, with why it was or was not his blink (Kalibracja). */
+export function closureReports(
+  frames: readonly FaceFrame[],
+  profile: SignalProfile,
+): ClosureReport[] {
+  let state = INITIAL_DETECTOR;
+  const out: ClosureReport[] = [];
+  for (const frame of frames) {
+    const d = detect(state, frame, profile);
+    state = d.state;
+    if (d.closure) out.push(d.closure);
+  }
+  return out;
+}

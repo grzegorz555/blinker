@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (Kalibracja says why)
+- The blink step of Kalibracja (Calibration) lists his last 3 closures of the eyes with their numbers and why each did or did not count, judged by the thresholds fitted so far; the result shows his blink thresholds. For tuning while trying it.
+
 ## 2026-11-15 (why a blink did not count)
 - MediaPipe lowers the gaze of a closed eye (eyeLookDown rises with eyeBlink), so the detector took every blink for a look at his hand. Now a closure is a look only if he was already looking down when it began, or the look lasted long enough to send HAND. Diagnostyka (Diagnostics) shows the last closure of the eyes (length, closure, squeeze, down) with the reason it did or did not count, and his blink thresholds.
 
