@@ -54,7 +54,7 @@ describe('checkRepo', () => {
     }
   });
 
-  afterEach(() => rmSync(root, { recursive: true, force: true }));
+  afterEach(() => rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
 
   it('exempts specs before 005 and reports unlabeled tasks from 005 on', () => {
     const problems = checkRepo(root);

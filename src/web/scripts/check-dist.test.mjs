@@ -17,7 +17,7 @@ describe('findDistProblems', () => {
     writeFileSync(join(dir, 'styles-XYZ.css'), 'body{}');
   });
 
-  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
 
   it('passes a clean build', () => {
     assert.deepEqual(findDistProblems(dir), []);

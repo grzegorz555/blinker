@@ -22,7 +22,12 @@ function run(command, env = {}) {
   return status === 0;
 }
 
-rmSync(resolve(webDir, '.lighthouseci'), { recursive: true, force: true });
+rmSync(resolve(webDir, '.lighthouseci'), {
+  recursive: true,
+  force: true,
+  maxRetries: 5,
+  retryDelay: 100,
+});
 
 let ok = true;
 for (const { lang, locale } of languages) {

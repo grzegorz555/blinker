@@ -105,7 +105,7 @@ describe('buildDesign', () => {
     );
   });
 
-  afterEach(() => rmSync(root, { recursive: true, force: true }));
+  afterEach(() => rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
 
   it('copies pages and scripts, keeps subfolders, and compiles only the classes the pages use', async () => {
     assert.deepEqual(await buildDesign({ src, out }), []);

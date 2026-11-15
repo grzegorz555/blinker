@@ -83,7 +83,7 @@ function walk(dir) {
  * @returns {Promise<string[]>}
  */
 export async function buildDesign({ src = DESIGN_SRC, out = DESIGN_OUT } = {}) {
-  rmSync(out, { recursive: true, force: true });
+  rmSync(out, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   mkdirSync(out, { recursive: true });
   const problems = [];
 
