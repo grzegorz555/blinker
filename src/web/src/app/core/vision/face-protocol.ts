@@ -20,4 +20,9 @@ export type FromWorker =
   | { readonly type: 'frame'; readonly frame: FaceFrame }
   /** A request the guard refused (only its origin): shown on Diagnostyka (Diagnostics), so the block is visible. */
   | { readonly type: 'blocked'; readonly origin: string }
-  | { readonly type: 'error'; readonly stage: 'init' | 'frame'; readonly message: string };
+  /** 'unsupported': this browser can't run the model in a worker (no OffscreenCanvas, e.g. Safari before 16.4). */
+  | {
+      readonly type: 'error';
+      readonly stage: 'init' | 'frame' | 'unsupported';
+      readonly message: string;
+    };

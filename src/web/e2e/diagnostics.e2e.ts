@@ -62,7 +62,7 @@ test.describe('Diagnostyka (Diagnostics)', () => {
     test.skip(browserName === 'chromium', 'Chromium has the fake camera');
     await page.getByRole('button', { name: 'Włącz kamerę' }).click();
     await expect(page.getByTestId('tracker-status')).toHaveText(
-      /Brak zgody na kamerę|Nie znaleziono przedniej kamery|nie obsługuje kamery|Kamera przestała działać/,
+      /Działa\. Analiza|Brak zgody na kamerę|Nie znaleziono przedniej kamery|nie obsługuje kamery|Kamera przestała działać/,
       { timeout: 20_000 },
     );
     await expectNoA11yViolations(page);

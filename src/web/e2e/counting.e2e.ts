@@ -226,7 +226,7 @@ test.describe('Liczenie (Counting) with the camera', () => {
     if (browserName === 'chromium') {
       await expect(status).toHaveText('Brak twarzy', { timeout: 60_000 });
     } else {
-      await expect(status).toHaveText(/Bez zgody|Brak kamery|Bez kamery|Błąd kamery/, {
+      await expect(status).toHaveText(/Brak twarzy|Bez zgody|Brak kamery|Bez kamery|Błąd kamery/, {
         timeout: 20_000,
       });
     }

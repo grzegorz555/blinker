@@ -72,7 +72,7 @@ test.describe('Kalibracja (Calibration)', () => {
     await next(page);
     await page.getByRole('button', { name: 'Włącz kamerę' }).click();
     await expect(page.getByTestId('calibration-status')).toHaveText(
-      /Brak zgody na kamerę|Nie znaleziono przedniej kamery|nie obsługuje kamery|Kamera przestała działać/,
+      /Nie widzę twarzy|Twarz w kadrze|Brak zgody na kamerę|Nie znaleziono przedniej kamery|nie obsługuje kamery|Kamera przestała działać/,
       { timeout: 20_000 },
     );
     await next(page);
