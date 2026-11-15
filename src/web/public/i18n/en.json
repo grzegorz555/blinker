@@ -306,7 +306,19 @@
       "SHAKE": "Head shake (no)",
       "RIGHT": "Head right (finish)"
     },
-    "errorDetail": "Technical details: {{detail}}"
+    "errorDetail": "Technical details: {{detail}}",
+    "closure": {
+      "title": "The last closure of the eyes",
+      "none": "None yet.",
+      "values": "{{ms}} ms; closure {{closure}}, squeeze {{squeeze}}, down {{down}}:",
+      "profile": "A blink counts when the closure reaches {{threshold}} and the lids squeeze to {{squeeze}}, or the eyes stay closed at least {{minMs}} ms (at most {{maxMs}} ms).",
+      "verdict": {
+        "blink": "counted as a blink",
+        "weak": "too weak and too short",
+        "tooLong": "too long (resting)",
+        "lookingDown": "he was looking down (a look at his hand)"
+      }
+    }
   },
   "calibration": {
     "stepOf": "Step {{n}} of {{total}}",

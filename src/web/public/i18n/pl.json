@@ -306,7 +306,19 @@
       "SHAKE": "Kręcenie głową (nie)",
       "RIGHT": "Głowa w prawo (koniec)"
     },
-    "errorDetail": "Szczegóły techniczne: {{detail}}"
+    "errorDetail": "Szczegóły techniczne: {{detail}}",
+    "closure": {
+      "title": "Ostatnie zamknięcie oczu",
+      "none": "Jeszcze żadnego.",
+      "values": "{{ms}} ms; zamknięcie {{closure}}, zaciśnięcie {{squeeze}}, w dół {{down}}:",
+      "profile": "Mrugnięcie się liczy, gdy zamknięcie sięga {{threshold}}, a powieki zaciskają się do {{squeeze}} albo oczy są zamknięte co najmniej {{minMs}} ms (najwyżej {{maxMs}} ms).",
+      "verdict": {
+        "blink": "mrugnięcie zaliczone",
+        "weak": "za słabe i za krótkie",
+        "tooLong": "za długie (odpoczynek)",
+        "lookingDown": "patrzył w dół (spojrzenie na rękę)"
+      }
+    }
   },
   "calibration": {
     "stepOf": "Krok {{n}} z {{total}}",
