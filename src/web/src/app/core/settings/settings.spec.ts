@@ -12,6 +12,16 @@ describe('validateSettings (spec 007, R12)', () => {
     expect(validateSettings({ keyboard: true })).toEqual({ ...DEFAULT_SETTINGS, keyboard: true });
   });
 
+  it('the camera is off by default; its sound is on; the camera faces him (spec 012)', () => {
+    expect(DEFAULT_SETTINGS.camera).toBe(false);
+    expect(DEFAULT_SETTINGS.cameraPreview).toBe(false);
+    expect(DEFAULT_SETTINGS.signalSound).toBe(true);
+    expect(DEFAULT_SETTINGS.cameraFacing).toBe('user');
+    expect(validateSettings({ cameraFacing: 'environment' })?.cameraFacing).toBe('environment');
+    expect(validateSettings({ cameraFacing: 'left' })).toBeNull();
+    expect(validateSettings({ camera: 'yes' })).toBeNull();
+  });
+
   it('drops unknown fields (a newer version may add some)', () => {
     expect(validateSettings({ ...DEFAULT_SETTINGS, future: 1 })).toEqual(DEFAULT_SETTINGS);
   });

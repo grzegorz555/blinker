@@ -7,6 +7,9 @@ import { isPlainObject } from '../storage/local-store';
 export const THEMES = ['system', 'light', 'dark'] as const;
 export type Theme = (typeof THEMES)[number];
 
+/** Which camera watches him (spec 012, R5): the front one, or the rear one when a caregiver holds the phone. */
+export const CAMERA_FACINGS = ['user', 'environment'] as const;
+export type CameraFacing = (typeof CAMERA_FACINGS)[number];
 /** Speech rates offered in Ustawienia (Settings). */
 export const RATES = [0.75, 1, 1.25, 1.5] as const;
 
@@ -28,6 +31,13 @@ export interface Settings {
   readonly theme: Theme;
   /** Keep the sentences read aloud on the device (R11). */
   readonly history: boolean;
+  /** His face signals drive Liczenie (Counting) (spec 012, R1); off until someone chooses it. */
+  readonly camera: boolean;
+  readonly cameraFacing: CameraFacing;
+  /** A small camera preview on Liczenie (Counting) (spec 012, R4). */
+  readonly cameraPreview: boolean;
+  /** A short sound for each signal from the camera (spec 012, R3). */
+  readonly signalSound: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -40,6 +50,10 @@ export const DEFAULT_SETTINGS: Settings = {
   rate: RATE.default,
   theme: 'system',
   history: true,
+  camera: false,
+  cameraFacing: 'user',
+  cameraPreview: false,
+  signalSound: true,
 };
 
 export const SETTINGS_KEY = 'blinker.settings.v1';
@@ -61,6 +75,10 @@ const CHECKS: { readonly [K in keyof Settings]: (value: unknown) => boolean } = 
   rate: (v) => typeof v === 'number' && v >= RATE.min && v <= RATE.max,
   theme: (v) => (THEMES as readonly unknown[]).includes(v),
   history: (v) => typeof v === 'boolean',
+  camera: (v) => typeof v === 'boolean',
+  cameraFacing: (v) => (CAMERA_FACINGS as readonly unknown[]).includes(v),
+  cameraPreview: (v) => typeof v === 'boolean',
+  signalSound: (v) => typeof v === 'boolean',
 };
 
 /**
