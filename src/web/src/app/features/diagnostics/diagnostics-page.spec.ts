@@ -124,6 +124,19 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     );
   });
 
+  it('says why the last look down was or was not a look at his hand, with the hand thresholds', async () => {
+    const { fixture, tracker, text } = await render();
+    expect(text('last-look')).toBe('None yet.');
+    expect(text('hand-profile')).toContain('both “–” = any side');
+    const eyes = (t: number) => ({ eyeLookDownLeft: t >= 200 && t < 900 ? 0.8 : 0.05 });
+    for (const frame of record(1500, { eyes })) {
+      tracker.frame.set(frame);
+      await fixture.whenStable();
+    }
+    expect(text('last-look')).toContain('down 0.80');
+    expect(text('last-look')).toContain('counted as a look at his hand');
+  });
+
   it('says why the camera stopped, in text', async () => {
     const { fixture, tracker, text } = await render();
     tracker.status.set('error');

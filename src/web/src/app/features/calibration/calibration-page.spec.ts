@@ -115,6 +115,12 @@ describe('CalibrationPage (spec 011, R4)', () => {
     expect(text('blink-closures')?.match(/counted as a blink/g)).toHaveLength(3);
     // Keep the blinks, skip the rest.
     await click('Next');
+    // A look at his left hand: listed with its numbers and verdict (then the step is skipped).
+    await feed(
+      record(1500, { eyes: (t) => ({ eyeLookDownLeft: t >= 200 && t < 900 ? 0.8 : 0.05 }) }),
+      7000,
+    );
+    expect(text('hand-looks')).toContain('down 0.80');
     for (let i = 0; i < 5; i++) await click('Skip this step');
     expect(text('results')).toContain('Detected 3 of 3');
     expect(text('results')).toContain('Skipped');

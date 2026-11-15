@@ -111,6 +111,31 @@
     </div>
   }
 
+  @if (status() === 'running' && handLooks().length) {
+    <div class="closures" data-testid="hand-looks">
+      <p class="muted">{{ 'calibration.looks' | transloco }}</p>
+      <ul>
+        @for (l of handLooks(); track $index) {
+          <li>
+            {{
+              'diagnostics.look.values'
+                | transloco
+                  : {
+                      ms: round(l.ms),
+                      down: round(l.down, 2),
+                      left: round(l.left, 2),
+                      right: round(l.right, 2),
+                      yaw: round(l.yaw),
+                      pitch: round(l.pitch),
+                    }
+            }}
+            <strong>{{ 'diagnostics.look.verdict.' + l.verdict | transloco }}</strong>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
   @if (page() === 'neutral' && status() === 'running') {
     <p class="muted" data-testid="ordinary">
       {{ 'calibration.ordinary' | transloco: { n: ordinary() } }}
@@ -139,6 +164,23 @@
                 squeeze: fit().profile.blink.squeeze,
                 minMs: fit().profile.blink.minMs,
                 maxMs: fit().profile.blink.maxMs,
+              }
+      }}
+    </p>
+  }
+
+  @if (
+    page() === 'result' && (fit().learnt.includes('handLeft') || fit().learnt.includes('handRight'))
+  ) {
+    <p class="muted" data-testid="hand-profile">
+      {{
+        'diagnostics.look.profile'
+          | transloco
+            : {
+                down: fit().profile.hand.threshold,
+                holdMs: fit().profile.hand.holdMs,
+                left: fit().profile.hand.left ?? '–',
+                right: fit().profile.hand.right ?? '–',
               }
       }}
     </p>

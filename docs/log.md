@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (his look at his hand with the head turned)
+- The look at his hand was not recognized: it required a still head, but he turns and tilts his head towards his hand. Now only a nod under way blocks it. Kalibracja (Calibration) finds short looks in a long step (per look, not per frame) and lists his last looks with their numbers and why each did or did not count; Diagnostyka (Diagnostics) shows the last look and the hand thresholds, and copies the last 10 looks.
+
 ## 2026-11-15 (ordinary blinks, nods and his hand)
 - Ordinary blinks counted and a nod sometimes gave +5. Kalibracja (Calibration) now learns his ordinary blinks in the rest step and picks the cue that tells his strong blink apart best (lids, cheeks or brows); when none does, only long blinks count and the result says so. A look at his hand needs a still head and, once learnt, his side (down and to his left).
 
