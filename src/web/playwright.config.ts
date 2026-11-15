@@ -20,11 +20,17 @@ const fakeCamera = {
 };
 const deployedTests = ['headers.e2e.ts', 'smoke.e2e.ts', 'deployed/**/*.e2e.ts'];
 
+/**
+ * A running server is reused only on request (PW_REUSE_SERVER=1): parallel worktrees share the ports, and a server left
+ * over from another worktree would serve its build (docs/knowledge/e2e-server-from-another-worktree.md).
+ */
+const reuseServer = !process.env['CI'] && process.env['PW_REUSE_SERVER'] === '1';
+
 const appServer = {
   command: 'node e2e/serve-dist.mjs',
   url: localURL,
   env: { PORT: String(port) },
-  reuseExistingServer: !process.env['CI'],
+  reuseExistingServer: reuseServer,
 };
 
 /** Bound to 127.0.0.1: tests never open the mock-ups to the network (spec 004, R10). */
@@ -32,7 +38,7 @@ const designServer = {
   command: 'node scripts/serve-design.mjs',
   url: designURL,
   env: { PORT: String(designPort), HOST: '127.0.0.1' },
-  reuseExistingServer: !process.env['CI'],
+  reuseExistingServer: reuseServer,
 };
 
 /**

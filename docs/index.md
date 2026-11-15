@@ -24,3 +24,4 @@ only what the task needs.
 * [Specs](specs/index.md) - Feature specs and task lists, one folder per feature.
 * [Knowledge](knowledge/index.md) - Learnings captured by the `/compound` step; read the relevant ones before a task.
 * [Backlog](backlog.md) - Stages and ideas not yet specified.
+* [Trial with the friend](trial/index.md) - Stage 6: the checklist for the first session with him.

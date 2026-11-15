@@ -26,6 +26,7 @@ Body: **Context** (what happened), **Lesson** (the rule), **How to apply** (wher
 * [Page.getInstallabilityErrors is always empty; use Page.getAppManifest](cdp-installability-errors-always-empty.md) - Every automated check needs a negative test that proves it can fail.
 * [Check the Lighthouse report language by the page text](lighthouse-language-by-text.md) - One marker element breaks when the layout changes; match node labels against the translations.
 * [A layout that fits to the pixel breaks on another system font](layout-fits-with-a-wider-font.md) - The CI font (DejaVu Sans) is wider; repeat fit checks with a wider font.
+* [With reuseExistingServer, e2e may test another worktree's build](e2e-server-from-another-worktree.md) - The server is reused only with PW_REUSE_SERVER=1.
 
 ## Interaction
 * ["No" means a different thing in every state](no-depends-on-context.md) - Map every state and signal explicitly; a second "no" must not delete.
@@ -36,8 +37,10 @@ Body: **Context** (what happened), **Lesson** (the rule), **How to apply** (wher
 ## Accessibility
 * [A visible skip link must not overlap other targets](skip-link-must-not-overlap.md) - SC 2.5.8; never cover another control; scan focused states with axe.
 * [Content under a sticky bar counts as covered](sticky-bar-covers-controls.md) - Keep the shell the viewport high and let only main scroll.
+* [A live role on a list element removes the list](log-role-on-a-list.md) - Put role="log" on a wrapper, not on the ol.
 
 ## Tooling
+* [An effect that writes a signal it reads runs forever](effect-that-writes-what-it-reads.md) - Do the work in untracked().
 * [Start Claude Code in the repo root](claude-session-start-directory.md) - Otherwise project agents (code-reviewer) are not loaded.
 * [`node -e` template strings eat backslashes](node-e-template-eats-backslashes.md) - Use Write/Edit or String.raw for regexes and paths.
 * [After a rebase merge, git branch -d says the branch is not merged](rebased-branch-is-not-merged-for-git.md) - Compare the trees with git diff before deleting.
