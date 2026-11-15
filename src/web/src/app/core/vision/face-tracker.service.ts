@@ -44,10 +44,14 @@ export type TrackerStatus = 'idle' | 'starting' | 'running' | 'error';
 export type TrackerError = 'denied' | 'no-camera' | 'unsupported' | 'model' | 'failed';
 
 /** The camera we ask for: the front camera, a small picture (enough for the face, cheaper to analyse). */
-export const CAMERA_CONSTRAINTS: MediaStreamConstraints = {
-  audio: false,
-  video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-};
+export const CAMERA_CONSTRAINTS: MediaStreamConstraints = cameraConstraints('user');
+
+export function cameraConstraints(facing: 'user' | 'environment'): MediaStreamConstraints {
+  return {
+    audio: false,
+    video: { facingMode: facing, width: { ideal: 640 }, height: { ideal: 480 } },
+  };
+}
 
 /** The video element calls back on each new frame; the fallback is the next animation frame. */
 type FrameLoopVideo = HTMLVideoElement & {
@@ -84,7 +88,8 @@ export class FaceTrackerService {
     inject(DestroyRef).onDestroy(() => this.stop());
   }
 
-  async start(video: HTMLVideoElement): Promise<void> {
+  /** Opens the camera (front by default; the rear one for a caregiver holding the phone, spec 012 R5). */
+  async start(video: HTMLVideoElement, facing: 'user' | 'environment' = 'user'): Promise<void> {
     if (this.status() === 'starting' || this.status() === 'running') return;
     const run = ++this.run;
     this.status.set('starting');
@@ -94,7 +99,7 @@ export class FaceTrackerService {
     this.stats.set(frameStats([]));
     if (!this.supported()) return this.fail('unsupported');
     try {
-      this.stream = await this.openCamera(CAMERA_CONSTRAINTS);
+      this.stream = await this.openCamera(cameraConstraints(facing));
     } catch (error) {
       if (run !== this.run) return;
       const name = (error as { name?: string })?.name;
