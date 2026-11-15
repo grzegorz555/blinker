@@ -6,6 +6,7 @@
 // right when the head comes back), so holding a position never repeats a signal. His blink is strong rather than long:
 // a closure counts if it is long enough or if the lids squeeze hard enough while it lasts.
 import type { FaceFrame } from '../vision/face-frame';
+import { closureOf, cuesOf, downOf, maxCues, NO_CUES, sidesOf, type CueValues } from './cues';
 import type { SignalProfile } from './profile';
 
 /** The signals his face can give (the same types as the buttons and keys). */
@@ -15,8 +16,8 @@ export interface DetectorState {
   /** When both eyes closed, and whether he was looking down then (the look at his hand lowers the lids). */
   readonly closedSince: number | null;
   readonly closedWhileDown: boolean;
-  /** The strongest squeeze of the lids, the deepest closure and the lowest look during the current closure. */
-  readonly closedSqueeze: number;
+  /** The strongest signs of a strong blink, the deepest closure and the lowest look during the current closure. */
+  readonly closedCues: CueValues;
   readonly closedPeak: number;
   readonly closedDown: number;
   /** When the eyes went down, and whether HAND was already sent for this look. */
@@ -35,7 +36,7 @@ export interface DetectorState {
 export const INITIAL_DETECTOR: DetectorState = {
   closedSince: null,
   closedWhileDown: false,
-  closedSqueeze: 0,
+  closedCues: NO_CUES,
   closedPeak: 0,
   closedDown: 0,
   downSince: null,
@@ -56,7 +57,9 @@ export type ClosureVerdict = 'blink' | 'weak' | 'tooLong' | 'lookingDown';
 export interface ClosureReport {
   readonly ms: number;
   readonly closure: number;
+  /** His strong-blink cue at its peak (the one his profile uses), and all three cues. */
   readonly squeeze: number;
+  readonly cues: CueValues;
   readonly down: number;
   readonly verdict: ClosureVerdict;
 }
@@ -77,11 +80,31 @@ const lost = (state: DetectorState): DetectorState => ({
 export function detect(state: DetectorState, frame: FaceFrame, profile: SignalProfile): Detection {
   if (!frame.face) return { state: lost(state), signals: [] };
   const t = frame.timestamp;
-  const e = frame.eyes;
-  const closure = Math.min(e.eyeBlinkLeft ?? 0, e.eyeBlinkRight ?? 0);
-  const squeeze = Math.min(e.eyeSquintLeft ?? 0, e.eyeSquintRight ?? 0);
-  const down = Math.max(e.eyeLookDownLeft ?? 0, e.eyeLookDownRight ?? 0);
-  const looksDown = down >= profile.hand.threshold;
+  const closure = closureOf(frame);
+  const cues = cuesOf(frame);
+  const down = downOf(frame);
+  const sides = sidesOf(frame);
+  const head = frame.head;
+  const pitch = head ? head.pitch - profile.neutral.pitch : 0;
+  const yaw = head ? head.yaw - profile.neutral.yaw : 0;
+  // His eyes stay on the screen while the head moves, so a nod or a turn moves the eyes against the head: the head going
+  // up reads as looking down. A look at his hand counts only with the head still.
+  const headStill =
+    Math.abs(pitch) < profile.nod.amplitude &&
+    Math.abs(yaw) < profile.shake.amplitude &&
+    state.nodSince === null &&
+    state.shakeSides.length === 0;
+  // To his hand: down, and to the side he looks (when Kalibracja (Calibration) learnt it), with hysteresis.
+  const towardsHand = (share: number) => {
+    const { left, right } = profile.hand;
+    if (left === null && right === null) return true;
+    return (
+      (left !== null && sides.left >= left * share) ||
+      (right !== null && sides.right >= right * share)
+    );
+  };
+  const atHand = down >= profile.hand.threshold && towardsHand(1) && headStill;
+  const stillAtHand = down >= profile.hand.threshold * RELEASE && towardsHand(RELEASE) && headStill;
   const fired: FaceSignal[] = [];
   let report: ClosureReport | undefined;
   let s: DetectorState = state;
@@ -95,7 +118,7 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
         ...s,
         closedSince: t,
         closedWhileDown: s.downSince !== null,
-        closedSqueeze: squeeze,
+        closedCues: cues,
         closedPeak: closure,
         closedDown: down,
       };
@@ -103,7 +126,8 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
   } else if (closure < profile.blink.threshold * RELEASE) {
     const ms = t - s.closedSince;
     const long = ms >= profile.blink.minMs;
-    const strong = s.closedSqueeze >= profile.blink.squeeze;
+    const peak = s.closedCues[profile.blink.cue];
+    const strong = profile.blink.squeeze < 1 && peak >= profile.blink.squeeze;
     const verdict: ClosureVerdict = s.closedWhileDown
       ? 'lookingDown'
       : ms > profile.blink.maxMs
@@ -112,28 +136,35 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
           ? 'blink'
           : 'weak';
     if (verdict === 'blink') fired.push('BLINK');
-    report = { ms, closure: s.closedPeak, squeeze: s.closedSqueeze, down: s.closedDown, verdict };
+    report = {
+      ms,
+      closure: s.closedPeak,
+      squeeze: peak,
+      cues: s.closedCues,
+      down: s.closedDown,
+      verdict,
+    };
     s = {
       ...s,
       closedSince: null,
       closedWhileDown: false,
-      closedSqueeze: 0,
+      closedCues: NO_CUES,
       closedPeak: 0,
       closedDown: 0,
     };
   } else {
     s = {
       ...s,
-      closedSqueeze: Math.max(s.closedSqueeze, squeeze),
+      closedCues: maxCues(s.closedCues, cues),
       closedPeak: Math.max(s.closedPeak, closure),
       closedDown: Math.max(s.closedDown, down),
     };
   }
 
-  // Look at his hand: fires once when the eyes have been down long enough.
+  // Look at his hand: fires once when the eyes have been on his hand long enough.
   if (s.downSince === null) {
-    if (looksDown) s = { ...s, downSince: t, handSent: false };
-  } else if (down < profile.hand.threshold * RELEASE) {
+    if (atHand) s = { ...s, downSince: t, handSent: false };
+  } else if (!stillAtHand) {
     s = { ...s, downSince: null, handSent: false };
   } else if (!s.handSent && t - s.downSince >= profile.hand.holdMs) {
     fired.push('HAND');
@@ -141,11 +172,7 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
     s = { ...s, handSent: true, closedWhileDown: s.closedSince !== null || s.closedWhileDown };
   }
 
-  const head = frame.head;
   if (head) {
-    const pitch = head.pitch - profile.neutral.pitch;
-    const yaw = head.yaw - profile.neutral.yaw;
-
     // Nod: away (in his direction, if known) and back within the window.
     const nodAway =
       profile.nod.direction === 0 ? Math.abs(pitch) : Math.max(0, pitch * profile.nod.direction);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { countDetected, fitProfile, percentile } from './fit';
+import { countDetected, fitProfile, ordinaryBlinks, percentile } from './fit';
 import { DEFAULT_PROFILE as P } from './profile';
 import { pulses, record } from './synthetic';
 
@@ -87,6 +87,101 @@ describe('fitProfile (spec 011, R5)', () => {
     expect(profile.blink.squeeze).toBeCloseTo(0.55, 2);
     expect(countDetected('blink', strong, profile)).toBe(3);
     expect(countDetected('blink', calm, profile)).toBe(0);
+  });
+
+  describe('his strong blink against his ordinary ones', () => {
+    type Shapes = Partial<Record<'eyeSquint' | 'cheekSquint' | 'browDown', number>>;
+    const blinksAt = (list: readonly (readonly [number, number])[], on: Shapes) => (t: number) => {
+      const closed = list.some(([a, b]) => t >= a && t < b);
+      const v = (k: keyof Shapes) => (closed ? (on[k] ?? 0.05) : 0.05);
+      return {
+        ...restEyes,
+        eyeBlinkLeft: closed ? 0.9 : 0.2,
+        eyeBlinkRight: closed ? 0.9 : 0.2,
+        eyeSquintLeft: v('eyeSquint'),
+        eyeSquintRight: v('eyeSquint'),
+        cheekSquintLeft: v('cheekSquint'),
+        cheekSquintRight: v('cheekSquint'),
+        browDownLeft: v('browDown'),
+        browDownRight: v('browDown'),
+      };
+    };
+    const calm = (on: Shapes) =>
+      record(4000, {
+        ...rest,
+        eyes: blinksAt(
+          [
+            [1000, 1200],
+            [2500, 2700],
+          ],
+          on,
+        ),
+      });
+    const strong = (on: Shapes) =>
+      record(6000, {
+        ...rest,
+        eyes: blinksAt(
+          [
+            [1000, 1250],
+            [3000, 3250],
+            [5000, 5250],
+          ],
+          on,
+        ),
+      });
+
+    it('counts his ordinary blinks at rest', () => {
+      expect(ordinaryBlinks(calm({ eyeSquint: 0.3 }))).toBe(2);
+      expect(ordinaryBlinks(neutral)).toBe(0);
+    });
+
+    it('picks the cue that tells them apart best (here the brows), and says it is ok', () => {
+      const r = {
+        neutral: calm({ eyeSquint: 0.6 }),
+        blink: strong({ eyeSquint: 0.7, browDown: 0.6 }),
+      };
+      const fit = fitProfile(r, P);
+      expect(fit.profile.blink.cue).toBe('browDown');
+      // Halfway between his ordinary blinks (0.05) and the weaker strong one (0.6).
+      expect(fit.profile.blink.squeeze).toBeCloseTo(0.325, 1);
+      expect(fit.blink).toEqual({ separation: 'ok', ordinary: 2 });
+      expect(countDetected('blink', r.blink, fit.profile)).toBe(3);
+      expect(countDetected('blink', r.neutral, fit.profile)).toBe(0);
+    });
+
+    it('when they look alike, turns the strong blink off rather than type a letter on an ordinary blink', () => {
+      const r = { neutral: calm({ eyeSquint: 0.8 }), blink: strong({ eyeSquint: 0.8 }) };
+      const fit = fitProfile(r, P);
+      expect(fit.profile.blink.squeeze).toBe(1);
+      expect(fit.blink?.separation).toBe('overlap');
+      expect(countDetected('blink', r.neutral, fit.profile)).toBe(0);
+    });
+
+    it('without ordinary blinks at rest, the threshold is a guess and says so', () => {
+      const fit = fitProfile({ neutral, blink: strong({ eyeSquint: 0.8 }) }, P);
+      expect(fit.blink?.separation).toBe('noOrdinary');
+      expect(fit.profile.blink.squeeze).toBeLessThan(0.8);
+    });
+  });
+
+  it('learns the side of his left hand: down and to his left', () => {
+    const leftLook = record(3000, {
+      ...rest,
+      eyes: (t) => {
+        const on = t >= 500 && t < 1500;
+        return {
+          ...restEyes,
+          eyeLookDownLeft: on ? 0.8 : 0.15,
+          eyeLookDownRight: on ? 0.8 : 0.15,
+          eyeLookOutLeft: on ? 0.6 : 0,
+          eyeLookInRight: on ? 0.6 : 0,
+        };
+      },
+    });
+    const { profile } = fitProfile({ neutral, handLeft: leftLook }, P);
+    expect(profile.hand.left).toBeCloseTo(0.3, 2);
+    expect(profile.hand.right).toBeNull();
+    expect(countDetected('handLeft', leftLook, profile)).toBe(1);
   });
 
   it('a step without a real movement keeps the previous value (not learnt)', () => {

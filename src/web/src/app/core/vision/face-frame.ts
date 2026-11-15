@@ -2,7 +2,7 @@
 import { headPose, type HeadPose } from './head-pose';
 
 /**
- * The blendshapes we keep: blinks, how hard the lids squeeze (his deliberate blink is strong rather than long), and
+ * The blendshapes we keep: blinks, how hard the lids squeeze and the cheeks and brows move (his deliberate blink is strong rather than long), and
  * where the eyes look (down and to a side for the look at his hand).
  */
 export const EYE_SHAPES = [
@@ -10,6 +10,10 @@ export const EYE_SHAPES = [
   'eyeBlinkRight',
   'eyeSquintLeft',
   'eyeSquintRight',
+  'cheekSquintLeft',
+  'cheekSquintRight',
+  'browDownLeft',
+  'browDownRight',
   'eyeLookDownLeft',
   'eyeLookDownRight',
   'eyeLookInLeft',

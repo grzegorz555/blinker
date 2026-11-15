@@ -5,6 +5,16 @@
 // (a sneeze, a lost face) doesn't move a threshold. Everything is clamped to the safe ranges of the profile, and a step
 // whose movement was too small to tell from rest keeps the previous value (it is not "learnt").
 import type { FaceFrame } from '../vision/face-frame';
+import {
+  closureOf,
+  cuesOf,
+  downOf,
+  maxCues,
+  sidesOf,
+  STRONG_CUES,
+  type CueValues,
+  type StrongCue,
+} from './cues';
 import { detectAll, type FaceSignal } from './detector';
 import { PROFILE_LIMITS, type SignalProfile } from './profile';
 
@@ -41,10 +51,19 @@ export const STEP_REPEATS: Record<Exclude<CalibrationStep, 'neutral'>, number> =
 /** The smallest difference from rest that counts as a deliberate movement. */
 export const MIN_CONTRAST = { eyes: 0.2, squeeze: 0.1, angle: 6 } as const;
 
+/**
+ * How well his strong blinks stand apart from his ordinary ones: `ok`; `noOrdinary` (no ordinary blink in the rest
+ * step, so the threshold is a rough guess against his resting face); `overlap` (they look alike to the camera, so only
+ * long blinks count).
+ */
+export type BlinkSeparation = 'ok' | 'noOrdinary' | 'overlap';
+
 export interface Fit {
   readonly profile: SignalProfile;
   /** The steps that changed the profile; the others kept the previous values. */
   readonly learnt: readonly CalibrationStep[];
+  /** Set when the blink was learnt. */
+  readonly blink?: { readonly separation: BlinkSeparation; readonly ordinary: number };
 }
 
 const clamp = (v: number, [min, max]: readonly [number, number]) => Math.min(max, Math.max(min, v));
@@ -58,34 +77,36 @@ export function percentile(values: readonly number[], p: number): number {
 }
 
 const withFace = (frames: readonly FaceFrame[] | undefined) => (frames ?? []).filter((f) => f.face);
-const closure = (f: FaceFrame) => Math.min(f.eyes.eyeBlinkLeft ?? 0, f.eyes.eyeBlinkRight ?? 0);
-const squeeze = (f: FaceFrame) => Math.min(f.eyes.eyeSquintLeft ?? 0, f.eyes.eyeSquintRight ?? 0);
-const down = (f: FaceFrame) => Math.max(f.eyes.eyeLookDownLeft ?? 0, f.eyes.eyeLookDownRight ?? 0);
-
 interface Closure {
   readonly ms: number;
   readonly closure: number;
-  readonly squeeze: number;
+  readonly cues: CueValues;
 }
 
-/** Each closure of the eyes (both at or above `threshold`): how long, how far closed, how hard squeezed at most. */
+/** Each closure of the eyes (both at or above `threshold`): how long, how far closed, how strong at most. */
 function closures(frames: readonly FaceFrame[], threshold: number): Closure[] {
   const out: Closure[] = [];
-  let open: { start: number; closure: number; squeeze: number } | null = null;
+  let open: { start: number; closure: number; cues: CueValues } | null = null;
   for (const f of frames) {
-    const c = closure(f);
+    const c = closureOf(f);
     if (c < threshold) {
-      if (open)
-        out.push({ ms: f.timestamp - open.start, closure: open.closure, squeeze: open.squeeze });
+      if (open) out.push({ ms: f.timestamp - open.start, closure: open.closure, cues: open.cues });
       open = null;
     } else if (open) {
       open.closure = Math.max(open.closure, c);
-      open.squeeze = Math.max(open.squeeze, squeeze(f));
+      open.cues = maxCues(open.cues, cuesOf(f));
     } else {
-      open = { start: f.timestamp, closure: c, squeeze: squeeze(f) };
+      open = { start: f.timestamp, closure: c, cues: cuesOf(f) };
     }
   }
   return out;
+}
+
+/** His ordinary blinks in a rest recording (Kalibracja (Calibration) shows how many it has seen). */
+export function ordinaryBlinks(frames: readonly FaceFrame[] | undefined): number {
+  const rest = withFace(frames);
+  if (!rest.length) return 0;
+  return closures(rest, percentile(rest.map(closureOf), 50) + MIN_CONTRAST.eyes).length;
 }
 
 /** The value with the largest size among the top 5 %, with its sign (a movement and its direction). */
@@ -99,12 +120,12 @@ function peak(values: readonly number[]): number {
 export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit {
   const L = PROFILE_LIMITS;
   const learnt: CalibrationStep[] = [];
+  let blinkFit: Fit['blink'];
   let p: SignalProfile = previous;
 
   // Rest: his head pose, and his eyes open and looking at the screen.
   const rest = withFace(recordings.neutral);
   let restClosure = 0.1;
-  let restSqueeze = 0.1;
   let restDown = 0.1;
   if (rest.length) {
     const yaw = percentile(
@@ -119,9 +140,8 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
       ...p,
       neutral: { yaw: round(clamp(yaw, L.angle), 1), pitch: round(clamp(pitch, L.angle), 1) },
     };
-    restClosure = percentile(rest.map(closure), 50);
-    restSqueeze = percentile(rest.map(squeeze), 50);
-    restDown = percentile(rest.map(down), 50);
+    restClosure = percentile(rest.map(closureOf), 50);
+    restDown = percentile(rest.map(downOf), 50);
     learnt.push('neutral');
   }
 
@@ -143,25 +163,38 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
     const minMs = Number.isNaN(typical)
       ? p.blink.minMs
       : Math.round(clamp(Math.min(p.blink.minMs, typical * 0.6), [350, L.blinkMinMs[1]]));
-    // His strong blinks: halfway between the squeeze of his ordinary blinks (those in the rest recording, or the
-    // resting lids if he did not blink then) and the median squeeze of his deliberate ones.
-    const ordinary = closures(rest, threshold).map((c) => c.squeeze);
-    const floor = Math.max(restSqueeze, ...ordinary);
-    const strong = percentile(
-      deliberate.map((c) => c.squeeze),
-      50,
-    );
-    const squeezeAt =
-      strong - floor >= MIN_CONTRAST.squeeze
-        ? round(clamp(floor + (strong - floor) / 2, L.threshold))
-        : p.blink.squeeze;
-    p = { ...p, blink: { ...p.blink, threshold: round(threshold), minMs, squeeze: squeezeAt } };
+    // His strong blinks: of the three cues, the one with the widest gap between his ordinary blinks (in the rest
+    // step; without them, his resting face) and the weaker of his strong ones; the threshold in the middle of the gap.
+    // Without a gap, the strong blink is off and only long blinks count: an ordinary blink must never type a letter.
+    const ordinary = closures(rest, threshold);
+    const strong = closures(blink, threshold);
+    const gaps = STRONG_CUES.map((cue) => {
+      const top = ordinary.length
+        ? Math.max(...ordinary.map((c) => c.cues[cue]))
+        : percentile(
+            rest.map((f) => cuesOf(f)[cue]),
+            50,
+          );
+      const low = percentile(
+        strong.map((c) => c.cues[cue]),
+        25,
+      );
+      return { cue, top: Number.isNaN(top) ? 0 : top, gap: low - (Number.isNaN(top) ? 0 : top) };
+    }).sort((a, b) => b.gap - a.gap);
+    const best = gaps[0];
+    const needed = ordinary.length ? MIN_CONTRAST.squeeze / 2 : MIN_CONTRAST.squeeze;
+    const separation: BlinkSeparation =
+      best.gap >= needed ? (ordinary.length ? 'ok' : 'noOrdinary') : 'overlap';
+    const cue: StrongCue = separation === 'overlap' ? p.blink.cue : best.cue;
+    const squeeze = separation === 'overlap' ? 1 : round(clamp(best.top + best.gap / 2, L.squeeze));
+    p = { ...p, blink: { ...p.blink, threshold: round(threshold), minMs, cue, squeeze } };
+    blinkFit = { separation, ordinary: ordinary.length };
     learnt.push('blink');
   }
 
   for (const step of ['handLeft', 'handRight'] as const) {
     const frames = withFace(recordings[step]);
-    const top = percentile(frames.map(down), 90);
+    const top = percentile(frames.map(downOf), 90);
     if (top - restDown >= MIN_CONTRAST.eyes) {
       const threshold = clamp(restDown + (top - restDown) / 2, L.threshold);
       // Both hands share one threshold: the lower one, so the weaker side still counts.
@@ -171,6 +204,38 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
       p = { ...p, hand: { ...p.hand, threshold: round(merged) } };
       learnt.push(step);
     }
+  }
+
+  // The side of each hand: with both learnt, a look must go to one of them; a hand looked at straight down (no side
+  // to tell) means any side counts.
+  const hands = (['handLeft', 'handRight'] as const).filter((step) => learnt.includes(step));
+  if (hands.length) {
+    const side = (step: 'handLeft' | 'handRight') => {
+      const key = step === 'handLeft' ? 'left' : 'right';
+      const restSide = rest.length
+        ? percentile(
+            rest.map((f) => sidesOf(f)[key]),
+            50,
+          )
+        : 0;
+      const looking = withFace(recordings[step]).filter((f) => downOf(f) >= p.hand.threshold);
+      const peak = percentile(
+        looking.map((f) => sidesOf(f)[key]),
+        50,
+      );
+      return peak - restSide >= MIN_CONTRAST.eyes / 2
+        ? round(clamp(restSide + (peak - restSide) / 2, L.threshold))
+        : null;
+    };
+    const left = learnt.includes('handLeft') ? side('handLeft') : null;
+    const right = learnt.includes('handRight') ? side('handRight') : null;
+    const anySide =
+      (learnt.includes('handLeft') && left === null) ||
+      (learnt.includes('handRight') && right === null);
+    p = {
+      ...p,
+      hand: { ...p.hand, left: anySide ? null : left, right: anySide ? null : right },
+    };
   }
 
   const nod = withFace(recordings.nod).map((f) => (f.head?.pitch ?? 0) - p.neutral.pitch);
@@ -208,7 +273,7 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
     learnt.push('right');
   }
 
-  return { profile: p, learnt };
+  return blinkFit ? { profile: p, learnt, blink: blinkFit } : { profile: p, learnt };
 }
 
 /** How many times the step's signal is found in its recording with a profile ("Wykryto n z k" (Detected n of k)). */
