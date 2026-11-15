@@ -13,10 +13,26 @@ const post = (message: FromWorker) => self.postMessage(message);
 // First of all: no request leaves the origin (MediaPipe's usage metrics included). The CSP blocks them too.
 guardFetch(self, self.location.origin, (origin) => post({ type: 'blocked', origin }));
 
+// MediaPipe loads its wasm loader with importScripts() and, when that throws a TypeError (a module worker), with
+// import(). WebKit (Safari) has no importScripts in module workers at all, so MediaPipe took it for a page and reached
+// for `document` ("Can't find variable: document"); Chromium has it, but the call is a Trusted Types sink. A stand-in
+// that always throws a TypeError sends every browser down the import() path, with no script URL sink touched.
+Object.defineProperty(self, 'importScripts', {
+  configurable: true,
+  writable: true,
+  value: () => {
+    throw new TypeError('importScripts is not used in this module worker');
+  },
+});
+
 let landmarker: FaceLandmarker | undefined;
 let lastTimestamp = -1;
 
 async function init(): Promise<void> {
+  if (typeof OffscreenCanvas === 'undefined') {
+    post({ type: 'error', stage: 'unsupported', message: 'no OffscreenCanvas in this worker' });
+    return;
+  }
   // Imported only now, after the guard is in place.
   const { FaceLandmarker, FilesetResolver } = await import('@mediapipe/tasks-vision');
   // useModule: the ES module loader, which a module worker loads with import() (not guarded by Trusted Types).
@@ -28,6 +44,9 @@ async function init(): Promise<void> {
   for (const delegate of ['GPU', 'CPU'] as const satisfies readonly Delegate[]) {
     try {
       landmarker = await FaceLandmarker.createFromOptions(fileset, {
+        // Our own canvas: MediaPipe guesses OffscreenCanvas support from the Safari version in the user agent and, when
+        // it can't tell, creates a page canvas through `document`, which a worker doesn't have.
+        canvas: new OffscreenCanvas(1, 1),
         baseOptions: { modelAssetPath: VISION_PATHS.model, delegate },
         runningMode: 'VIDEO',
         numFaces: 1,

@@ -166,6 +166,13 @@ describe('FaceTrackerService (spec 010, R2, R4)', () => {
     expect(tracks[0].stop).toHaveBeenCalled();
   });
 
+  it('a browser that cannot run the model in a worker is "unsupported", not a model error', async () => {
+    const { service, worker } = setup();
+    await service.start(fakeVideo().video);
+    worker.reply({ type: 'error', stage: 'unsupported', message: 'no OffscreenCanvas' });
+    expect(service.error()).toBe('unsupported');
+  });
+
   it('lists each origin the worker blocked once (R1)', async () => {
     const { service, worker } = setup();
     await service.start(fakeVideo().video);

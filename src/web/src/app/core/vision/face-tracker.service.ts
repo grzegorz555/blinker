@@ -170,7 +170,13 @@ export class FaceTrackerService {
         }
         return;
       case 'error':
-        this.fail(message.stage === 'init' ? 'model' : 'failed');
+        this.fail(
+          message.stage === 'unsupported'
+            ? 'unsupported'
+            : message.stage === 'init'
+              ? 'model'
+              : 'failed',
+        );
         return;
     }
   }
