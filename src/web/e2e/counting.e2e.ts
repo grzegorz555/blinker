@@ -160,8 +160,12 @@ test.describe('Liczenie (Counting) screen', () => {
   });
 
   test('the Pause button leaves the top bar with the screen', async ({ page }) => {
+    // The lazy screen first (its listeners), then the link; WebKit under load needs more than the default 5 s.
+    await expect(page.getByRole('table')).toBeVisible();
     await page.getByRole('link', { name: 'Ustawienia' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Ustawienia' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Ustawienia' })).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByRole('banner').getByRole('button')).toHaveCount(0);
   });
 
