@@ -12,6 +12,8 @@ import { addSample, frameStats, type FrameSample, type FrameStats } from './fram
 export interface FaceWorker {
   postMessage(message: ToWorker, transfer?: Transferable[]): void;
   onmessage: ((event: MessageEvent<FromWorker>) => void) | null;
+  /** The worker script itself failed (not a message): it would otherwise leave the status at "starting" for good. */
+  onerror: ((event: Event) => void) | null;
   terminate(): void;
 }
 
@@ -126,6 +128,9 @@ export class FaceTrackerService {
     worker.onmessage = ({ data }) => {
       if (run === this.run) this.onMessage(data);
     };
+    worker.onerror = () => {
+      if (run === this.run) this.fail('model');
+    };
     worker.postMessage({ type: 'init' });
   }
 
@@ -134,6 +139,7 @@ export class FaceTrackerService {
     this.cancelLoop();
     if (this.worker) {
       this.worker.onmessage = null;
+      this.worker.onerror = null;
       this.worker.postMessage({ type: 'close' });
       this.worker.terminate();
       this.worker = null;
