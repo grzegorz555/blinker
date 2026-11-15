@@ -91,7 +91,19 @@
     },
     "askNewSentence": "New sentence?",
     "newSentence": "New sentence",
-    "kept": "Keeping the sentence"
+    "kept": "Keeping the sentence",
+    "camera": {
+      "starting": "Camera…",
+      "face": "Face in view",
+      "noFace": "No face",
+      "error": {
+        "denied": "No permission",
+        "no-camera": "No camera",
+        "unsupported": "No camera",
+        "model": "Model error",
+        "failed": "Camera error"
+      }
+    }
   },
   "common": {
     "cancel": "Cancel"
@@ -217,6 +229,18 @@
       "title": "Camera diagnostics",
       "help": "Check how the phone tracks the face: blinks, head movement, analysis speed.",
       "open": "Open diagnostics"
+    },
+    "camera": {
+      "title": "Camera",
+      "camera": "Camera control in Counting",
+      "cameraHint": "His blinks, the look at his hand and his head movements work like the signal buttons. The picture stays on the device.",
+      "cameraPreview": "Camera preview in Counting",
+      "cameraPreviewHint": "A small preview next to the prompt; without it the board is bigger.",
+      "signalSound": "A sound for each signal",
+      "signalSoundHint": "A short sound when Blinker recognizes his signal from the camera.",
+      "facing": "Which camera",
+      "facingUser": "Front (the phone in front of him)",
+      "facingEnvironment": "Rear (a caregiver holds the phone)"
     }
   },
   "diagnostics": {

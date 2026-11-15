@@ -91,7 +91,19 @@
     },
     "askNewSentence": "Nowe zdanie?",
     "newSentence": "Nowe zdanie",
-    "kept": "Zostawiam zdanie"
+    "kept": "Zostawiam zdanie",
+    "camera": {
+      "starting": "Kamera…",
+      "face": "Widzę twarz",
+      "noFace": "Brak twarzy",
+      "error": {
+        "denied": "Bez zgody",
+        "no-camera": "Brak kamery",
+        "unsupported": "Bez kamery",
+        "model": "Błąd modelu",
+        "failed": "Błąd kamery"
+      }
+    }
   },
   "common": {
     "cancel": "Anuluj"
@@ -217,6 +229,18 @@
       "title": "Diagnostyka kamery",
       "help": "Sprawdź, jak telefon śledzi twarz: mrugnięcia, ruch głowy, szybkość analizy.",
       "open": "Otwórz diagnostykę"
+    },
+    "camera": {
+      "title": "Kamera",
+      "camera": "Sterowanie kamerą w Liczeniu",
+      "cameraHint": "Jego mrugnięcia, spojrzenie na rękę i ruchy głowy działają jak przyciski sygnałów. Obraz zostaje na urządzeniu.",
+      "cameraPreview": "Podgląd kamery w Liczeniu",
+      "cameraPreviewHint": "Mały podgląd obok polecenia; bez niego tablica jest większa.",
+      "signalSound": "Dźwięk przy sygnale",
+      "signalSoundHint": "Krótki dźwięk, gdy Blinker rozpozna jego sygnał z kamery.",
+      "facing": "Która kamera",
+      "facingUser": "Przednia (telefon przed nim)",
+      "facingEnvironment": "Tylna (opiekun trzyma telefon)"
     }
   },
   "diagnostics": {

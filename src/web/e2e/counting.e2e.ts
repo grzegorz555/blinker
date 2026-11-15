@@ -201,3 +201,58 @@ test.describe('Liczenie (Counting) screen', () => {
     }
   });
 });
+
+// Spec 012: with the camera switch on, his face signals drive Liczenie (Counting). Chromium has a fake camera (a test
+// pattern without a face); WebKit in tests has none, so it shows the reason and the buttons keep working.
+test.describe('Liczenie (Counting) with the camera', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() =>
+      localStorage.setItem('blinker.settings.v1', JSON.stringify({ camera: true })),
+    );
+    await page
+      .context()
+      .grantPermissions(['camera'])
+      .catch(() => undefined);
+    await page.goto('/');
+    await expect(page.getByRole('heading', { level: 1, name: 'Liczenie' })).toBeVisible();
+  });
+
+  test('says whether it sees his face; the buttons still work; the board still fits at 360 × 640', async ({
+    page,
+    browserName,
+  }) => {
+    test.slow(); // the wasm and the model load on a cold start
+    const status = page.getByTestId('camera-status');
+    if (browserName === 'chromium') {
+      await expect(status).toHaveText('Brak twarzy', { timeout: 60_000 });
+    } else {
+      await expect(status).toHaveText(/Bez zgody|Brak kamery|Bez kamery|Błąd kamery/, {
+        timeout: 20_000,
+      });
+    }
+    await cell(page, 'W').click();
+    await expect(sentence(page)).toHaveText('W');
+    await expectNoA11yViolations(page);
+    await page.setViewportSize({ width: 360, height: 640 });
+    await expectFits(page, 'phone portrait 360 with the camera status');
+  });
+
+  test('the camera stops when leaving Liczenie (Counting)', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'only Chromium has a fake camera in tests');
+    test.slow();
+    await expect(page.getByTestId('camera-status')).toHaveText('Brak twarzy', {
+      timeout: 60_000,
+    });
+    const live = () =>
+      page.evaluate(
+        () =>
+          [...document.querySelectorAll('video')].filter(
+            (v) => (v.srcObject as MediaStream | null)?.active,
+          ).length,
+      );
+    expect(await live()).toBe(1);
+    await page.getByRole('link', { name: 'Ustawienia' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Ustawienia' })).toBeVisible();
+    expect(await live()).toBe(0);
+  });
+});

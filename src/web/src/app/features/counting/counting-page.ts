@@ -17,9 +17,14 @@ import { listenToKeys } from '../../core/input/keyboard';
 import type { InputSignalType } from '../../core/input/signals';
 import { keepScreenAwake, type WakeLockLike } from '../../core/screen/wake-lock';
 import { SettingsService } from '../../core/settings/settings.service';
+import { SignalCue } from '../../core/sound/cue';
+import { CameraInput } from '../../core/vision/camera-input.service';
+import { FACE_WORKER, FaceTrackerService } from '../../core/vision/face-tracker.service';
+import { createFaceWorker } from '../../core/vision/face-worker';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 import { TopBar } from '../../shell/top-bar';
 import { BoardView, type CellPick } from './board-view';
+import { CameraChip } from './camera-chip';
 import { SignalPanel } from './signal-panel';
 
 /**
@@ -30,7 +35,13 @@ import { SignalPanel } from './signal-panel';
  */
 @Component({
   selector: 'app-counting-page',
-  imports: [BoardView, CdkPortal, MatButton, SignalPanel, TranslocoPipe],
+  imports: [BoardView, CameraChip, CdkPortal, MatButton, SignalPanel, TranslocoPipe],
+  // Spec 012: the camera lives with this screen: it starts when Liczenie (Counting) opens and stops when it closes.
+  providers: [
+    FaceTrackerService,
+    CameraInput,
+    { provide: FACE_WORKER, useValue: createFaceWorker },
+  ],
   templateUrl: './counting-page.html',
   styleUrl: './counting-page.css',
 })
@@ -40,6 +51,23 @@ export class CountingPage implements AfterViewInit, OnDestroy {
   private readonly topBar = inject(TopBar);
   private readonly settings = inject(SettingsService).settings;
   private readonly actions = viewChild.required(CdkPortal);
+  private readonly camera = inject(CameraInput);
+  private readonly cue = inject(SignalCue);
+
+  /** Spec 012: his face signals drive this screen (a setting, off by default). */
+  protected readonly cameraOn = computed(() => this.settings().camera);
+  protected readonly cameraPreview = computed(() => this.settings().cameraPreview);
+  protected readonly cameraMirrored = computed(() => this.settings().cameraFacing === 'user');
+  protected readonly cameraStatusKey = computed(() => {
+    const status = this.camera.status();
+    if (status === 'error') return `counting.camera.error.${this.camera.error()}`;
+    if (status !== 'running') return 'counting.camera.starting';
+    const face = this.camera.faceInView();
+    return face === false ? 'counting.camera.noFace' : 'counting.camera.face';
+  });
+  protected readonly cameraProblem = computed(
+    () => this.camera.status() === 'error' || this.camera.faceInView() === false,
+  );
 
   protected readonly state = this.counting.state;
   protected readonly board = computed(() => this.counting.config().board);
@@ -105,8 +133,18 @@ export class CountingPage implements AfterViewInit, OnDestroy {
     this.topBar.show(this.actions());
   }
 
+  /** Spec 012: the chip in the top bar holds the video; the camera starts once it exists. */
+  protected startCamera(video: HTMLVideoElement): void {
+    // One input path (R2): a face signal goes where a button press goes; a short sound tells him it counted (R3).
+    void this.camera.start(video, this.settings().cameraFacing, (signal) => {
+      this.counting.send({ type: signal });
+      if (this.settings().signalSound) this.cue.play(signal);
+    });
+  }
+
   ngOnDestroy(): void {
     this.topBar.clear(this.actions());
+    this.camera.stop();
     this.counting.stop();
   }
 

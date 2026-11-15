@@ -88,6 +88,13 @@ test.describe('Ustawienia (Settings)', () => {
       'false',
     );
     await expect(toggle(page, /Mów pytania i komunikaty/)).toHaveAttribute('aria-checked', 'false');
+    // Spec 012: the camera is off until someone chooses it; its sound is on; the front camera.
+    await expect(toggle(page, /Sterowanie kamerą w Liczeniu/)).toHaveAttribute(
+      'aria-checked',
+      'false',
+    );
+    await expect(toggle(page, /Dźwięk przy sygnale/)).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByRole('radio', { name: /Przednia/ })).toBeChecked();
   });
 
   test('with the keyboard shortcuts and the nod confirmation on, keys give his signals and Blinker asks (spec 006 R7, spec 009 R1)', async ({
