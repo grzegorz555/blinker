@@ -17,6 +17,7 @@ export class CameraInput {
 
   readonly status = this.tracker.status;
   readonly error = this.tracker.error;
+  readonly errorDetail = this.tracker.errorDetail;
   /** null until the first frame; then whether his face is in view (with the grace time). */
   readonly faceInView = signal<boolean | null>(null);
   readonly calibrated = this.profiles.calibrated;

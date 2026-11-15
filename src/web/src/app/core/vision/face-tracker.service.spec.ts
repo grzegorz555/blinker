@@ -145,8 +145,9 @@ describe('FaceTrackerService (spec 010, R2, R4)', () => {
   it('a model that fails to load is the "model" error, and the camera is released', async () => {
     const { service, worker } = setup();
     await service.start(fakeVideo().video);
-    worker.reply({ type: 'error', stage: 'init', message: 'x' });
+    worker.reply({ type: 'error', stage: 'init', message: 'ReferenceError: x' });
     expect(service.error()).toBe('model');
+    expect(service.errorDetail()).toBe('ReferenceError: x');
     expect(tracks[0].stop).toHaveBeenCalled();
   });
 
