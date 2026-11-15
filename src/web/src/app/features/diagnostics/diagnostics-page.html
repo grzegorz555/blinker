@@ -27,6 +27,11 @@
   <p class="status" role="status" data-testid="tracker-status" [class.error]="status() === 'error'">
     {{ statusText() }}
   </p>
+  @if (status() === 'error' && errorDetail()) {
+    <p class="muted detail" data-testid="error-detail" translate="no">
+      {{ 'diagnostics.errorDetail' | transloco: { detail: errorDetail() } }}
+    </p>
+  }
 </section>
 
 <section class="group" aria-labelledby="diag-values">

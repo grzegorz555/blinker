@@ -303,7 +303,8 @@
       "NOD": "Skinienie (tak)",
       "SHAKE": "Kręcenie głową (nie)",
       "RIGHT": "Głowa w prawo (koniec)"
-    }
+    },
+    "errorDetail": "Szczegóły techniczne: {{detail}}"
   },
   "calibration": {
     "stepOf": "Krok {{n}} z {{total}}",

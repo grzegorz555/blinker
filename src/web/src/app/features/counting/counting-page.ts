@@ -65,6 +65,7 @@ export class CountingPage implements AfterViewInit, OnDestroy {
     const face = this.camera.faceInView();
     return face === false ? 'counting.camera.noFace' : 'counting.camera.face';
   });
+  protected readonly cameraErrorDetail = this.camera.errorDetail;
   protected readonly cameraProblem = computed(
     () => this.camera.status() === 'error' || this.camera.faceInView() === false,
   );

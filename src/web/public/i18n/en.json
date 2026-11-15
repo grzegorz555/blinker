@@ -303,7 +303,8 @@
       "NOD": "Nod (yes)",
       "SHAKE": "Head shake (no)",
       "RIGHT": "Head right (finish)"
-    }
+    },
+    "errorDetail": "Technical details: {{detail}}"
   },
   "calibration": {
     "stepOf": "Step {{n}} of {{total}}",

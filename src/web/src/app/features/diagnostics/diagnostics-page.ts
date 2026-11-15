@@ -45,6 +45,7 @@ export class DiagnosticsPage {
   protected readonly shapes = EYE_SHAPES;
   protected readonly status = this.tracker.status;
   protected readonly error = this.tracker.error;
+  protected readonly errorDetail = this.tracker.errorDetail;
   protected readonly delegate = this.tracker.delegate;
   protected readonly frame = this.tracker.frame;
   protected readonly stats = this.tracker.stats;

@@ -4,6 +4,7 @@
     <app-camera-chip
       [statusKey]="cameraStatusKey()"
       [problem]="cameraProblem()"
+      [attr.data-detail]="cameraErrorDetail()"
       [preview]="cameraPreview()"
       [mirrored]="cameraMirrored()"
       (ready)="startCamera($event)"

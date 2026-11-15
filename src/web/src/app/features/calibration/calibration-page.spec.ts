@@ -15,6 +15,7 @@ function fakeTracker() {
   return {
     status: signal<TrackerStatus>('idle'),
     error: signal<string | null>(null),
+    errorDetail: signal<string | null>(null),
     frame: signal<FaceFrame | null>(null),
     start: vi.fn(async () => undefined),
     stop: vi.fn(),

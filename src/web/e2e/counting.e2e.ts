@@ -226,6 +226,11 @@ test.describe('Liczenie (Counting) with the camera', () => {
     if (browserName === 'chromium') {
       await expect(status).toHaveText('Brak twarzy', { timeout: 60_000 });
     } else {
+      const detail = async () =>
+        (await page.locator('app-camera-chip').getAttribute('data-detail')) ?? '';
+      await expect
+        .poll(async () => `${await status.innerText()} ${await detail()}`, { timeout: 20_000 })
+        .toMatch(/^(Brak twarzy|Bez zgody|Brak kamery|Bez kamery|Błąd kamery)/);
       await expect(status).toHaveText(/Brak twarzy|Bez zgody|Brak kamery|Bez kamery|Błąd kamery/, {
         timeout: 20_000,
       });

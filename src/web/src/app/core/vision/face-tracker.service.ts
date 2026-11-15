@@ -71,6 +71,8 @@ export class FaceTrackerService {
 
   readonly status = signal<TrackerStatus>('idle');
   readonly error = signal<TrackerError | null>(null);
+  /** The worker's own words for a failure (shown small on Diagnostyka (Diagnostics), for measurements and bug reports). */
+  readonly errorDetail = signal<string | null>(null);
   readonly delegate = signal<Delegate | null>(null);
   readonly frame = signal<FaceFrame | null>(null);
   readonly stats = signal<FrameStats>(frameStats([]));
@@ -96,6 +98,7 @@ export class FaceTrackerService {
     const run = ++this.run;
     this.status.set('starting');
     this.error.set(null);
+    this.errorDetail.set(null);
     this.frame.set(null);
     this.samples = [];
     this.stats.set(frameStats([]));
@@ -170,6 +173,7 @@ export class FaceTrackerService {
         }
         return;
       case 'error':
+        this.errorDetail.set(message.message.slice(0, 300));
         this.fail(
           message.stage === 'unsupported'
             ? 'unsupported'

@@ -12,6 +12,7 @@ function fakeTracker() {
   return {
     status: signal<TrackerStatus>('idle'),
     error: signal<string | null>(null),
+    errorDetail: signal<string | null>(null),
     delegate: signal<'GPU' | 'CPU' | null>(null),
     frame: signal<FaceFrame | null>(null),
     stats: signal(frameStats([])),
