@@ -6,7 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 export interface NavItem {
   readonly path: string;
   readonly label: string;
-  readonly icon: 'board' | 'sentences' | 'boards' | 'settings';
+  readonly icon: 'board' | 'sentences' | 'boards' | 'calibration' | 'settings';
 }
 
 /**
@@ -16,6 +16,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/', label: 'nav.counting', icon: 'board' },
   { path: '/sentences', label: 'nav.sentences', icon: 'sentences' },
   { path: '/boards', label: 'nav.boards', icon: 'boards' },
+  { path: '/calibration', label: 'nav.calibration', icon: 'calibration' },
   { path: '/settings', label: 'nav.settings', icon: 'settings' },
 ];
 
@@ -66,6 +67,10 @@ export const NAV_ITEMS: readonly NavItem[] = [
                       <svg:rect x="14" y="3" width="7" height="7" rx="1" />
                       <svg:rect x="3" y="14" width="7" height="7" rx="1" />
                       <svg:rect x="14" y="14" width="7" height="7" rx="1" />
+                    }
+                    @case ('calibration') {
+                      <svg:path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" />
+                      <svg:circle cx="12" cy="12" r="3" />
                     }
                     @case ('settings') {
                       <svg:path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1" />

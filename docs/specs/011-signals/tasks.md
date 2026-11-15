@@ -16,7 +16,7 @@ Branch: `feat/011-signals` on top of `feat/010-face-spike` (PR #19). Gates: `npm
       _To understand:_ hysteresis and a refractory time, why a signal fires on release.
 - [x] **T2 [sonnet]: Signals in Diagnostyka (Diagnostics).** The detector on the live frames and a list of the last
       signals (R3). Tests: unit with a fake tracker.
-- [ ] **T3 [opus]: Kalibracja (Calibration).** `fitProfile()` (R5) and the wizard page (R4), in the navigation. Tests:
+- [x] **T3 [opus]: Kalibracja (Calibration).** `fitProfile()` (R5) and the wizard page (R4), in the navigation. Tests:
       fitting with synthetic steps, the page with a fake tracker, e2e with the fake camera, axe.
       _To understand:_ a threshold halfway between rest and a deliberate peak; medians against outliers.
 - [ ] **T4 [haiku]: Docs.** Interaction model (how each signal is detected), architecture, README, log, specs index,

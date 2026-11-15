@@ -11,7 +11,8 @@
     "sentences": "Sentences · Blinker",
     "boards": "Boards · Blinker",
     "settings": "Settings · Blinker",
-    "diagnostics": "Diagnostics · Blinker"
+    "diagnostics": "Diagnostics · Blinker",
+    "calibration": "Calibration · Blinker"
   },
   "notFound": {
     "heading": "Page not found",
@@ -100,7 +101,8 @@
     "counting": "Counting",
     "sentences": "Sentences",
     "boards": "Boards",
-    "settings": "Settings"
+    "settings": "Settings",
+    "calibration": "Calibration"
   },
   "sentences": {
     "empty": "No sentences yet. Sentences read aloud on Counting appear here.",
@@ -278,5 +280,75 @@
       "SHAKE": "Head shake (no)",
       "RIGHT": "Head right (finish)"
     }
+  },
+  "calibration": {
+    "stepOf": "Step {{n}} of {{total}}",
+    "intro": {
+      "what": "Blinker will learn his signals: a long blink, a look at his hand, a nod, a head shake and head right. A few short steps, about 2 minutes. No step has a time limit.",
+      "setup": "Place the phone as for talking: on a stand, facing him, in ordinary light."
+    },
+    "camera": {
+      "ask": "The browser will ask for the camera. Choose “Allow”."
+    },
+    "step": {
+      "intro": {
+        "title": "What will happen"
+      },
+      "camera": {
+        "title": "Camera"
+      },
+      "result": {
+        "title": "Result"
+      },
+      "neutral": {
+        "title": "At rest, facing the screen",
+        "do": "Ask him to look calmly at the screen for a few seconds.",
+        "say": "Look calmly at the screen."
+      },
+      "blink": {
+        "title": "Long blink (+1)",
+        "do": "Ask him for 3 long blinks, at his own pace.",
+        "say": "Three long blinks."
+      },
+      "handLeft": {
+        "title": "Look at his left hand (+5)",
+        "do": "Ask him to look down at his left hand and back. Twice.",
+        "say": "Look at your left hand and back. Twice."
+      },
+      "handRight": {
+        "title": "Look at his right hand",
+        "do": "Only if he also looks at his right hand. If not, skip this step: the left is enough.",
+        "say": "Look at your right hand and back. Twice."
+      },
+      "nod": {
+        "title": "Nod (yes)",
+        "do": "Ask him to nod the way he answers “yes”. Twice.",
+        "say": "Nod. Twice."
+      },
+      "shake": {
+        "title": "Head shake (no)",
+        "do": "Ask him to shake his head the way he answers “no”. Twice.",
+        "say": "Shake your head. Twice."
+      },
+      "right": {
+        "title": "Head right (finish)",
+        "do": "Ask him to turn his head to his right, hold it a moment and come back. Twice.",
+        "say": "Turn your head right, hold, and come back. Twice."
+      }
+    },
+    "faceYes": "Face in view",
+    "faceNo": "No face in view: move the phone or improve the light",
+    "detected": "Detected {{n}} of {{k}}",
+    "learnt": "Learnt",
+    "notLearnt": "Not learnt",
+    "skipped": "Skipped",
+    "nothingLearnt": "No movement was recognized. Check that his face is in view, and try again.",
+    "saved": "Calibration saved. Blinker uses it from now on.",
+    "tryIt": "Check the signals in diagnostics",
+    "back": "Back",
+    "skip": "Skip this step",
+    "next": "Next",
+    "restart": "Start again",
+    "save": "Save the calibration"
   }
 }

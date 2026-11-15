@@ -11,7 +11,8 @@
     "sentences": "Zdania · Blinker",
     "boards": "Tablice · Blinker",
     "settings": "Ustawienia · Blinker",
-    "diagnostics": "Diagnostyka · Blinker"
+    "diagnostics": "Diagnostyka · Blinker",
+    "calibration": "Kalibracja · Blinker"
   },
   "notFound": {
     "heading": "Nie znaleziono strony",
@@ -100,7 +101,8 @@
     "counting": "Liczenie",
     "sentences": "Zdania",
     "boards": "Tablice",
-    "settings": "Ustawienia"
+    "settings": "Ustawienia",
+    "calibration": "Kalibracja"
   },
   "sentences": {
     "empty": "Nie ma jeszcze zdań. Zdania przeczytane na głos w Liczeniu pojawią się tutaj.",
@@ -278,5 +280,75 @@
       "SHAKE": "Kręcenie głową (nie)",
       "RIGHT": "Głowa w prawo (koniec)"
     }
+  },
+  "calibration": {
+    "stepOf": "Krok {{n}} z {{total}}",
+    "intro": {
+      "what": "Blinker pozna jego sygnały: długie mrugnięcie, spojrzenie na rękę, skinienie, kręcenie głową i głowę w prawo. To kilka krótkich kroków, razem około 2 minut. Żaden krok nie ma limitu czasu.",
+      "setup": "Ustaw telefon tak jak do rozmowy: na statywie, na wprost twarzy, w zwykłym świetle."
+    },
+    "camera": {
+      "ask": "Za chwilę przeglądarka zapyta o dostęp do kamery. Wybierz „Zezwól”."
+    },
+    "step": {
+      "intro": {
+        "title": "Co się stanie"
+      },
+      "camera": {
+        "title": "Kamera"
+      },
+      "result": {
+        "title": "Wynik"
+      },
+      "neutral": {
+        "title": "Spokojnie, na wprost",
+        "do": "Poproś, żeby przez kilka sekund spokojnie patrzył w ekran.",
+        "say": "Patrz spokojnie na ekran."
+      },
+      "blink": {
+        "title": "Długie mrugnięcie (+1)",
+        "do": "Poproś go o 3 długie mrugnięcia, w swoim tempie.",
+        "say": "Trzy długie mrugnięcia."
+      },
+      "handLeft": {
+        "title": "Spojrzenie na lewą rękę (+5)",
+        "do": "Poproś, żeby spojrzał w dół na lewą rękę i wrócił wzrokiem. Dwa razy.",
+        "say": "Spójrz na lewą rękę i wróć. Dwa razy."
+      },
+      "handRight": {
+        "title": "Spojrzenie na prawą rękę",
+        "do": "Tylko jeśli patrzy też na prawą rękę. Jeśli nie, pomiń ten krok: wystarczy lewa.",
+        "say": "Spójrz na prawą rękę i wróć. Dwa razy."
+      },
+      "nod": {
+        "title": "Skinienie (tak)",
+        "do": "Poproś go o skinienie głową, tak jak odpowiada „tak”. Dwa razy.",
+        "say": "Skiń głową. Dwa razy."
+      },
+      "shake": {
+        "title": "Kręcenie głową (nie)",
+        "do": "Poproś go o pokręcenie głową, tak jak odpowiada „nie”. Dwa razy.",
+        "say": "Pokręć głową. Dwa razy."
+      },
+      "right": {
+        "title": "Głowa w prawo (koniec)",
+        "do": "Poproś, żeby obrócił głowę w swoją prawą stronę, chwilę przytrzymał i wrócił. Dwa razy.",
+        "say": "Obróć głowę w prawo, przytrzymaj i wróć. Dwa razy."
+      }
+    },
+    "faceYes": "Twarz w kadrze",
+    "faceNo": "Nie widzę twarzy: popraw telefon albo światło",
+    "detected": "Wykryto {{n}} z {{k}}",
+    "learnt": "Zapamiętano",
+    "notLearnt": "Nie zapamiętano",
+    "skipped": "Pominięto",
+    "nothingLearnt": "Nie rozpoznano żadnego ruchu. Sprawdź, czy twarz jest w kadrze, i powtórz.",
+    "saved": "Zapisano kalibrację. Blinker używa jej od teraz.",
+    "tryIt": "Sprawdź sygnały w diagnostyce",
+    "back": "Wstecz",
+    "skip": "Pomiń ten krok",
+    "next": "Dalej",
+    "restart": "Powtórz od początku",
+    "save": "Zapisz kalibrację"
   }
 }
