@@ -210,6 +210,55 @@ describe('detector: why a closure was or was not his blink (Diagnostyka (Diagnos
   });
 });
 
+describe('detector: a look at his hand needs a still head, and his side', () => {
+  it('a nod with the eyes on the screen reads as looking down, but is only NOD, not HAND', () => {
+    // The head goes up 18° for 600 ms; the eyes stay on the screen, so against the head they look down.
+    const eyes = (t: number) => ({ eyeLookDownLeft: pulse(300, 900, 0.8, 0.05)(t) });
+    expect(signals(record(2000, { pitch: pulse(300, 900, -18), eyes }))).toEqual(['NOD']);
+  });
+
+  it('with his left side learnt, down and to his left is HAND; straight down is not', () => {
+    const profile = { ...P, hand: { ...P.hand, left: 0.3 } };
+    const leftDown = (t: number) => {
+      const on = t >= 300 && t < 1000;
+      return {
+        eyeLookDownLeft: on ? 0.8 : 0.05,
+        eyeLookOutLeft: on ? 0.6 : 0.05,
+        eyeLookInRight: on ? 0.6 : 0.05,
+      };
+    };
+    expect(signals(record(2000, { eyes: leftDown }), profile)).toEqual(['HAND']);
+    const straightDown = (t: number) => ({ eyeLookDownLeft: pulse(300, 1000, 0.8, 0.05)(t) });
+    expect(signals(record(2000, { eyes: straightDown }), profile)).toEqual([]);
+  });
+});
+
+describe('detector: his strong-blink cue', () => {
+  const brows = (brow: number, lids: number) => (t: number) => {
+    const on = t >= 500 && t < 750;
+    return {
+      eyeBlinkLeft: on ? 0.9 : 0.05,
+      eyeBlinkRight: on ? 0.9 : 0.05,
+      eyeSquintLeft: on ? lids : 0.05,
+      eyeSquintRight: on ? lids : 0.05,
+      browDownLeft: on ? brow : 0.05,
+      browDownRight: on ? brow : 0.05,
+    };
+  };
+  const byBrows = { ...P, blink: { ...P.blink, cue: 'browDown' as const, squeeze: 0.5 } };
+
+  it('uses the cue of his profile: brows down counts, squeezed lids alone do not', () => {
+    expect(signals(record(2000, { eyes: brows(0.7, 0.1) }), byBrows)).toEqual(['BLINK']);
+    expect(signals(record(2000, { eyes: brows(0.1, 0.9) }), byBrows)).toEqual([]);
+  });
+
+  it('a squeeze of 1 turns the strong blink off: only long blinks count', () => {
+    const off = { ...P, blink: { ...P.blink, squeeze: 1 } };
+    expect(signals(record(2000, { eyes: squeezed(500, 750, 1) }), off)).toEqual([]);
+    expect(signals(record(2000, { eyes: closed(500, 1200) }), off)).toEqual(['BLINK']);
+  });
+});
+
 describe('detector: safety', () => {
   it('a face lost in the middle of a blink drops it', () => {
     const face = (t: number) => t < 800 || t > 1000;

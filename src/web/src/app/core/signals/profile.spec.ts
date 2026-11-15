@@ -10,6 +10,23 @@ describe('validateProfile (spec 011, R2)', () => {
     expect(validateProfile({ ...DEFAULT_PROFILE, extra: 1 })).toEqual(DEFAULT_PROFILE);
   });
 
+  it('a profile stored before the cue and the hand sides existed gets their defaults', () => {
+    const { threshold, holdMs } = DEFAULT_PROFILE.hand;
+    const { minMs, maxMs, squeeze } = DEFAULT_PROFILE.blink;
+    const old = {
+      ...DEFAULT_PROFILE,
+      blink: { threshold: 0.4, minMs, maxMs, squeeze },
+      hand: { threshold, holdMs },
+    };
+    expect(validateProfile(old)).toEqual({
+      ...DEFAULT_PROFILE,
+      blink: { ...DEFAULT_PROFILE.blink, threshold: 0.4 },
+    });
+    expect(
+      validateProfile({ ...DEFAULT_PROFILE, blink: { ...DEFAULT_PROFILE.blink, cue: 'nose' } }),
+    ).toBeNull();
+  });
+
   it('a profile stored before the squeeze existed gets the default squeeze', () => {
     const { minMs, maxMs } = DEFAULT_PROFILE.blink;
     const old = { ...DEFAULT_PROFILE, blink: { threshold: 0.4, minMs, maxMs } };
@@ -73,7 +90,10 @@ describe('ProfileService', () => {
     const { service, data } = setup(null);
     expect(service.save({ ...DEFAULT_PROFILE, refractoryMs: -1 })).toBe(false);
     expect(data.has(PROFILE_KEY)).toBe(false);
-    const custom = { ...DEFAULT_PROFILE, hand: { threshold: 0.4, holdMs: 500 } };
+    const custom = {
+      ...DEFAULT_PROFILE,
+      hand: { ...DEFAULT_PROFILE.hand, threshold: 0.4, holdMs: 500 },
+    };
     expect(service.save(custom)).toBe(true);
     expect(JSON.parse(data.get(PROFILE_KEY)!)).toEqual(custom);
     expect(service.calibrated()).toBe(true);

@@ -1,5 +1,6 @@
 // Spec 011, R2: his calibrated thresholds (a profile), with defaults and a validator. Plain TypeScript.
 import { isPlainObject } from '../storage/local-store';
+import { STRONG_CUES, type StrongCue } from './cues';
 
 export interface SignalProfile {
   readonly version: 1;
@@ -7,17 +8,26 @@ export interface SignalProfile {
   readonly neutral: { readonly yaw: number; readonly pitch: number };
   /**
    * His blink: both eyes at or above the threshold, no longer than maxMs, and either long (at least minMs) or strong
-   * (the lids squeeze to at least `squeeze` at some point), so a short, forceful blink counts and an ordinary one
-   * (to wet the eye) does not.
+   * (his `cue` reaches `squeeze` at some point), so a short, forceful blink counts and an ordinary one (to wet the eye)
+   * does not. A squeeze of 1 turns the strong blink off: then only long blinks count.
    */
   readonly blink: {
     readonly threshold: number;
     readonly minMs: number;
     readonly maxMs: number;
+    readonly cue: StrongCue;
     readonly squeeze: number;
   };
-  /** Look at his hand: eyes down at or above the threshold for holdMs. */
-  readonly hand: { readonly threshold: number; readonly holdMs: number };
+  /**
+   * Look at his hand: eyes down at or above the threshold for holdMs, with the head still. With `left` or `right` set,
+   * the eyes must also go that way (to his left: `sidesOf().left`) at least that far; with both null, any way.
+   */
+  readonly hand: {
+    readonly threshold: number;
+    readonly holdMs: number;
+    readonly left: number | null;
+    readonly right: number | null;
+  };
   /** Nod: pitch away by the amplitude and back within windowMs; direction 1 or -1 (0 = either). */
   readonly nod: {
     readonly amplitude: number;
@@ -40,8 +50,8 @@ export interface SignalProfile {
 export const DEFAULT_PROFILE: SignalProfile = {
   version: 1,
   neutral: { yaw: 0, pitch: 0 },
-  blink: { threshold: 0.5, minMs: 600, maxMs: 2500, squeeze: 0.6 },
-  hand: { threshold: 0.5, holdMs: 400 },
+  blink: { threshold: 0.5, minMs: 600, maxMs: 2500, cue: 'eyeSquint', squeeze: 0.6 },
+  hand: { threshold: 0.5, holdMs: 400, left: null, right: null },
   nod: { amplitude: 12, direction: 0, windowMs: 1200 },
   shake: { amplitude: 10, windowMs: 1500 },
   right: { amplitude: 20, direction: 1, holdMs: 300 },
@@ -51,6 +61,7 @@ export const DEFAULT_PROFILE: SignalProfile = {
 /** Safe ranges: a fitted or stored value outside them is clamped (fitting) or refused (stored). */
 export const PROFILE_LIMITS = {
   threshold: [0.15, 0.95],
+  squeeze: [0.15, 1],
   blinkMinMs: [250, 2000],
   blinkMaxMs: [1000, 6000],
   holdMs: [100, 2000],
@@ -65,6 +76,8 @@ export const PROFILE_KEY = 'blinker.profile.v1';
 type Range = readonly [number, number];
 const inRange = (v: unknown, [min, max]: Range): v is number =>
   typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max;
+const optionalSide = (v: unknown) =>
+  v === undefined || v === null || inRange(v, PROFILE_LIMITS.threshold);
 const obj = (v: unknown): Record<string, unknown> | null => (isPlainObject(v) ? v : null);
 
 /** A stored profile, checked field by field; anything wrong gives null (the caller falls back and says so). */
@@ -87,7 +100,10 @@ export function validateProfile(data: unknown): SignalProfile | null {
     inRange(b['maxMs'], L.blinkMaxMs) &&
     (b['minMs'] as number) < (b['maxMs'] as number) &&
     // Added after the first profiles were stored: missing means the default.
-    (b['squeeze'] === undefined || inRange(b['squeeze'], L.threshold)) &&
+    (b['squeeze'] === undefined || inRange(b['squeeze'], L.squeeze)) &&
+    (b['cue'] === undefined || (STRONG_CUES as readonly unknown[]).includes(b['cue'])) &&
+    optionalSide(h['left']) &&
+    optionalSide(h['right']) &&
     inRange(h['threshold'], L.threshold) &&
     inRange(h['holdMs'], L.holdMs) &&
     inRange(nod['amplitude'], L.amplitude) &&
@@ -107,9 +123,15 @@ export function validateProfile(data: unknown): SignalProfile | null {
       threshold: b['threshold'] as number,
       minMs: b['minMs'] as number,
       maxMs: b['maxMs'] as number,
+      cue: (b['cue'] as StrongCue | undefined) ?? DEFAULT_PROFILE.blink.cue,
       squeeze: (b['squeeze'] as number | undefined) ?? DEFAULT_PROFILE.blink.squeeze,
     },
-    hand: { threshold: h['threshold'] as number, holdMs: h['holdMs'] as number },
+    hand: {
+      threshold: h['threshold'] as number,
+      holdMs: h['holdMs'] as number,
+      left: (h['left'] as number | null | undefined) ?? null,
+      right: (h['right'] as number | null | undefined) ?? null,
+    },
     nod: {
       amplitude: nod['amplitude'] as number,
       direction: nod['direction'] as -1 | 0 | 1,
