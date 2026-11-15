@@ -17,6 +17,7 @@ import {
   CALIBRATION_STEPS,
   countDetected,
   fitProfile,
+  ordinaryBlinks,
   STEP_REPEATS,
   type CalibrationStep,
   type Recordings,
@@ -86,6 +87,11 @@ export class CalibrationPage {
     return closureReports(this.recordings().blink ?? [], this.fit().profile)
       .slice(-3)
       .reverse();
+  });
+  /** His ordinary blinks seen in the rest step: the strong blink is told apart from them. */
+  protected readonly ordinary = computed(() => {
+    this.revision();
+    return ordinaryBlinks(this.recordings().neutral);
   });
   protected readonly round = (value: number, digits = 0) => value.toFixed(digits);
 

@@ -81,7 +81,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
     tracker.status.set('running');
     await click('Next');
     expect(heading()).toBe('At rest, facing the screen');
-    expect(listen).toHaveBeenLastCalledWith('Look calmly at the screen.', 'en');
+    expect(listen).toHaveBeenLastCalledWith('Look calmly at the screen and blink as usual.', 'en');
     expect(text('step-count')).toBe('Step 3 of 10');
   });
 
@@ -93,6 +93,8 @@ describe('CalibrationPage (spec 011, R4)', () => {
     // At rest: lids a little low (0.2).
     const restEyes = { eyeBlinkLeft: 0.2, eyeBlinkRight: 0.2 };
     await feed(record(1500, { eyes: () => restEyes }), 0);
+    // No ordinary blink at rest: the step says so (at least 2 are best).
+    expect(text('ordinary')).toBe('Ordinary blinks: 0. At least 2 is best.');
     await click('Next');
     // Three long blinks closing to 0.7 only.
     const lids = pulses(
@@ -117,6 +119,9 @@ describe('CalibrationPage (spec 011, R4)', () => {
     expect(text('results')).toContain('Detected 3 of 3');
     expect(text('results')).toContain('Skipped');
     expect(text('blink-profile')).toContain('closure reaches 0.45');
+    // His long blinks were not squeezed: they cannot be told from ordinary ones by strength, so only long ones count.
+    expect(text('blink-separation')).toContain('look alike to the camera');
+    expect(text('blink-profile')).toContain('The strong blink is off');
     expect(data.has(PROFILE_KEY)).toBe(false);
     await click('Save the calibration');
     expect(text('saved')).toBe('Calibration saved. Blinker uses it from now on.');

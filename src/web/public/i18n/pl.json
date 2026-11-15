@@ -279,6 +279,10 @@
       "eyeBlinkRight": "Mrugnięcie, jego prawe oko",
       "eyeSquintLeft": "Zaciśnięcie powiek, jego lewe oko",
       "eyeSquintRight": "Zaciśnięcie powiek, jego prawe oko",
+      "cheekSquintLeft": "Policzek uniesiony, jego lewy",
+      "cheekSquintRight": "Policzek uniesiony, jego prawy",
+      "browDownLeft": "Brew ściągnięta, jego lewa",
+      "browDownRight": "Brew ściągnięta, jego prawa",
       "eyeLookDownLeft": "Patrzy w dół, lewe oko",
       "eyeLookDownRight": "Patrzy w dół, prawe oko",
       "eyeLookInLeft": "Lewe oko do nosa",
@@ -310,14 +314,20 @@
     "closure": {
       "title": "Ostatnie zamknięcie oczu",
       "none": "Jeszcze żadnego.",
-      "values": "{{ms}} ms; zamknięcie {{closure}}, zaciśnięcie {{squeeze}}, w dół {{down}}:",
-      "profile": "Mrugnięcie się liczy, gdy zamknięcie sięga {{threshold}}, a powieki zaciskają się do {{squeeze}} albo oczy są zamknięte co najmniej {{minMs}} ms (najwyżej {{maxMs}} ms).",
+      "values": "{{ms}} ms; zamknięcie {{closure}}; powieki {{eyeSquint}}, policzki {{cheekSquint}}, brwi {{browDown}}; w dół {{down}}:",
+      "profile": "Mrugnięcie się liczy, gdy zamknięcie sięga {{threshold}} i {{cue}} sięga {{squeeze}} albo oczy są zamknięte co najmniej {{minMs}} ms (najwyżej {{maxMs}} ms).",
       "verdict": {
         "blink": "mrugnięcie zaliczone",
         "weak": "za słabe i za krótkie",
         "tooLong": "za długie (odpoczynek)",
         "lookingDown": "patrzył w dół (spojrzenie na rękę)"
-      }
+      },
+      "profileLongOnly": "Mrugnięcie się liczy, gdy zamknięcie sięga {{threshold}} i trwa od {{minMs}} do {{maxMs}} ms. Mocne mrugnięcie jest wyłączone: kamera nie odróżnia go od zwykłego."
+    },
+    "cue": {
+      "eyeSquint": "zaciśnięcie powiek",
+      "cheekSquint": "uniesienie policzków",
+      "browDown": "ściągnięcie brwi"
     }
   },
   "calibration": {
@@ -341,8 +351,8 @@
       },
       "neutral": {
         "title": "Spokojnie, na wprost",
-        "do": "Poproś, żeby przez kilka sekund spokojnie patrzył w ekran.",
-        "say": "Patrz spokojnie na ekran."
+        "do": "Poproś, żeby przez około 10 sekund spokojnie patrzył w ekran i mrugał zwyczajnie. Blinker nauczy się odróżniać zwykłe mrugnięcia od mocnych.",
+        "say": "Patrz spokojnie na ekran i mrugaj zwyczajnie."
       },
       "blink": {
         "title": "Mocne mrugnięcie (+1)",
@@ -389,6 +399,11 @@
     "next": "Dalej",
     "restart": "Powtórz od początku",
     "save": "Zapisz kalibrację",
-    "closures": "Jego ostatnie mrugnięcia (od najnowszego), oceniane progami z tej kalibracji:"
+    "closures": "Jego ostatnie mrugnięcia (od najnowszego), oceniane progami z tej kalibracji:",
+    "ordinary": "Zwykłe mrugnięcia: {{n}}. Najlepiej co najmniej 2.",
+    "separation": {
+      "noOrdinary": "W kroku „Spokojnie, na wprost” nie było zwykłego mrugnięcia, więc próg mocnego mrugnięcia jest przybliżony i zwykłe mrugnięcie może się liczyć. Powtórz kalibrację: niech w tym kroku mruga zwyczajnie.",
+      "overlap": "Jego mocne i zwykłe mrugnięcia wyglądają dla kamery podobnie, więc liczą się tylko długie mrugnięcia. Powtórz krok mrugnięcia: mocniej zaciśnięte powieki."
+    }
   }
 }

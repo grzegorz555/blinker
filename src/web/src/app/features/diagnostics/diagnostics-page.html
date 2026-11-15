@@ -141,7 +141,9 @@
             : {
                 ms: round(c.ms),
                 closure: round(c.closure, 2),
-                squeeze: round(c.squeeze, 2),
+                eyeSquint: round(c.cues.eyeSquint, 2),
+                cheekSquint: round(c.cues.cheekSquint, 2),
+                browDown: round(c.cues.browDown, 2),
                 down: round(c.down, 2),
               }
       }}
@@ -152,10 +154,14 @@
   </p>
   <p class="muted" data-testid="blink-profile">
     {{
-      'diagnostics.closure.profile'
+      (blinkProfile().squeeze < 1
+        ? 'diagnostics.closure.profile'
+        : 'diagnostics.closure.profileLongOnly'
+      )
         | transloco
           : {
               threshold: blinkProfile().threshold,
+              cue: 'diagnostics.cue.' + blinkProfile().cue | transloco,
               squeeze: blinkProfile().squeeze,
               minMs: blinkProfile().minMs,
               maxMs: blinkProfile().maxMs,

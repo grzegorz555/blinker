@@ -51,7 +51,9 @@ test.describe('Kalibracja (Calibration)', () => {
     await expect(page.getByTestId('calibration-status')).toHaveText(/Nie widzę twarzy/, {
       timeout: 60_000,
     });
-    await expect.poll(() => spoken(page)).toContain('Patrz spokojnie na ekran.');
+    await expect
+      .poll(() => spoken(page))
+      .toContain('Patrz spokojnie na ekran i mrugaj zwyczajnie.');
     await next(page);
     await expect(heading(page)).toHaveText('Mocne mrugnięcie (+1)');
     await expect(page.getByTestId('detected')).toHaveText('Wykryto 0 z 3');
