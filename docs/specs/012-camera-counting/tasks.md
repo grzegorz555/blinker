@@ -20,4 +20,4 @@ Branch: `feat/012-camera-counting` on top of `feat/011-signals` (PR #21). Gates:
 - [x] **T3 [sonnet]: Liczenie (Counting) with the camera.** Start and stop with the page, the status in the status
       line, the optional preview, the switches in Ustawienia (Settings) (R1, R4, R5). Tests: unit, e2e with the fake
       camera, layout fit, axe.
-- [ ] **T4 [haiku]: Docs.** Interaction model, architecture, README, log, specs index, Polish copies.
+- [x] **T4 [haiku]: Docs.** Interaction model, architecture, README, log, specs index, Polish copies.
