@@ -15,6 +15,7 @@ import {
 class FakeWorker implements FaceWorker {
   readonly sent: ToWorker[] = [];
   onmessage: ((event: MessageEvent<FromWorker>) => void) | null = null;
+  onerror: ((event: Event) => void) | null = null;
   terminated = false;
   postMessage(message: ToWorker): void {
     this.sent.push(message);
@@ -154,6 +155,15 @@ describe('FaceTrackerService (spec 010, R2, R4)', () => {
     await service.start(fakeVideo().video);
     expect(service.error()).toBe('unsupported');
     expect(openCamera).not.toHaveBeenCalled();
+  });
+
+  it('a worker script that fails to load is the "model" error, not a status stuck at starting', async () => {
+    const { service, worker } = setup();
+    await service.start(fakeVideo().video);
+    worker.onerror?.(new Event('error'));
+    expect(service.status()).toBe('error');
+    expect(service.error()).toBe('model');
+    expect(tracks[0].stop).toHaveBeenCalled();
   });
 
   it('lists each origin the worker blocked once (R1)', async () => {
