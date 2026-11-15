@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (stage 6 preparation)
+- A checklist for the first session with him (`docs/trial/first-session.md`): Diagnostyka (Diagnostics) for ADR-0006, Kalibracja (Calibration), Liczenie (Counting) with the camera, the open questions. Learnings from specs 011-012 (drafts). Local e2e runs no longer reuse a server another worktree left behind.
+
 ## 2026-11-15 (spec 012, the camera drives Liczenie (Counting))
 - With the camera switch on (off by default), his face signals go to the counting machine like the buttons, each confirmed by a short tone; the top bar says whether his face is in view; a caregiver can use the rear camera. Stage 5 is built; everything waits for the first session with him (calibration, thresholds, the tones).
 

@@ -25,6 +25,8 @@ A task is done only when **in the same commit** as the code there are:
 # E2E tests (Playwright)
 - They run in Chromium (desktop + Pixel emulation) and WebKit (iPhone emulation).
 - **No real camera in CI:**
+- Locally, Playwright starts its own servers; set `PW_REUSE_SERVER=1` to reuse ones you started yourself (a leftover
+  server from another worktree would serve its build).
   - Chromium runs with `--use-fake-ui-for-media-stream` and `--use-fake-device-for-media-stream`. For face tests, it also gets `--use-file-for-fake-video-capture=<synthetic.y4m>`.
   - Most flows inject signals directly through a **test-only signal source**: in development and test builds, the `SWITCH` adapter and a `window.__blinkerTest.emit('LONG_BLINK')` hook. The hook is compiled out of production builds, and a test checks that it is absent in the production build.
 - Accessibility: `new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze()` must return no violations (https://playwright.dev/docs/accessibility-testing).
