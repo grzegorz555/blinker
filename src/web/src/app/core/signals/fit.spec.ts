@@ -164,6 +164,20 @@ describe('fitProfile (spec 011, R5)', () => {
     });
   });
 
+  it('finds two short looks at his hand in a long step (per look, not per frame)', () => {
+    const looks = record(12000, {
+      ...rest,
+      eyes: (t) => {
+        const on = (t >= 2000 && t < 2600) || (t >= 8000 && t < 8600);
+        return { ...restEyes, eyeLookDownLeft: on ? 0.7 : 0.15, eyeLookDownRight: on ? 0.7 : 0.15 };
+      },
+    });
+    const { profile, learnt } = fitProfile({ neutral, handLeft: looks }, P);
+    expect(learnt).toContain('handLeft');
+    expect(profile.hand.threshold).toBeCloseTo(0.425, 1);
+    expect(countDetected('handLeft', looks, profile)).toBe(2);
+  });
+
   it('learns the side of his left hand: down and to his left', () => {
     const leftLook = record(3000, {
       ...rest,
