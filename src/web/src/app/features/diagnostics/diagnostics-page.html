@@ -132,6 +132,37 @@
     </ol>
   </div>
 
+  <h3 class="sub-title">{{ 'diagnostics.closure.title' | transloco }}</h3>
+  <p data-testid="last-closure">
+    @if (lastClosure(); as c) {
+      {{
+        'diagnostics.closure.values'
+          | transloco
+            : {
+                ms: round(c.ms),
+                closure: round(c.closure, 2),
+                squeeze: round(c.squeeze, 2),
+                down: round(c.down, 2),
+              }
+      }}
+      <strong>{{ 'diagnostics.closure.verdict.' + c.verdict | transloco }}</strong>
+    } @else {
+      <span class="muted">{{ 'diagnostics.closure.none' | transloco }}</span>
+    }
+  </p>
+  <p class="muted" data-testid="blink-profile">
+    {{
+      'diagnostics.closure.profile'
+        | transloco
+          : {
+              threshold: blinkProfile().threshold,
+              squeeze: blinkProfile().squeeze,
+              minMs: blinkProfile().minMs,
+              maxMs: blinkProfile().maxMs,
+            }
+    }}
+  </p>
+
   @if (blocked().length) {
     <p class="muted" data-testid="blocked">
       {{ 'diagnostics.blocked' | transloco: { origins: blocked().join(', ') } }}

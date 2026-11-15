@@ -4,7 +4,7 @@ import { translocoTesting } from '../../../testing/transloco';
 import type { FaceFrame } from '../../core/vision/face-frame';
 import { FaceTrackerService, type TrackerStatus } from '../../core/vision/face-tracker.service';
 import { frameStats } from '../../core/vision/frame-stats';
-import { record, closed } from '../../core/signals/synthetic';
+import { record, closed, squeezed } from '../../core/signals/synthetic';
 import { DiagnosticsPage } from './diagnostics-page';
 
 /** A tracker the test drives by hand (no camera, no worker). */
@@ -93,6 +93,23 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
       li.textContent?.split(/\s\d/)[0].trim(),
     );
     expect(items).toEqual(['Look at his hand (+5)', 'Strong blink (+1)']);
+  });
+
+  it('says why the last closure of his eyes was or was not a blink, with the thresholds', async () => {
+    const { fixture, tracker, text } = await render();
+    expect(text('last-closure')).toBe('None yet.');
+    expect(text('blink-profile')).toContain('0.5');
+    const feed = async (frames: FaceFrame[]) => {
+      for (const frame of frames) {
+        tracker.frame.set(frame);
+        await fixture.whenStable();
+      }
+    };
+    await feed(record(1000, { eyes: squeezed(300, 550, 0.3) }));
+    expect(text('last-closure')).toContain('too weak and too short');
+    expect(text('last-closure')).toContain('squeeze 0.30');
+    await feed(record(1000, { eyes: squeezed(300, 550) }, 2000));
+    expect(text('last-closure')).toContain('counted as a blink');
   });
 
   it('says why the camera stopped, in text', async () => {

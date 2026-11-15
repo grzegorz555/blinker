@@ -10,7 +10,12 @@ import {
 } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { detect, INITIAL_DETECTOR, type FaceSignal } from '../../core/signals/detector';
+import {
+  detect,
+  INITIAL_DETECTOR,
+  type ClosureReport,
+  type FaceSignal,
+} from '../../core/signals/detector';
 import { ProfileService } from '../../core/signals/profile.service';
 import { EYE_SHAPES, type EyeShape } from '../../core/vision/face-frame';
 import { FACE_WORKER, FaceTrackerService } from '../../core/vision/face-tracker.service';
@@ -60,6 +65,10 @@ export class DiagnosticsPage {
     [],
   );
 
+  /** The last closure of his eyes and why it was or was not a blink, with the thresholds it was judged by. */
+  protected readonly lastClosure = signal<ClosureReport | null>(null);
+  protected readonly blinkProfile = computed(() => this.profiles.profile().blink);
+
   /** Frames analysed and frames with a face, since the camera was turned on. */
   private readonly counts = signal({ frames: 0, faces: 0, since: 0 });
   protected readonly facePercent = computed(() => {
@@ -74,6 +83,7 @@ export class DiagnosticsPage {
       // His signals, as Liczenie (Counting) would get them with the camera (spec 011, R3).
       const found = detect(this.detector, frame, this.profiles.profile());
       this.detector = found.state;
+      if (found.closure) this.lastClosure.set(found.closure);
       if (found.signals.length) {
         const at = new Date().toLocaleTimeString(this.transloco.getActiveLang());
         this.detected.update((list) =>
@@ -96,6 +106,7 @@ export class DiagnosticsPage {
     this.copied.set(false);
     this.detector = INITIAL_DETECTOR;
     this.detected.set([]);
+    this.lastClosure.set(null);
     this.counts.set({ frames: 0, faces: 0, since: performance.now() });
     void this.watchBattery();
     await this.tracker.start(this.video().nativeElement);

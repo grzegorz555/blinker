@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (why a blink did not count)
+- MediaPipe lowers the gaze of a closed eye (eyeLookDown rises with eyeBlink), so the detector took every blink for a look at his hand. Now a closure is a look only if he was already looking down when it began, or the look lasted long enough to send HAND. Diagnostyka (Diagnostics) shows the last closure of the eyes (length, closure, squeeze, down) with the reason it did or did not count, and his blink thresholds.
+
 ## 2026-11-15 (his blink is strong, not long)
 - The author saw that his deliberate blink is strong rather than long. A blink now counts when the lids squeeze hard (`eyeSquint`, calibrated against his ordinary blinks at rest) or when it is long; Kalibracja (Calibration) finds short blinks in a long recording. The camera page of Kalibracja asks for the camera at once. Tablice (Boards): space between the example file and its button.
 
