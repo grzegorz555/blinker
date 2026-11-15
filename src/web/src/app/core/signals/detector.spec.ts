@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectAll } from './detector';
+import { detect, detectAll, INITIAL_DETECTOR, type ClosureReport } from './detector';
 import { DEFAULT_PROFILE as P } from './profile';
 import { closed, pulse, pulses, record, squeezed } from './synthetic';
 
@@ -20,6 +20,24 @@ describe('detector: his blink is strong rather than long', () => {
       const v = pulse(500, 800, 0.9, 0.05)(t);
       const q = pulse(650, 700, 0.8, 0.05)(t);
       return { eyeBlinkLeft: v, eyeBlinkRight: v, eyeSquintLeft: q, eyeSquintRight: q };
+    };
+    expect(signals(record(2000, { eyes }))).toEqual(['BLINK']);
+  });
+
+  it('closing the eyes also lowers them (eyeLookDown rises with the lids): still a BLINK, not a look', () => {
+    // MediaPipe reports a closed eye as looking down too; the look did not come first, so it is his blink.
+    const eyes = (t: number) => {
+      const on = t >= 500 && t < 750;
+      const v = on ? 0.9 : 0.05;
+      const q = on ? 0.8 : 0.05;
+      const d = on ? 0.7 : 0.05;
+      return {
+        eyeBlinkLeft: v,
+        eyeBlinkRight: v,
+        eyeSquintLeft: q,
+        eyeSquintRight: q,
+        eyeLookDownLeft: d,
+      };
     };
     expect(signals(record(2000, { eyes }))).toEqual(['BLINK']);
   });
@@ -164,6 +182,40 @@ describe('detector: head signals', () => {
   it('the neutral pose is subtracted: a head resting turned 15° is quiet', () => {
     const profile = { ...P, neutral: { yaw: 15, pitch: -10 } };
     expect(signals(record(2000, { yaw: () => 15, pitch: () => -10 }), profile)).toEqual([]);
+  });
+});
+
+describe('detector: why a closure was or was not his blink (Diagnostyka (Diagnostics))', () => {
+  const reports = (frames: Parameters<typeof detectAll>[0]) => {
+    let state = INITIAL_DETECTOR;
+    const out: ClosureReport[] = [];
+    for (const frame of frames) {
+      const d = detect(state, frame, P);
+      state = d.state;
+      if (d.closure) out.push(d.closure);
+    }
+    return out;
+  };
+
+  it('reports each closure once, when the eyes open, with its length, peaks and verdict', () => {
+    const [r] = reports(record(2000, { eyes: squeezed(500, 750) }));
+    expect(r.verdict).toBe('blink');
+    expect(r.ms).toBeGreaterThanOrEqual(250);
+    expect(r.closure).toBeCloseTo(0.9);
+    expect(r.squeeze).toBeCloseTo(0.8);
+  });
+
+  it('a short closure without the squeeze is weak; a 4 s closure is too long', () => {
+    expect(reports(record(2000, { eyes: squeezed(500, 750, 0.3) }))[0].verdict).toBe('weak');
+    expect(reports(record(6000, { eyes: closed(500, 4500) }))[0].verdict).toBe('tooLong');
+  });
+
+  it('a closure that starts while he already looks down is a look, not a blink', () => {
+    const eyes = (t: number) => {
+      const v = pulse(800, 1000, 0.9, 0.05)(t);
+      return { eyeLookDownLeft: pulse(300, 1200, 0.8, 0.05)(t), eyeBlinkLeft: v, eyeBlinkRight: v };
+    };
+    expect(reports(record(2000, { eyes }))[0].verdict).toBe('lookingDown');
   });
 });
 
