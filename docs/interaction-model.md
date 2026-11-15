@@ -15,20 +15,22 @@ Blendshape names come from MediaPipe Face Landmarker (https://ai.google.dev/edge
 
 | Signal | How it is detected | Status |
 |---|---|---|
-| `BLINK` (strong) | both `eyeBlinkLeft/Right` above the threshold, and either **strong** (`eyeSquintLeft/Right` squeezed past his calibrated level at some moment of the closure) or long (at least ~0.6 s, calibrated). His deliberate blink is strong rather than long (the author, 2026-11-15); an ordinary blink (short, lids not squeezed) is **ignored as involuntary**. | confirmed; the squeeze level to measure with him |
+| `BLINK` (strong) | both `eyeBlinkLeft/Right` above the threshold, and either **strong** (his strong-blink cue past his calibrated level at some moment of the closure: the lids squeezed `eyeSquint*`, the cheeks raised `cheekSquint*` or the brows pulled down `browDown*`, whichever tells his strong blink from his ordinary one best) or long (at least ~0.6 s, calibrated). When the camera cannot tell them apart, the strong blink is off and only long blinks count. His deliberate blink is strong rather than long (the author, 2026-11-15); an ordinary blink (short, lids not squeezed) is **ignored as involuntary**. | confirmed; the squeeze level to measure with him |
 | `VERY_LONG_CLOSE` | eyes closed for at least ~3 s | to confirm with him |
 | `HEAD_NOD` | head pitch down and back up within a time window (facial transformation matrix) | **confirmed: he uses it today to confirm ("yes")** |
 | `HEAD_LEFT` / `HEAD_RIGHT` | head yaw past the threshold, then back to neutral | possible |
 | `HEAD_SHAKE` | yaw left-right-left | **confirmed: he uses it today for "no"** |
-| `LOOK_AT_HAND` | gaze held down towards his hand, usually to his left, sometimes to his right (`eyeLook*` blendshapes, both directions calibrated) | **confirmed: he uses it today, it means "5" (counting only)** |
+| `LOOK_AT_HAND` | gaze held down towards his hand: down and to his left (to his palm), sometimes to his right (`eyeLookDown*` and `eyeLookOut*`/`eyeLookIn*`, the sides calibrated), with the head still (a nod moves the eyes against the head) | **confirmed: he uses it today, it means "5" (counting only)** |
 | `GAZE_UP` | `eyeLookUp*` held | possible |
 
 **How Blinker detects them (spec 011, `core/signals/detector.ts`):** a pure function over the camera frames, with
 hysteresis (a signal starts at its threshold and ends below 80 % of it) and a quiet time of 400 ms after each signal;
 without a face every half-done signal is dropped.
-- `LONG_BLINK` → `BLINK`: both eyes closed for 600–2500 ms, sent when they open. A closure that starts while he looks
-  down is the look at his hand (looking down lowers the lids).
-- `LOOK_AT_HAND` → `HAND`: either eye down past the threshold for 400 ms, once per look (left or right hand alike).
+- `BLINK`: both eyes closed, strong or for at least 600 ms, at most 2500 ms, sent when they open. A closure that starts
+  while he already looks down is the look at his hand (looking down lowers the lids); a closed eye also reads as looking
+  down, so that alone does not make a blink a look.
+- `LOOK_AT_HAND` → `HAND`: either eye down past the threshold for 400 ms, once per look, with the head within the nod
+  and shake amplitudes of neutral; once calibrated, also to the side of a learnt hand.
 - `HEAD_NOD` → `NOD`: pitch away from his neutral by the amplitude (12°) and back within 1.2 s; the direction is
   learnt in calibration.
 - `HEAD_SHAKE` → `SHAKE`: yaw past 10° to one side and then the other within 1.5 s.

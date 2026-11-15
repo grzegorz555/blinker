@@ -146,10 +146,10 @@ export class DiagnosticsPage {
       `Frames with a face: ${this.facePercent()}% over ${minutes.toFixed(1)} min`,
       `Battery: ${b ? `${Math.round(b.start * 100)}% -> ${Math.round(b.now * 100)}%` : 'not reported'}`,
       `Profile: ${this.calibrated() ? 'calibrated' : 'defaults'}; blink ${JSON.stringify(this.blinkProfile())}; hand ${JSON.stringify(this.profiles.profile().hand)}`,
-      'Last closures of the eyes (newest first): ms, closure, squeeze, down, verdict',
+      'Last closures of the eyes (newest first): ms, closure, eyeSquint, cheekSquint, browDown, down, verdict',
       ...this.closures.map(
         (c) =>
-          `  ${Math.round(c.ms)}, ${c.closure.toFixed(2)}, ${c.squeeze.toFixed(2)}, ${c.down.toFixed(2)}, ${c.verdict}`,
+          `  ${Math.round(c.ms)}, ${c.closure.toFixed(2)}, ${c.cues.eyeSquint.toFixed(2)}, ${c.cues.cheekSquint.toFixed(2)}, ${c.cues.browDown.toFixed(2)}, ${c.down.toFixed(2)}, ${c.verdict}`,
       ),
       `Signals (newest first): ${
         this.detected()

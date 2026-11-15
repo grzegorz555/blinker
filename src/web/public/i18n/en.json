@@ -279,6 +279,10 @@
       "eyeBlinkRight": "Blink, his right eye",
       "eyeSquintLeft": "Lids squeezed, his left eye",
       "eyeSquintRight": "Lids squeezed, his right eye",
+      "cheekSquintLeft": "Cheek raised, his left",
+      "cheekSquintRight": "Cheek raised, his right",
+      "browDownLeft": "Brow pulled down, his left",
+      "browDownRight": "Brow pulled down, his right",
       "eyeLookDownLeft": "Looks down, left eye",
       "eyeLookDownRight": "Looks down, right eye",
       "eyeLookInLeft": "Left eye towards the nose",
@@ -310,14 +314,20 @@
     "closure": {
       "title": "The last closure of the eyes",
       "none": "None yet.",
-      "values": "{{ms}} ms; closure {{closure}}, squeeze {{squeeze}}, down {{down}}:",
-      "profile": "A blink counts when the closure reaches {{threshold}} and the lids squeeze to {{squeeze}}, or the eyes stay closed at least {{minMs}} ms (at most {{maxMs}} ms).",
+      "values": "{{ms}} ms; closure {{closure}}; lids {{eyeSquint}}, cheeks {{cheekSquint}}, brows {{browDown}}; down {{down}}:",
+      "profile": "A blink counts when the closure reaches {{threshold}} and the {{cue}} reaches {{squeeze}}, or the eyes stay closed at least {{minMs}} ms (at most {{maxMs}} ms).",
       "verdict": {
         "blink": "counted as a blink",
         "weak": "too weak and too short",
         "tooLong": "too long (resting)",
         "lookingDown": "he was looking down (a look at his hand)"
-      }
+      },
+      "profileLongOnly": "A blink counts when the closure reaches {{threshold}} and lasts {{minMs}} to {{maxMs}} ms. The strong blink is off: the camera does not tell it from an ordinary one."
+    },
+    "cue": {
+      "eyeSquint": "squeeze of the lids",
+      "cheekSquint": "raise of the cheeks",
+      "browDown": "pull of the brows"
     }
   },
   "calibration": {
@@ -341,8 +351,8 @@
       },
       "neutral": {
         "title": "At rest, facing the screen",
-        "do": "Ask him to look calmly at the screen for a few seconds.",
-        "say": "Look calmly at the screen."
+        "do": "Ask him to look calmly at the screen for about 10 seconds and blink as usual. Blinker learns to tell his ordinary blinks from strong ones.",
+        "say": "Look calmly at the screen and blink as usual."
       },
       "blink": {
         "title": "Strong blink (+1)",
@@ -389,6 +399,11 @@
     "next": "Next",
     "restart": "Start again",
     "save": "Save the calibration",
-    "closures": "His last blinks (newest first), judged by the thresholds of this calibration:"
+    "closures": "His last blinks (newest first), judged by the thresholds of this calibration:",
+    "ordinary": "Ordinary blinks: {{n}}. At least 2 is best.",
+    "separation": {
+      "noOrdinary": "There was no ordinary blink in the step “At rest, facing the screen”, so the strong-blink threshold is a guess and an ordinary blink may count. Calibrate again and let him blink as usual in that step.",
+      "overlap": "His strong and ordinary blinks look alike to the camera, so only long blinks count. Repeat the blink step with the lids squeezed harder."
+    }
   }
 }

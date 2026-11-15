@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-15 (ordinary blinks, nods and his hand)
+- Ordinary blinks counted and a nod sometimes gave +5. Kalibracja (Calibration) now learns his ordinary blinks in the rest step and picks the cue that tells his strong blink apart best (lids, cheeks or brows); when none does, only long blinks count and the result says so. A look at his hand needs a still head and, once learnt, his side (down and to his left).
+
 ## 2026-11-15 (Kalibracja says why)
 - The blink step of Kalibracja (Calibration) lists his last 3 closures of the eyes with their numbers and why each did or did not count, judged by the thresholds fitted so far; the result shows his blink thresholds. For tuning while trying it.
 

@@ -36,7 +36,9 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
 
 # 2. Kalibracja (Calibration), about 2 minutes
 
-- [ ] Kalibracja (Calibration): go through the steps at his pace; each step is said aloud.
+- [ ] Kalibracja (Calibration): go through the steps at his pace; each step is said aloud. In "Spokojnie, na wprost"
+      (At rest, facing the screen) let him blink as usual for about 10 s: "Zwykłe mrugnięcia" (Ordinary blinks) at least 2.
+- [ ] Note the result's message on his blink (a guess, or strong and ordinary look alike) and which cue was chosen.
 - [ ] Note per step "Wykryto n z k" (Detected n of k). A step at 0: repeat it once; if still 0, skip it and note why.
 - [ ] "Zapisz kalibrację" (Save the calibration); then check in Diagnostyka (Diagnostics) that his signals appear.
 

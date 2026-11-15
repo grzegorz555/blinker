@@ -98,7 +98,9 @@
                   : {
                       ms: round(c.ms),
                       closure: round(c.closure, 2),
-                      squeeze: round(c.squeeze, 2),
+                      eyeSquint: round(c.cues.eyeSquint, 2),
+                      cheekSquint: round(c.cues.cheekSquint, 2),
+                      browDown: round(c.cues.browDown, 2),
                       down: round(c.down, 2),
                     }
             }}
@@ -109,13 +111,31 @@
     </div>
   }
 
+  @if (page() === 'neutral' && status() === 'running') {
+    <p class="muted" data-testid="ordinary">
+      {{ 'calibration.ordinary' | transloco: { n: ordinary() } }}
+    </p>
+  }
+
+  @if (page() === 'result' && fit().blink; as b) {
+    @if (b.separation !== 'ok') {
+      <p class="problem" data-testid="blink-separation">
+        {{ 'calibration.separation.' + b.separation | transloco }}
+      </p>
+    }
+  }
+
   @if (page() === 'result' && fit().learnt.includes('blink')) {
     <p class="muted" data-testid="blink-profile">
       {{
-        'diagnostics.closure.profile'
+        (fit().profile.blink.squeeze < 1
+          ? 'diagnostics.closure.profile'
+          : 'diagnostics.closure.profileLongOnly'
+        )
           | transloco
             : {
                 threshold: fit().profile.blink.threshold,
+                cue: 'diagnostics.cue.' + fit().profile.blink.cue | transloco,
                 squeeze: fit().profile.blink.squeeze,
                 minMs: fit().profile.blink.minMs,
                 maxMs: fit().profile.blink.maxMs,
