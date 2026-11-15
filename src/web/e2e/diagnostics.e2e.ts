@@ -11,7 +11,10 @@ test.describe('Diagnostyka (Diagnostics)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/settings');
     await page.getByRole('link', { name: 'Otwórz diagnostykę' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Diagnostyka' })).toBeVisible();
+    // WebKit under a full parallel run can take longer than 5 s to open a lazy page.
+    await expect(page.getByRole('heading', { level: 1, name: 'Diagnostyka' })).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test('says the picture stays on the device; the camera is off until asked; no axe violations', async ({

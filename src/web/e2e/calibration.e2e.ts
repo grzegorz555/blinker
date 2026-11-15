@@ -18,7 +18,10 @@ test.describe('Kalibracja (Calibration)', () => {
       .getByRole('navigation', { name: 'Menu główne' })
       .getByRole('link', { name: 'Kalibracja' })
       .click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Kalibracja' })).toBeVisible();
+    // WebKit under a full parallel run can take longer than 5 s to open a lazy page.
+    await expect(page.getByRole('heading', { level: 1, name: 'Kalibracja' })).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test('explains the steps first, then the camera; no axe violations', async ({ page }) => {
