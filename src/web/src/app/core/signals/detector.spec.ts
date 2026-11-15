@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { closureReports, detectAll } from './detector';
+import { closureReports, detectAll, lookReports } from './detector';
 import { DEFAULT_PROFILE as P } from './profile';
 import { closed, pulse, pulses, record, squeezed } from './synthetic';
 
@@ -230,6 +230,38 @@ describe('detector: a look at his hand needs a still head, and his side', () => 
     expect(signals(record(2000, { eyes: leftDown }), profile)).toEqual(['HAND']);
     const straightDown = (t: number) => ({ eyeLookDownLeft: pulse(300, 1000, 0.8, 0.05)(t) });
     expect(signals(record(2000, { eyes: straightDown }), profile)).toEqual([]);
+  });
+});
+
+describe('detector: his look at his hand with the head turned and tilted towards it', () => {
+  const leftDown = (t: number) => {
+    const on = t >= 300 && t < 1000;
+    return {
+      eyeLookDownLeft: on ? 0.8 : 0.05,
+      eyeLookOutLeft: on ? 0.6 : 0.05,
+      eyeLookInRight: on ? 0.6 : 0.05,
+    };
+  };
+  const towardsHand = { yaw: pulse(300, 1000, -15), pitch: pulse(300, 1000, 8) };
+
+  it('the head turned 15° and tilted 8° towards his hand is still HAND', () => {
+    const profile = { ...P, hand: { ...P.hand, left: 0.3 } };
+    expect(signals(record(2000, { eyes: leftDown, ...towardsHand }), profile)).toEqual(['HAND']);
+  });
+
+  it('reports each look with its peaks and verdict', () => {
+    const profile = { ...P, hand: { ...P.hand, left: 0.3 } };
+    const [look] = lookReports(record(2000, { eyes: leftDown, ...towardsHand }), profile);
+    expect(look.verdict).toBe('hand');
+    expect(look.down).toBeCloseTo(0.8);
+    expect(look.left).toBeCloseTo(0.6);
+    expect(look.yaw).toBeCloseTo(15);
+    const straight = (t: number) => ({ eyeLookDownLeft: pulse(300, 1000, 0.8, 0.05)(t) });
+    expect(lookReports(record(2000, { eyes: straight }), profile)[0].verdict).toBe('wrongSide');
+    const quick = (t: number) => ({ eyeLookDownLeft: pulse(300, 500, 0.8, 0.05)(t) });
+    expect(lookReports(record(2000, { eyes: quick }), P)[0].verdict).toBe('short');
+    const nod = { pitch: pulse(300, 900, -18), eyes: straight };
+    expect(lookReports(record(2000, nod), P)[0].verdict).toBe('nodding');
   });
 });
 

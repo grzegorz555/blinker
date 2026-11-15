@@ -23,6 +23,9 @@ export interface DetectorState {
   /** When the eyes went down, and whether HAND was already sent for this look. */
   readonly downSince: number | null;
   readonly handSent: boolean;
+  /** Any look down past the threshold (side and head aside), for the report: since when, its peaks, what stopped it. */
+  readonly lookSince: number | null;
+  readonly look: LookPeaks;
   /** The nod: when the head left neutral (pitch), or null at rest. */
   readonly nodSince: number | null;
   /** The sides the head passed in the shake window, newest last: -1 or 1 with their time. */
@@ -33,6 +36,39 @@ export interface DetectorState {
   readonly lastSignalAt: number;
 }
 
+/** The peaks of one look down, and what happened during it. */
+export interface LookPeaks {
+  readonly down: number;
+  readonly left: number;
+  readonly right: number;
+  /** The largest head turn and tilt from his neutral during the look, degrees. */
+  readonly yaw: number;
+  readonly pitch: number;
+  readonly sideOk: boolean;
+  readonly nodding: boolean;
+  readonly sent: boolean;
+}
+
+const NO_LOOK: LookPeaks = {
+  down: 0,
+  left: 0,
+  right: 0,
+  yaw: 0,
+  pitch: 0,
+  sideOk: false,
+  nodding: false,
+  sent: false,
+};
+
+/** Why a look down was or was not a look at his hand (Diagnostyka (Diagnostics), Kalibracja (Calibration)). */
+export type LookVerdict = 'hand' | 'short' | 'wrongSide' | 'nodding';
+
+/** One look down, reported when the eyes come back up. */
+export interface LookReport extends Omit<LookPeaks, 'sideOk' | 'nodding' | 'sent'> {
+  readonly ms: number;
+  readonly verdict: LookVerdict;
+}
+
 export const INITIAL_DETECTOR: DetectorState = {
   closedSince: null,
   closedWhileDown: false,
@@ -41,6 +77,8 @@ export const INITIAL_DETECTOR: DetectorState = {
   closedDown: 0,
   downSince: null,
   handSent: false,
+  lookSince: null,
+  look: NO_LOOK,
   nodSince: null,
   shakeSides: [],
   rightSince: null,
@@ -69,6 +107,8 @@ export interface Detection {
   readonly signals: readonly FaceSignal[];
   /** Set on the frame where a closure ends. */
   readonly closure?: ClosureReport;
+  /** Set on the frame where a look down ends. */
+  readonly look?: LookReport;
 }
 
 /** Without a face: every half-done signal is dropped (only the refractory time is kept). */
@@ -87,13 +127,10 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
   const head = frame.head;
   const pitch = head ? head.pitch - profile.neutral.pitch : 0;
   const yaw = head ? head.yaw - profile.neutral.yaw : 0;
-  // His eyes stay on the screen while the head moves, so a nod or a turn moves the eyes against the head: the head going
-  // up reads as looking down. A look at his hand counts only with the head still.
-  const headStill =
-    Math.abs(pitch) < profile.nod.amplitude &&
-    Math.abs(yaw) < profile.shake.amplitude &&
-    state.nodSince === null &&
-    state.shakeSides.length === 0;
+  // His eyes stay on the screen while he nods, so the nod moves the eyes against the head: the head going up reads as
+  // looking down. A look at his hand does not count while a nod is under way. Turning or tilting the head towards his
+  // hand is part of the look, so the head pose itself does not matter.
+  const nodding = state.nodSince !== null;
   // To his hand: down, and to the side he looks (when Kalibracja (Calibration) learnt it), with hysteresis.
   const towardsHand = (share: number) => {
     const { left, right } = profile.hand;
@@ -103,10 +140,11 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
       (right !== null && sides.right >= right * share)
     );
   };
-  const atHand = down >= profile.hand.threshold && towardsHand(1) && headStill;
-  const stillAtHand = down >= profile.hand.threshold * RELEASE && towardsHand(RELEASE) && headStill;
+  const atHand = down >= profile.hand.threshold && towardsHand(1) && !nodding;
+  const stillAtHand = down >= profile.hand.threshold * RELEASE && towardsHand(RELEASE) && !nodding;
   const fired: FaceSignal[] = [];
   let report: ClosureReport | undefined;
+  let lookReport: LookReport | undefined;
   let s: DetectorState = state;
 
   // His blink: fires when the eyes open again, if the closure was long enough or strong enough, and not too long.
@@ -172,6 +210,55 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
     s = { ...s, handSent: true, closedWhileDown: s.closedSince !== null || s.closedWhileDown };
   }
 
+  // The report of the look: any look down past the threshold, whatever its side and the head.
+  const lookNow = {
+    down,
+    left: sides.left,
+    right: sides.right,
+    yaw: Math.abs(yaw),
+    pitch: Math.abs(pitch),
+    sideOk: towardsHand(1),
+    nodding,
+    sent: s.handSent,
+  };
+  if (s.lookSince === null) {
+    if (down >= profile.hand.threshold) s = { ...s, lookSince: t, look: lookNow };
+  } else if (down < profile.hand.threshold * RELEASE) {
+    const l = s.look;
+    const verdict: LookVerdict = l.sent
+      ? 'hand'
+      : !l.sideOk
+        ? 'wrongSide'
+        : l.nodding
+          ? 'nodding'
+          : 'short';
+    lookReport = {
+      ms: t - s.lookSince,
+      down: l.down,
+      left: l.left,
+      right: l.right,
+      yaw: l.yaw,
+      pitch: l.pitch,
+      verdict,
+    };
+    s = { ...s, lookSince: null, look: NO_LOOK };
+  } else {
+    const l = s.look;
+    s = {
+      ...s,
+      look: {
+        down: Math.max(l.down, down),
+        left: Math.max(l.left, sides.left),
+        right: Math.max(l.right, sides.right),
+        yaw: Math.max(l.yaw, Math.abs(yaw)),
+        pitch: Math.max(l.pitch, Math.abs(pitch)),
+        sideOk: l.sideOk || lookNow.sideOk,
+        nodding: l.nodding || nodding,
+        sent: l.sent || s.handSent,
+      },
+    };
+  }
+
   if (head) {
     // Nod: away (in his direction, if known) and back within the window.
     const nodAway =
@@ -211,7 +298,10 @@ export function detect(state: DetectorState, frame: FaceFrame, profile: SignalPr
   }
 
   // One signal at a time, and a quiet time after it.
-  const extra = report ? { closure: report } : {};
+  const extra = {
+    ...(report ? { closure: report } : {}),
+    ...(lookReport ? { look: lookReport } : {}),
+  };
   if (!fired.length || t - s.lastSignalAt < profile.refractoryMs) {
     return { state: s, signals: [], ...extra };
   }
@@ -244,6 +334,18 @@ export function closureReports(
     const d = detect(state, frame, profile);
     state = d.state;
     if (d.closure) out.push(d.closure);
+  }
+  return out;
+}
+
+/** Every look down in a recording, oldest first, with why it was or was not a look at his hand (Kalibracja). */
+export function lookReports(frames: readonly FaceFrame[], profile: SignalProfile): LookReport[] {
+  let state = INITIAL_DETECTOR;
+  const out: LookReport[] = [];
+  for (const frame of frames) {
+    const d = detect(state, frame, profile);
+    state = d.state;
+    if (d.look) out.push(d.look);
   }
   return out;
 }

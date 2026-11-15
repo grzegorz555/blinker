@@ -194,7 +194,10 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
 
   for (const step of ['handLeft', 'handRight'] as const) {
     const frames = withFace(recordings[step]);
-    const top = percentile(frames.map(downOf), 90);
+    // Per look, not per frame: two short looks in a long step are only a few frames, which a percentile of all
+    // frames would miss. The frames clearly lower than his rest, and their median.
+    const lower = frames.map(downOf).filter((d) => d - restDown >= MIN_CONTRAST.eyes);
+    const top = lower.length >= 3 ? percentile(lower, 50) : Number.NaN;
     if (top - restDown >= MIN_CONTRAST.eyes) {
       const threshold = clamp(restDown + (top - restDown) / 2, L.threshold);
       // Both hands share one threshold: the lower one, so the weaker side still counts.
