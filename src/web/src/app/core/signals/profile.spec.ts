@@ -10,6 +10,12 @@ describe('validateProfile (spec 011, R2)', () => {
     expect(validateProfile({ ...DEFAULT_PROFILE, extra: 1 })).toEqual(DEFAULT_PROFILE);
   });
 
+  it('a profile stored before the squeeze existed gets the default squeeze', () => {
+    const { minMs, maxMs } = DEFAULT_PROFILE.blink;
+    const old = { ...DEFAULT_PROFILE, blink: { threshold: 0.4, minMs, maxMs } };
+    expect(validateProfile(old)?.blink).toEqual({ ...DEFAULT_PROFILE.blink, threshold: 0.4 });
+  });
+
   it.each([
     ['not an object', 'x'],
     ['another version', { ...DEFAULT_PROFILE, version: 2 }],
@@ -27,6 +33,7 @@ describe('validateProfile (spec 011, R2)', () => {
       { ...DEFAULT_PROFILE, right: { ...DEFAULT_PROFILE.right, direction: 0 } },
     ],
     ['a missing part', { ...DEFAULT_PROFILE, shake: undefined }],
+    ['a squeeze of 0', { ...DEFAULT_PROFILE, blink: { ...DEFAULT_PROFILE.blink, squeeze: 0 } }],
     ['NaN', { ...DEFAULT_PROFILE, neutral: { yaw: Number.NaN, pitch: 0 } }],
   ])('refuses %s', (_label, value) => {
     expect(validateProfile(value)).toBeNull();

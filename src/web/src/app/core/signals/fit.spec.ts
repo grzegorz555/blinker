@@ -48,6 +48,47 @@ describe('fitProfile (spec 011, R5)', () => {
     expect(profile.blink.minMs).toBeGreaterThanOrEqual(350);
   });
 
+  it('learns his short, strong blinks: a long recording, 3 blinks of 250 ms, ordinary blinks at rest', () => {
+    const lids = (list: readonly (readonly [number, number])[], q: number) => (t: number) => {
+      const on = list.some(([a, b]) => t >= a && t < b);
+      return {
+        ...restEyes,
+        eyeBlinkLeft: on ? 0.9 : 0.2,
+        eyeBlinkRight: on ? 0.9 : 0.2,
+        eyeSquintLeft: on ? q : 0.05,
+        eyeSquintRight: on ? q : 0.05,
+      };
+    };
+    // At rest he blinks twice to wet his eyes: short, the lids barely squeezed (0.3).
+    const calm = record(4000, {
+      ...rest,
+      eyes: lids(
+        [
+          [1000, 1200],
+          [2500, 2700],
+        ],
+        0.3,
+      ),
+    });
+    // 12 s for 3 strong blinks: closed in about 6 % of the frames, which a percentile of all frames would miss.
+    const strong = record(12000, {
+      ...rest,
+      eyes: lids(
+        [
+          [2000, 2250],
+          [6000, 6250],
+          [10000, 10250],
+        ],
+        0.8,
+      ),
+    });
+    const { profile, learnt } = fitProfile({ neutral: calm, blink: strong }, P);
+    expect(learnt).toContain('blink');
+    expect(profile.blink.squeeze).toBeCloseTo(0.55, 2);
+    expect(countDetected('blink', strong, profile)).toBe(3);
+    expect(countDetected('blink', calm, profile)).toBe(0);
+  });
+
   it('a step without a real movement keeps the previous value (not learnt)', () => {
     const still = record(3000, { ...rest, eyes: () => restEyes });
     const { profile, learnt } = fitProfile({ neutral, blink: still, nod: still }, P);

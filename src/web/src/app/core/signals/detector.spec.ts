@@ -1,10 +1,33 @@
 import { describe, expect, it } from 'vitest';
 import { detectAll } from './detector';
 import { DEFAULT_PROFILE as P } from './profile';
-import { closed, pulse, pulses, record } from './synthetic';
+import { closed, pulse, pulses, record, squeezed } from './synthetic';
 
 const signals = (frames: Parameters<typeof detectAll>[0], profile = P) =>
   detectAll(frames, profile).map((x) => x.signal);
+
+describe('detector: his blink is strong rather than long', () => {
+  it('a short (250 ms) blink with the lids squeezed is a BLINK', () => {
+    expect(signals(record(2000, { eyes: squeezed(500, 750) }))).toEqual(['BLINK']);
+  });
+
+  it('the same short blink without the squeeze (to wet the eye) is not', () => {
+    expect(signals(record(2000, { eyes: squeezed(500, 750, 0.3) }))).toEqual([]);
+  });
+
+  it('the squeeze counts at any moment of the closure, not only at its start', () => {
+    const eyes = (t: number) => {
+      const v = pulse(500, 800, 0.9, 0.05)(t);
+      const q = pulse(650, 700, 0.8, 0.05)(t);
+      return { eyeBlinkLeft: v, eyeBlinkRight: v, eyeSquintLeft: q, eyeSquintRight: q };
+    };
+    expect(signals(record(2000, { eyes }))).toEqual(['BLINK']);
+  });
+
+  it('eyes squeezed shut for 4 s is still not a blink (too long)', () => {
+    expect(signals(record(6000, { eyes: squeezed(500, 4500) }))).toEqual([]);
+  });
+});
 
 describe('detector: long blink (spec 011, R1)', () => {
   it('a 700 ms closure is one BLINK, sent when the eyes open', () => {

@@ -5,8 +5,17 @@ export interface SignalProfile {
   readonly version: 1;
   /** His head at rest, looking at the screen (degrees, MediaPipe's frame). */
   readonly neutral: { readonly yaw: number; readonly pitch: number };
-  /** Long blink: both eyes at or above the threshold for minMs…maxMs. */
-  readonly blink: { readonly threshold: number; readonly minMs: number; readonly maxMs: number };
+  /**
+   * His blink: both eyes at or above the threshold, no longer than maxMs, and either long (at least minMs) or strong
+   * (the lids squeeze to at least `squeeze` at some point), so a short, forceful blink counts and an ordinary one
+   * (to wet the eye) does not.
+   */
+  readonly blink: {
+    readonly threshold: number;
+    readonly minMs: number;
+    readonly maxMs: number;
+    readonly squeeze: number;
+  };
   /** Look at his hand: eyes down at or above the threshold for holdMs. */
   readonly hand: { readonly threshold: number; readonly holdMs: number };
   /** Nod: pitch away by the amplitude and back within windowMs; direction 1 or -1 (0 = either). */
@@ -31,7 +40,7 @@ export interface SignalProfile {
 export const DEFAULT_PROFILE: SignalProfile = {
   version: 1,
   neutral: { yaw: 0, pitch: 0 },
-  blink: { threshold: 0.5, minMs: 600, maxMs: 2500 },
+  blink: { threshold: 0.5, minMs: 600, maxMs: 2500, squeeze: 0.6 },
   hand: { threshold: 0.5, holdMs: 400 },
   nod: { amplitude: 12, direction: 0, windowMs: 1200 },
   shake: { amplitude: 10, windowMs: 1500 },
@@ -77,6 +86,8 @@ export function validateProfile(data: unknown): SignalProfile | null {
     inRange(b['minMs'], L.blinkMinMs) &&
     inRange(b['maxMs'], L.blinkMaxMs) &&
     (b['minMs'] as number) < (b['maxMs'] as number) &&
+    // Added after the first profiles were stored: missing means the default.
+    (b['squeeze'] === undefined || inRange(b['squeeze'], L.threshold)) &&
     inRange(h['threshold'], L.threshold) &&
     inRange(h['holdMs'], L.holdMs) &&
     inRange(nod['amplitude'], L.amplitude) &&
@@ -96,6 +107,7 @@ export function validateProfile(data: unknown): SignalProfile | null {
       threshold: b['threshold'] as number,
       minMs: b['minMs'] as number,
       maxMs: b['maxMs'] as number,
+      squeeze: (b['squeeze'] as number | undefined) ?? DEFAULT_PROFILE.blink.squeeze,
     },
     hand: { threshold: h['threshold'] as number, holdMs: h['holdMs'] as number },
     nod: {

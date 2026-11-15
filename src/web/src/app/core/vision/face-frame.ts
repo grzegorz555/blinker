@@ -1,10 +1,15 @@
 // Spec 010, R3: one analysed camera frame, reduced to the values stage 4 needs. Plain TypeScript.
 import { headPose, type HeadPose } from './head-pose';
 
-/** The blendshapes we keep: blinks, and where the eyes look (down and to a side for the look at his hand). */
+/**
+ * The blendshapes we keep: blinks, how hard the lids squeeze (his deliberate blink is strong rather than long), and
+ * where the eyes look (down and to a side for the look at his hand).
+ */
 export const EYE_SHAPES = [
   'eyeBlinkLeft',
   'eyeBlinkRight',
+  'eyeSquintLeft',
+  'eyeSquintRight',
   'eyeLookDownLeft',
   'eyeLookDownRight',
   'eyeLookInLeft',

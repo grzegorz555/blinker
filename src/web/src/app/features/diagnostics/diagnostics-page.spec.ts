@@ -92,7 +92,7 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     const items = [...root.querySelectorAll('[data-testid="signals"] li')].map((li) =>
       li.textContent?.split(/\s\d/)[0].trim(),
     );
-    expect(items).toEqual(['Look at his hand (+5)', 'Long blink (+1)']);
+    expect(items).toEqual(['Look at his hand (+5)', 'Strong blink (+1)']);
   });
 
   it('says why the camera stopped, in text', async () => {

@@ -17,7 +17,7 @@ verified:
 Two audiences ([accessibility conventions](../conventions/accessibility.md)):
 
 1. **He communicates** with the board, on his own: he looks at the board, the question and the sentence, and
-   controls Blinker with **face signals only** (a long blink +1, a look at his hand +5, a nod = yes, a head shake =
+   controls Blinker with **face signals only** (a strong blink +1, a look at his hand +5, a nod = yes, a head shake =
    no, see the [interaction model](../interaction-model.md)). The goal is that he manages **without a caregiver**.
 2. **A caregiver** sets things up (calibration, boards, settings) by touch, keyboard or a screen reader.
 

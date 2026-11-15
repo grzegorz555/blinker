@@ -31,7 +31,8 @@ test.describe('Kalibracja (Calibration)', () => {
     await next(page);
     await expect(heading(page)).toHaveText('Kamera');
     await expect(heading(page)).toBeFocused();
-    await expect(page.getByRole('button', { name: 'Włącz kamerę' })).toBeVisible();
+    // The camera starts on its own when this page opens; the status says how it went.
+    await expect(page.getByTestId('calibration-status')).toBeVisible();
     await expectNoA11yViolations(page);
   });
 
@@ -45,7 +46,6 @@ test.describe('Kalibracja (Calibration)', () => {
     const thirdParty = collectThirdPartyRequests(page, baseURL!);
     await page.context().grantPermissions(['camera']);
     await next(page);
-    await page.getByRole('button', { name: 'Włącz kamerę' }).click();
     await next(page);
     await expect(heading(page)).toHaveText('Spokojnie, na wprost');
     await expect(page.getByTestId('calibration-status')).toHaveText(/Nie widzę twarzy/, {
@@ -53,7 +53,7 @@ test.describe('Kalibracja (Calibration)', () => {
     });
     await expect.poll(() => spoken(page)).toContain('Patrz spokojnie na ekran.');
     await next(page);
-    await expect(heading(page)).toHaveText('Długie mrugnięcie (+1)');
+    await expect(heading(page)).toHaveText('Mocne mrugnięcie (+1)');
     await expect(page.getByTestId('detected')).toHaveText('Wykryto 0 z 3');
     await expectNoA11yViolations(page);
     for (let i = 0; i < 5; i++) await page.getByRole('button', { name: 'Pomiń ten krok' }).click();
@@ -73,7 +73,6 @@ test.describe('Kalibracja (Calibration)', () => {
   }) => {
     test.skip(browserName === 'chromium', 'Chromium has the fake camera');
     await next(page);
-    await page.getByRole('button', { name: 'Włącz kamerę' }).click();
     await expect(page.getByTestId('calibration-status')).toHaveText(
       /Nie widzę twarzy|Twarz w kadrze|Brak zgody na kamerę|Nie znaleziono przedniej kamery|nie obsługuje kamery|Kamera przestała działać/,
       { timeout: 20_000 },
