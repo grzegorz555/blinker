@@ -264,6 +264,19 @@
     "roll": "Przechylenie",
     "blocked": "Zablokowano wysyłkę do: {{origins}}",
     "copy": "Kopiuj wyniki",
-    "copied": "Skopiowano wyniki (bez obrazu)."
+    "copied": "Skopiowano wyniki (bez obrazu).",
+    "signals": {
+      "title": "Wykryte sygnały",
+      "calibrated": "Według jego kalibracji.",
+      "defaults": "Według ustawień domyślnych: skalibruj, żeby lepiej rozpoznawać jego sygnały.",
+      "none": "Jeszcze żadnego."
+    },
+    "signal": {
+      "BLINK": "Długie mrugnięcie (+1)",
+      "HAND": "Spojrzenie na rękę (+5)",
+      "NOD": "Skinienie (tak)",
+      "SHAKE": "Kręcenie głową (nie)",
+      "RIGHT": "Głowa w prawo (koniec)"
+    }
   }
 }

@@ -11,10 +11,10 @@ generated:
 
 Branch: `feat/011-signals` on top of `feat/010-face-spike` (PR #19). Gates: `npm run verify -- --lighthouse`.
 
-- [ ] **T1 [opus]: Detector and profile.** `core/signals/`: `SignalProfile` with defaults and a validator, the
+- [x] **T1 [opus]: Detector and profile.** `core/signals/`: `SignalProfile` with defaults and a validator, the
       store, `detect()` for the five signals (R1, R2). Tests: synthetic frame streams.
       _To understand:_ hysteresis and a refractory time, why a signal fires on release.
-- [ ] **T2 [sonnet]: Signals in Diagnostyka (Diagnostics).** The detector on the live frames and a list of the last
+- [x] **T2 [sonnet]: Signals in Diagnostyka (Diagnostics).** The detector on the live frames and a list of the last
       signals (R3). Tests: unit with a fake tracker.
 - [ ] **T3 [opus]: Kalibracja (Calibration).** `fitProfile()` (R5) and the wizard page (R4), in the navigation. Tests:
       fitting with synthetic steps, the page with a fake tracker, e2e with the fake camera, axe.

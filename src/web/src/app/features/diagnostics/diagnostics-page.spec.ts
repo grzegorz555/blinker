@@ -4,6 +4,7 @@ import { translocoTesting } from '../../../testing/transloco';
 import type { FaceFrame } from '../../core/vision/face-frame';
 import { FaceTrackerService, type TrackerStatus } from '../../core/vision/face-tracker.service';
 import { frameStats } from '../../core/vision/frame-stats';
+import { record, closed } from '../../core/signals/synthetic';
 import { DiagnosticsPage } from './diagnostics-page';
 
 /** A tracker the test drives by hand (no camera, no worker). */
@@ -68,6 +69,29 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     expect(meter.value).toBeCloseTo(0.9);
     expect(text('head')).toContain('12°');
     expect(text('head')).toContain('-4°');
+  });
+
+  it('runs the detector on the frames and lists his signals, newest first (spec 011, R3)', async () => {
+    const { fixture, tracker, text, root } = await render();
+    expect(text('signals')).toBe('None yet.');
+    expect(text('profile-kind')).toContain('By the default settings');
+    // A long blink, then a look at his hand.
+    const frames = [
+      ...record(1500, { eyes: closed(200, 1000) }),
+      ...record(
+        1200,
+        { eyes: (t) => ({ eyeLookDownLeft: t > 200 && t < 1000 ? 0.8 : 0.05 }) },
+        1600,
+      ),
+    ];
+    for (const frame of frames) {
+      tracker.frame.set(frame);
+      await fixture.whenStable();
+    }
+    const items = [...root.querySelectorAll('[data-testid="signals"] li')].map((li) =>
+      li.textContent?.split(/\s\d/)[0].trim(),
+    );
+    expect(items).toEqual(['Look at his hand (+5)', 'Long blink (+1)']);
   });
 
   it('says why the camera stopped, in text', async () => {

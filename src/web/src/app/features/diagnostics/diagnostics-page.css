@@ -107,3 +107,12 @@
   text-align: end;
   font-variant-numeric: tabular-nums;
 }
+
+.signals {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 600;
+}
