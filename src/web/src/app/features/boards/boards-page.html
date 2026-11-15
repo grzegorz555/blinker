@@ -110,17 +110,19 @@
   <p class="muted">{{ 'boards.importHelp' | transloco: limits }}</p>
   <details class="example" data-testid="board-example">
     <summary>{{ 'boards.example.title' | transloco }}</summary>
-    <p class="muted">{{ 'boards.example.help' | transloco }}</p>
-    <!-- Code, not prose: no translation and no language of its own beyond the board's locale inside. -->
-    <pre
-      class="example-code"
-      translate="no"
-      tabindex="0"
-      [attr.aria-label]="'boards.example.title' | transloco"
-    ><code>{{ example() }}</code></pre>
-    <button matButton="outlined" type="button" (click)="downloadExample()">
-      {{ 'boards.example.download' | transloco }}
-    </button>
+    <div class="example-body">
+      <p class="muted">{{ 'boards.example.help' | transloco }}</p>
+      <!-- Code, not prose: no translation and no language of its own beyond the board's locale inside. -->
+      <pre
+        class="example-code"
+        translate="no"
+        tabindex="0"
+        [attr.aria-label]="'boards.example.title' | transloco"
+      ><code>{{ example() }}</code></pre>
+      <button matButton="outlined" type="button" (click)="downloadExample()">
+        {{ 'boards.example.download' | transloco }}
+      </button>
+    </div>
   </details>
   <!-- A Material button opens the system file picker; the native input stays hidden (its "no file chosen" text
        looked foreign). The result below names the imported board. -->
