@@ -67,6 +67,8 @@ export class DiagnosticsPage {
 
   /** The last closure of his eyes and why it was or was not a blink, with the thresholds it was judged by. */
   protected readonly lastClosure = signal<ClosureReport | null>(null);
+  /** The last 10 closures, newest first, for "Kopiuj wyniki" (Copy the results). */
+  private closures: ClosureReport[] = [];
   protected readonly blinkProfile = computed(() => this.profiles.profile().blink);
 
   /** Frames analysed and frames with a face, since the camera was turned on. */
@@ -83,7 +85,10 @@ export class DiagnosticsPage {
       // His signals, as Liczenie (Counting) would get them with the camera (spec 011, R3).
       const found = detect(this.detector, frame, this.profiles.profile());
       this.detector = found.state;
-      if (found.closure) this.lastClosure.set(found.closure);
+      if (found.closure) {
+        this.lastClosure.set(found.closure);
+        this.closures = [found.closure, ...this.closures].slice(0, 10);
+      }
       if (found.signals.length) {
         const at = new Date().toLocaleTimeString(this.transloco.getActiveLang());
         this.detected.update((list) =>
@@ -107,6 +112,7 @@ export class DiagnosticsPage {
     this.detector = INITIAL_DETECTOR;
     this.detected.set([]);
     this.lastClosure.set(null);
+    this.closures = [];
     this.counts.set({ frames: 0, faces: 0, since: performance.now() });
     void this.watchBattery();
     await this.tracker.start(this.video().nativeElement);
@@ -124,7 +130,10 @@ export class DiagnosticsPage {
     return value.toFixed(digits);
   }
 
-  /** "Kopiuj wyniki" (Copy the results): a short text for ADR-0006. No picture, nothing about him. */
+  /**
+   * "Kopiuj wyniki" (Copy the results): a short text for ADR-0006 and for tuning his blink. Only numbers: no picture,
+   * nothing that identifies him.
+   */
   protected async copy(): Promise<void> {
     const s = this.stats();
     const b = this.battery();
@@ -136,6 +145,17 @@ export class DiagnosticsPage {
       `FPS: ${s.fps.toFixed(1)}; analysis median ${s.medianMs.toFixed(1)} ms, p95 ${s.p95Ms.toFixed(1)} ms`,
       `Frames with a face: ${this.facePercent()}% over ${minutes.toFixed(1)} min`,
       `Battery: ${b ? `${Math.round(b.start * 100)}% -> ${Math.round(b.now * 100)}%` : 'not reported'}`,
+      `Profile: ${this.calibrated() ? 'calibrated' : 'defaults'}; blink ${JSON.stringify(this.blinkProfile())}; hand ${JSON.stringify(this.profiles.profile().hand)}`,
+      'Last closures of the eyes (newest first): ms, closure, squeeze, down, verdict',
+      ...this.closures.map(
+        (c) =>
+          `  ${Math.round(c.ms)}, ${c.closure.toFixed(2)}, ${c.squeeze.toFixed(2)}, ${c.down.toFixed(2)}, ${c.verdict}`,
+      ),
+      `Signals (newest first): ${
+        this.detected()
+          .map((d) => d.signal)
+          .join(', ') || '-'
+      }`,
     ];
     try {
       await navigator.clipboard.writeText(lines.join('\n'));
