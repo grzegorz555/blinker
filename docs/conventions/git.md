@@ -18,20 +18,25 @@ generated:
   - inside the PR, **each task from `tasks.md` is one commit** (or a few logical ones), with its tests;
   - a PR never mixes stages or unrelated specs;
   - stage 0 is the exception: it has no spec, so it is a single branch, `chore/000-bootstrap`, with commits split by topic.
-- **Merging needs green CI.** Branch protection and rulesets are not available for private repos on the free GitHub plan (the API returns 403), so we use a workaround that the author chose on 2026-11-10:
-  - CI runs every gate on every PR;
-  - a versioned **pre-push hook** (`.githooks/pre-push`, spec 002) runs the fast gates (`npm run verify -- --quick`: docs, Prettier, ESLint, unit and script tests, about 20–30 s) before anything leaves the machine. The full gates (audit, build, e2e, Lighthouse) are left to CI, which is the real check (decided by the author on 2026-11-11, spec 005). Agents never bypass the hook with `--no-verify`;
-  - agents never merge, and the author merges only when every check is green.
-- Repository settings (free tier, already applied):
+- **Merging needs green CI.** The repo is public since 2026-11-15 (the author's choice), so `main` is protected:
+  - required status checks: Web (npm run verify), Lighthouse (accessibility = 100), Docs (OKF bundle), Secret scan
+    (gitleaks), Vulnerability scan (OSV-Scanner); a branch does not have to be rebased on the newest `main` first;
+  - no force-push and no deletion of `main`; the author (admin) can still merge by hand;
+  - a versioned **pre-push hook** (`.githooks/pre-push`, spec 002) still runs the fast gates (`npm run verify -- --quick`)
+    before anything leaves the machine. Agents never bypass it with `--no-verify`;
+  - agents never merge. The author merges, by hand or with GitHub's "Enable auto-merge" (rebase) on a PR, which then
+    merges by itself once every required check is green.
+- Repository settings (applied):
   - head branches are deleted on merge;
   - only squash and rebase merges are allowed (linear history);
-  - auto-merge is off;
-  - Dependabot alerts and security updates are on.
-- **When the repo becomes public or moves to GitHub Pro**, turn on:
-  - a ruleset for `main`: PR required, required status checks (every CI job), no force-push, no deletion;
-  - for a public repo, also CodeQL and secret scanning with push protection.
-
-  Before making the repo public, re-check `docs/` for personal data.
+  - auto-merge is allowed (used only when the author turns it on for a PR);
+  - Dependabot alerts and security updates, secret scanning with push protection, and CodeQL
+    (`.github/workflows/codeql.yml`, results under Security > Code scanning).
+- **Stacked PRs** (one built on another): merge from the bottom up. After a rebase merge the next branch must be rebased
+  on `main` (its old commits have new hashes), otherwise GitHub shows no CI for it
+  (`docs/knowledge/rebased-branch-is-not-merged-for-git.md`).
+- The repo is public: every tracked file is published. No personal data of him (`scripts/privacy.test.mjs` checks
+  it); the Polish copies and summaries stay git-ignored.
 - Make small, logical commits. **Commit only after the author has reviewed the uncommitted changes in the IDE**; push and open PRs only when the author asks.
 - Local repo setup (local config is not part of the repo, so repeat it after a fresh clone):
   ```
