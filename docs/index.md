@@ -19,6 +19,7 @@ only what the task needs.
 * [Architecture](architecture.md) - Modules, data flow from camera to speech, where data is stored.
 * [Decisions (ADR)](adr/index.md) - Architecture decision records.
 * [Conventions](conventions/index.md) - Frontend, testing, git, AI workflow, accessibility, security.
+* [Security pass](security-review.md) - The ASVS chapter-level pass before the first real use: results and two open findings.
 
 # Work
 * [Specs](specs/index.md) - Feature specs and task lists, one folder per feature.

@@ -88,4 +88,4 @@ Agents never read `.env*`, the credential manager or `git credential` output.
 # How we check
 - The `code-reviewer` agent checks the points above for every change.
 - An e2e test reads the response headers on the preview deploy.
-- Before the first real use: a pass through the ASVS chapters listed above, plus `/security-review`.
+- Before the first real use: a pass through the ASVS chapters listed above, plus `/security-review`. The chapter-level pass of 2026-11-16 is in [security-review.md](../security-review.md); its two findings are open.
