@@ -1,7 +1,12 @@
 // Spec 006, T1: the board validator (R1, R2). Every invalid case returns { path, code } and never throws.
 import friendBoard from '../../../../public/boards/friend-pl.json';
 import { BOARD_LIMITS, cellAt } from './board';
-import { validateBoard, validateBoardData, type BoardError } from './validate-board';
+import {
+  validateBoard,
+  validateBoardBytes,
+  validateBoardData,
+  type BoardError,
+} from './validate-board';
 
 const valid = () => JSON.parse(JSON.stringify(friendBoard)) as Record<string, unknown>;
 const errorsOf = (data: unknown): readonly BoardError[] => {
@@ -61,6 +66,43 @@ describe('validateBoard: the file text', () => {
       expect(validateBoard(text), text).toEqual({
         ok: false,
         errors: [{ path: '', code: 'not-object' }],
+      });
+    }
+  });
+});
+
+describe('validateBoardBytes: the bytes of the file', () => {
+  const utf8 = (text: string) => new TextEncoder().encode(text);
+
+  it('accepts UTF-8, with or without a BOM (Notepad on Windows adds one)', () => {
+    const bytes = utf8(JSON.stringify(friendBoard));
+    expect(validateBoardBytes(bytes).ok).toBe(true);
+    expect(validateBoardBytes(new Uint8Array([0xef, 0xbb, 0xbf, ...bytes])).ok).toBe(true);
+  });
+
+  it('refuses bytes that are not UTF-8: a binary file, UTF-16, a cut character', () => {
+    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    const exe = new Uint8Array([0x4d, 0x5a, 0x90, 0x00, 0x03, 0xff, 0xff]);
+    const utf16 = new Uint8Array([0xff, 0xfe, 0x7b, 0x00, 0x7d, 0x00]);
+    const cut = utf8('{"name": "ż"}').slice(0, 11);
+    for (const bytes of [png, exe, utf16, cut]) {
+      expect(validateBoardBytes(bytes)).toEqual({
+        ok: false,
+        errors: [{ path: '', code: 'not-text' }],
+      });
+    }
+  });
+
+  it('refuses more than 64 KB before decoding', () => {
+    const result = validateBoardBytes(new Uint8Array(BOARD_LIMITS.bytes + 1).fill(0xff));
+    expect(result).toMatchObject({ ok: false, errors: [{ code: 'too-large' }] });
+  });
+
+  it('text that is UTF-8 but not JSON is not-json: a script, a page', () => {
+    for (const text of ['alert(1)', '<script>alert(1)</script>', '<!doctype html><html></html>']) {
+      expect(validateBoardBytes(utf8(text)), text).toEqual({
+        ok: false,
+        errors: [{ path: '', code: 'not-json' }],
       });
     }
   });
@@ -164,9 +206,49 @@ describe('validateBoardData: cells', () => {
     expect(codes(withCell('A'))).toEqual(['cells[0][0] wrong-type']);
   });
 
-  it('keeps markup in a value as plain text: it is data, the UI renders it with text bindings', () => {
-    const result = validateBoardData(withCell({ type: 'word', value: '<b>x</b>' }));
-    expect(result.ok && cellAt(result.board, 1, 1)).toEqual({ type: 'word', value: '<b>x</b>' });
+  it('rejects markup in any text: a script tag in a cell, the name or a label', () => {
+    expect(codes(withCell({ type: 'word', value: '<script>x</script>' }))).toEqual([
+      'cells[0][0].value unsafe-text',
+    ]);
+    expect(codes(withCell({ type: 'char', value: '<' }))).toEqual([
+      'cells[0][0].value unsafe-text',
+    ]);
+    const board = valid();
+    board['name'] = 'Tablica <img src=x onerror=alert(1)>';
+    (board['columns'] as string[])[0] = '>';
+    expect(codes(board)).toEqual(['name unsafe-text', 'columns[0] unsafe-text']);
+  });
+
+  it('rejects control and invisible characters, also written as JSON escapes', () => {
+    const hidden: Record<string, string> = {
+      NUL: 'A\u0000B',
+      escape: 'A\u001bB',
+      'line break': 'A\nB',
+      'zero-width space': 'A​B',
+      'right-to-left override': 'A‮B',
+      'bidi isolate': 'A⁦B',
+      'soft hyphen': 'A­B',
+      BOM: 'A﻿B',
+      'private use': 'AB',
+      'lone surrogate': 'A\ud800B',
+      'tag character': 'A\u{e0041}B',
+    };
+    for (const [name, value] of Object.entries(hidden)) {
+      expect(codes(withCell({ type: 'word', value })), name).toEqual([
+        'cells[0][0].value unsafe-text',
+      ]);
+    }
+    const escaped = JSON.stringify(withCell({ type: 'word', value: 'TAK' })).replace(
+      'TAK',
+      'T\\u0000K',
+    );
+    expect(validateBoard(escaped)).toMatchObject({ ok: false, errors: [{ code: 'unsafe-text' }] });
+  });
+
+  it('keeps ordinary text: Polish letters, punctuation, an emoji joined with a zero-width joiner', () => {
+    for (const value of ['ŻÓŁĆ', 'TAK!', "NIE, 'A' & B?", '👩‍⚕️', 'نه‌']) {
+      expect(codes(withCell({ type: 'word', value })), value).toEqual([]);
+    }
   });
 
   it('returns a fresh object with known fields only', () => {

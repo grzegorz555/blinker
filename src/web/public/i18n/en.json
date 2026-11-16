@@ -159,7 +159,10 @@
       "unavailable": "This browser does not let Blinker save on the device, so imported boards last only until the page is closed."
     },
     "errors": {
+      "not-json-file": "The file name must end with .json.",
       "too-large": "The file is larger than {{limit}} bytes.",
+      "not-text": "The file is not UTF-8 text (it looks like a binary file or another encoding), or it could not be read.",
+      "unsafe-text": "The text contains characters that are not allowed: < or >, control characters or invisible characters.",
       "not-json": "The file is not valid JSON.",
       "not-object": "The file must contain one board object.",
       "unknown-field": "An unknown field.",

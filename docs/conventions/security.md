@@ -51,7 +51,10 @@ The headers are written only in `src/web/public/staticwebapp.config.json`; a uni
 the local e2e server sends the same headers, so every e2e run fails on a CSP or Trusted Types violation (spec 003).
 
 # Untrusted input: board files
+- Take only a `.json` file: the name is checked in code, because the picker's `accept` is a hint a person can switch off. The MIME type is not checked: browsers derive it from the extension, and some phones leave it empty.
+- Read the bytes with a strict UTF-8 decode (`TextDecoder` with `fatal: true`), so a binary file or another encoding is refused, not guessed.
 - Validate against the JSON Schema before use: reject unknown keys, limit the file size (64 KB) and string lengths.
+- Scan every text (name, labels, cell values): no `<` or `>`, no control characters, no invisible or direction-changing characters (zero-width space, bidi overrides and isolates, tag characters), no private-use characters or lone surrogates. Text bindings already stop markup from running; this is a second layer, and it keeps out what a person cannot see ([Unicode TR36](https://unicode.org/reports/tr36/), [Trojan Source](https://trojansource.codes/)).
 - Render values only through Angular text bindings. **Never** use `innerHTML`, `bypassSecurityTrust*`, `eval`, `new Function` or dynamic `import()` of user data.
 - Parse with `JSON.parse` inside `try`, show a translated error, and keep the previous board.
 

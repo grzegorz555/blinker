@@ -2,7 +2,7 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { CountingService, defaultBoard } from '../counting/counting.service';
 import { STORAGE, readStored, writeStored, type StoreProblem } from '../storage/local-store';
 import { BOARD_LIMITS, type Board } from './board';
-import { validateBoard, validateBoardData, type BoardError } from './validate-board';
+import { validateBoardBytes, validateBoardData, type BoardError } from './validate-board';
 
 export const BOARDS_KEY = 'blinker.boards.v1';
 export const ACTIVE_BOARD_KEY = 'blinker.activeBoard.v1';
@@ -11,6 +11,9 @@ export const ACTIVE_BOARD_KEY = 'blinker.activeBoard.v1';
 export type ImportResult =
   | { readonly ok: true; readonly board: Board; readonly replaced: boolean }
   | { readonly ok: false; readonly errors: readonly BoardError[] };
+
+/** The only kind of file an import takes. The picker's `accept` is a hint a person can switch off, so we check. */
+const JSON_FILE = /\.json$/i;
 
 /** Imported boards read back from the device: each is validated again, like a new import. */
 function validateStoredBoards(data: unknown): Board[] | null {
@@ -29,8 +32,8 @@ const validateId = (data: unknown) =>
 
 /**
  * Tablice (Boards) (spec 007, R10, R12): his built-in board and the imported ones, the active board, kept on the
- * device. Imported files are untrusted input: the size is checked before the file is read, then the spec 006
- * validator checks every field. The active board goes to the counting machine.
+ * device. Imported files are untrusted input: the name and the size are checked before the file is read, then the
+ * spec 006 validator checks the bytes and every field. The active board goes to the counting machine.
  */
 @Injectable({ providedIn: 'root' })
 export class BoardsService {
@@ -69,14 +72,26 @@ export class BoardsService {
   }
 
   /**
-   * Imports a board from a file. The size is checked before reading (R10), then the text goes through the validator.
+   * Imports a board from a file. Only a .json file is taken, and the size is checked before reading (R10); then the
+   * bytes go through the validator (strict UTF-8, JSON, every field, a scan of every text). The file type is not
+   * checked: browsers derive it from the extension, and some phones leave it empty.
    * A board with the id of an imported one replaces it (a corrected file); the id of his board is reserved.
    */
-  async import(file: Pick<File, 'size' | 'text'>): Promise<ImportResult> {
+  async import(file: Pick<File, 'name' | 'size' | 'arrayBuffer'>): Promise<ImportResult> {
+    if (!JSON_FILE.test(file.name)) {
+      return { ok: false, errors: [{ path: '', code: 'not-json-file' }] };
+    }
     if (file.size > BOARD_LIMITS.bytes) {
       return { ok: false, errors: [{ path: '', code: 'too-large', limit: BOARD_LIMITS.bytes }] };
     }
-    const result = validateBoard(await file.text());
+    let bytes: Uint8Array;
+    try {
+      bytes = new Uint8Array(await file.arrayBuffer());
+    } catch {
+      // The file was moved or deleted after it was chosen, or the system refused to read it.
+      return { ok: false, errors: [{ path: '', code: 'not-text' }] };
+    }
+    const result = validateBoardBytes(bytes);
     if (!result.ok) return result;
     const board = result.board;
     if (board.id === this.builtIn.id) {

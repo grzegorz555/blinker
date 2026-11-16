@@ -22,12 +22,15 @@ const yesNo = {
 };
 
 // Through the button, as a helper would: it opens the system file picker (the native input stays hidden).
-const choose = async (page: Page, name: string, content: string) => {
+const choose = async (
+  page: Page,
+  name: string,
+  content: string | Buffer,
+  mimeType = 'application/json',
+) => {
   const picker = page.waitForEvent('filechooser');
   await page.getByRole('button', { name: 'Wybierz plik tablicy (.json)' }).click();
-  await (
-    await picker
-  ).setFiles({ name, mimeType: 'application/json', buffer: Buffer.from(content) });
+  await (await picker).setFiles({ name, mimeType, buffer: Buffer.from(content) });
 };
 
 test.describe('Tablice (Boards)', () => {
@@ -100,6 +103,27 @@ test.describe('Tablice (Boards)', () => {
     await expect(page.getByTestId('import-errors')).toContainText(
       'Plik jest większy niż 65536 bajtów.',
     );
+  });
+
+  // The picker's accept is only a hint: a person can switch to "all files", so the app checks by itself.
+  test('only a .json text file is taken: another name, a binary file and a script in a text are rejected', async ({
+    page,
+  }) => {
+    const errors = page.getByTestId('import-errors');
+    await choose(page, 'tak-nie.txt', JSON.stringify(yesNo), 'text/plain');
+    await expect(errors).toBeFocused();
+    await expect(errors).toContainText('Nazwa pliku musi kończyć się na .json.');
+
+    await choose(page, 'program.json', Buffer.from([0x4d, 0x5a, 0x90, 0x00, 0xff, 0xfe]));
+    await expect(errors).toContainText('Plik nie jest tekstem UTF-8');
+
+    const script = { ...yesNo, name: '<script>window.hacked = true</script>' };
+    await choose(page, 'skrypt.json', JSON.stringify(script));
+    await expect(errors.locator('code', { hasText: 'name' })).toBeVisible();
+    await expect(errors).toContainText('Tekst zawiera niedozwolone znaki');
+    expect(await page.evaluate(() => 'hacked' in window)).toBe(false);
+    await expect(page.getByRole('radio')).toHaveCount(1);
+    await expectNoA11yViolations(page);
   });
 
   test('deletes an imported board only after the confirmation; his board comes back as active', async ({

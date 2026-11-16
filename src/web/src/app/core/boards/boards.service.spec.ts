@@ -22,9 +22,12 @@ const yesNo: Board = {
   ],
 };
 
-const file = (content: unknown, size?: number) => {
-  const text = typeof content === 'string' ? content : JSON.stringify(content);
-  return { size: size ?? new TextEncoder().encode(text).length, text: async () => text };
+const file = (content: unknown, name = 'board.json') => {
+  const bytes =
+    content instanceof Uint8Array
+      ? content
+      : new TextEncoder().encode(typeof content === 'string' ? content : JSON.stringify(content));
+  return { name, size: bytes.length, arrayBuffer: async () => bytes.slice().buffer };
 };
 
 describe('BoardsService (spec 007, R10, R12)', () => {
@@ -72,10 +75,11 @@ describe('BoardsService (spec 007, R10, R12)', () => {
     const { service } = setup();
     let read = false;
     const big = {
+      name: 'big.json',
       size: 64 * 1024 + 1,
-      text: async () => {
+      arrayBuffer: async () => {
         read = true;
-        return '';
+        return new ArrayBuffer(0);
       },
     };
     expect(await service.import(big)).toEqual({
@@ -83,6 +87,54 @@ describe('BoardsService (spec 007, R10, R12)', () => {
       errors: [{ path: '', code: 'too-large', limit: 65536 }],
     });
     expect(read).toBe(false);
+  });
+
+  it('takes only a .json file, and refuses another name before reading it', async () => {
+    const { service } = setup();
+    for (const name of ['board.txt', 'board.json.exe', 'board.html', 'board', 'json', 'board.js']) {
+      let read = false;
+      const other = {
+        name,
+        size: 10,
+        arrayBuffer: async () => {
+          read = true;
+          return new ArrayBuffer(0);
+        },
+      };
+      expect(await service.import(other), name).toEqual({
+        ok: false,
+        errors: [{ path: '', code: 'not-json-file' }],
+      });
+      expect(read, name).toBe(false);
+    }
+    expect((await service.import(file(yesNo, 'TAK-NIE.JSON'))).ok).toBe(true);
+  });
+
+  it('refuses a .json file that is not text, or that cannot be read', async () => {
+    const { service } = setup();
+    const binary = new Uint8Array([0x4d, 0x5a, 0x90, 0x00, 0xff, 0xfe]);
+    expect(await service.import(file(binary, 'program.json'))).toEqual({
+      ok: false,
+      errors: [{ path: '', code: 'not-text' }],
+    });
+    const gone = {
+      name: 'gone.json',
+      size: 10,
+      arrayBuffer: () => Promise.reject(new DOMException('gone', 'NotFoundError')),
+    };
+    expect(await service.import(gone)).toEqual({
+      ok: false,
+      errors: [{ path: '', code: 'not-text' }],
+    });
+    expect(service.boards()).toHaveLength(1);
+  });
+
+  it('refuses a board with a script in a text, and keeps nothing of it', async () => {
+    const { service, data } = setup();
+    const result = await service.import(file({ ...yesNo, name: '<script>alert(1)</script>' }));
+    expect(result).toEqual({ ok: false, errors: [{ path: 'name', code: 'unsafe-text' }] });
+    expect(service.boards()).toHaveLength(1);
+    expect(data.has(BOARDS_KEY)).toBe(false);
   });
 
   it('returns every validator error with its path', async () => {
@@ -128,7 +180,10 @@ describe('BoardsService (spec 007, R10, R12)', () => {
 
   it('has a translation for every error code, in both languages', () => {
     const codes: BoardErrorCode[] = [
+      'not-json-file',
       'too-large',
+      'not-text',
+      'unsafe-text',
       'not-json',
       'not-object',
       'unknown-field',
