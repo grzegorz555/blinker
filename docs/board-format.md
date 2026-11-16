@@ -46,8 +46,15 @@ generated:
 
 `src/web/src/app/core/boards/validate-board.ts` ([security conventions](conventions/security.md)):
 
+- only a file whose name ends with `.json` (checked in code before the file is read; the picker's `accept` is only
+  a hint);
 - at most 64 KB, counted in bytes **before** parsing;
+- the bytes must be UTF-8 text (a strict decode; a leading BOM is fine): a binary file or UTF-16 is rejected;
 - `JSON.parse` inside `try`; anything that is not an object is rejected;
+- every text (`name`, the labels, cell values) is scanned: `<` and `>`, control characters, invisible and
+  direction-changing characters (zero-width space, bidi overrides and isolates, soft hyphen, tag characters),
+  private-use characters and lone surrogates are rejected with `unsafe-text`, also when written as `\u` escapes.
+  The zero-width joiner and non-joiner stay allowed (emoji, several scripts);
 - every field checked by type, length and allowed values; **unknown fields** and the keys `__proto__`,
   `constructor` and `prototype` are rejected;
 - the result is a fresh object with the known fields only;
@@ -115,10 +122,13 @@ dependency). The schema below documents the format for people who write boards b
 ```
 
 The schema cannot say that every row has one cell per column, that `cells` has one row per row label, or that
-lengths count characters after NFC; the validator checks those too.
+lengths count characters after NFC, or which characters a text may not hold; the validator checks those too.
 
 # References
 
 - OWASP Input Validation Cheat Sheet https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html
 - JSON Schema 2020-12 https://json-schema.org/draft/2020-12
 - Unicode normalization (NFC) https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+- OWASP File Upload Cheat Sheet https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
+- TextDecoder `fatal` https://developer.mozilla.org/docs/Web/API/TextDecoder/TextDecoder
+- Unicode Security Considerations (TR36) https://unicode.org/reports/tr36/ · Trojan Source https://trojansource.codes/

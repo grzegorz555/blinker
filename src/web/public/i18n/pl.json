@@ -159,7 +159,10 @@
       "unavailable": "Ta przeglądarka nie pozwala Blinkerowi zapisywać na urządzeniu, więc zaimportowane tablice działają tylko do zamknięcia strony."
     },
     "errors": {
+      "not-json-file": "Nazwa pliku musi kończyć się na .json.",
       "too-large": "Plik jest większy niż {{limit}} bajtów.",
+      "not-text": "Plik nie jest tekstem UTF-8 (wygląda na plik binarny albo inne kodowanie) albo nie udało się go odczytać.",
+      "unsafe-text": "Tekst zawiera niedozwolone znaki: < lub >, znaki sterujące albo znaki niewidoczne.",
       "not-json": "Plik nie jest poprawnym JSON-em.",
       "not-object": "Plik musi zawierać jeden obiekt tablicy.",
       "unknown-field": "Nieznane pole.",

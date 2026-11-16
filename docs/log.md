@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-16 (a stricter board import)
+- Tablice (Boards) takes only a `.json` file (the name is checked in code, not only by the picker), reads it with a strict UTF-8 decode so a binary file is refused, and scans every text for `<` and `>`, control characters and invisible or direction-changing characters. Three new errors: `not-json-file`, `not-text`, `unsafe-text`. Saved boards go through the same scan when read back.
+
 ## 2026-11-15 (his look at his hand with the head turned)
 - The look at his hand was not recognized: it required a still head, but he turns and tilts his head towards his hand. Now only a nod under way blocks it. Kalibracja (Calibration) finds short looks in a long step (per look, not per frame) and lists his last looks with their numbers and why each did or did not count; Diagnostyka (Diagnostics) shows the last look and the hand thresholds, and copies the last 10 looks.
 

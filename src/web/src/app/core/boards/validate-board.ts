@@ -1,6 +1,7 @@
 // Validator for board files (spec 006, R1, R2). Imported boards are untrusted input (docs/conventions/security.md):
-// the size is checked before parsing, every field is checked by type, length and allowed values, unknown fields and
-// prototype keys are rejected, and the result is a fresh object with known fields only. Errors are data
+// the size is checked before parsing, the bytes must be UTF-8 text, every field is checked by type, length and
+// allowed values, unknown fields and prototype keys are rejected, every text is scanned for markup and for control
+// and invisible characters, and the result is a fresh object with known fields only. Errors are data
 // ({ path, code }) so the UI can show them in text (SC 3.3.1).
 //
 // Why not a JSON Schema library: Ajv compiles schemas with `new Function`, which our CSP (no 'unsafe-eval') and
@@ -8,7 +9,11 @@
 import { BOARD_ACTIONS, BOARD_LIMITS, type Board, type BoardAction, type Cell } from './board';
 
 export type BoardErrorCode =
+  /** The file name does not end with .json (checked by the service, before the file is read). */
+  | 'not-json-file'
   | 'too-large'
+  /** The bytes are not UTF-8 text: a binary file, or another encoding (UTF-16). */
+  | 'not-text'
   | 'not-json'
   | 'not-object'
   | 'unknown-field'
@@ -25,6 +30,8 @@ export type BoardErrorCode =
   | 'row-length'
   | 'unknown-cell-type'
   | 'unknown-action'
+  /** A text with markup (< or >), or a control or invisible character. */
+  | 'unsafe-text'
   /** An import with the id of his built-in board (spec 007, R10). */
   | 'reserved-id';
 
@@ -47,11 +54,42 @@ const ID = /^[a-z0-9-]+$/;
 // A pragmatic BCP 47 check: a 2–3 letter language, then optional subtags ("pl", "pl-PL", "sr-Latn").
 const LOCALE = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;
 
+/**
+ * What no board text may hold. The UI shows values with text bindings, so markup would never run; this is a second
+ * layer, and it keeps out what a person cannot see but the screen and the voice would still get:
+ * - `<` and `>`: no markup and no script tag, whatever a later change does with the text;
+ * - control characters (Cc: NUL, escape, line breaks), also when written as \u0000 escapes;
+ * - invisible and direction-changing characters (soft hyphen, zero-width space, the bidi marks, embeddings and
+ *   isolates that make a text read differently from what it holds, the BOM, tag characters);
+ * - private-use characters and lone surrogates.
+ * The zero-width joiner and non-joiner stay allowed: emoji and several scripts need them.
+ * https://unicode.org/reports/tr36/ (Unicode security considerations), https://trojansource.codes/
+ */
+const UNSAFE_TEXT =
+  /[<>\p{Cc}\p{Co}\p{Cs}\u00AD\u061C\u200B\u200E\u200F\u2028-\u202E\u2060-\u206F\uFEFF\u{E0000}-\u{E007F}]/u;
+
 /** Length in characters as people count them (code points after NFC), so "Ż" is 1 however it was typed. */
 const length = (text: string) => [...text.normalize('NFC')].length;
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/**
+ * Validates the bytes of a board file: the size, then a strict UTF-8 decode (a binary file or another encoding is
+ * refused instead of being read with replacement characters; a leading BOM is dropped), then the text. Never throws.
+ */
+export function validateBoardBytes(bytes: Uint8Array): BoardResult {
+  if (bytes.length > BOARD_LIMITS.bytes) {
+    return { ok: false, errors: [{ path: '', code: 'too-large', limit: BOARD_LIMITS.bytes }] };
+  }
+  let content: string;
+  try {
+    content = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    return { ok: false, errors: [{ path: '', code: 'not-text' }] };
+  }
+  return validateBoard(content);
+}
 
 /** Validates the text of a board file. Never throws. */
 export function validateBoard(text: string): BoardResult {
@@ -122,6 +160,7 @@ function text(obj: Record<string, unknown>, key: string, max: number, fail: Fail
   const clean = value.trim().normalize('NFC');
   if (!clean) return void fail(key, 'empty');
   if (length(clean) > max) return void fail(key, 'too-long', max);
+  if (UNSAFE_TEXT.test(clean)) return void fail(key, 'unsafe-text');
   return clean;
 }
 
@@ -140,6 +179,7 @@ function labels(obj: Record<string, unknown>, key: 'columns' | 'rows', fail: Fai
     if (!clean) return fail(at, 'empty');
     if (length(clean) > BOARD_LIMITS.labelLength)
       return fail(at, 'too-long', BOARD_LIMITS.labelLength);
+    if (UNSAFE_TEXT.test(clean)) return fail(at, 'unsafe-text');
     out.push(clean);
   });
   return out.length === list.length ? out : undefined;
@@ -188,6 +228,7 @@ function cell(value: unknown, path: string, fail: Fail): Cell | null | undefined
   if (typeof content !== 'string') return void fail(`${path}.value`, 'wrong-type');
   const clean = content.trim().normalize('NFC');
   if (!clean) return void fail(`${path}.value`, 'empty');
+  if (UNSAFE_TEXT.test(clean)) return void fail(`${path}.value`, 'unsafe-text');
   switch (type) {
     case 'char':
       if (length(clean) > BOARD_LIMITS.charLength) {
