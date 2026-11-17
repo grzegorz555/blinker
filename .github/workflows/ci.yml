@@ -15,7 +15,7 @@ concurrency:
 jobs:
   docs:
     name: Docs (OKF bundle)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -27,7 +27,7 @@ jobs:
 
   secrets:
     name: Secret scan (gitleaks)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -41,7 +41,7 @@ jobs:
   # The image is pinned by digest, like the actions are pinned by SHA.
   vulnerabilities:
     name: Vulnerability scan (OSV-Scanner)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -49,14 +49,14 @@ jobs:
         run: >-
           docker run --rm -v "$PWD:/repo:ro"
           ghcr.io/google/osv-scanner:v2.7.1@sha256:a70ffffc2bfd33482953e5d6b64c6fcdb30239717a07b0f0d3ab2859ce3e4cde
-          scan source --lockfile /repo/src/web/package-lock.json
+          scan source --config /repo/src/web/osv-scanner.toml --lockfile /repo/src/web/package-lock.json
 
   # Spec 002: every gate of `npm run verify` (src/web/scripts/verify.mjs), so CI and the
   # pre-push hook share one definition: docs, Prettier, ESLint, unit, script tests, npm audit,
   # production build, dist/ check (no .map/.md), Playwright + axe on three device projects.
   web:
     name: Web (npm run verify)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
@@ -94,7 +94,7 @@ jobs:
   # Reports are kept as a workflow artifact only, never uploaded to public storage.
   lighthouse:
     name: Lighthouse (accessibility = 100)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -128,7 +128,7 @@ jobs:
     name: Deploy preview (Azure)
     if: ${{ github.event_name == 'pull_request' }}
     needs: [docs, secrets, vulnerabilities, web, lighthouse]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -184,7 +184,7 @@ jobs:
     name: Deploy production (Azure)
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: [docs, secrets, vulnerabilities, web, lighthouse]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     concurrency:
       group: deploy-production

@@ -18,8 +18,9 @@ export const GATES = [
   { name: 'lint (ESLint)', command: 'npm run lint', quick: true },
   { name: 'unit (Vitest)', command: 'npm test', quick: true },
   { name: 'scripts (node --test)', command: 'npm run test:scripts', quick: true },
-  // R3: any high/critical advisory, or any advisory in production dependencies, blocks.
-  { name: 'audit (high, all deps)', command: 'npm audit --audit-level=high' },
+  // R3: any high/critical advisory, or any advisory in production dependencies, blocks. The first gate
+  // honours the dated exceptions of osv-scanner.toml (scripts/audit.mjs); the production one has none.
+  { name: 'audit (high, all deps)', command: 'node scripts/audit.mjs' },
   { name: 'audit (any, production)', command: 'npm audit --omit=dev' },
   { name: 'build (production)', command: 'npm run build' },
   { name: 'dist check', command: 'npm run check:dist' },
