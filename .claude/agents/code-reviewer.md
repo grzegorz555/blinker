@@ -15,7 +15,7 @@ Input:
 
 Check:
 1. **Correctness** against the spec rules R1…Rn and the acceptance criteria. Also the safety rules from `docs/interaction-model.md`: nothing is spoken or cleared without confirmation, and undo is always possible.
-2. **Tests:** are there unit tests for every rule and e2e + axe tests for every user-visible path? Are they in the same commit? List the missing cases. Is time injected, with no real timers in the logic?
+2. **Tests:** are there unit tests for every rule, in the same commit? E2E tests are not expected per task (they come in an e2e pass); for an e2e pass, check every user-visible path of the specs it covers has a test with an axe scan. List the missing cases. Is time injected, with no real timers in the logic?
 3. **Accessibility** (WCAG 2.2 AA + the AAC rules): labels, keyboard access, focus, contrast, the scanning highlight not relying on color alone, timing settings, `aria-live`.
 4. **Security and privacy:**
    - nothing leaves the device (no third-party URLs, no network TTS by default);

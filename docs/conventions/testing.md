@@ -1,7 +1,7 @@
 ---
 type: Convention
 title: Testing conventions
-description: Every task ships with Vitest unit tests and Playwright + axe e2e tests; how to test camera-driven features without a camera.
+description: Every task ships with Vitest unit tests; Playwright + axe e2e tests are added and run in batches, by hand; how to test camera-driven features without a camera.
 tags: [convention, testing]
 status: draft
 generated:
@@ -12,8 +12,12 @@ generated:
 # Definition of done
 A task is done only when **in the same commit** as the code there are:
 1. **Unit tests (Vitest)** for every rule in the spec. Pure logic (state machines, the signal detector, the board validator, the input mapping) aims for **100% branch coverage**.
-2. **E2E tests (Playwright)** for every user-visible path the task touches, each with an **axe-core scan** that allows zero violations.
-3. Green gates: `ng lint`, `ng test`, `ng build`, `npx playwright test`.
+2. Green gates: `npm run verify -- --quick` before the push (the hook runs it); CI runs `npm run verify` (everything except e2e and Lighthouse in the web job).
+
+**E2E is not part of a task** (the author, 2026-11-17: it takes too long after every change):
+- the spec's Test plan lists the e2e paths with an axe scan, and the task names them, but does not write them;
+- from time to time the author asks for an **e2e pass**: it writes the missing e2e tests for the specs done since the last pass, runs `npm run e2e` (or Actions > E2E > Run workflow) and fixes what fails;
+- the `deployed` project still runs after every deploy in CI (headers, HTTPS, smoke + axe on the real host).
 
 # Unit tests (Vitest)
 - Test names say what happens: `describe('ScanStateMachine')` → `it('returns to column scanning after undo in row scanning')`.
@@ -23,6 +27,7 @@ A task is done only when **in the same commit** as the code there are:
 - Components are tested through TestBed by their user-visible behavior (text, roles, clicks). Transloco uses `TranslocoTestingModule.forRoot({ langs: { en, pl } })`.
 
 # E2E tests (Playwright)
+- Run by hand: `npm run e2e` (build + mock-ups + Playwright), `npm run verify -- --e2e`, or the manual `E2E` workflow in GitHub Actions.
 - They run in Chromium (desktop + Pixel emulation) and WebKit (iPhone emulation).
 - **No real camera in CI:**
 - Locally, Playwright starts its own servers; set `PW_REUSE_SERVER=1` to reuse ones you started yourself (a leftover

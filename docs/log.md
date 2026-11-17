@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-17 (e2e by hand)
+- E2E (Playwright + axe) no longer runs after every change: `npm run verify` and the CI web job skip it (`--e2e` adds it), and `.github/workflows/e2e.yml` runs it only by hand. Tasks ship with unit tests; e2e tests are written in an e2e pass the author asks for from time to time. The `deployed` project still runs after each deploy.
+
 ## 2026-11-17 (CI: the runner and a picomatch exception)
 - CI runs on `ubuntu-24.04` instead of `ubuntu-latest`: the new Ubuntu 26.04 image lacks the system packages that `playwright install --with-deps` asks for. `picomatch` 4.0.7 (GHSA-fc5q-39xc-vjpf, ReDoS, no fixed version, dev only) is a dated exception in `src/web/osv-scanner.toml`, read by OSV-Scanner and by the new `scripts/audit.mjs` gate; the production audit keeps no exceptions. Do not depend on picomatch directly.
 
