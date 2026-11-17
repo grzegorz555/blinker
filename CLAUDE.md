@@ -27,9 +27,9 @@ npm ci                     # install from the lockfile
 npm run lint               # ESLint (TS, template a11y, no-unsanitized)
 npm test                   # Vitest unit tests, single run
 npm run build              # production build (no source maps)
-npm run e2e                # build + Playwright (3 device projects) + axe
+npm run e2e                # build + Playwright (3 device projects) + axe; by hand only, not after every change
 npm run format:check       # Prettier
-npm run verify             # every gate in CI order; --lighthouse adds Lighthouse; --quick = fast gates only
+npm run verify             # every gate in CI order except e2e; --e2e adds e2e, --lighthouse adds Lighthouse; --quick = fast gates only
 npm run hooks:install      # once per clone: core.hooksPath = .githooks (pre-push runs verify --quick)
 node ../../scripts/check-okf.mjs ../../docs   # docs bundle check
 ```
@@ -46,7 +46,7 @@ Environment: Windows with the Git Bash tool. **There is no Python.** Write multi
 ## Working rules (mandatory)
 1. **One task per session.** By default, work on a branch in the main checkout. Use a worktree in `C:\Repozytorium\Blinker\wt\<name>` only when the author runs tasks in parallel (`docs/conventions/git.md`). Run `/clear` between tasks.
 2. **Follow the loop with human gates:** `/plan` (the author approves the spec) → `/work` (one task from `tasks.md`; the author reviews the diff) → `/review` → `/compound` (the author approves the learnings).
-3. **Every task ships with tests in the same commit:** Vitest unit tests for the logic and components, plus Playwright + axe e2e tests for every user-visible path (`docs/conventions/testing.md`). No tests means not done.
+3. **Every task ships with unit tests in the same commit:** Vitest for the logic and components (`docs/conventions/testing.md`). No tests means not done. **E2E (Playwright + axe) is not written or run after every change:** the spec lists the e2e paths, and the author asks for an e2e pass from time to time, which adds the missing e2e tests and runs them (`npm run e2e`, or the manual E2E workflow in CI).
 4. **After every step**, write a Polish learning summary in `.local/summaries/YYYY-MM-DD-NN-topic.md` following `.local/summaries/_TEMPLATE.md`. Cover what was done and why, which files changed, each tool or concept explained from scratch with doc links, how to verify it yourself, and 2–3 quiz questions. The folder is git-ignored; never commit it.
 5. **Accessibility and mobile:** every change meets **WCAG 2.2 AA** (`docs/conventions/accessibility.md`) and is designed mobile-first (`docs/conventions/frontend.md`). If a task would break this, say so before writing code.
 6. **Security and privacy** (`docs/conventions/security.md`): no data leaves the device, nothing is loaded from third-party origins, imported boards are untrusted input, and there is no `innerHTML`/`bypassSecurityTrust*`.

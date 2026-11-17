@@ -1,17 +1,19 @@
 // Runs the quality gates in the same order as CI (spec 002, R1) and prints an honest summary:
 // which gates passed, which failed and which were not run. It stops at the first failure.
 // Usage (from src/web):
-//   npm run verify                   every gate except Lighthouse (what the CI `web` job runs)
+//   npm run verify                   every gate except e2e and Lighthouse (what the CI `web` job runs)
+//   npm run verify -- --e2e          also Playwright + axe; e2e runs by hand, not after every change
+//                                    (the author adds and runs e2e tests in batches; CI: the manual E2E workflow)
 //   npm run verify -- --lighthouse   also Lighthouse CI (needs a build and Google Chrome)
 //   npm run verify -- --quick        fast gates only, about 30 s (what the pre-push hook runs, spec 005);
-//                                    e2e, audit, build and Lighthouse are left to CI
+//                                    audit and build are left to CI
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const webDir = resolve(import.meta.dirname, '..');
 
-/** Every gate in CI order. `quick` gates also run with --quick; `lighthouse` only with --lighthouse. */
+/** Every gate in CI order. `quick` gates also run with --quick; `e2e` only with --e2e; `lighthouse` only with --lighthouse. */
 export const GATES = [
   { name: 'docs (OKF)', command: 'node ../../scripts/check-okf.mjs ../../docs', quick: true },
   { name: 'format (Prettier)', command: 'npm run format:check', quick: true },
@@ -25,7 +27,7 @@ export const GATES = [
   { name: 'build (production)', command: 'npm run build' },
   { name: 'dist check', command: 'npm run check:dist' },
   { name: 'mock-ups build (spec 004)', command: 'npm run design:build' },
-  { name: 'e2e (Playwright + axe)', command: 'npm run e2e:only' },
+  { name: 'e2e (Playwright + axe)', command: 'npm run e2e:only', e2e: true },
   { name: 'Lighthouse (a11y = 100)', command: 'npm run lighthouse', lighthouse: true },
 ];
 
@@ -37,10 +39,13 @@ export const GATES = [
 export function planGates(args) {
   const quick = args.includes('--quick');
   const withLighthouse = args.includes('--lighthouse');
-  if (quick && withLighthouse) throw new Error('--quick and --lighthouse cannot be combined');
-  return GATES.map(({ name, command, quick: isQuick, lighthouse }) => {
+  const withE2e = args.includes('--e2e');
+  if (quick && (withLighthouse || withE2e))
+    throw new Error('--quick cannot be combined with --lighthouse or --e2e');
+  return GATES.map(({ name, command, quick: isQuick, e2e, lighthouse }) => {
     let skipReason = null;
     if (quick && !isQuick) skipReason = 'skipped (--quick; CI runs it)';
+    else if (e2e && !withE2e) skipReason = 'skipped (by hand: --e2e or npm run e2e)';
     else if (lighthouse && !withLighthouse) skipReason = 'skipped (use --lighthouse)';
     return { name, command, skipReason };
   });

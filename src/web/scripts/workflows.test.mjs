@@ -70,7 +70,14 @@ describe('workflows', () => {
     }
   });
 
-  it('deploy the build that passed e2e, not a second build (R8)', () => {
+  it('run e2e by hand only: not in the web job, and the E2E workflow has no automatic trigger', () => {
+    assert.doesNotMatch(job(ci, 'web'), /playwright|--e2e/);
+    const e2e = read('e2e.yml');
+    assert.match(e2e, /\non:\n {2}workflow_dispatch:\n\n/);
+    assert.match(e2e, /run: npm run e2e\n/);
+  });
+
+  it('deploy the build that passed the gates, not a second build (R8)', () => {
     assert.match(job(ci, 'web'), /name: dist\n\s+path: src\/web\/dist\/blinker-web\/browser\//);
     for (const id of ['deploy-preview', 'deploy-production']) {
       const text = job(ci, id);

@@ -16,7 +16,7 @@ Review → Compound, and 80% of the effort goes into planning and review (ADR-00
 | Step | Skill | What the AI does | Human gate |
 |---|---|---|---|
 | 1. Plan | `/plan` | Reads `docs/index.md`, the related ADRs and **the relevant `docs/knowledge/` learnings**. Asks at most 3–4 questions, then writes `docs/specs/NNN-slug/spec.md` (goal, scope, rules R1…Rn, acceptance criteria, test plan, out of scope) and `tasks.md` (small tasks, each with its tests). | **The author approves the spec and the tasks.** |
-| 2. Work | `/work` | Implements **one** task from `tasks.md` on the feature branch, with unit and e2e tests in the same commit. Runs the gates and leaves the changes uncommitted. | **The author reviews the diff in the IDE**; then one commit with `[gen]`. |
+| 2. Work | `/work` | Implements **one** task from `tasks.md` on the feature branch, with unit tests in the same commit (e2e waits for the next e2e pass, `testing.md`). Runs the fast gates and leaves the changes uncommitted. | **The author reviews the diff in the IDE**; then one commit with `[gen]`. |
 | 3. Review | `/review` | The `code-reviewer` agent works in a fresh context against the spec, conventions and ADRs. Blocking findings go back to step 2. | The author decides which findings to apply. |
 | 4. Compound | `/compound` | Writes the Polish learning summary in `.local/summaries/`. Captures new learnings as `type: Learning` concepts in `docs/knowledge/`. Proposes updates to `CLAUDE.md`, conventions or skills when a mistake could repeat. Updates `docs/log.md` and the indexes. | **The author approves the learnings.** Only then does the AI add `verified: [{by: "human:Grzegorz Roczniak", at: …}]`. |
 

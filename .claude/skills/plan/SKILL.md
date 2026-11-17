@@ -13,7 +13,7 @@ effort: high
    - frontmatter: `type: Spec`, `title`, `description`, `tags`, `status: draft`, `generated: {by: agent:<model>, at: <date>}`;
    - sections: Goal · Scope · Rules R1…Rn · UI and accessibility notes · Security and privacy notes · Acceptance criteria (testable checklist) · **Test plan** (unit cases per rule, e2e paths + axe) · Out of scope · **References** (the official docs and best-practice sources behind the rules: WCAG success criteria, APG patterns, angular.dev, MDN, OWASP, vendor docs). Verify the links. Don't write them from memory.
 4. Create `tasks.md` (`type: Task List`). Use 3–8 tasks. Start each task line with a **difficulty label**, `**T1 [sonnet]: …**`, chosen by the criteria in `docs/conventions/ai-workflow.md` (Model routing). `/work` picks the model from it. Make each task:
-   - one commit, with its own unit and e2e tests;
+   - one commit, with its own unit tests (the e2e paths stay in the Test plan for the next e2e pass);
    - followed by a line *"To understand:"* naming the concepts the author will learn.
 5. If an architectural decision comes up, use `/new-adr` (status Proposed) and let the author decide.
 6. Add the spec to `docs/specs/index.md`. Propose the branch name `feat/NNN-slug`.

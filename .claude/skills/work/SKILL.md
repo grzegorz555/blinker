@@ -1,6 +1,6 @@
 ---
 name: work
-description: Step 2 of the Compound Engineering loop in Blinker. Implements exactly one task from an approved tasks.md, with unit and e2e tests, runs the gates and commits locally. Use for "/work", "zrób następny task", "zaimplementuj zadanie N".
+description: Step 2 of the Compound Engineering loop in Blinker. Implements exactly one task from an approved tasks.md, with unit tests, runs the fast gates and commits locally. Use for "/work", "zrób następny task", "zaimplementuj zadanie N".
 model: sonnet
 effort: medium
 ---
@@ -22,8 +22,8 @@ effort: medium
 4a. Update `README.md` (status, features, how to run, test and verify) in the same commit if the task changes any of them.
 5. Write the tests in the same change (`docs/conventions/testing.md`):
    - Vitest unit tests for every rule the task touches;
-   - Playwright e2e tests with an axe scan for every user-visible path.
-6. Run the gates and report honestly what passed, what failed, and what was not run: `cd src/web && npm run verify -- --quick`, and for app changes also `npm run build && npm run e2e:only`. CI runs the full `npm run verify` on the PR.
+   - no e2e tests and no e2e run: they wait for the next e2e pass the author asks for (`testing.md`). Say which e2e paths of the spec are still missing.
+6. Run the gates and report honestly what passed, what failed, and what was not run: `cd src/web && npm run verify -- --quick`, plus the Vitest files the task touches. CI runs `npm run verify` (without e2e) on the PR.
 7. Tick the task in `tasks.md`. **Don't commit yet:** leave the changes uncommitted, so the author sees them in the IDE.
    Show a short diff summary and the proposed commit message (Conventional Commit, ` [gen]` suffix).
 8. **Commit only after the author's OK**, one commit per task. Push and open a PR only when the author asks. Then suggest `/review`.
