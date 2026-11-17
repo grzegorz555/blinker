@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-17 (CI: the runner and a picomatch exception)
+- CI runs on `ubuntu-24.04` instead of `ubuntu-latest`: the new Ubuntu 26.04 image lacks the system packages that `playwright install --with-deps` asks for. `picomatch` 4.0.7 (GHSA-fc5q-39xc-vjpf, ReDoS, no fixed version, dev only) is a dated exception in `src/web/osv-scanner.toml`, read by OSV-Scanner and by the new `scripts/audit.mjs` gate; the production audit keeps no exceptions. Do not depend on picomatch directly.
+
 ## 2026-11-16 (a stricter board import)
 - Tablice (Boards) takes only a `.json` file (the name is checked in code, not only by the picker), reads it with a strict UTF-8 decode so a binary file is refused, and scans every text for `<` and `>`, control characters and invisible or direction-changing characters. Three new errors: `not-json-file`, `not-text`, `unsafe-text`. Saved boards go through the same scan when read back.
 

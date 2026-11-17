@@ -1,0 +1,9 @@
+# Justified exceptions for the vulnerability gates (docs/conventions/security.md, "Known vulnerabilities").
+# Read by OSV-Scanner in CI (--config) and by scripts/audit.mjs for the `npm audit` gate of all dependencies.
+# Every entry needs a reason and an expiry date; after ignoreUntil both gates block again.
+# The production audit (`npm audit --omit=dev`) has no exceptions.
+
+[[IgnoredVulns]]
+id = "GHSA-fc5q-39xc-vjpf"
+ignoreUntil = 2026-12-31T00:00:00Z
+reason = "picomatch <= 4.0.7 ReDoS through crafted extglob patterns; no fixed version yet. Dev dependency only (Angular CLI, Vite, Vitest), never in the app bundle; it matches only the fixed globs of our own config, never a pattern from outside. We do not depend on picomatch directly. Remove when a fixed picomatch reaches the lockfile."
