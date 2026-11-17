@@ -35,10 +35,11 @@ State of the code: `main` at `e7f1d26` plus the stricter board import (PR #30).
   boards removed one by one, but the UI has no action that removes his signal profile, the settings and the rest
   together (`ProfileService.reset()` exists and no screen calls it). It matters when Blinker runs on a borrowed or
   a caregiver's phone. Proposal: "Usuń wszystkie dane z tego urządzenia" (Delete all data from this device) in
-  Ustawienia (Settings), after a confirmation. Needs a small spec.
+  Ustawienia (Settings), after a confirmation. Planned in spec [013](specs/013-delete-all-data/spec.md).
 - **F2 (low, privacy): the camera stays open while the app is in the background.** The stream stops when he leaves
   the page that uses it, not when the tab or the app is hidden. Proposal: stop on `visibilitychange` (hidden) and
-  start again on return. To decide with him in mind: starting again takes a moment before signals count.
+  start again on return. To decide with him in mind: starting again takes a moment before signals count. Planned
+  in spec [014](specs/014-camera-in-background/spec.md).
 
 # Not checked here
 
