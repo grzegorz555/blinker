@@ -27,8 +27,9 @@ interface SignalButton {
         @for (button of buttons; track button.type) {
           <li>
             <button type="button" class="signal-btn" (click)="send.emit(button.type)">
-              <span class="signal-name">{{ button.name | transloco }} </span
-              ><span>{{ button.short | transloco }}</span>
+              <span class="signal-name">{{ button.name | transloco }} </span><span>{{
+                button.short | transloco
+              }}</span>
             </button>
           </li>
         }
