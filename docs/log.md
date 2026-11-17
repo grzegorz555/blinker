@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-17 (specs for the security findings)
+- Two draft specs from the security pass, following its proposals: 013 (F1) one "Usuń wszystkie dane" (Delete all data) action in Ustawienia (Settings), after a confirmation, with every stored key under the `blinker.` prefix; 014 (F2) the camera is released when the page is hidden and starts again by itself on return. Both wait for the author's approval.
+
 ## 2026-11-17 (e2e by hand)
 - E2E (Playwright + axe) no longer runs after every change: `npm run verify` and the CI web job skip it (`--e2e` adds it), and `.github/workflows/e2e.yml` runs it only by hand. Tasks ship with unit tests; e2e tests are written in an e2e pass the author asks for from time to time. The `deployed` project still runs after each deploy.
 

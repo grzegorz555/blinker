@@ -22,8 +22,9 @@ generated:
 | 6 | Trial with the friend | tune the thresholds, capture learnings. Checklist ready: `docs/trial/first-session.md`. |
 
 # Ideas (not specified)
-- From the [security pass](security-review.md) (2026-11-16), to decide with the author: one action that deletes
-  all data from the device (F1); stopping the camera while the app is in the background (F2).
+- From the [security pass](security-review.md) (2026-11-16), planned and waiting for the author's approval: one
+  action that deletes all data from the device (F1, spec [013](specs/013-delete-all-data/spec.md)); stopping the
+  camera while the app is in the background (F2, spec [014](specs/014-camera-in-background/spec.md)).
 - Board editor; importing a board from a photo.
 - **Shortcuts for frequent words** (author, 2026-11-12: "do rozważenia" (to consider)): a word picked with one number instead of
   letter by letter. To design after the PoC, together with him.
