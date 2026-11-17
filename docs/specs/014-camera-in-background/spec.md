@@ -1,7 +1,7 @@
 ---
 type: Spec
-title: "014: The camera stops while Blinker is in the background and starts again on return"
-description: Finding F2 of the security pass. When the page is hidden (another app, another tab, a locked screen) the camera is released at once, so the camera indicator goes off; when the page is visible again the camera starts by itself, and the detector, Kalibracja (Calibration) and Diagnostyka (Diagnostics) begin cleanly.
+title: "014: The camera stops in the background, starts again on return, and can be turned off by hand"
+description: Finding F2 of the security pass. When the page is hidden (another app, another tab, a locked screen) the camera is released at once, so the camera indicator goes off; when the page is visible again the camera starts by itself, and the detector, Kalibracja (Calibration) and Diagnostyka (Diagnostics) begin cleanly. A caregiver can also turn the camera off and on with one button on each of the three screens.
 tags: [security, privacy, vision, camera]
 status: draft
 generated:
@@ -15,11 +15,17 @@ Today the camera stops only when he leaves the page that uses it. When a caregiv
 screen locks, the stream stays open ([security pass](../../security-review.md), F2). The camera should be on only
 while someone can see Blinker. On return it must come back without a tap, because he cannot tap.
 
+A caregiver (or the author, testing) also needs an easy way to turn the camera off right now: for a meal, a visit,
+or to rest his eyes. Today Liczenie (Counting) offers only the switch in Ustawienia (Settings), Kalibracja
+(Calibration) has no way at all, and in Diagnostyka (Diagnostics) the button scrolls out of view (the author,
+2026-11-17). Closing the tab works, but nobody should have to know that.
+
 # Scope
 
 - `FaceTrackerService` (one place, so it holds for Liczenie (Counting), Kalibracja (Calibration) and Diagnostyka
   (Diagnostics)): release the camera when the document is hidden, open it again when it is visible.
 - What each of the three pages does on return.
+- One button to turn the camera off and on, on each of the three screens (R10–R13).
 - No new setting and no new screen.
 
 # Rules
@@ -51,11 +57,33 @@ while someone can see Blinker. On return it must come back without a tap, becaus
   when hidden; a stream that arrives late for a run that was stopped is closed at once.
 - **R9. Privacy.** As in specs 010–012: frames stay in the worker, nothing is saved or sent. This spec only shortens
   the time the camera is open.
+- **R10. Liczenie (Counting): a camera button in the top bar.** While the setting "Sterowanie kamerą w Liczeniu"
+  (Camera control in Counting) is on, the top bar has a toggle button "Kamera" (Camera) next to the camera chip and
+  "Pauza" (Pause), built like "Pauza" (Pause): a constant label with an icon, its state in `aria-pressed` (pressed =
+  the camera is on). Turning it off releases the camera at once (every track stopped, the video cleared, as R1) and
+  the chip says "Kamera wyłączona" (Camera off); the signal buttons and the keyboard keep working. Turning it on opens
+  the camera again (R4 and R5 apply). The setting is not changed: the off holds until the button is pressed again or
+  Liczenie (Counting) is opened again, where the setting turns the camera on as today.
+- **R11. Kalibracja (Calibration): "Wyłącz kamerę" (Turn off the camera).** From the camera step on, every step has
+  this button. Off releases the camera; a step being recorded stops and its recording is dropped; steps already
+  finished keep their recordings. The step then shows "Włącz kamerę" (Turn on the camera), which opens the camera
+  again and records the step from its start, as R6.
+- **R12. Diagnostyka (Diagnostics): the button stays in view.** "Włącz kamerę" (Turn on the camera) and "Wyłącz
+  kamerę" (Turn off the camera) sit in a bar that stays visible while the page scrolls, so the camera can always be
+  turned off without scrolling back up. The bar must not cover content or a focused control: the page keeps room for
+  it at the end (SC 2.4.11; [learning](../../knowledge/sticky-bar-covers-controls.md)).
+- **R13. Only a person at the screen.** The buttons of R10–R12 are touch and keyboard controls. No face signal, no
+  board cell and no key of the signal mapping reaches them: if his signals could turn the camera off, he could not
+  turn it on again. A camera turned off by hand stays off when the page comes back from the background (R2).
 
 # UI and accessibility notes
 
-- No new control. The chip in the top bar of Liczenie (Counting) already announces its changes politely (SC 4.1.3);
-  the return goes through the same states as opening the page.
+- The chip in the top bar of Liczenie (Counting) already announces its changes politely (SC 4.1.3); the return and
+  the button of R10 go through the same states as opening the page, plus "Kamera wyłączona" (Camera off).
+- The toggle of R10 follows the APG button pattern: one constant name, the state in `aria-pressed`, never a label
+  that flips. The buttons of R11 and R12 are ordinary buttons whose text says the action. Each has a visible text
+  label and is at least 44 px high; the top bar is checked at 360 px, portrait and landscape, with the chip, "Kamera"
+  (Camera) and "Pauza" (Pause) together.
 - He listens rather than reads: nothing is said aloud by the return (R4), so coming back from another app is quiet.
 - In Kalibracja (Calibration) the repeated instruction (R6) tells him the step began again.
 
@@ -77,22 +105,30 @@ while someone can see Blinker. On return it must come back without a tap, becaus
 - [ ] Unit: the camera input starts the detector from its initial state on return, and the face status is unknown
       until a frame comes (R4); Kalibracja (Calibration) restarts the step under way and keeps finished steps (R6);
       Diagnostyka (Diagnostics) restarts its measurement (R7).
-- [ ] e2e (Chromium projects, fake camera): on Liczenie (Counting) with the camera on, the page is made hidden →
-      the tracks of the stream are ended and the video has no source; made visible → the chip goes through
-      "starting" to a face status without a tap, and the signal buttons worked all the time; no third-party request,
-      no CSP violation, axe.
+- [ ] Unit: the "Kamera" (Camera) toggle of Liczenie (Counting) releases the camera, says "Kamera wyłączona" (Camera
+      off), keeps the signal buttons working, leaves the setting unchanged and opens the camera again (R10); a camera
+      turned off by hand stays off after hidden → visible (R13); Kalibracja (Calibration) drops the step under way and
+      keeps finished ones (R11); no face signal or signal key changes the camera (R13).
 - [ ] By hand on a phone (before the first session, noted in `docs/trial/first-session.md`): switching to another
-      app turns the camera indicator off; coming back turns the camera on within a moment.
-- [ ] `npm run verify -- --lighthouse` passes.
+      app turns the camera indicator off; coming back turns the camera on within a moment; "Kamera" (Camera) in
+      Liczenie (Counting) turns the indicator off and on.
+- [ ] `npm run verify` passes. E2E waits for the next e2e pass (`docs/conventions/testing.md`): the paths are in the
+      Test plan.
 
 # Test plan
 
 - **Unit (Vitest):** `face-tracker.service.spec.ts` for R1–R3, R5, R8 with a document fake like the one of
   `wake-lock.ts` (a `visibilityState` and the listener); `camera-input.service.spec.ts` for R4; the calibration and
-  diagnostics page specs for R6 and R7.
-- **e2e (Playwright + axe):** `counting.e2e.ts` or a new `camera-background.e2e.ts` on the fake-camera projects. A
-  test cannot really hide the page, so it overrides `document.visibilityState` and dispatches `visibilitychange`
-  (a helper in `e2e/support`); the stream is read from the video element before hiding.
+  diagnostics page specs for R6 and R7; the counting, calibration and diagnostics page specs for R10–R13.
+- **e2e for the next e2e pass (Playwright + axe, fake-camera projects):**
+  - Liczenie (Counting) with the camera on, the page made hidden → the tracks of the stream are ended and the video
+    has no source; made visible → the chip goes through "starting" to a face status without a tap, and the signal
+    buttons worked all the time; no third-party request, no CSP violation, axe. A test cannot really hide the page,
+    so it overrides `document.visibilityState` and dispatches `visibilitychange` (a helper in `e2e/support`).
+  - "Kamera" (Camera) in Liczenie (Counting): off → tracks ended, `aria-pressed="false"`, "Kamera wyłączona" (Camera
+    off); on → a face status; the top bar at 360 px portrait and landscape; axe.
+  - Diagnostyka (Diagnostics) scrolled to the end: "Wyłącz kamerę" (Turn off the camera) is in view and covers no
+    focused control; Kalibracja (Calibration): off and on during a step.
 
 # Out of scope
 
@@ -111,4 +147,6 @@ while someone can see Blinker. On return it must come back without a tap, becaus
 - MDN `getUserMedia()`, Privacy and security (browsers must show an indicator while a camera is in use) https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 - W3C Media Capture and Streams, life-cycle of a track and documents not in view https://www.w3.org/TR/mediacapture-streams/
 - WCAG 2.2, SC 4.1.3 Status Messages https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html
+- WCAG 2.2, SC 2.4.11 Focus Not Obscured (Minimum) https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html
+- APG, Button pattern (toggle buttons: a constant label, the state in `aria-pressed`) https://www.w3.org/WAI/ARIA/apg/patterns/button/
 - [Security pass](../../security-review.md), F2; ADR-0006; specs [010](../010-face-spike/spec.md), [011](../011-signals/spec.md), [012](../012-camera-counting/spec.md).

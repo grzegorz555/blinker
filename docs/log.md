@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-17 (spec 014: the camera off by hand)
+- Spec 014 also gives a caregiver one button to turn the camera off and on: a "Kamera" (Camera) toggle in the top bar of Liczenie (Counting), "Wyłącz kamerę" (Turn off the camera) in Kalibracja (Calibration), and the Diagnostyka (Diagnostics) button in a bar that stays in view (R10–R13); his signals cannot reach them. E2E paths moved to the next e2e pass. Still a draft, to approve.
+
 ## 2026-11-17 (specs for the security findings)
 - Two draft specs from the security pass, following its proposals: 013 (F1) one "Usuń wszystkie dane" (Delete all data) action in Ustawienia (Settings), after a confirmation, with every stored key under the `blinker.` prefix; 014 (F2) the camera is released when the page is hidden and starts again by itself on return. Both wait for the author's approval.
 
