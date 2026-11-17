@@ -179,8 +179,7 @@
           @for (error of errors(); track $index) {
             <li>
               @if (error.path) {
-                <code>{{ error.path }}</code
-                >:
+                <code>{{ error.path }}</code>:
               }
               {{ 'boards.errors.' + error.code | transloco: { limit: error.limit ?? '' } }}
             </li>
