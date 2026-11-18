@@ -111,25 +111,17 @@
     </div>
   }
 
-  @if (status() === 'running' && handLooks().length) {
-    <div class="closures" data-testid="hand-looks">
-      <p class="muted">{{ 'calibration.looks' | transloco }}</p>
+  @if (status() === 'running' && handMoves().length) {
+    <div class="closures" data-testid="hand-moves">
+      <p class="muted">{{ 'calibration.moves' | transloco }}</p>
       <ul>
-        @for (l of handLooks(); track $index) {
+        @for (m of handMoves(); track $index) {
           <li>
             {{
-              'diagnostics.look.values'
-                | transloco
-                  : {
-                      ms: round(l.ms),
-                      down: round(l.down, 2),
-                      left: round(l.left, 2),
-                      right: round(l.right, 2),
-                      yaw: round(l.yaw),
-                      pitch: round(l.pitch),
-                    }
+              'diagnostics.move.values'
+                | transloco: { ms: round(m.ms), yaw: round(m.yaw), pitch: round(m.pitch) }
             }}
-            <strong>{{ 'diagnostics.look.verdict.' + l.verdict | transloco }}</strong>
+            <strong>{{ 'diagnostics.move.verdict.' + m.verdict | transloco }}</strong>
           </li>
         }
       </ul>
@@ -174,13 +166,12 @@
   ) {
     <p class="muted" data-testid="hand-profile">
       {{
-        'diagnostics.look.profile'
+        'diagnostics.move.profile'
           | transloco
             : {
-                down: fit().profile.hand.threshold,
-                holdMs: fit().profile.hand.holdMs,
-                left: fit().profile.hand.left ?? '–',
-                right: fit().profile.hand.right ?? '–',
+                amplitude: fit().profile.hand.amplitude,
+                direction: fit().profile.hand.direction,
+                windowMs: fit().profile.hand.windowMs,
               }
       }}
     </p>

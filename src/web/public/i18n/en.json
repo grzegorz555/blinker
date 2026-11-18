@@ -335,7 +335,7 @@
         "blink": "counted as a blink",
         "weak": "too weak and too short",
         "tooLong": "too long (resting)",
-        "lookingDown": "he was looking down (a look at his hand)"
+        "atHand": "his head was turned to his hand (a look at his hand)"
       },
       "profileLongOnly": "A blink counts when the closure reaches {{threshold}} and lasts {{minMs}} to {{maxMs}} ms. The strong blink is off: the camera does not tell it from an ordinary one."
     },
@@ -344,16 +344,18 @@
       "cheekSquint": "raise of the cheeks",
       "browDown": "pull of the brows"
     },
-    "look": {
-      "title": "The last look down",
-      "values": "{{ms}} ms; down {{down}}, left {{left}}, right {{right}}; head: turn {{yaw}}°, tilt {{pitch}}°:",
+    "move": {
+      "title": "The last movement of the head",
+      "values": "{{ms}} ms; head from his neutral: turn {{yaw}}°, tilt {{pitch}}°:",
       "verdict": {
         "hand": "counted as a look at his hand",
-        "short": "too short",
-        "wrongSide": "not towards his hand",
-        "nodding": "during a nod"
+        "small": "towards his hand, too small",
+        "slow": "too slow (held past the window)",
+        "shake": "a shake (the other side followed)",
+        "otherSide": "not towards his hand",
+        "tooSoon": "a look at his hand, too soon after the last signal (not counted)"
       },
-      "profile": "A look at his hand counts when down reaches {{down}} for {{holdMs}} ms, towards his hand: left from {{left}}, right from {{right}} (“–” = that side not required, both “–” = any side)."
+      "profile": "A look at his hand counts when the head turns {{amplitude}}° to his left (turn sign {{direction}}) and back within {{windowMs}} ms."
     }
   },
   "calibration": {
@@ -431,6 +433,6 @@
       "noOrdinary": "There was no ordinary blink in the step “At rest, facing the screen”, so the strong-blink threshold is a guess and an ordinary blink may count. Calibrate again and let him blink as usual in that step.",
       "overlap": "His strong and ordinary blinks look alike to the camera, so only long blinks count. Repeat the blink step with the lids squeezed harder."
     },
-    "looks": "His last looks down (newest first), judged by the thresholds of this calibration:"
+    "moves": "His last movements of the head (newest first), judged by the thresholds of this calibration:"
   }
 }

@@ -19,14 +19,15 @@ export interface SignalProfile {
     readonly squeeze: number;
   };
   /**
-   * Look at his hand: eyes down at or above the threshold for holdMs, with the head still. With `left` or `right` set,
-   * the eyes must also go that way (to his left: `sidesOf().left`) at least that far; with both null, any way.
+   * Look at his hand (spec 015, R1): a quick turn of the head to his left past the amplitude and back within windowMs.
+   * `direction` is the sign of the yaw towards his left hand; `pitch` is the learnt signed tilt of his glance, shown but
+   * not used to decide.
    */
   readonly hand: {
-    readonly threshold: number;
-    readonly holdMs: number;
-    readonly left: number | null;
-    readonly right: number | null;
+    readonly amplitude: number;
+    readonly direction: -1 | 1;
+    readonly pitch: number;
+    readonly windowMs: number;
   };
   /** Nod: pitch away by the amplitude and back within windowMs; direction 1 or -1 (0 = either). */
   readonly nod: {
@@ -51,7 +52,8 @@ export const DEFAULT_PROFILE: SignalProfile = {
   version: 1,
   neutral: { yaw: 0, pitch: 0 },
   blink: { threshold: 0.5, minMs: 600, maxMs: 2500, cue: 'eyeSquint', squeeze: 0.6 },
-  hand: { threshold: 0.5, holdMs: 400, left: null, right: null },
+  // His left is the other way from his right (spec 015, R7).
+  hand: { amplitude: 25, direction: -1, pitch: 0, windowMs: 1500 },
   nod: { amplitude: 12, direction: 0, windowMs: 1200 },
   shake: { amplitude: 10, windowMs: 1500 },
   right: { amplitude: 20, direction: 1, holdMs: 300 },
@@ -76,8 +78,9 @@ export const PROFILE_KEY = 'blinker.profile.v1';
 type Range = readonly [number, number];
 const inRange = (v: unknown, [min, max]: Range): v is number =>
   typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max;
-const optionalSide = (v: unknown) =>
-  v === undefined || v === null || inRange(v, PROFILE_LIMITS.threshold);
+/** A field added after the first profiles were stored: missing means its default. */
+const optional = (v: unknown, ok: (v: unknown) => boolean) => v === undefined || ok(v);
+const isSide = (v: unknown): v is -1 | 1 => v === -1 || v === 1;
 const obj = (v: unknown): Record<string, unknown> | null => (isPlainObject(v) ? v : null);
 
 /** A stored profile, checked field by field; anything wrong gives null (the caller falls back and says so). */
@@ -102,10 +105,11 @@ export function validateProfile(data: unknown): SignalProfile | null {
     // Added after the first profiles were stored: missing means the default.
     (b['squeeze'] === undefined || inRange(b['squeeze'], L.squeeze)) &&
     (b['cue'] === undefined || (STRONG_CUES as readonly unknown[]).includes(b['cue'])) &&
-    optionalSide(h['left']) &&
-    optionalSide(h['right']) &&
-    inRange(h['threshold'], L.threshold) &&
-    inRange(h['holdMs'], L.holdMs) &&
+    // The hand of spec 015 (R7); the eye fields of spec 011 (threshold, holdMs, left, right) are ignored.
+    optional(h['amplitude'], (v) => inRange(v, L.amplitude)) &&
+    optional(h['direction'], isSide) &&
+    optional(h['pitch'], (v) => inRange(v, L.angle)) &&
+    optional(h['windowMs'], (v) => inRange(v, L.windowMs)) &&
     inRange(nod['amplitude'], L.amplitude) &&
     [-1, 0, 1].includes(nod['direction'] as number) &&
     inRange(nod['windowMs'], L.windowMs) &&
@@ -127,10 +131,11 @@ export function validateProfile(data: unknown): SignalProfile | null {
       squeeze: (b['squeeze'] as number | undefined) ?? DEFAULT_PROFILE.blink.squeeze,
     },
     hand: {
-      threshold: h['threshold'] as number,
-      holdMs: h['holdMs'] as number,
-      left: (h['left'] as number | null | undefined) ?? null,
-      right: (h['right'] as number | null | undefined) ?? null,
+      amplitude: (h['amplitude'] as number | undefined) ?? DEFAULT_PROFILE.hand.amplitude,
+      // His left is the other way from his right, so a profile stored before spec 015 works at once.
+      direction: (h['direction'] as -1 | 1 | undefined) ?? (r['direction'] === 1 ? -1 : 1),
+      pitch: (h['pitch'] as number | undefined) ?? DEFAULT_PROFILE.hand.pitch,
+      windowMs: (h['windowMs'] as number | undefined) ?? DEFAULT_PROFILE.hand.windowMs,
     },
     nod: {
       amplitude: nod['amplitude'] as number,

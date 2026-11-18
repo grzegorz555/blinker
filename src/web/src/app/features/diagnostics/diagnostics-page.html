@@ -173,35 +173,26 @@
     }}
   </p>
 
-  <h3 class="sub-title">{{ 'diagnostics.look.title' | transloco }}</h3>
-  <p data-testid="last-look">
-    @if (lastLook(); as l) {
+  <h3 class="sub-title">{{ 'diagnostics.move.title' | transloco }}</h3>
+  <p data-testid="last-move">
+    @if (lastMove(); as m) {
       {{
-        'diagnostics.look.values'
-          | transloco
-            : {
-                ms: round(l.ms),
-                down: round(l.down, 2),
-                left: round(l.left, 2),
-                right: round(l.right, 2),
-                yaw: round(l.yaw),
-                pitch: round(l.pitch),
-              }
+        'diagnostics.move.values'
+          | transloco: { ms: round(m.ms), yaw: round(m.yaw), pitch: round(m.pitch) }
       }}
-      <strong>{{ 'diagnostics.look.verdict.' + l.verdict | transloco }}</strong>
+      <strong>{{ 'diagnostics.move.verdict.' + m.verdict | transloco }}</strong>
     } @else {
       <span class="muted">{{ 'diagnostics.closure.none' | transloco }}</span>
     }
   </p>
   <p class="muted" data-testid="hand-profile">
     {{
-      'diagnostics.look.profile'
+      'diagnostics.move.profile'
         | transloco
           : {
-              down: handProfile().threshold,
-              holdMs: handProfile().holdMs,
-              left: handProfile().left ?? '–',
-              right: handProfile().right ?? '–',
+              amplitude: handProfile().amplitude,
+              direction: handProfile().direction,
+              windowMs: handProfile().windowMs,
             }
     }}
   </p>

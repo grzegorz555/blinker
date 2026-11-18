@@ -5,16 +5,7 @@
 // (a sneeze, a lost face) doesn't move a threshold. Everything is clamped to the safe ranges of the profile, and a step
 // whose movement was too small to tell from rest keeps the previous value (it is not "learnt").
 import type { FaceFrame } from '../vision/face-frame';
-import {
-  closureOf,
-  cuesOf,
-  downOf,
-  maxCues,
-  sidesOf,
-  STRONG_CUES,
-  type CueValues,
-  type StrongCue,
-} from './cues';
+import { closureOf, cuesOf, maxCues, STRONG_CUES, type CueValues, type StrongCue } from './cues';
 import { detectAll, type FaceSignal } from './detector';
 import { PROFILE_LIMITS, type SignalProfile } from './profile';
 
@@ -126,7 +117,6 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
   // Rest: his head pose, and his eyes open and looking at the screen.
   const rest = withFace(recordings.neutral);
   let restClosure = 0.1;
-  let restDown = 0.1;
   if (rest.length) {
     const yaw = percentile(
       rest.map((f) => f.head?.yaw ?? 0),
@@ -141,7 +131,6 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
       neutral: { yaw: round(clamp(yaw, L.angle), 1), pitch: round(clamp(pitch, L.angle), 1) },
     };
     restClosure = percentile(rest.map(closureOf), 50);
-    restDown = percentile(rest.map(downOf), 50);
     learnt.push('neutral');
   }
 
@@ -192,54 +181,8 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
     learnt.push('blink');
   }
 
-  for (const step of ['handLeft', 'handRight'] as const) {
-    const frames = withFace(recordings[step]);
-    // Per look, not per frame: two short looks in a long step are only a few frames, which a percentile of all
-    // frames would miss. The frames clearly lower than his rest, and their median.
-    const lower = frames.map(downOf).filter((d) => d - restDown >= MIN_CONTRAST.eyes);
-    const top = lower.length >= 3 ? percentile(lower, 50) : Number.NaN;
-    if (top - restDown >= MIN_CONTRAST.eyes) {
-      const threshold = clamp(restDown + (top - restDown) / 2, L.threshold);
-      // Both hands share one threshold: the lower one, so the weaker side still counts.
-      const merged = learnt.includes('handLeft')
-        ? Math.min(threshold, p.hand.threshold)
-        : threshold;
-      p = { ...p, hand: { ...p.hand, threshold: round(merged) } };
-      learnt.push(step);
-    }
-  }
-
-  // The side of each hand: with both learnt, a look must go to one of them; a hand looked at straight down (no side
-  // to tell) means any side counts.
-  const hands = (['handLeft', 'handRight'] as const).filter((step) => learnt.includes(step));
-  if (hands.length) {
-    const side = (step: 'handLeft' | 'handRight') => {
-      const key = step === 'handLeft' ? 'left' : 'right';
-      const restSide = rest.length
-        ? percentile(
-            rest.map((f) => sidesOf(f)[key]),
-            50,
-          )
-        : 0;
-      const looking = withFace(recordings[step]).filter((f) => downOf(f) >= p.hand.threshold);
-      const peak = percentile(
-        looking.map((f) => sidesOf(f)[key]),
-        50,
-      );
-      return peak - restSide >= MIN_CONTRAST.eyes / 2
-        ? round(clamp(restSide + (peak - restSide) / 2, L.threshold))
-        : null;
-    };
-    const left = learnt.includes('handLeft') ? side('handLeft') : null;
-    const right = learnt.includes('handRight') ? side('handRight') : null;
-    const anySide =
-      (learnt.includes('handLeft') && left === null) ||
-      (learnt.includes('handRight') && right === null);
-    p = {
-      ...p,
-      hand: { ...p.hand, left: anySide ? null : left, right: anySide ? null : right },
-    };
-  }
+  // The hand steps learn nothing for now: the eye rule is gone (spec 015, R6), and the head angle of his hand is
+  // learnt by the one hand step of spec 015, R8 (still to come). countDetected finds his glances with the profile.
 
   const nod = withFace(recordings.nod).map((f) => (f.head?.pitch ?? 0) - p.neutral.pitch);
   const nodPeak = peak(nod);

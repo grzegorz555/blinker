@@ -22,7 +22,7 @@ import {
   type CalibrationStep,
   type Recordings,
 } from '../../core/signals/fit';
-import { closureReports, lookReports } from '../../core/signals/detector';
+import { closureReports, headReports } from '../../core/signals/detector';
 import { ProfileService } from '../../core/signals/profile.service';
 import type { FaceFrame } from '../../core/vision/face-frame';
 import { FACE_WORKER, FaceTrackerService } from '../../core/vision/face-tracker.service';
@@ -88,12 +88,12 @@ export class CalibrationPage {
       .slice(-3)
       .reverse();
   });
-  /** His last 2 looks down in a hand step, newest first, judged by the profile fitted so far. */
-  protected readonly handLooks = computed(() => {
+  /** His last 2 movements of the head in a hand step, newest first, judged by the profile fitted so far. */
+  protected readonly handMoves = computed(() => {
     this.revision();
     const page = this.page();
     if (page !== 'handLeft' && page !== 'handRight') return [];
-    return lookReports(this.recordings()[page] ?? [], this.fit().profile)
+    return headReports(this.recordings()[page] ?? [], this.fit().profile)
       .slice(-2)
       .reverse();
   });

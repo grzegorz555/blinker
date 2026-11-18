@@ -164,38 +164,29 @@ describe('fitProfile (spec 011, R5)', () => {
     });
   });
 
-  it('finds two short looks at his hand in a long step (per look, not per frame)', () => {
-    const looks = record(12000, {
+  it('the hand steps learn nothing from the eyes; his glances are found by the head (spec 015, R6)', () => {
+    // Two glances at his left hand: the head turns 50° to his left (yaw +, from his neutral 8°) and back.
+    const glances = record(4000, {
       ...rest,
-      eyes: (t) => {
-        const on = (t >= 2000 && t < 2600) || (t >= 8000 && t < 8600);
-        return { ...restEyes, eyeLookDownLeft: on ? 0.7 : 0.15, eyeLookDownRight: on ? 0.7 : 0.15 };
-      },
+      eyes: (t) => ({ ...restEyes, eyeLookDownLeft: t >= 300 && t < 900 ? 0.7 : 0.15 }),
+      yaw: pulses(
+        [
+          [300, 900, 58],
+          [2000, 2600, 58],
+        ],
+        8,
+      ),
     });
-    const { profile, learnt } = fitProfile({ neutral, handLeft: looks }, P);
-    expect(learnt).toContain('handLeft');
-    expect(profile.hand.threshold).toBeCloseTo(0.425, 1);
-    expect(countDetected('handLeft', looks, profile)).toBe(2);
-  });
-
-  it('learns the side of his left hand: down and to his left', () => {
-    const leftLook = record(3000, {
-      ...rest,
-      eyes: (t) => {
-        const on = t >= 500 && t < 1500;
-        return {
-          ...restEyes,
-          eyeLookDownLeft: on ? 0.8 : 0.15,
-          eyeLookDownRight: on ? 0.8 : 0.15,
-          eyeLookOutLeft: on ? 0.6 : 0,
-          eyeLookInRight: on ? 0.6 : 0,
-        };
-      },
-    });
-    const { profile } = fitProfile({ neutral, handLeft: leftLook }, P);
-    expect(profile.hand.left).toBeCloseTo(0.3, 2);
-    expect(profile.hand.right).toBeNull();
-    expect(countDetected('handLeft', leftLook, profile)).toBe(1);
+    // His sides: his left is yaw +1, his right -1.
+    const left = {
+      ...P,
+      hand: { ...P.hand, direction: 1 as const },
+      right: { ...P.right, direction: -1 as const },
+    };
+    const { profile, learnt } = fitProfile({ neutral, handLeft: glances }, left);
+    expect(learnt).toEqual(['neutral']);
+    expect(profile.hand).toEqual(left.hand);
+    expect(countDetected('handLeft', glances, profile)).toBe(2);
   });
 
   it('a step without a real movement keeps the previous value (not learnt)', () => {
@@ -240,7 +231,7 @@ describe('fitProfile (spec 011, R5)', () => {
     expect(countDetected('right', right, profile)).toBe(2);
   });
 
-  it('learns the shake size and the hand threshold (the lower of both hands)', () => {
+  it('learns the shake size', () => {
     const shake = record(3000, {
       pitch: () => -5,
       yaw: pulses(
@@ -253,27 +244,9 @@ describe('fitProfile (spec 011, R5)', () => {
         8,
       ),
     });
-    const hand = (peak: number) =>
-      record(2500, {
-        ...rest,
-        eyes: (t) => ({
-          ...restEyes,
-          eyeLookDownLeft: pulses(
-            [
-              [300, 1100, peak],
-              [1500, 2300, peak],
-            ],
-            0.15,
-          )(t),
-        }),
-      });
-    const { profile, learnt } = fitProfile(
-      { neutral, shake, handLeft: hand(0.85), handRight: hand(0.55) },
-      P,
-    );
+    const { profile, learnt } = fitProfile({ neutral, shake }, P);
     expect(profile.shake.amplitude).toBe(7);
-    expect(profile.hand.threshold).toBeCloseTo(0.35, 2);
-    expect(learnt).toEqual(['neutral', 'handLeft', 'handRight', 'shake']);
+    expect(learnt).toEqual(['neutral', 'shake']);
   });
 
   it('clamps to the safe ranges', () => {

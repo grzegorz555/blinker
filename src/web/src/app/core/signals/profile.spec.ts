@@ -11,14 +11,9 @@ describe('validateProfile (spec 011, R2)', () => {
     expect(validateProfile({ ...DEFAULT_PROFILE, extra: 1 })).toEqual(DEFAULT_PROFILE);
   });
 
-  it('a profile stored before the cue and the hand sides existed gets their defaults', () => {
-    const { threshold, holdMs } = DEFAULT_PROFILE.hand;
+  it('a profile stored before the cue existed gets its default', () => {
     const { minMs, maxMs, squeeze } = DEFAULT_PROFILE.blink;
-    const old = {
-      ...DEFAULT_PROFILE,
-      blink: { threshold: 0.4, minMs, maxMs, squeeze },
-      hand: { threshold, holdMs },
-    };
+    const old = { ...DEFAULT_PROFILE, blink: { threshold: 0.4, minMs, maxMs, squeeze } };
     expect(validateProfile(old)).toEqual({
       ...DEFAULT_PROFILE,
       blink: { ...DEFAULT_PROFILE.blink, threshold: 0.4 },
@@ -32,6 +27,60 @@ describe('validateProfile (spec 011, R2)', () => {
     const { minMs, maxMs } = DEFAULT_PROFILE.blink;
     const old = { ...DEFAULT_PROFILE, blink: { threshold: 0.4, minMs, maxMs } };
     expect(validateProfile(old)?.blink).toEqual({ ...DEFAULT_PROFILE.blink, threshold: 0.4 });
+  });
+
+  describe('his hand by the head (spec 015, R7)', () => {
+    /** His profile as stored on 2026-11-17, with the eye hand of spec 011. */
+    const his = {
+      version: 1,
+      neutral: { yaw: 4.9, pitch: 5.7 },
+      blink: { threshold: 0.45, minMs: 600, maxMs: 2500, cue: 'eyeSquint', squeeze: 0.6 },
+      hand: { threshold: 0.5, holdMs: 400, left: null, right: null },
+      nod: { amplitude: 7.7, direction: 1, windowMs: 1200 },
+      shake: { amplitude: 16, windowMs: 1500 },
+      right: { amplitude: 34, direction: -1, holdMs: 300 },
+      refractoryMs: 400,
+    };
+
+    it('reads his old stored profile: the eye fields go, the hand takes its defaults and his left', () => {
+      const p = validateProfile(his);
+      expect(p?.hand).toEqual({ amplitude: 25, direction: 1, pitch: 0, windowMs: 1500 });
+      expect(p?.right).toEqual(his.right);
+      expect(p?.nod).toEqual(his.nod);
+      expect(p?.neutral).toEqual(his.neutral);
+    });
+
+    it('his left is the other way from his right', () => {
+      const right1 = { ...his, right: { ...his.right, direction: 1 } };
+      expect(validateProfile(right1)?.hand.direction).toBe(-1);
+      expect(DEFAULT_PROFILE.hand.direction).toBe(-DEFAULT_PROFILE.right.direction);
+    });
+
+    it('keeps a stored hand of spec 015 as it is', () => {
+      const hand = { amplitude: 30, direction: 1, pitch: -8.5, windowMs: 1200 };
+      expect(validateProfile({ ...his, hand })?.hand).toEqual(hand);
+      expect(validateProfile({ ...his, hand: {} })?.hand).toEqual({
+        amplitude: 25,
+        direction: 1,
+        pitch: 0,
+        windowMs: 1500,
+      });
+    });
+
+    it.each([
+      ['an amplitude of 3°', { amplitude: 3 }],
+      ['an amplitude of 46°', { amplitude: 46 }],
+      ['a direction of 0', { direction: 0 }],
+      ['a pitch of 61°', { pitch: 61 }],
+      ['a window of 300 ms', { windowMs: 300 }],
+      ['a text amplitude', { amplitude: '25' }],
+    ])('refuses a hand with %s', (_label, hand) => {
+      expect(validateProfile({ ...his, hand })).toBeNull();
+    });
+
+    it('refuses a profile without a hand', () => {
+      expect(validateProfile({ ...his, hand: undefined })).toBeNull();
+    });
   });
 
   it.each([
@@ -89,7 +138,7 @@ describe('ProfileService', () => {
     expect(data.has(PROFILE_KEY)).toBe(false);
     const custom = {
       ...DEFAULT_PROFILE,
-      hand: { ...DEFAULT_PROFILE.hand, threshold: 0.4, holdMs: 500 },
+      hand: { ...DEFAULT_PROFILE.hand, amplitude: 30, direction: 1 as const },
     };
     expect(service.save(custom)).toBe(true);
     expect(JSON.parse(data.get(PROFILE_KEY)!)).toEqual(custom);

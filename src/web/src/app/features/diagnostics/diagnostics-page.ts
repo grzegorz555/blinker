@@ -15,7 +15,7 @@ import {
   detect,
   INITIAL_DETECTOR,
   type ClosureReport,
-  type LookReport,
+  type HeadReport,
   type FaceSignal,
 } from '../../core/signals/detector';
 import { ProfileService } from '../../core/signals/profile.service';
@@ -71,9 +71,9 @@ export class DiagnosticsPage {
   protected readonly lastClosure = signal<ClosureReport | null>(null);
   /** The last 10 closures, newest first, for "Kopiuj wyniki" (Copy the results). */
   private closures: ClosureReport[] = [];
-  /** The last look down and why it was or was not a look at his hand; the last 10 for the copy. */
-  protected readonly lastLook = signal<LookReport | null>(null);
-  private looks: LookReport[] = [];
+  /** The last movement of the head and why it was or was not a look at his hand; the last 10 for the copy. */
+  protected readonly lastMove = signal<HeadReport | null>(null);
+  private moves: HeadReport[] = [];
   protected readonly handProfile = computed(() => this.profiles.profile().hand);
   protected readonly blinkProfile = computed(() => this.profiles.profile().blink);
 
@@ -101,9 +101,9 @@ export class DiagnosticsPage {
         this.lastClosure.set(found.closure);
         this.closures = [found.closure, ...this.closures].slice(0, 10);
       }
-      if (found.look) {
-        this.lastLook.set(found.look);
-        this.looks = [found.look, ...this.looks].slice(0, 10);
+      if (found.head) {
+        this.lastMove.set(found.head);
+        this.moves = [found.head, ...this.moves].slice(0, 10);
       }
       if (found.signals.length) {
         const at = new Date().toLocaleTimeString(this.transloco.getActiveLang());
@@ -136,8 +136,8 @@ export class DiagnosticsPage {
     this.detected.set([]);
     this.lastClosure.set(null);
     this.closures = [];
-    this.lastLook.set(null);
-    this.looks = [];
+    this.lastMove.set(null);
+    this.moves = [];
     this.counts.set({ frames: 0, faces: 0, since: performance.now() });
     this.battery.update((b) => (b ? { start: b.now, now: b.now } : b));
   }
@@ -176,10 +176,10 @@ export class DiagnosticsPage {
         (c) =>
           `  ${Math.round(c.ms)}, ${c.closure.toFixed(2)}, ${c.cues.eyeSquint.toFixed(2)}, ${c.cues.cheekSquint.toFixed(2)}, ${c.cues.browDown.toFixed(2)}, ${c.down.toFixed(2)}, ${c.verdict}`,
       ),
-      'Last looks down (newest first): ms, down, left, right, |yaw|, |pitch|, verdict',
-      ...this.looks.map(
-        (l) =>
-          `  ${Math.round(l.ms)}, ${l.down.toFixed(2)}, ${l.left.toFixed(2)}, ${l.right.toFixed(2)}, ${Math.round(l.yaw)}, ${Math.round(l.pitch)}, ${l.verdict}`,
+      'Last movements of the head (newest first): ms, yaw, pitch (signed, from neutral), signal, verdict',
+      ...this.moves.map(
+        (m) =>
+          `  ${Math.round(m.ms)}, ${m.yaw.toFixed(1)}, ${m.pitch.toFixed(1)}, ${m.signal ?? '-'}, ${m.verdict}`,
       ),
       `Signals (newest first): ${
         this.detected()

@@ -79,14 +79,10 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     const { fixture, tracker, text, root } = await render();
     expect(text('signals')).toBe('None yet.');
     expect(text('profile-kind')).toContain('By the default settings');
-    // A long blink, then a look at his hand.
+    // A long blink, then a look at his hand (the head turned to his left by the default sign, and back).
     const frames = [
       ...record(1500, { eyes: closed(200, 1000) }),
-      ...record(
-        1200,
-        { eyes: (t) => ({ eyeLookDownLeft: t > 200 && t < 1000 ? 0.8 : 0.05 }) },
-        1600,
-      ),
+      ...record(1200, { yaw: (t) => (t > 200 && t < 700 ? -50 : 0) }, 1600),
     ];
     for (const frame of frames) {
       tracker.frame.set(frame);
@@ -127,17 +123,27 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     );
   });
 
-  it('says why the last look down was or was not a look at his hand, with the hand thresholds', async () => {
-    const { fixture, tracker, text } = await render();
-    expect(text('last-look')).toBe('None yet.');
-    expect(text('hand-profile')).toContain('both “–” = any side');
-    const eyes = (t: number) => ({ eyeLookDownLeft: t >= 200 && t < 900 ? 0.8 : 0.05 });
-    for (const frame of record(1500, { eyes })) {
+  it('says why the last movement of the head was or was not a look at his hand, with the hand rule', async () => {
+    const { fixture, tracker, text, button } = await render();
+    expect(text('last-move')).toBe('None yet.');
+    expect(text('hand-profile')).toContain('turns 25° to his left (turn sign -1)');
+    const yaw = (t: number) => (t >= 200 && t < 700 ? -50 : 0);
+    const pitch = (t: number) => (t >= 200 && t < 700 ? 9 : 0);
+    for (const frame of record(1500, { yaw, pitch })) {
       tracker.frame.set(frame);
       await fixture.whenStable();
     }
-    expect(text('last-look')).toContain('down 0.80');
-    expect(text('last-look')).toContain('counted as a look at his hand');
+    expect(text('last-move')).toContain('turn -50°, tilt 9°');
+    expect(text('last-move')).toContain('counted as a look at his hand');
+    // "Kopiuj wyniki" (Copy the results) carries the movements with signed angles.
+    const writeText = vi.fn(async () => undefined);
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
+    tracker.stats.set({ ...tracker.stats(), frames: 10 });
+    await fixture.whenStable();
+    button('Copy the results')!.click();
+    await fixture.whenStable();
+    const copied = (writeText.mock.calls[0] as unknown as [string])[0];
+    expect(copied).toMatch(/\n {2}\d+, -50\.0, 9\.0, HAND, hand\n/);
   });
 
   it('says why the camera stopped, in text', async () => {
