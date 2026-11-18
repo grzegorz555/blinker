@@ -2,10 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { en, pl, translocoTesting } from '../../../testing/transloco';
 import { CountingService, SPEAKER, TICK_SCHEDULER } from '../counting/counting.service';
 import { FakeSpeaker } from '../speech/fake-speaker';
-import { STORAGE, type StorageLike } from '../storage/local-store';
+import { STORAGE } from '../storage/local-store';
 import type { Board } from './board';
 import { ACTIVE_BOARD_KEY, BOARDS_KEY, BoardsService } from './boards.service';
 import type { BoardErrorCode } from './validate-board';
+import { memoryStorage } from '../../../testing/memory-storage';
 
 const yesNo: Board = {
   schemaVersion: 1,
@@ -33,11 +34,7 @@ const file = (content: unknown, name = 'board.json') => {
 describe('BoardsService (spec 007, R10, R12)', () => {
   function setup(stored: Record<string, string> = {}) {
     const data = new Map(Object.entries(stored));
-    const memory: StorageLike = {
-      getItem: (k) => data.get(k) ?? null,
-      setItem: (k, v) => void data.set(k, v),
-      removeItem: (k) => void data.delete(k),
-    };
+    const memory = memoryStorage(data);
     TestBed.configureTestingModule({
       imports: [translocoTesting()],
       providers: [
@@ -206,5 +203,20 @@ describe('BoardsService (spec 007, R10, R12)', () => {
       const errors = (lang as { boards: { errors: Record<string, string> } }).boards.errors;
       for (const code of codes) expect(typeof errors[code], code).toBe('string');
     }
+  });
+
+  it('reset leaves only his board, active, and deletes the stored boards (spec 013, R3)', async () => {
+    const { service, data, counting } = setup();
+    await service.import(file(yesNo));
+    service.select('yes-no');
+    TestBed.tick();
+    service.reset();
+    TestBed.tick();
+    expect(service.boards().map((b) => b.id)).toEqual([service.builtIn.id]);
+    expect(service.active().id).toBe(service.builtIn.id);
+    expect(counting.config().board.id).toBe(service.builtIn.id);
+    expect(data.has(BOARDS_KEY)).toBe(false);
+    expect(data.has(ACTIVE_BOARD_KEY)).toBe(false);
+    expect(service.problem()).toBeNull();
   });
 });

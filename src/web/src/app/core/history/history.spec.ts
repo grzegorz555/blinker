@@ -3,9 +3,10 @@ import { translocoTesting } from '../../../testing/transloco';
 import { CountingService, SPEAKER, TICK_SCHEDULER } from '../counting/counting.service';
 import { SettingsService } from '../settings/settings.service';
 import { FakeSpeaker } from '../speech/fake-speaker';
-import { STORAGE, type StorageLike } from '../storage/local-store';
+import { STORAGE } from '../storage/local-store';
 import { HISTORY_KEY, addEntry, byDay, prune, validateHistory, type HistoryEntry } from './history';
 import { CLOCK, HistoryService } from './history.service';
+import { memoryStorage } from '../../../testing/memory-storage';
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = new Date(2026, 10, 14, 12, 0).getTime();
@@ -46,11 +47,7 @@ describe('history (spec 007, R11)', () => {
 describe('HistoryService (spec 007, R11, R12)', () => {
   function setup(stored?: string) {
     const data = new Map<string, string>(stored ? [[HISTORY_KEY, stored]] : []);
-    const memory: StorageLike = {
-      getItem: (k) => data.get(k) ?? null,
-      setItem: (k, v) => void data.set(k, v),
-      removeItem: (k) => void data.delete(k),
-    };
+    const memory = memoryStorage(data);
     const speaker = new FakeSpeaker();
     TestBed.configureTestingModule({
       imports: [translocoTesting()],
@@ -129,5 +126,16 @@ describe('HistoryService (spec 007, R11, R12)', () => {
     const { service } = setup('[{"text": 1}]');
     expect(service.entries()).toEqual([]);
     expect(service.problem()).toBe('corrupted');
+  });
+
+  it('reset empties the history, deletes it, and forgets a past problem (spec 013, R3)', () => {
+    const { service, data, speak } = setup('[{"text": 1}]');
+    expect(service.problem()).toBe('corrupted');
+    speak('A');
+    service.reset();
+    TestBed.tick();
+    expect(service.entries()).toEqual([]);
+    expect(data.has(HISTORY_KEY)).toBe(false);
+    expect(service.problem()).toBeNull();
   });
 });

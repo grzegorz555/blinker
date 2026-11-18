@@ -1,6 +1,12 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { CountingService, defaultBoard } from '../counting/counting.service';
-import { STORAGE, readStored, writeStored, type StoreProblem } from '../storage/local-store';
+import {
+  STORAGE,
+  readStored,
+  removeStored,
+  writeStored,
+  type StoreProblem,
+} from '../storage/local-store';
 import { BOARD_LIMITS, type Board } from './board';
 import { validateBoardBytes, validateBoardData, type BoardError } from './validate-board';
 
@@ -109,6 +115,14 @@ export class BoardsService {
     this.imported.update((list) => list.filter((b) => b.id !== id));
     this.save(BOARDS_KEY, this.imported());
     if (this.activeId() === id) this.select(this.builtIn.id);
+  }
+
+  /** Only his built-in board, and it is the active one; the stored boards deleted (spec 013, R3). */
+  reset(): void {
+    this.imported.set([]);
+    this.activeId.set(this.builtIn.id);
+    const removed = [BOARDS_KEY, ACTIVE_BOARD_KEY].map((key) => removeStored(this.storage, key));
+    this.problem.set(removed.every(Boolean) ? null : 'unavailable');
   }
 
   private save(key: string, value: unknown): void {

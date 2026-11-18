@@ -7,6 +7,7 @@ import friendBoard from '../../../../public/boards/friend-pl.json';
 import type { Board } from '../boards/board';
 import { validateBoardData } from '../boards/validate-board';
 import type { InputSignal } from '../input/signals';
+import { createSentence } from '../sentence/sentence';
 import { RATE, type SpeakResult, type Speaker } from '../speech/speaker';
 import { createWebSpeaker } from '../speech/web-speaker';
 import {
@@ -130,6 +131,19 @@ export class CountingService {
   stopSpeaking(): void {
     this.reading = false;
     this.speaker.cancel();
+  }
+
+  /**
+   * Back to the start ("Usuń wszystkie dane" (Delete all data), spec 013, R3): speech under way stops, the sentence is
+   * empty with nothing left to undo, and nothing is waiting to be kept in the history. The board, the rate and the
+   * settings come from their own services.
+   */
+  reset(): void {
+    this.stopSpeaking();
+    this.current.update((state) => initialState(createSentence(), state.now));
+    this.announcement.set('');
+    this.spoken.set(null);
+    this.speakResult.set(null);
   }
 
   /** The speech rate from Ustawienia (Settings), 0.5–2. */

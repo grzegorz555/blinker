@@ -5,6 +5,7 @@ import { FakeSpeaker } from '../speech/fake-speaker';
 import { STORAGE, type StorageLike } from '../storage/local-store';
 import { DEFAULT_SETTINGS, SETTINGS_KEY, validateSettings } from './settings';
 import { SettingsService } from './settings.service';
+import { memoryStorage } from '../../../testing/memory-storage';
 
 describe('validateSettings (spec 007, R12)', () => {
   it('accepts the defaults and fills missing fields from them (an older version had fewer)', () => {
@@ -43,11 +44,7 @@ describe('validateSettings (spec 007, R12)', () => {
 describe('SettingsService (spec 007, R9, R12)', () => {
   function setup(stored?: string, storage?: StorageLike | null) {
     const data = new Map<string, string>(stored === undefined ? [] : [[SETTINGS_KEY, stored]]);
-    const memory: StorageLike = {
-      getItem: (k) => data.get(k) ?? null,
-      setItem: (k, v) => void data.set(k, v),
-      removeItem: (k) => void data.delete(k),
-    };
+    const memory = memoryStorage(data);
     TestBed.configureTestingModule({
       imports: [translocoTesting()],
       providers: [
@@ -117,5 +114,25 @@ describe('SettingsService (spec 007, R9, R12)', () => {
     service.update({ theme: 'system' });
     TestBed.tick();
     expect(document.documentElement.style.colorScheme).toBe('');
+  });
+
+  it('reset brings back the defaults and deletes the stored settings (spec 013, R3)', () => {
+    const { service, data, counting } = setup(JSON.stringify({ camera: true, askAfterMs: 2000 }));
+    service.update({ theme: 'dark' });
+    service.reset();
+    TestBed.tick();
+    expect(service.settings()).toEqual(DEFAULT_SETTINGS);
+    expect(data.has(SETTINGS_KEY)).toBe(false);
+    expect(counting.config().askAfterMs).toBe(DEFAULT_SETTINGS.askAfterMs);
+    expect(document.documentElement.style.colorScheme).toBe('');
+    expect(service.problem()).toBeNull();
+  });
+
+  it('reset still applies the defaults when the storage is blocked, and says so', () => {
+    const { service } = setup(undefined, null);
+    service.update({ keyboard: true });
+    service.reset();
+    expect(service.settings()).toEqual(DEFAULT_SETTINGS);
+    expect(service.problem()).toBe('unavailable');
   });
 });

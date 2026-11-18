@@ -182,4 +182,23 @@ describe('CountingService', () => {
     expect(service.announcement()).toBe('Kolumna 1?');
     expect(speaker.said).toEqual([]);
   });
+
+  it('reset stops the speech and empties the sentence with nothing left to undo (spec 013, R3)', () => {
+    const { service, speaker } = setup();
+    service.touch({ kind: 'cell', column: 1, row: 1 });
+    service.touch({ kind: 'speak' });
+    expect(speaker.speaking).toBe(true);
+    expect(service.spoken()).not.toBeNull();
+    const board = service.config().board;
+
+    service.reset();
+
+    expect(speaker.speaking).toBe(false);
+    expect(service.state().name).toBe('column.waiting');
+    expect(service.sentence()).toBe('');
+    expect(service.state().sentence.history).toEqual([]);
+    expect(service.spoken()).toBeNull();
+    expect(service.announcement()).toBe('');
+    expect(service.config().board).toBe(board);
+  });
 });

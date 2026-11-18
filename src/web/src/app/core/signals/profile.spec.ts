@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { afterEach, describe, expect, it } from 'vitest';
-import { STORAGE, type StorageLike } from '../storage/local-store';
+import { STORAGE } from '../storage/local-store';
 import { DEFAULT_PROFILE, PROFILE_KEY, validateProfile } from './profile';
 import { ProfileService } from './profile.service';
+import { memoryStorage } from '../../../testing/memory-storage';
 
 describe('validateProfile (spec 011, R2)', () => {
   it('accepts the defaults and returns a clean copy (unknown fields dropped)', () => {
@@ -62,11 +63,7 @@ describe('ProfileService', () => {
 
   function setup(stored: string | null) {
     const data = new Map<string, string>(stored === null ? [] : [[PROFILE_KEY, stored]]);
-    const storage: StorageLike = {
-      getItem: (k) => data.get(k) ?? null,
-      setItem: (k, v) => void data.set(k, v),
-      removeItem: (k) => void data.delete(k),
-    };
+    const storage = memoryStorage(data);
     TestBed.configureTestingModule({ providers: [{ provide: STORAGE, useValue: storage }] });
     return { service: TestBed.inject(ProfileService), data };
   }
@@ -100,5 +97,15 @@ describe('ProfileService', () => {
     service.reset();
     expect(data.has(PROFILE_KEY)).toBe(false);
     expect(service.profile()).toEqual(DEFAULT_PROFILE);
+    expect(service.problem()).toBeNull();
+  });
+
+  it('reset still applies the defaults when the storage is blocked, and says so', () => {
+    TestBed.configureTestingModule({ providers: [{ provide: STORAGE, useValue: null }] });
+    const service = TestBed.inject(ProfileService);
+    service.reset();
+    expect(service.profile()).toEqual(DEFAULT_PROFILE);
+    expect(service.calibrated()).toBe(false);
+    expect(service.problem()).toBe('unavailable');
   });
 });

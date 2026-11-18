@@ -66,6 +66,12 @@ export class HistoryService {
     if (!removeStored(this.storage, HISTORY_KEY)) this.problem.set('unavailable');
   }
 
+  /** Empty, and the stored history deleted; unlike `clear`, a past problem is forgotten (spec 013, R3). */
+  reset(): void {
+    this.list.set([]);
+    this.problem.set(removeStored(this.storage, HISTORY_KEY) ? null : 'unavailable');
+  }
+
   private save(list: readonly HistoryEntry[]): void {
     this.list.set(list);
     if (!writeStored(this.storage, HISTORY_KEY, list)) this.problem.set('unavailable');

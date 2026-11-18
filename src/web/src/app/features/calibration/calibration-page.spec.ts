@@ -6,10 +6,11 @@ import { CountingService } from '../../core/counting/counting.service';
 import { PROFILE_KEY } from '../../core/signals/profile';
 import { ProfileService } from '../../core/signals/profile.service';
 import { closed, pulses, record } from '../../core/signals/synthetic';
-import { STORAGE, type StorageLike } from '../../core/storage/local-store';
+import { STORAGE } from '../../core/storage/local-store';
 import type { FaceFrame } from '../../core/vision/face-frame';
 import { FaceTrackerService, type TrackerStatus } from '../../core/vision/face-tracker.service';
 import { CalibrationPage } from './calibration-page';
+import { memoryStorage } from '../../../testing/memory-storage';
 
 function fakeTracker() {
   return {
@@ -28,11 +29,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
   async function render() {
     const tracker = fakeTracker();
     const data = new Map<string, string>();
-    const storage: StorageLike = {
-      getItem: (k) => data.get(k) ?? null,
-      setItem: (k, v) => void data.set(k, v),
-      removeItem: (k) => void data.delete(k),
-    };
+    const storage = memoryStorage(data);
     const listen = vi.fn();
     await TestBed.configureTestingModule({
       imports: [CalibrationPage, translocoTesting()],

@@ -1,20 +1,14 @@
+import { memoryStorage } from '../../../testing/memory-storage';
 import {
   isPlainObject,
   readStored,
+  removeByPrefix,
   removeStored,
   writeStored,
   type StorageLike,
 } from './local-store';
 
-function memory(): StorageLike & { data: Map<string, string> } {
-  const data = new Map<string, string>();
-  return {
-    data,
-    getItem: (k) => data.get(k) ?? null,
-    setItem: (k, v) => void data.set(k, v),
-    removeItem: (k) => void data.delete(k),
-  };
-}
+const memory = () => memoryStorage();
 
 const throwing: StorageLike = {
   getItem: () => {
@@ -24,6 +18,12 @@ const throwing: StorageLike = {
     throw new Error('QuotaExceededError');
   },
   removeItem: () => {
+    throw new Error('SecurityError');
+  },
+  key: () => {
+    throw new Error('SecurityError');
+  },
+  get length(): number {
     throw new Error('SecurityError');
   },
 };
@@ -55,6 +55,29 @@ describe('local-store (spec 007, R12)', () => {
     expect(writeStored(throwing, 'k', 1)).toBe(false);
     expect(writeStored(null, 'k', 1)).toBe(false);
     expect(removeStored(throwing, 'k')).toBe(false);
+  });
+
+  describe('removeByPrefix (spec 013, R3, R5)', () => {
+    it('removes every key with the prefix, also next to each other, and leaves other keys', () => {
+      const s = memory();
+      for (const k of ['blinker.a', 'blinker.b', 'other.c', 'blinker.d', 'blinkerX'])
+        s.data.set(k, '1');
+      expect(removeByPrefix(s, 'blinker.')).toBe(true);
+      expect([...s.data.keys()]).toEqual(['other.c', 'blinkerX']);
+    });
+
+    it('nothing to remove is a success', () => {
+      expect(removeByPrefix(memory(), 'blinker.')).toBe(true);
+    });
+
+    it('a storage that throws, is missing, or keeps a key is a failure', () => {
+      expect(removeByPrefix(throwing, 'blinker.')).toBe(false);
+      expect(removeByPrefix(null, 'blinker.')).toBe(false);
+      const stubborn = memory();
+      stubborn.data.set('blinker.a', '1');
+      stubborn.removeItem = () => undefined;
+      expect(removeByPrefix(stubborn, 'blinker.')).toBe(false);
+    });
   });
 
   it('isPlainObject rejects arrays, null and objects with another prototype', () => {

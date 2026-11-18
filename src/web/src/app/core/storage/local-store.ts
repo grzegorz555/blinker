@@ -6,8 +6,11 @@
 //   or cut off. The caller validates it and falls back to defaults.
 import { InjectionToken } from '@angular/core';
 
-/** The parts of Storage we use (a fake in tests). */
-export type StorageLike = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
+/** The parts of Storage we use (a fake in tests); `key` and `length` for the sweep of spec 013. */
+export type StorageLike = Pick<Storage, 'getItem' | 'setItem' | 'removeItem' | 'key' | 'length'>;
+
+/** Every key Blinker stores starts with this (spec 013, R5), so one sweep finds them all. */
+export const STORAGE_PREFIX = 'blinker.';
 
 /** The device storage; null when the browser has none. */
 export const STORAGE = new InjectionToken<StorageLike | null>('STORAGE', {
@@ -72,6 +75,30 @@ export function removeStored(storage: StorageLike | null, key: string): boolean 
   } catch {
     return false;
   }
+}
+
+/**
+ * Removes every key that starts with `prefix` (spec 013, R3, R5) and checks that none is left. False when the
+ * storage is missing, throws, or keeps a key. The keys are collected first: removing while indexing would skip some,
+ * and the order of `key(i)` is not defined (https://developer.mozilla.org/docs/Web/API/Storage/key).
+ */
+export function removeByPrefix(storage: StorageLike | null, prefix: string): boolean {
+  try {
+    if (!storage) return false;
+    for (const key of keysWithPrefix(storage, prefix)) storage.removeItem(key);
+    return keysWithPrefix(storage, prefix).length === 0;
+  } catch {
+    return false;
+  }
+}
+
+function keysWithPrefix(storage: StorageLike, prefix: string): string[] {
+  const keys: string[] = [];
+  for (let i = 0; i < storage.length; i++) {
+    const key = storage.key(i);
+    if (key?.startsWith(prefix)) keys.push(key);
+  }
+  return keys;
 }
 
 /** A plain object with no prototype tricks (for validators). */
