@@ -8,10 +8,12 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { DeviceDataService, type EraseResult } from '../../core/storage/device-data.service';
 import { ASK_AFTER } from '../../core/counting/counting';
 import { CountingService } from '../../core/counting/counting.service';
 import { RATES, THEMES, validAskAfter, type Settings } from '../../core/settings/settings';
 import { SettingsService } from '../../core/settings/settings.service';
+import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 import { LanguageSwitch } from '../../shared/language-switch/language-switch';
 
 type Toggle = 'confirmByNod' | 'speakPrompts' | 'signalButtons' | 'keyboard' | 'hints';
@@ -49,6 +51,11 @@ export class SettingsPage {
   private readonly service = inject(SettingsService);
   private readonly counting = inject(CountingService);
   private readonly transloco = inject(TranslocoService);
+  private readonly confirmService = inject(ConfirmService);
+  private readonly deviceData = inject(DeviceDataService);
+
+  /** The outcome of "Usuń wszystkie dane" (Delete all data), shown in text under the button (spec 013, R4). */
+  protected readonly erased = signal<EraseResult | null>(null);
 
   protected readonly settings = this.service.settings;
   protected readonly problem = this.service.problem;
@@ -92,6 +99,20 @@ export class SettingsPage {
 
   protected listen(): void {
     this.counting.listen(this.transloco.translate('settings.voice.sample'));
+    this.hasVoice.set(this.counting.hasVoice());
+  }
+
+  /** Only a touch or key on this button gets here (R6); the dialog asks first, with the first focus on Cancel (R2). */
+  protected async deleteAll(): Promise<void> {
+    const yes = await this.confirmService.confirm({
+      title: 'settings.data.confirmTitle',
+      message: 'settings.data.confirmMessage',
+      confirm: 'settings.data.confirmAction',
+    });
+    if (!yes) return;
+    this.erased.set(this.deviceData.eraseAll());
+    // The form field is rebuilt from the defaults, so it does not show the erased value.
+    this.askAfter.setValue(this.settings().askAfterMs, { emitEvent: false });
     this.hasVoice.set(this.counting.hasVoice());
   }
 }

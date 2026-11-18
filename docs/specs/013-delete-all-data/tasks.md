@@ -18,7 +18,7 @@ Branch: `feat/013-delete-all-data`. Gates: `npm run verify -- --lighthouse`.
       Tests: unit per service, the fill-erase-check test, the prefix test, a storage that throws.
       _To understand:_ why a sweep by prefix and a reset per service together; effects that would write a value back
       after it was removed (`docs/knowledge/effect-that-writes-what-it-reads.md`).
-- [ ] **T2 [sonnet]: The section in Ustawienia (Settings).** "Dane na tym urządzeniu" (Data on this device): the
+- [x] **T2 [sonnet]: The section in Ustawienia (Settings).** "Dane na tym urządzeniu" (Data on this device): the
       text, the button, the confirmation through `ConfirmService`, the status and the error in text; strings in
       `en.json` and `pl.json` (R1, R2, R4, R6, R7). Tests: unit for the page, e2e on 3 device projects with axe, the
       layout at 360 px.

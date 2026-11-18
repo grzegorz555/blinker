@@ -190,6 +190,16 @@
   "settings": {
     "appearance": "Wygląd",
     "about": "O aplikacji",
+    "data": {
+      "title": "Dane na tym urządzeniu",
+      "help": "Blinker trzyma na tym urządzeniu: ustawienia, zaimportowane tablice, jego kalibrację, przeczytane zdania i język. Zgodę na kamerę cofa się w ustawieniach witryny w przeglądarce, a sama aplikacja zostaje zainstalowana.",
+      "delete": "Usuń wszystkie dane",
+      "confirmTitle": "Usunąć wszystkie dane z tego urządzenia?",
+      "confirmMessage": "Ustawienia, zaimportowane tablice, jego kalibracja, przeczytane zdania i język zostaną usunięte. Tego nie da się cofnąć. Jego wbudowana tablica zostaje.",
+      "confirmAction": "Usuń",
+      "done": "Usunięto wszystkie dane z tego urządzenia.",
+      "failed": "Nie udało się usunąć danych z pamięci przeglądarki. Wyczyść dane witryny Blinker w ustawieniach przeglądarki."
+    },
     "privacy": "Wszystko zostaje na tym urządzeniu: ustawienia, tablice i zdania nigdy nie są nigdzie wysyłane.",
     "problem": {
       "corrupted": "Nie udało się odczytać zapisanych ustawień, więc działają domyślne. Zmień dowolne ustawienie, żeby zapisać je ponownie.",
