@@ -29,7 +29,7 @@ for the next e2e pass (the paths are in the spec's Test plan).
       buttons in a bar that stays in view (R12); none of them reachable by his signals (R13). New strings in en and pl.
       Tests: unit per page.
       _To understand:_ toggle buttons and `aria-pressed`; a sticky bar that does not hide the focus (SC 2.4.11).
-- [ ] **T4 [haiku]: Docs.** Security conventions and the security pass (F2 closed), architecture (the camera's life
+- [x] **T4 [haiku]: Docs.** Security conventions and the security pass (F2 closed), architecture (the camera's life
       cycle), the first-session checklist (the checks by hand on his phone), README, backlog, log, specs index,
       Polish copies.
       _To understand:_ nothing new.

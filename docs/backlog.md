@@ -23,8 +23,9 @@ generated:
 
 # Ideas (not specified)
 - From the [security pass](security-review.md) (2026-11-16): ✅ one action that deletes all data from the device
-  (F1, spec [013](specs/013-delete-all-data/spec.md), done 2026-11-18); stopping the camera while the app is in the
-  background (F2, spec [014](specs/014-camera-in-background/spec.md)), approved 2026-11-18, in progress.
+  (F1, spec [013](specs/013-delete-all-data/spec.md), done 2026-11-18); ✅ stopping the camera while the app is in the
+  background (F2, spec [014](specs/014-camera-in-background/spec.md), done 2026-11-18; the checks on his phone wait in
+  [first session](trial/first-session.md)).
 - Board editor; importing a board from a photo.
 - **Shortcuts for frequent words** (author, 2026-11-12: "do rozważenia" (to consider)): a word picked with one number instead of
   letter by letter. To design after the PoC, together with him.

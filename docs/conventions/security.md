@@ -23,6 +23,7 @@ There are no accounts, no server and no shared data. The main risks are:
 
 # Privacy (on the device only)
 - Camera frames are processed in the browser, never uploaded, never stored, and never kept beyond the current frame. Calibration stores numbers (thresholds), not images.
+- **The camera is open only while Blinker is visible** (spec 014). When the page is hidden (another app, another tab, a locked screen) every track is stopped at once and the browser's camera indicator goes off; when the page is visible again the camera starts by itself. A caregiver can also turn the camera off by hand on each screen that uses it (Liczenie (Counting), Kalibracja (Calibration), Diagnostyka (Diagnostics)); his signals cannot do that.
 - **Text-to-speech:** some browser voices are **network voices** (for example Google voices in Chrome), and the text is sent to the vendor. By default we use only voices with `SpeechSynthesisVoice.localService === true` (https://developer.mozilla.org/docs/Web/API/SpeechSynthesisVoice/localService). Network voices can be turned on only in settings, with a clear warning.
 - No analytics, no error reporting service, no third-party fonts, scripts or CDNs. `connect-src 'self'` enforces this.
 - **A third person's health data:** the user's disability is special-category data (GDPR/RODO art. 9).
@@ -93,4 +94,4 @@ Agents never read `.env*`, the credential manager or `git credential` output.
 # How we check
 - The `code-reviewer` agent checks the points above for every change.
 - An e2e test reads the response headers on the preview deploy.
-- Before the first real use: a pass through the ASVS chapters listed above, plus `/security-review`. The chapter-level pass of 2026-11-16 is in [security-review.md](../security-review.md); its F1 is closed by spec 013, and F2 stays open (spec 014).
+- Before the first real use: a pass through the ASVS chapters listed above, plus `/security-review`. The chapter-level pass of 2026-11-16 is in [security-review.md](../security-review.md); its F1 is closed by spec 013 and its F2 by spec 014.

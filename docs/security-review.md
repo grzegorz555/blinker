@@ -26,7 +26,7 @@ State of the code: `main` at `e7f1d26` plus the stricter board import (PR #30).
 | V3 Web Frontend Security | `src/web/public/staticwebapp.config.json`: CSP with `script-src 'self' 'wasm-unsafe-eval'`, `object-src 'none'`, `base-uri 'self'`, `frame-ancestors 'none'`, Trusted Types; `nosniff`; `Referrer-Policy: no-referrer`; COOP; a Permissions-Policy that allows only the camera. No cookies, no `window.open`, no `target="_blank"`, no cross-window `postMessage` (only the page and its own face worker). | Pass |
 | V12 Secure Communication | HSTS for two years with subdomains; the host serves HTTPS only (ADR-0003). The app makes no request to another origin (`connect-src 'self'`; the face worker refuses cross-origin `fetch`, ADR-0006). | Pass (the host's TLS settings were not measured) |
 | V13 Configuration | Production build without source maps (`angular.json`); the `dist/` check for `.md`, `.map`, `.local*`, `.claude` runs in `npm run verify`; no secrets in the app. | Pass |
-| V14 Data Protection | Everything stays on the device in `localStorage`: settings, boards, his signal profile (numbers), the sentence history, the language. The history is capped (500 sentences, 30 days), can be deleted and can be turned off. Camera frames are never stored. The clipboard is written only by "Kopiuj wyniki" (Copy the results), with numbers and the browser name. | Pass, with findings F1 (closed by spec 013) and F2 (open) |
+| V14 Data Protection | Everything stays on the device in `localStorage`: settings, boards, his signal profile (numbers), the sentence history, the language. The history is capped (500 sentences, 30 days), can be deleted and can be turned off. Camera frames are never stored. The clipboard is written only by "Kopiuj wyniki" (Copy the results), with numbers and the browser name. | Pass, with findings F1 (closed by spec 013) and F2 (closed by spec 014) |
 | V15 Secure Coding and Architecture | Every stored value is validated when read back (`readStored` with a validator per key; the language against the supported list); prototype keys rejected in board files; the lockfile, `npm audit`, OSV-Scanner, CodeQL, pinned Actions. | Pass |
 
 # Open findings (to decide with the author)
@@ -35,10 +35,11 @@ State of the code: `main` at `e7f1d26` plus the stricter board import (PR #30).
   Ustawienia (Settings) has "Usuń wszystkie dane" (Delete all data) after a confirmation: every service goes back to
   its defaults (signal profile and settings included), and every `blinker.` key is removed from the storage; the
   result is said in text. A test keeps it so: a new store must use the prefix and have a reset.
-- **F2 (low, privacy): the camera stays open while the app is in the background.** The stream stops when he leaves
-  the page that uses it, not when the tab or the app is hidden. Proposal: stop on `visibilitychange` (hidden) and
-  start again on return. To decide with him in mind: starting again takes a moment before signals count. Planned
-  in spec [014](specs/014-camera-in-background/spec.md).
+- **F2 (low, privacy): the camera stays open while the app is in the background. Closed (spec [014](specs/014-camera-in-background/spec.md), 2026-11-18).**
+  The camera is open only while Blinker is visible: when the page is hidden every track is stopped at once and the
+  camera starts again by itself on return (the worker and its model stay loaded). A caregiver can turn the camera off
+  and on by hand on each of the three screens; his signals cannot. The clean start of the detector on return is in
+  the same spec (R4, R6, R7). The checks by hand on his phone wait in [first-session](trial/first-session.md).
 
 # Not checked here
 

@@ -91,6 +91,30 @@ machine. Stage 4 adds his face signals as one more source of `InputSignal`.
 - `core/settings/`, `core/history/`, `core/storage/`: settings, the sentence history, storage that may fail; `core/storage/device-data.service.ts` is the one erase ("Usuń wszystkie dane" (Delete all data), spec 013).
 - `features/counting`, `features/sentences`, `features/boards`, `features/settings`; `features/calibrate` in stage 4.
 
+# Camera life cycle (spec 014)
+
+`FaceTrackerService` (`core/vision/face-tracker.service.ts`) owns the camera and follows the page's visibility through
+the injected document (`visibilitychange`, as `wake-lock.ts` does):
+
+- **start** (a page opens, or the page is visible): the camera opens with the front or rear facing of the settings, and
+  the face worker loads its model the first time only.
+- **hidden**: a camera that is starting or running stops every track and clears the video element, so the browser's
+  camera indicator goes off. The face worker and its model are kept. No frame is grabbed while hidden.
+- **visible** again: a camera that the hiding stopped opens again with the same facing and video, and `resumes()`
+  counts the return, so the page restarts its own state (`CameraInput` resets the detector; Kalibracja (Calibration)
+  records the step under way again; Diagnostyka (Diagnostics) restarts its measurement). A camera that was off, in
+  error, or stopped by the page before the hiding stays off.
+- **release()** (the "Kamera" (Camera) toggle in Liczenie (Counting), "Wyłącz kamerę" (Turn off the camera) in
+  Kalibracja (Calibration) and Diagnostyka (Diagnostics)): the same stop as hidden, but remembered, so a return to the
+  page does not reopen the camera. **reopen()** undoes it, with the same video and facing and no model reload and no
+  count in `resumes()`.
+- **stop()** (leaving the page that uses the tracker): the run is forgotten, the camera and the worker end.
+- A stream that arrives late for a run that was already stopped, released or hidden is closed at once. Quick changes
+  of visibility end with one open stream when visible and none when hidden.
+- A refused camera on return shows the error in text; there is no retry loop.
+
+Only a person at the screen reaches `release()` and `reopen()`: no face signal and no board key does.
+
 # Storage
 
 Everything stays on the device:

@@ -23,6 +23,12 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
 - [ ] Bring: a phone stand, his paper board (the fallback), a charger.
 - [ ] Battery charged to a known level (for the battery measurement).
 
+- [ ] By hand on **your** phone (spec 014, before the first visit): open Liczenie (Counting) with the camera on,
+      switch to another app: the camera indicator goes off. Come back: the camera is on again within a moment, with
+      no tap.
+- [ ] On the same phone, in Liczenie (Counting): "Kamera" (Camera) turns the camera indicator off, and on again when
+      pressed once more; the chip says "Kamera wyłączona" (Camera off) while it is off.
+
 # 1. Diagnostyka (Diagnostics), 10 minutes (ADR-0006)
 
 - [ ] Phone on the stand, facing him as for talking; Diagnostyka (Diagnostics) → "Włącz kamerę" (Turn on the camera).
