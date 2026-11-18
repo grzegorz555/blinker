@@ -148,6 +148,46 @@
   <a matButton="tonal" routerLink="/diagnostics">{{ 'settings.diagnostics.open' | transloco }}</a>
 </section>
 
+<!-- Dane na tym urządzeniu (Data on this device), spec 013 -->
+<section class="group" aria-labelledby="settings-data">
+  <h2 id="settings-data" class="group-title">{{ 'settings.data.title' | transloco }}</h2>
+  <p class="muted">{{ 'settings.data.help' | transloco }}</p>
+  <button
+    matButton="outlined"
+    class="danger"
+    type="button"
+    data-testid="delete-all-data"
+    (click)="deleteAll()"
+  >
+    {{ 'settings.data.delete' | transloco }}
+  </button>
+  <!-- The live region stays in the page, so the text added into it is announced (SC 4.1.3). -->
+  <div role="status" data-testid="delete-all-status">
+    @switch (erased()) {
+      @case ('erased') {
+        <p class="data-done">{{ 'settings.data.done' | transloco }}</p>
+      }
+      @case ('unavailable') {
+        <p class="voice-error">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v6M12 16.5v.5" />
+          </svg>
+          <span>{{ 'settings.data.failed' | transloco }}</span>
+        </p>
+      }
+    }
+  </div>
+</section>
+
 <!-- O aplikacji (About) -->
 <section class="group" aria-labelledby="settings-about">
   <h2 id="settings-about" class="group-title">{{ 'settings.about' | transloco }}</h2>

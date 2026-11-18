@@ -83,3 +83,17 @@ svg {
   flex-shrink: 0;
   margin-top: 0.125rem;
 }
+
+/* "Usuń wszystkie dane" (Delete all data): outlined in the error color, text label, at least 44 px high (spec 013). */
+.danger {
+  --mat-button-outlined-label-text-color: var(--error);
+  --mat-button-outlined-outline-color: var(--error);
+  min-height: 2.75rem;
+  max-width: 100%;
+  height: auto;
+  white-space: normal;
+}
+
+.data-done {
+  font-weight: 600;
+}

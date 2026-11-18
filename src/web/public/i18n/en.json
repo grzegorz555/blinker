@@ -190,6 +190,16 @@
   "settings": {
     "appearance": "Appearance",
     "about": "About",
+    "data": {
+      "title": "Data on this device",
+      "help": "Blinker keeps on this device: the settings, imported boards, his calibration, the sentences read aloud and the language. The camera permission is taken back in the browser's site settings, and the app itself stays installed.",
+      "delete": "Delete all data",
+      "confirmTitle": "Delete all data from this device?",
+      "confirmMessage": "The settings, imported boards, his calibration, the sentences read aloud and the language will be deleted. This cannot be undone. His built-in board stays.",
+      "confirmAction": "Delete",
+      "done": "All data was deleted from this device.",
+      "failed": "The data could not be deleted from the browser's storage. Clear the site data for Blinker in the browser's settings."
+    },
     "privacy": "Everything stays on this device: settings, boards and sentences are never sent anywhere.",
     "problem": {
       "corrupted": "The saved settings could not be read, so the defaults are used. Change a setting to save it again.",
