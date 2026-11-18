@@ -1,7 +1,13 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { CountingService } from '../counting/counting.service';
-import { STORAGE, readStored, writeStored, type StoreProblem } from '../storage/local-store';
+import {
+  STORAGE,
+  readStored,
+  removeStored,
+  writeStored,
+  type StoreProblem,
+} from '../storage/local-store';
 import { DEFAULT_SETTINGS, SETTINGS_KEY, validateSettings, type Settings } from './settings';
 
 /**
@@ -44,5 +50,11 @@ export class SettingsService {
     this.current.set(next);
     if (!writeStored(this.storage, SETTINGS_KEY, next)) this.problem.set('unavailable');
     else if (this.problem() === 'corrupted') this.problem.set(null);
+  }
+
+  /** Back to the defaults, and the stored settings deleted ("Usuń wszystkie dane" (Delete all data), spec 013). */
+  reset(): void {
+    this.current.set(DEFAULT_SETTINGS);
+    this.problem.set(removeStored(this.storage, SETTINGS_KEY) ? null : 'unavailable');
   }
 }

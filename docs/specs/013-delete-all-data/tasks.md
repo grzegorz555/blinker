@@ -11,7 +11,7 @@ generated:
 
 Branch: `feat/013-delete-all-data`. Gates: `npm run verify -- --lighthouse`.
 
-- [ ] **T1 [opus]: The erase in the core.** A `DeviceData` service with `eraseAll()`: every service gets a reset to
+- [x] **T1 [opus]: The erase in the core.** A `DeviceData` service with `eraseAll()`: every service gets a reset to
       its defaults (`SettingsService`, `BoardsService`, `HistoryService`, `CountingService` for the sentence and its
       undo, `LanguageService` for the saved choice; `ProfileService.reset()` exists), then a sweep removes every
       `blinker.` key (`StorageLike` gains `key` and `length`); the result says whether the storage obeyed (R3, R5).

@@ -9,12 +9,13 @@ import { SETTINGS_KEY } from '../../core/settings/settings';
 import { closed, record } from '../../core/signals/synthetic';
 import { SignalCue } from '../../core/sound/cue';
 import { FakeSpeaker } from '../../core/speech/fake-speaker';
-import { STORAGE, type StorageLike } from '../../core/storage/local-store';
+import { STORAGE } from '../../core/storage/local-store';
 import type { FaceFrame } from '../../core/vision/face-frame';
 import { FaceTrackerService, type TrackerStatus } from '../../core/vision/face-tracker.service';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 import { TopBar } from '../../shell/top-bar';
 import { CountingPage } from './counting-page';
+import { memoryStorage } from '../../../testing/memory-storage';
 
 /** The page with the top bar outlet, as the shell renders it (the camera chip lives in the top bar). */
 @Component({
@@ -31,11 +32,7 @@ describe('CountingPage with the camera (spec 012)', () => {
 
   async function render(settings: Record<string, unknown>) {
     const data = new Map([[SETTINGS_KEY, JSON.stringify(settings)]]);
-    const storage: StorageLike = {
-      getItem: (k) => data.get(k) ?? null,
-      setItem: (k, v) => void data.set(k, v),
-      removeItem: (k) => void data.delete(k),
-    };
+    const storage = memoryStorage(data);
     const tracker = {
       status: signal<TrackerStatus>('idle'),
       error: signal<string | null>(null),

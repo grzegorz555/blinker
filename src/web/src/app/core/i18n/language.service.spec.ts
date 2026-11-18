@@ -78,4 +78,23 @@ describe('LanguageService (spec 001, R2–R3)', () => {
     await expect(service.setLanguage('en')).resolves.toBeUndefined();
     expect(service.language()).toBe('en');
   });
+
+  it('forgetChoice deletes the saved choice and keeps the language on screen (spec 013, R3)', async () => {
+    await service.setLanguage('pl');
+    expect(service.forgetChoice()).toBe(true);
+    expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBeNull();
+    expect(service.language()).toBe('pl');
+    expect(document.documentElement.lang).toBe('pl');
+  });
+
+  it('forgetChoice drops a switch still loading, so it cannot save the choice again', async () => {
+    const plLoad = new Subject<Translation>();
+    vi.spyOn(transloco, 'load').mockReturnValue(plLoad.asObservable());
+    const slow = service.setLanguage('pl');
+    service.forgetChoice();
+    plLoad.next({});
+    plLoad.complete();
+    await slow;
+    expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBeNull();
+  });
 });

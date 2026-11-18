@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Injectable, inject, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
+import { STORAGE, removeStored } from '../storage/local-store';
 import { LANGUAGE_STORAGE_KEY, type LanguageCode, resolveLanguage } from './languages';
 
 /**
@@ -12,6 +13,7 @@ import { LANGUAGE_STORAGE_KEY, type LanguageCode, resolveLanguage } from './lang
 export class LanguageService {
   private readonly transloco = inject(TranslocoService);
   private readonly document = inject(DOCUMENT);
+  private readonly storage = inject(STORAGE);
   private readonly current = signal<LanguageCode>(this.transloco.getActiveLang() as LanguageCode);
 
   /** The active language as a signal, for templates. */
@@ -39,6 +41,16 @@ export class LanguageService {
 
   private latestRequest = 0;
 
+  /**
+   * Forgets the saved choice ("Usuń wszystkie dane" (Delete all data), spec 013, R3). The language on screen stays
+   * until the app is opened again, because the caregiver is reading it; a switch still loading is dropped, so it
+   * cannot save the choice again. False when the storage refused.
+   */
+  forgetChoice(): boolean {
+    this.latestRequest++;
+    return removeStored(this.storage, LANGUAGE_STORAGE_KEY);
+  }
+
   private apply(lang: LanguageCode): void {
     this.transloco.setActiveLang(lang);
     this.document.documentElement.lang = lang;
@@ -48,7 +60,7 @@ export class LanguageService {
   // localStorage can throw (e.g. storage disabled); the app must keep working without it.
   private readSaved(): string | null {
     try {
-      return this.document.defaultView?.localStorage.getItem(LANGUAGE_STORAGE_KEY) ?? null;
+      return this.storage?.getItem(LANGUAGE_STORAGE_KEY) ?? null;
     } catch {
       return null;
     }
@@ -56,7 +68,7 @@ export class LanguageService {
 
   private save(lang: LanguageCode): void {
     try {
-      this.document.defaultView?.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      this.storage?.setItem(LANGUAGE_STORAGE_KEY, lang);
     } catch {
       /* not persisted; the choice still applies for this session */
     }

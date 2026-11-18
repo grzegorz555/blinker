@@ -41,9 +41,9 @@ export class ProfileService {
 
   /** Back to the defaults ("Usuń kalibrację" (Delete the calibration)). */
   reset(): void {
-    removeStored(this.storage, PROFILE_KEY);
+    const removed = removeStored(this.storage, PROFILE_KEY);
     this.current.set(DEFAULT_PROFILE);
     this.calibrated.set(false);
-    this.problem.set(null);
+    this.problem.set(removed ? null : 'unavailable');
   }
 }
