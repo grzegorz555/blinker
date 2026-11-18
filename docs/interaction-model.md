@@ -18,24 +18,33 @@ Blendshape names come from MediaPipe Face Landmarker (https://ai.google.dev/edge
 | `BLINK` (strong) | both `eyeBlinkLeft/Right` above the threshold, and either **strong** (his strong-blink cue past his calibrated level at some moment of the closure: the lids squeezed `eyeSquint*`, the cheeks raised `cheekSquint*` or the brows pulled down `browDown*`, whichever tells his strong blink from his ordinary one best) or long (at least ~0.6 s, calibrated). When the camera cannot tell them apart, the strong blink is off and only long blinks count. His deliberate blink is strong rather than long (the author, 2026-11-15); an ordinary blink (short, lids not squeezed) is **ignored as involuntary**. | confirmed; the squeeze level to measure with him |
 | `VERY_LONG_CLOSE` | eyes closed for at least ~3 s | to confirm with him |
 | `HEAD_NOD` | head pitch down and back up within a time window (facial transformation matrix) | **confirmed: he uses it today to confirm ("yes")** |
-| `HEAD_LEFT` / `HEAD_RIGHT` | head yaw past the threshold, then back to neutral | possible |
+| `HEAD_LEFT` / `HEAD_RIGHT` | head yaw past the threshold, then back to neutral; to his left it is the hand (`LOOK_AT_HAND`), so `HEAD_LEFT` is not a signal of its own (spec 015) | `HEAD_RIGHT`: possible; `HEAD_LEFT`: taken by the hand |
 | `HEAD_SHAKE` | yaw left-right-left | **confirmed: he uses it today for "no"** |
-| `LOOK_AT_HAND` | gaze held down towards his hand: down and to his left (to his palm), sometimes to his right (`eyeLookDown*` and `eyeLookOut*`/`eyeLookIn*`, the sides calibrated), not during a nod (a nod moves the eyes against the head); the head may turn towards the hand | **confirmed: he uses it today, it means "5" (counting only)** |
+| `LOOK_AT_HAND` | a quick turn of the head to his left and straight back, a little down (his glance at his left hand; detected as `HAND`, spec 015); no hold, and the eyes are not used. Only his left hand for now; the right hand is later | **confirmed: he glances at his hand, it means "5" (counting only); the head turn to be checked with him** |
 | `GAZE_UP` | `eyeLookUp*` held | possible |
 
 **How Blinker detects them (spec 011, `core/signals/detector.ts`):** a pure function over the camera frames, with
 hysteresis (a signal starts at its threshold and ends below 80 % of it) and a quiet time of 400 ms after each signal;
 without a face every half-done signal is dropped.
 - `BLINK`: both eyes closed, strong or for at least 600 ms, at most 2500 ms, sent when they open. A closure that starts
-  while he already looks down is the look at his hand (looking down lowers the lids); a closed eye also reads as looking
-  down, so that alone does not make a blink a look.
-- `LOOK_AT_HAND` → `HAND`: either eye down past the threshold for 400 ms, once per look, not while a nod is under
-  way (a nod moves the eyes against the head); turning or tilting the head towards his hand is part of the look. Once
-  calibrated, the look must also go to the side of a learnt hand.
+  while the head is turned past the hand amplitude to his left, or that is still going on when the hand is sent, is
+  `atHand`, not a blink (spec 015, R5).
+- `LOOK_AT_HAND` → `HAND` (spec 015, R1–R3): the yaw goes past the learnt hand amplitude to his left and comes back to
+  within half of it, at most the window after passing it (default 1500 ms, learnt). There is no hold: a turn held longer
+  than the window is not a hand (he is looking at something or someone). The pitch does not decide. The hand is sent
+  after a 300 ms settle: a turn past the shake amplitude to his right within the settle makes it a shake, and a sent hand
+  clears the shake sides. A nod during which the yaw passed half the hand amplitude is not a nod (his glance tilts the
+  head down). The eye rule (`eyeLookDown*`, the 400 ms hold) is gone.
 - `HEAD_NOD` → `NOD`: pitch away from his neutral by the amplitude (12°) and back within 1.2 s; the direction is
   learnt in calibration.
 - `HEAD_SHAKE` → `SHAKE`: yaw past 10° to one side and then the other within 1.5 s.
 - `HEAD_RIGHT` → `RIGHT`: yaw past 20° to his right held for 300 ms, sent when the head comes back; the side is learnt.
+- Kalibracja (Calibration) learns the hand in one step (spec 015, R8): the signed yaw peak gives the amplitude (half of
+  it) and the side; the pitch past the amplitude gives the tilt. Nothing is learnt under 6°, or on the side of a learnt
+  head right, which is refused for the hand.
+- The head-movement report (spec 015, R9) lists each head movement when it comes back, with its length, the signed peak
+  yaw and pitch, the signal sent and a verdict: `hand`, `small` (under the amplitude), `slow` (past the window), `shake`,
+  `otherSide` or `tooSoon`. Diagnostyka (Diagnostics) and the calibration step show it.
 
 **From the camera to Liczenie (Counting) (spec 012):** with "Sterowanie kamerą w Liczeniu" (Camera control in
 Counting) on, each detected signal goes to the counting machine exactly like a button press, and a short tone confirms
@@ -66,7 +75,7 @@ confirms it with a nod or rejects it by shaking his head. Blinker takes the care
 1. **Column first, then row.** The column numbers (1–7) are printed above the paper board and the row numbers (1–5) on its left.
 2. While he gives a number:
    - each `LONG_BLINK` adds **1**;
-   - `LOOK_AT_HAND` adds **5**, so he doesn't have to blink five times (7 = hand + 2 blinks). He looks **down at his hand, usually to his left, sometimes to his right**, so calibration must accept either side.
+   - `LOOK_AT_HAND` adds **5**, so he doesn't have to blink five times (7 = hand + 2 blinks). He turns his **head to his left hand, a little down, and straight back** (author, 2026-11-17). Only his left hand for now (spec 015), so calibration learns the side of his left hand and refuses the side of head right.
 3. When no signal comes for a short while (configurable), **the pause takes the number** (spec 009, the default): the
    column is fixed and he gives the row the same way; the pause after the row adds the letter, and Blinker **says only
    the letter** ("K"). Blinking again is the next letter; a shake right after it undoes it, so he gives it again.
@@ -110,7 +119,7 @@ readers, and said aloud only with "Mów pytania i komunikaty" (Say the questions
 | `LONG_BLINK` | select (scanning) / +1 (counting) | — |
 | `LOOK_AT_HAND` | +5 (counting only; ignored in scanning) | — |
 | `HEAD_NOD` | confirm the number Blinker asked about (with the nod confirmation on); **without a number, while Blinker waits for a column: a space** (the end of a word; author, 2026-11-13) | **yes** |
-| `HEAD_SHAKE` or `HEAD_LEFT` | **no / back one step (−1)**: in counting, discard the number Blinker asked about; otherwise from rows back to columns, and at columns delete the last character | **no** |
+| `HEAD_SHAKE` | **no / back one step (−1)**: in counting, discard the number Blinker asked about; otherwise from rows back to columns, and at columns delete the last character (`HEAD_LEFT` is the hand, not a "no") | **no** |
 | `HEAD_RIGHT` | finish the sentence and ask "Read it aloud?"; after reading, Blinker asks "New sentence?" | — |
 | `VERY_LONG_CLOSE` | pause or resume input (rest mode) | — |
 

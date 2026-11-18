@@ -17,7 +17,7 @@ generated:
 | 1.5 | Mock-ups: spec **004-mockups** | Clickable HTML/Tailwind mock-ups in `docs/design/`, viewed on a real phone; we iterate on them with the author. Output: the visual direction and the final tokens. Free: no design tool is needed. |
 | 2 | Board and input **without a camera** ✅: specs **006-counting-core**, **007-screens** | board model and import, the friend's board, the **counting** machine (the default and the PoC mode; scanning comes after the PoC), Space/button input, text and TTS. Already usable with a switch. |
 | 3 | Face-tracking spike | MediaPipe in a worker, a diagnostic screen with live blendshapes and head pose, measurements on Android Chrome and iOS Safari (FPS, battery, light, glasses). Ends with an ADR. Built (spec 010); ADR-0006 proposed, measurements on his devices pending. |
-| 4 | Signal detection + calibration | PoC signals first: LONG_BLINK, LOOK_AT_HAND, HEAD_NOD, HEAD_SHAKE; other head turns later; calibration wizard; profiles. Built (spec 011): the five signals incl. head right, one profile; thresholds to check with him. |
+| 4 | Signal detection + calibration | PoC signals first: LONG_BLINK, LOOK_AT_HAND, HEAD_NOD, HEAD_SHAKE; other head turns later; calibration wizard; profiles. Built (spec 011): the five signals incl. head right, one profile; thresholds to check with him. The hand is a quick head turn to his left (spec 015, built; to check with him). |
 | 5 | Integration and UX | signals → actions, undo, confirmations, pause, audio mode for the "caregiver holds the phone" setup. Built (spec 012): the camera drives Liczenie (Counting), a tone per signal, the face status, the rear camera; pause by closed eyes waits for him. |
 | 6 | Trial with the friend | tune the thresholds, capture learnings. Checklist ready: `docs/trial/first-session.md`. |
 
@@ -26,6 +26,8 @@ generated:
   (F1, spec [013](specs/013-delete-all-data/spec.md), done 2026-11-18); ✅ stopping the camera while the app is in the
   background (F2, spec [014](specs/014-camera-in-background/spec.md), done 2026-11-18; the checks on his phone wait in
   [first session](trial/first-session.md)).
+- **His right hand** (spec 015, out of scope): a turn of the head to his right is head right (`RIGHT`), so the right
+  hand needs another mark, for example the pitch (the hand goes down, head right does not) or the hold. Decide after the trial.
 - Board editor; importing a board from a photo.
 - **Shortcuts for frequent words** (author, 2026-11-12: "do rozważenia" (to consider)): a word picked with one number instead of
   letter by letter. To design after the PoC, together with him.

@@ -35,7 +35,7 @@ Diagnostyka (Diagnostics) pages; whichever lands second rebases on the other.
       movement and the hand rule instead of the look down, live yaw and pitch also from neutral (R10). Strings in en
       and pl. Tests: diagnostics page unit (the copied text).
       _To understand:_ why a copy with signs and the whole profile is enough to tune him from a distance.
-- [ ] **T5 [haiku]: Docs.** `interaction-model.md` (`LOOK_AT_HAND`, `HEAD_LEFT`, the detection notes; R11), the
+- [x] **T5 [haiku]: Docs.** `interaction-model.md` (`LOOK_AT_HAND`, `HEAD_LEFT`, the detection notes; R11), the
       first-session checklist (the checks with him), architecture if it names the eye rule, README, backlog, log,
       specs index, Polish copies.
       _To understand:_ nothing new.
