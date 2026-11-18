@@ -15,6 +15,7 @@ function setup() {
     error: signal<string | null>(null),
     errorDetail: signal<string | null>(null),
     frame: signal<FaceFrame | null>(null),
+    resumes: signal(0),
     start: vi.fn(async () => undefined),
     stop: vi.fn(),
   };
@@ -74,5 +75,50 @@ describe('CameraInput (spec 012, R2, R4)', () => {
     expect(tracker.stop).toHaveBeenCalled();
     feed(record(2000, { eyes: closed(300, 1100) }));
     expect(sent).toEqual([]);
+  });
+
+  it('a return starts the detector afresh: half a blink from before never joins one after (spec 014, R4)', async () => {
+    const { input, tracker, feed } = setup();
+    const sent: FaceSignal[] = [];
+    await input.start({} as HTMLVideoElement, 'user', (s) => sent.push(s));
+    const all = record(2000, { eyes: closed(300, 1100) });
+    feed(all.filter((f) => f.timestamp < 1000));
+    tracker.resumes.set(1);
+    TestBed.tick();
+    feed(all.filter((f) => f.timestamp >= 1000));
+    // Joined, the closure would last 800 ms and count as a blink.
+    expect(sent).toEqual([]);
+  });
+
+  it('a return makes "Face in view" unknown until the first frame, and sends no signal (spec 014, R4)', async () => {
+    const { input, tracker, feed } = setup();
+    const sent: FaceSignal[] = [];
+    await input.start({} as HTMLVideoElement, 'user', (s) => sent.push(s));
+    feed(record(500));
+    expect(input.faceInView()).toBe(true);
+    tracker.frame.set(null);
+    tracker.resumes.set(1);
+    TestBed.tick();
+    expect(input.faceInView()).toBeNull();
+    expect(sent).toEqual([]);
+    feed(record(100, {}, 3000));
+    expect(input.faceInView()).toBe(true);
+  });
+
+  it('"Brak twarzy" (No face) needs the grace time from the first frame of a run, at a start and on a return (spec 014, R4)', async () => {
+    const { input, tracker, feed } = setup();
+    await input.start({} as HTMLVideoElement, 'user', () => undefined);
+    feed(record(FACE_LOST_AFTER_MS - 300, { face: () => false }, 1000));
+    expect(input.faceInView()).toBeNull();
+    feed(record(300, { face: () => false }, 1000 + FACE_LOST_AFTER_MS));
+    expect(input.faceInView()).toBe(false);
+
+    tracker.frame.set(null);
+    tracker.resumes.set(1);
+    TestBed.tick();
+    feed(record(FACE_LOST_AFTER_MS - 300, { face: () => false }, 9000));
+    expect(input.faceInView()).toBeNull();
+    feed(record(300, { face: () => false }, 9000 + FACE_LOST_AFTER_MS));
+    expect(input.faceInView()).toBe(false);
   });
 });

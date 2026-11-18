@@ -19,7 +19,7 @@ for the next e2e pass (the paths are in the spec's Test plan).
       Tests: unit with a fake document, camera and worker, including the quick changes of R8.
       _To understand:_ the Page Visibility API; why a run counter makes late answers harmless; stopping a track
       against ending a worker.
-- [ ] **T2 [sonnet]: A clean start on the three pages.** `CameraInput` resets the detector and the face status on a
+- [x] **T2 [sonnet]: A clean start on the three pages.** `CameraInput` resets the detector and the face status on a
       new run; Kalibracja (Calibration) records the step under way again and says its instruction; Diagnostyka
       (Diagnostics) restarts its measurement (R4, R6, R7). Tests: unit per page and for the camera input.
       _To understand:_ why half a movement must not survive a gap.

@@ -24,9 +24,18 @@ export class CameraInput {
 
   private sink: ((signal: FaceSignal) => void) | null = null;
   private detector = INITIAL_DETECTOR;
-  private lastFaceAt = Number.NEGATIVE_INFINITY;
+  /** The last frame with his face; null until the first frame of a run. */
+  private lastFaceAt: number | null = null;
 
   constructor() {
+    // Spec 014, R4: a return from the background is a new run. The detector starts from its initial state, so half a
+    // blink or nod from before the gap never joins one after it; the face status is unknown until the first frame,
+    // and "no face" again needs its grace time. Nothing is sent to the sink: no tone and no speech from the return.
+    // untracked: the reset writes faceInView, which must not run this effect again.
+    effect(() => {
+      if (this.tracker.resumes() === 0) return;
+      untracked(() => this.reset());
+    });
     effect(() => {
       const frame = this.tracker.frame();
       if (!frame) return;
@@ -34,6 +43,9 @@ export class CameraInput {
         const found = detect(this.detector, frame, this.profiles.profile());
         this.detector = found.state;
         for (const s of found.signals) this.sink?.(s);
+        // The grace time counts from the first frame of a run, so "no face" never shows before the camera had
+        // 1.5 s to find him (spec 014, R4).
+        this.lastFaceAt ??= frame.timestamp;
         if (frame.face) {
           this.lastFaceAt = frame.timestamp;
           if (this.faceInView() !== true) this.faceInView.set(true);
@@ -53,10 +65,14 @@ export class CameraInput {
     sink: (signal: FaceSignal) => void,
   ): Promise<void> {
     this.sink = sink;
-    this.detector = INITIAL_DETECTOR;
-    this.lastFaceAt = Number.NEGATIVE_INFINITY;
-    this.faceInView.set(null);
+    this.reset();
     await this.tracker.start(video, facing);
+  }
+
+  private reset(): void {
+    this.detector = INITIAL_DETECTOR;
+    this.lastFaceAt = null;
+    this.faceInView.set(null);
   }
 
   stop(): void {

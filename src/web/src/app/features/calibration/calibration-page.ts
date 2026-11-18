@@ -123,6 +123,15 @@ export class CalibrationPage {
       // untracked: adding a frame changes the recordings, which must not run this effect again.
       if (frame && isStep(page)) untracked(() => this.add(page, frame));
     });
+    // Spec 014, R6: a return from the background records the step under way again from its start and says its
+    // instruction again; finished steps keep their recordings. The tracker cleared its frame, so nothing old joins.
+    effect(() => {
+      if (this.tracker.resumes() === 0) return;
+      untracked(() => {
+        const page = this.page();
+        if (isStep(page)) this.beginStep(page);
+      });
+    });
     inject(DestroyRef).onDestroy(() => this.tracker.stop());
   }
 
@@ -162,16 +171,7 @@ export class CalibrationPage {
   private go(index: number): void {
     const target = Math.max(0, Math.min(WIZARD.length - 1, index));
     const page = WIZARD[target];
-    if (isStep(page)) {
-      // Entering a step records it again from the start, and un-skips it.
-      this.recordings.update((r) => ({ ...r, [page]: [] }));
-      this.skipped.update((s) => new Set([...s].filter((x) => x !== page)));
-      // He listens: the instruction is said aloud as well as shown.
-      this.counting.listen(
-        this.transloco.translate(`calibration.step.${page}.say`),
-        this.transloco.getActiveLang(),
-      );
-    }
+    if (isStep(page)) this.beginStep(page);
     this.saved.set(false);
     this.index.set(target);
     // The camera page asks for the camera at once (the click on Dalej (Next) is the user's gesture); the button
@@ -179,6 +179,17 @@ export class CalibrationPage {
     if (page === 'camera' && !this.cameraOn()) void this.startCamera();
     // Focus the new step's heading, so a screen reader starts there (like a page change).
     queueMicrotask(() => this.heading()?.nativeElement.focus());
+  }
+
+  /** Records a step again from its start, un-skips it, and says its instruction aloud (he listens). */
+  private beginStep(page: CalibrationStep): void {
+    this.recordings.update((r) => ({ ...r, [page]: [] }));
+    this.skipped.update((s) => new Set([...s].filter((x) => x !== page)));
+    this.revision.update((n) => n + 1);
+    this.counting.listen(
+      this.transloco.translate(`calibration.step.${page}.say`),
+      this.transloco.getActiveLang(),
+    );
   }
 
   private add(step: CalibrationStep, frame: FaceFrame): void {
