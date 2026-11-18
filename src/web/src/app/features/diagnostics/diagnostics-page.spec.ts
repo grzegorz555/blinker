@@ -126,7 +126,7 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
   it('says why the last movement of the head was or was not a look at his hand, with the hand rule', async () => {
     const { fixture, tracker, text, button } = await render();
     expect(text('last-move')).toBe('None yet.');
-    expect(text('hand-profile')).toContain('turns 25° to his left (turn sign -1)');
+    expect(text('hand-profile')).toContain('turns 25° to his left (turn sign -1, tilt 0°)');
     const yaw = (t: number) => (t >= 200 && t < 700 ? -50 : 0);
     const pitch = (t: number) => (t >= 200 && t < 700 ? 9 : 0);
     for (const frame of record(1500, { yaw, pitch })) {

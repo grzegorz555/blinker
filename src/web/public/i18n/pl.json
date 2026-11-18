@@ -355,7 +355,7 @@
         "otherSide": "nie w stronę jego ręki",
         "tooSoon": "spojrzenie na rękę, za szybko po poprzednim sygnale (niezaliczone)"
       },
-      "profile": "Spojrzenie na rękę się liczy, gdy głowa obróci się o {{amplitude}}° w jego lewo (znak obrotu {{direction}}) i wróci w ciągu {{windowMs}} ms."
+      "profile": "Spojrzenie na rękę się liczy, gdy głowa obróci się o {{amplitude}}° w jego lewo (znak obrotu {{direction}}, skłon {{pitch}}°) i wróci w ciągu {{windowMs}} ms."
     }
   },
   "calibration": {
@@ -388,14 +388,9 @@
         "say": "Trzy mocne mrugnięcia."
       },
       "hand": {
-        "title": "Spojrzenie na lewą rękę (+5)",
-        "do": "Poproś, żeby spojrzał w dół na lewą rękę i wrócił wzrokiem. Dwa razy.",
-        "say": "Spójrz na lewą rękę i wróć. Dwa razy."
-      },
-      "handRight": {
-        "title": "Spojrzenie na prawą rękę",
-        "do": "Tylko jeśli patrzy też na prawą rękę. Jeśli nie, pomiń ten krok: wystarczy lewa.",
-        "say": "Spójrz na prawą rękę i wróć. Dwa razy."
+        "title": "Ręka (+5)",
+        "do": "Poproś, żeby szybko obrócił głowę w stronę swojej lewej ręki i wrócił głową do ekranu. Dwa razy.",
+        "say": "Spójrz szybko na swoją lewą rękę i wróć głową do ekranu. Dwa razy."
       },
       "nod": {
         "title": "Skinienie (tak)",
