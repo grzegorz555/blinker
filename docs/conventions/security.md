@@ -32,6 +32,11 @@ There are no accounts, no server and no shared data. The main risks are:
   - The repository holds no personal data (GDPR): no names, contact details, ID numbers or health records of him,
     and no image metadata (EXIF can hold GPS). `scripts/privacy.test.mjs` checks every tracked file on each run (images
     without EXIF, XMP or GPS; no e-mail addresses but GitHub noreply ones; no PESEL or phone numbers).
+- **One erase, one prefix (spec 013, closes F1 of the [security pass](../security-review.md)):** every key Blinker
+  writes to the device starts with `blinker.` (`STORAGE_PREFIX`). "Usuń wszystkie dane" (Delete all data) in
+  Ustawienia (Settings) asks first, resets every service to its defaults and removes every `blinker.` key. A new store
+  must use the prefix and have a reset in `DeviceDataService.eraseAll()`; a unit test fills every store, erases, and
+  fails when a `blinker.` key is left or a service is not at its defaults.
 
 # Response headers (set by the host, see ADR-0003)
 ```
@@ -88,4 +93,4 @@ Agents never read `.env*`, the credential manager or `git credential` output.
 # How we check
 - The `code-reviewer` agent checks the points above for every change.
 - An e2e test reads the response headers on the preview deploy.
-- Before the first real use: a pass through the ASVS chapters listed above, plus `/security-review`. The chapter-level pass of 2026-11-16 is in [security-review.md](../security-review.md); its two findings are open.
+- Before the first real use: a pass through the ASVS chapters listed above, plus `/security-review`. The chapter-level pass of 2026-11-16 is in [security-review.md](../security-review.md); its F1 is closed by spec 013, and F2 stays open (spec 014).

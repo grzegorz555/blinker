@@ -1,5 +1,10 @@
 # Log
 
+## 2026-11-18 (spec 013: delete all data)
+- F1 of the security pass is closed: Ustawienia (Settings) has "Dane na tym urządzeniu" (Data on this device) with "Usuń wszystkie dane" (Delete all data) after a confirmation (focus on "Anuluj" (Cancel)). Every service goes back to its defaults and every `blinker.` key is removed; the result is said in text.
+- `DeviceDataService.eraseAll()` resets Settings, Boards, History, Counting, Language (the saved choice) and Profile, then sweeps the `blinker.` prefix; a unit test fills every store and fails on a leftover key or a service not at its defaults. The rule for new stores is in `docs/conventions/security.md`.
+- E2E paths for the section (3 device projects, axe) are in the spec and wait for the next e2e pass.
+
 ## 2026-11-17 (spec 014: the camera off by hand)
 - Spec 014 also gives a caregiver one button to turn the camera off and on: a "Kamera" (Camera) toggle in the top bar of Liczenie (Counting), "Wyłącz kamerę" (Turn off the camera) in Kalibracja (Calibration), and the Diagnostyka (Diagnostics) button in a bar that stays in view (R10–R13); his signals cannot reach them. E2E paths moved to the next e2e pass. Still a draft, to approve.
 
