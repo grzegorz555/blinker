@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  untracked,
   DestroyRef,
   effect,
   ElementRef,
@@ -84,6 +85,12 @@ export class DiagnosticsPage {
   });
 
   constructor() {
+    // Spec 014, R7: a return from the background restarts the measurement, like "Włącz kamerę" (Turn on the camera).
+    // untracked: the reset writes signals that must not run this effect again.
+    effect(() => {
+      if (this.tracker.resumes() === 0) return;
+      untracked(() => this.resetMeasurement());
+    });
     effect(() => {
       const frame = this.frame();
       if (!frame) return;
@@ -117,6 +124,13 @@ export class DiagnosticsPage {
   }
 
   protected async start(): Promise<void> {
+    this.resetMeasurement();
+    void this.watchBattery();
+    await this.tracker.start(this.video().nativeElement);
+  }
+
+  /** The counters, lists and detector begin again, so a copied result never mixes two runs. */
+  private resetMeasurement(): void {
     this.copied.set(false);
     this.detector = INITIAL_DETECTOR;
     this.detected.set([]);
@@ -125,8 +139,7 @@ export class DiagnosticsPage {
     this.lastLook.set(null);
     this.looks = [];
     this.counts.set({ frames: 0, faces: 0, since: performance.now() });
-    void this.watchBattery();
-    await this.tracker.start(this.video().nativeElement);
+    this.battery.update((b) => (b ? { start: b.now, now: b.now } : b));
   }
 
   protected stop(): void {

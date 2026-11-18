@@ -15,6 +15,7 @@ function fakeTracker() {
     errorDetail: signal<string | null>(null),
     delegate: signal<'GPU' | 'CPU' | null>(null),
     frame: signal<FaceFrame | null>(null),
+    resumes: signal(0),
     stats: signal(frameStats([])),
     blocked: signal<readonly string[]>([]),
     start: vi.fn(async () => undefined),
@@ -143,6 +144,23 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     tracker.error.set('denied');
     await fixture.whenStable();
     expect(text('tracker-status')).toContain('No permission for the camera');
+  });
+
+  it('a return from the background restarts the measurement like the button does (spec 014, R7)', async () => {
+    const { fixture, tracker, text } = await render();
+    tracker.status.set('running');
+    for (const frame of record(1500, { eyes: closed(200, 1000) })) {
+      tracker.frame.set(frame);
+      await fixture.whenStable();
+    }
+    expect(text('signals')).not.toBe('None yet.');
+    expect(text('last-closure')).not.toBe('None yet.');
+    tracker.frame.set(null);
+    tracker.resumes.set(1);
+    await fixture.whenStable();
+    expect(text('signals')).toBe('None yet.');
+    expect(text('last-closure')).toBe('None yet.');
+    expect(tracker.start).not.toHaveBeenCalled();
   });
 
   it('turns the camera off when the page goes', async () => {

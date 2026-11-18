@@ -38,6 +38,7 @@ describe('CountingPage with the camera (spec 012)', () => {
       error: signal<string | null>(null),
       errorDetail: signal<string | null>(null),
       frame: signal<FaceFrame | null>(null),
+      resumes: signal(0),
       start: vi.fn(async () => undefined),
       stop: vi.fn(),
     };

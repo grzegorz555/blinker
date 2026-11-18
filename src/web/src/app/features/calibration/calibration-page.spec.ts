@@ -18,6 +18,7 @@ function fakeTracker() {
     error: signal<string | null>(null),
     errorDetail: signal<string | null>(null),
     frame: signal<FaceFrame | null>(null),
+    resumes: signal(0),
     start: vi.fn(async () => undefined),
     stop: vi.fn(),
   };
@@ -149,6 +150,70 @@ describe('CalibrationPage (spec 011, R4)', () => {
       (b) => b.textContent?.trim() === 'Save the calibration',
     )!;
     expect(save.disabled).toBe(true);
+  });
+
+  it('a return from the background records the step under way again, says it again, and keeps finished steps (spec 014, R6)', async () => {
+    const { fixture, click, tracker, text, feed, listen } = await render();
+    await click('Next');
+    await click('Next');
+    tracker.status.set('running');
+    await feed(record(1500), 0);
+    await click('Next');
+    // The blink step: three long blinks closing to 0.7.
+    const lids = pulses(
+      [
+        [200, 1000, 0.7],
+        [1500, 2300, 0.7],
+        [2800, 3600, 0.7],
+      ],
+      0.2,
+    );
+    const blinks = record(4000, {
+      eyes: (t) => ({ eyeBlinkLeft: lids(t), eyeBlinkRight: lids(t) }),
+    });
+    await feed(blinks, 2000);
+    expect(text('detected')).toBe('Detected 3 of 3');
+    listen.mockClear();
+    tracker.resumes.set(1);
+    await fixture.whenStable();
+    expect(text('detected')).toBe('Detected 0 of 3');
+    expect(listen).toHaveBeenCalledTimes(1);
+    expect(listen).toHaveBeenLastCalledWith(expect.any(String), 'en');
+  });
+
+  it('a return keeps the recording of a finished step (spec 014, R6)', async () => {
+    const { fixture, click, tracker, text, feed } = await render();
+    await click('Next');
+    await click('Next');
+    tracker.status.set('running');
+    await feed(record(1500), 0);
+    await click('Next');
+    const lids = pulses(
+      [
+        [200, 1000, 0.7],
+        [1500, 2300, 0.7],
+        [2800, 3600, 0.7],
+      ],
+      0.2,
+    );
+    await feed(
+      record(4000, { eyes: (t) => ({ eyeBlinkLeft: lids(t), eyeBlinkRight: lids(t) }) }),
+      2000,
+    );
+    expect(text('detected')).toBe('Detected 3 of 3');
+    // The blink step is finished; the return comes during the next step.
+    await click('Next');
+    tracker.resumes.set(1);
+    await fixture.whenStable();
+    for (let i = 0; i < 5; i++) await click('Skip this step');
+    expect(text('results')).toContain('Detected 3 of 3');
+  });
+
+  it('a return on a page that is not a step changes nothing (spec 014, R6)', async () => {
+    const { fixture, tracker, listen } = await render();
+    tracker.resumes.set(1);
+    await fixture.whenStable();
+    expect(listen).not.toHaveBeenCalled();
   });
 
   it('turns the camera off when the page goes', async () => {
