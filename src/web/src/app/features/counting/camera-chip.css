@@ -56,3 +56,14 @@ video {
 .mirrored video {
   transform: scaleX(-1);
 }
+
+/* Spec 014: on a narrow top bar the status text wraps (two lines at most) instead of pushing the buttons away. */
+@media (max-width: 599px) {
+  .chip > span:last-child {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    max-width: 4.5rem;
+  }
+}

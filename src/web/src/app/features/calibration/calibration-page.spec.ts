@@ -21,6 +21,8 @@ function fakeTracker() {
     resumes: signal(0),
     start: vi.fn(async () => undefined),
     stop: vi.fn(),
+    release: vi.fn(),
+    reopen: vi.fn(),
   };
 }
 
@@ -220,5 +222,131 @@ describe('CalibrationPage (spec 011, R4)', () => {
     const { fixture, tracker } = await render();
     fixture.destroy();
     expect(tracker.stop).toHaveBeenCalled();
+  });
+
+  describe('the camera button (spec 014, R11)', () => {
+    const lids = pulses(
+      [
+        [200, 1000, 0.7],
+        [1500, 2300, 0.7],
+        [2800, 3600, 0.7],
+      ],
+      0.2,
+    );
+    const blinks = () =>
+      record(4000, { eyes: (t) => ({ eyeBlinkLeft: lids(t), eyeBlinkRight: lids(t) }) });
+    const names = (root: HTMLElement) =>
+      [...root.querySelectorAll('button')].map((b) => b.textContent?.trim());
+
+    const toResult = async (
+      click: (n: string) => Promise<void>,
+      heading: () => string | undefined,
+    ) => {
+      for (let i = 0; i < 10 && heading() !== 'Result'; i++) await click('Next');
+    };
+
+    it('has no camera button on the intro and the result, one on the camera step and every step', async () => {
+      const { root, click, tracker, fixture, heading } = await render();
+      expect(names(root)).not.toContain('Turn off the camera');
+      expect(names(root)).not.toContain('Turn on the camera');
+      await click('Next');
+      tracker.status.set('running');
+      await click('Next'); // At rest
+      await fixture.whenStable();
+      expect(names(root)).toContain('Turn off the camera');
+      await toResult(click, heading);
+      expect(names(root)).not.toContain('Turn off the camera');
+      expect(names(root)).not.toContain('Turn on the camera');
+    });
+
+    it('off releases the camera and drops the step under way; finished steps keep theirs', async () => {
+      const { click, tracker, text, feed, root, fixture, heading } = await render();
+      await click('Next');
+      await click('Next');
+      tracker.status.set('running');
+      await feed(record(1500), 0);
+      await click('Next'); // the blink step
+      await feed(blinks(), 2000);
+      expect(text('detected')).toBe('Detected 3 of 3');
+      await click('Next'); // finished blink step; the next one is under way
+      await feed(record(500), 7000);
+      await click('Turn off the camera');
+      expect(tracker.release).toHaveBeenCalledTimes(1);
+      tracker.status.set('idle');
+      await fixture.whenStable();
+      expect(names(root)).toContain('Turn on the camera');
+      expect(names(root)).not.toContain('Turn off the camera');
+      await toResult(click, heading);
+      expect(text('results')).toContain('Detected 3 of 3');
+    });
+
+    it('off drops the recording of the step under way', async () => {
+      const { click, tracker, text, feed, fixture } = await render();
+      await click('Next');
+      await click('Next');
+      tracker.status.set('running');
+      await feed(record(1500), 0);
+      await click('Next');
+      await feed(blinks(), 2000);
+      expect(text('detected')).toBe('Detected 3 of 3');
+      await click('Turn off the camera');
+      tracker.status.set('idle');
+      await fixture.whenStable();
+      tracker.status.set('running');
+      await fixture.whenStable();
+      expect(text('detected')).toBe('Detected 0 of 3');
+    });
+
+    it('on reopens the camera, records the step from its start and says the instruction', async () => {
+      const { click, tracker, listen, fixture } = await render();
+      await click('Next');
+      await click('Next');
+      tracker.status.set('running');
+      await fixture.whenStable();
+      await click('Turn off the camera');
+      tracker.status.set('idle');
+      await fixture.whenStable();
+      listen.mockClear();
+      await click('Turn on the camera');
+      expect(tracker.reopen).toHaveBeenCalledTimes(1);
+      expect(tracker.start).toHaveBeenCalledTimes(1); // only the camera step started it
+      expect(listen).toHaveBeenCalledTimes(1);
+      expect(listen).toHaveBeenLastCalledWith(
+        'Look calmly at the screen and blink as usual.',
+        'en',
+      );
+    });
+
+    it('on after an error starts the camera again instead of reopening', async () => {
+      const { click, tracker, fixture } = await render();
+      await click('Next');
+      await click('Next');
+      tracker.status.set('error');
+      await fixture.whenStable();
+      await click('Turn on the camera');
+      expect(tracker.start).toHaveBeenCalledTimes(2);
+      expect(tracker.reopen).not.toHaveBeenCalled();
+    });
+
+    it('the camera step offers off while the camera runs', async () => {
+      const { click, tracker, fixture, root } = await render();
+      await click('Next');
+      tracker.status.set('running');
+      await fixture.whenStable();
+      expect(names(root)).toContain('Turn off the camera');
+      await click('Turn off the camera');
+      expect(tracker.release).toHaveBeenCalledTimes(1);
+    });
+
+    it('no face signal reaches the buttons: frames change neither the camera nor the buttons (R13)', async () => {
+      const { tracker, feed, fixture, click } = await render();
+      await click('Next');
+      await click('Next');
+      tracker.status.set('running');
+      await feed(blinks(), 0);
+      fixture.nativeElement.ownerDocument.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
+      expect(tracker.release).not.toHaveBeenCalled();
+      expect(tracker.reopen).not.toHaveBeenCalled();
+    });
   });
 });

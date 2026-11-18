@@ -142,8 +142,9 @@ export class DiagnosticsPage {
     this.battery.update((b) => (b ? { start: b.now, now: b.now } : b));
   }
 
+  /** Spec 014, R12: turns the camera off by hand: every track stopped, the worker kept so "Włącz kamerę" (Turn on the camera) is quick. */
   protected stop(): void {
-    this.tracker.stop();
+    this.tracker.release();
   }
 
   protected eye(shape: EyeShape): number {

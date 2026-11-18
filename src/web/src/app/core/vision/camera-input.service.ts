@@ -75,6 +75,21 @@ export class CameraInput {
     this.faceInView.set(null);
   }
 
+  /**
+   * Spec 014, R10: the camera turned off by hand. The detector starts from its initial state and the face status is
+   * unknown; his signals keep reaching the sink from the buttons and keys, which never pass through here.
+   */
+  release(): void {
+    this.tracker.release();
+    this.reset();
+  }
+
+  /** Spec 014, R10: turns the camera on again; like a new run, the detector and the face status start afresh. */
+  reopen(): void {
+    this.reset();
+    this.tracker.reopen();
+  }
+
   stop(): void {
     this.sink = null;
     this.tracker.stop();

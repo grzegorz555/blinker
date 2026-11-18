@@ -20,6 +20,8 @@ function fakeTracker() {
     blocked: signal<readonly string[]>([]),
     start: vi.fn(async () => undefined),
     stop: vi.fn(),
+    release: vi.fn(),
+    reopen: vi.fn(),
   };
 }
 
@@ -167,5 +169,52 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     const { fixture, tracker } = await render();
     fixture.destroy();
     expect(tracker.stop).toHaveBeenCalled();
+  });
+
+  describe('the camera bar (spec 014, R12)', () => {
+    it('holds the camera button and the status in one sticky bar, ahead of the page content', async () => {
+      const { root, tracker, fixture } = await render();
+      const bar = root.querySelector('[data-testid="camera-bar"]')!;
+      expect(bar.querySelector('button')?.textContent?.trim()).toBe('Turn on the camera');
+      expect(bar.querySelector('[data-testid="tracker-status"]')).not.toBeNull();
+      expect(root.firstElementChild).toBe(bar);
+      tracker.status.set('running');
+      await fixture.whenStable();
+      expect(bar.querySelector('button')?.textContent?.trim()).toBe('Turn off the camera');
+    });
+
+    it('has the sticky position and keeps a scroll margin for the controls under it', async () => {
+      const { root } = await render();
+      const bar = root.querySelector('[data-testid="camera-bar"]')!;
+      expect(getComputedStyle(bar).position).toBe('sticky');
+      expect(
+        parseFloat(getComputedStyle(bar.querySelector('button')!).scrollMarginTop),
+      ).toBeGreaterThan(0);
+    });
+
+    it('off releases the camera and keeps the worker; on measures again from the start', async () => {
+      const { tracker, button, fixture, text } = await render();
+      tracker.status.set('running');
+      await fixture.whenStable();
+      button('Turn off the camera')!.click();
+      expect(tracker.release).toHaveBeenCalledTimes(1);
+      expect(tracker.stop).not.toHaveBeenCalled();
+      tracker.status.set('idle');
+      await fixture.whenStable();
+      expect(text('tracker-status')).toBe('The camera is off.');
+      button('Turn on the camera')!.click();
+      expect(tracker.start).toHaveBeenCalledTimes(1);
+    });
+
+    it('no face signal changes the camera (R13)', async () => {
+      const { tracker, fixture } = await render();
+      tracker.status.set('running');
+      for (const frame of record(2000, { eyes: closed(300, 1100) })) {
+        tracker.frame.set(frame);
+        await fixture.whenStable();
+      }
+      expect(tracker.release).not.toHaveBeenCalled();
+      expect(tracker.start).not.toHaveBeenCalled();
+    });
   });
 });

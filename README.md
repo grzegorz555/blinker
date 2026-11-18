@@ -24,7 +24,7 @@ them into sentences that are shown on screen and read aloud.
 
 **Stage 5: the camera drives Liczenie (Counting)** (spec [012](docs/specs/012-camera-counting/spec.md), built; to try with him):
 
-- In Ustawienia (Settings), "Kamera" (Camera): "Sterowanie kamerą w Liczeniu" (Camera control in Counting, off by default), a small preview, "Dźwięk przy sygnale" (A sound for each signal, on), and the front or rear camera. With it on, Liczenie (Counting) watches his face: each signal works like its button and plays a short tone; the top bar says whether his face is in view.
+- In Ustawienia (Settings), "Kamera" (Camera): "Sterowanie kamerą w Liczeniu" (Camera control in Counting, off by default), a small preview, "Dźwięk przy sygnale" (A sound for each signal, on), and the front or rear camera. With it on, Liczenie (Counting) watches his face: each signal works like its button and plays a short tone; the top bar says whether his face is in view. A "Kamera" (Camera) toggle button next to "Pauza" (Pause) turns the camera off and on by hand (the chip says "Kamera wyłączona" (Camera off)); Kalibracja (Calibration) has "Wyłącz kamerę" (Turn off the camera) / "Włącz kamerę" (Turn on the camera) on its steps, and Diagnostyka (Diagnostics) keeps them in a bar that stays in view (spec [014](docs/specs/014-camera-in-background/spec.md)).
 
 **Stage 4: his signals from the camera** (spec [011](docs/specs/011-signals/spec.md), built; the thresholds are defaults until he is calibrated):
 

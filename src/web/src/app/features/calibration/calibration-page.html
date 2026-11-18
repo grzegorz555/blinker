@@ -191,6 +191,18 @@
   }
 
   <div class="actions">
+    <!-- Spec 014, R11: an ordinary button whose text says the action; on the camera step the button above starts it. -->
+    @if (hasCameraButton()) {
+      @if (cameraOn()) {
+        <button matButton="outlined" type="button" data-testid="camera-off" (click)="turnOff()">
+          {{ 'diagnostics.stop' | transloco }}
+        </button>
+      } @else if (page() !== 'camera') {
+        <button matButton="outlined" type="button" data-testid="camera-on" (click)="turnOn()">
+          {{ 'diagnostics.start' | transloco }}
+        </button>
+      }
+    }
     @if (index() > 0) {
       <button matButton="outlined" type="button" (click)="back()">
         {{ 'calibration.back' | transloco }}
