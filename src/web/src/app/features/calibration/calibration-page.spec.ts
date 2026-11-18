@@ -82,7 +82,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
     await click('Next');
     expect(heading()).toBe('At rest, facing the screen');
     expect(listen).toHaveBeenLastCalledWith('Look calmly at the screen and blink as usual.', 'en');
-    expect(text('step-count')).toBe('Step 3 of 10');
+    expect(text('step-count')).toBe('Step 3 of 9');
   });
 
   it('learns from his movements, shows "Detected 3 of 3", and saves only on the button', async () => {
@@ -120,7 +120,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
     await feed(record(1500, { yaw: (t) => (t >= 200 && t < 700 ? -50 : 0) }), 7000);
     expect(text('hand-moves')).toContain('turn -50°');
     expect(text('hand-moves')).toContain('counted as a look at his hand');
-    for (let i = 0; i < 5; i++) await click('Skip this step');
+    for (let i = 0; i < 4; i++) await click('Skip this step');
     expect(text('results')).toContain('Detected 3 of 3');
     expect(text('results')).toContain('Skipped');
     expect(text('blink-profile')).toContain('closure reaches 0.45');
@@ -145,7 +145,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
     await click('Next');
     await feed(record(2000, { eyes: closed(200, 1000), face: () => false }), 1500);
     expect(text('detected')).toBe('Detected 0 of 3');
-    for (let i = 0; i < 6; i++) await click(i === 0 ? 'Next' : 'Skip this step');
+    for (let i = 0; i < 5; i++) await click(i === 0 ? 'Next' : 'Skip this step');
     expect(text('nothing-learnt')).toContain('No movement was recognized');
     const save = [...root.querySelectorAll('button')].find(
       (b) => b.textContent?.trim() === 'Save the calibration',

@@ -76,7 +76,7 @@ export class CalibrationPage {
     this.revision();
     const recordings = { ...this.recordings() };
     for (const step of this.skipped()) delete recordings[step];
-    return fitProfile(recordings, this.profiles.profile());
+    return fitProfile(recordings, this.profiles.profile(), this.profiles.calibrated());
   });
 
   protected readonly repeats = (step: Movement) => STEP_REPEATS[step];
@@ -88,12 +88,11 @@ export class CalibrationPage {
       .slice(-3)
       .reverse();
   });
-  /** His last 2 movements of the head in a hand step, newest first, judged by the profile fitted so far. */
+  /** His last 2 movements of the head in the hand step, newest first, judged by the profile fitted so far. */
   protected readonly handMoves = computed(() => {
     this.revision();
-    const page = this.page();
-    if (page !== 'handLeft' && page !== 'handRight') return [];
-    return headReports(this.recordings()[page] ?? [], this.fit().profile)
+    if (this.page() !== 'hand') return [];
+    return headReports(this.recordings().hand ?? [], this.fit().profile)
       .slice(-2)
       .reverse();
   });

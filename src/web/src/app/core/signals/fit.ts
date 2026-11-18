@@ -9,31 +9,21 @@ import { closureOf, cuesOf, maxCues, STRONG_CUES, type CueValues, type StrongCue
 import { detectAll, type FaceSignal } from './detector';
 import { PROFILE_LIMITS, type SignalProfile } from './profile';
 
-export const CALIBRATION_STEPS = [
-  'neutral',
-  'blink',
-  'handLeft',
-  'handRight',
-  'nod',
-  'shake',
-  'right',
-] as const;
+export const CALIBRATION_STEPS = ['neutral', 'blink', 'hand', 'nod', 'shake', 'right'] as const;
 export type CalibrationStep = (typeof CALIBRATION_STEPS)[number];
 export type Recordings = Partial<Record<CalibrationStep, readonly FaceFrame[]>>;
 
 /** What each movement step should produce, and how many times we ask for it. */
 export const STEP_SIGNAL: Record<Exclude<CalibrationStep, 'neutral'>, FaceSignal> = {
   blink: 'BLINK',
-  handLeft: 'HAND',
-  handRight: 'HAND',
+  hand: 'HAND',
   nod: 'NOD',
   shake: 'SHAKE',
   right: 'RIGHT',
 };
 export const STEP_REPEATS: Record<Exclude<CalibrationStep, 'neutral'>, number> = {
   blink: 3,
-  handLeft: 2,
-  handRight: 2,
+  hand: 2,
   nod: 2,
   shake: 2,
   right: 2,
@@ -108,7 +98,15 @@ function peak(values: readonly number[]): number {
   return Math.sign(percentile(big, 50)) * size;
 }
 
-export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit {
+/**
+ * `previousCalibrated`: the previous profile came from a calibration, so its head right is his, not the guess of the
+ * defaults (spec 015, R8: only a known head right can refuse his hand).
+ */
+export function fitProfile(
+  recordings: Recordings,
+  previous: SignalProfile,
+  previousCalibrated = false,
+): Fit {
   const L = PROFILE_LIMITS;
   const learnt: CalibrationStep[] = [];
   let blinkFit: Fit['blink'];
@@ -181,9 +179,6 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
     learnt.push('blink');
   }
 
-  // The hand steps learn nothing for now: the eye rule is gone (spec 015, R6), and the head angle of his hand is
-  // learnt by the one hand step of spec 015, R8 (still to come). countDetected finds his glances with the profile.
-
   const nod = withFace(recordings.nod).map((f) => (f.head?.pitch ?? 0) - p.neutral.pitch);
   const nodPeak = peak(nod);
   if (Math.abs(nodPeak) >= MIN_CONTRAST.angle) {
@@ -218,6 +213,42 @@ export function fitProfile(recordings: Recordings, previous: SignalProfile): Fit
     };
     learnt.push('right');
   }
+
+  // His glance at his hand (spec 015, R8): a quick turn of the head, learnt like head right from the signed peak of the
+  // yaw. After head right, because a side that a known head right uses is refused: the same turn cannot mean both.
+  // A head right that is only the guess of the defaults never refuses a real glance; it moves to the other side.
+  const rightKnown = learnt.includes('right') || previousCalibrated;
+  const hand = withFace(recordings.hand).map((f) => ({
+    yaw: (f.head?.yaw ?? 0) - p.neutral.yaw,
+    pitch: (f.head?.pitch ?? 0) - p.neutral.pitch,
+  }));
+  const handPeak = peak(hand.map((f) => f.yaw));
+  const handSide = Math.sign(handPeak) as -1 | 1;
+  if (Math.abs(handPeak) >= MIN_CONTRAST.angle && (handSide !== p.right.direction || !rightKnown)) {
+    if (handSide === p.right.direction) {
+      p = { ...p, right: { ...p.right, direction: -handSide as -1 | 1 } };
+    }
+    const amplitude = round(clamp(Math.abs(handPeak) / 2, L.amplitude), 1);
+    // The tilt of his glance: the median pitch while the head is turned past the amplitude (shown, not used to decide).
+    const pitch = percentile(
+      hand.filter((f) => f.yaw * handSide >= amplitude).map((f) => f.pitch),
+      50,
+    );
+    p = {
+      ...p,
+      hand: {
+        ...p.hand,
+        amplitude,
+        direction: handSide,
+        pitch: Number.isNaN(pitch) ? p.hand.pitch : round(clamp(pitch, L.angle), 1),
+      },
+    };
+    learnt.push('hand');
+  } else if (p.hand.direction === p.right.direction) {
+    // Head right was learnt on the side his hand had: his left is the other way from his right (R7).
+    p = { ...p, hand: { ...p.hand, direction: -p.right.direction as -1 | 1 } };
+  }
+  learnt.sort((a, b) => CALIBRATION_STEPS.indexOf(a) - CALIBRATION_STEPS.indexOf(b));
 
   return blinkFit ? { profile: p, learnt, blink: blinkFit } : { profile: p, learnt };
 }

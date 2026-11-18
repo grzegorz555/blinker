@@ -387,7 +387,7 @@
         "do": "Poproś go o 3 mocne mrugnięcia (mocniejsze niż zwykłe), w swoim tempie.",
         "say": "Trzy mocne mrugnięcia."
       },
-      "handLeft": {
+      "hand": {
         "title": "Spojrzenie na lewą rękę (+5)",
         "do": "Poproś, żeby spojrzał w dół na lewą rękę i wrócił wzrokiem. Dwa razy.",
         "say": "Spójrz na lewą rękę i wróć. Dwa razy."

@@ -387,7 +387,7 @@
         "do": "Ask him for 3 strong blinks (stronger than usual), at his own pace.",
         "say": "Three strong blinks."
       },
-      "handLeft": {
+      "hand": {
         "title": "Look at his left hand (+5)",
         "do": "Ask him to look down at his left hand and back. Twice.",
         "say": "Look at your left hand and back. Twice."
