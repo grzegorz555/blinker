@@ -8,6 +8,7 @@ import {
   FaceTrackerService,
   GRAB_FRAME,
   NOW,
+  PAGE_DOCUMENT,
   VISION_SUPPORTED,
   type FaceWorker,
 } from './face-tracker.service';
@@ -50,6 +51,12 @@ function fakeVideo() {
   return { video: video as unknown as HTMLVideoElement, raw: video, nextFrame, callbacks };
 }
 
+const visiblePage = {
+  visibilityState: 'visible' as DocumentVisibilityState,
+  addEventListener: () => undefined,
+  removeEventListener: () => undefined,
+};
+
 function setup(camera: () => Promise<MediaStream> = async () => stream(), supported = true) {
   const worker = new FakeWorker();
   const openCamera = vi.fn(camera);
@@ -62,6 +69,8 @@ function setup(camera: () => Promise<MediaStream> = async () => stream(), suppor
       { provide: GRAB_FRAME, useValue: async () => bitmap() },
       { provide: NOW, useValue: () => 1000 },
       { provide: VISION_SUPPORTED, useValue: () => supported },
+      // A visible page; spec 014 (hidden and visible) is in face-tracker.visibility.spec.ts.
+      { provide: PAGE_DOCUMENT, useValue: visiblePage },
     ],
   });
   return { service: TestBed.inject(FaceTrackerService), worker, openCamera };

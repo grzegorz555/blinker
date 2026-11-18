@@ -12,7 +12,7 @@ generated:
 Branch: `feat/014-camera-in-background`. Gates: `npm run verify -- --quick`; CI runs `npm run verify`. E2E waits
 for the next e2e pass (the paths are in the spec's Test plan).
 
-- [ ] **T1 [opus]: The tracker follows the page's visibility.** `FaceTrackerService` listens to `visibilitychange`
+- [x] **T1 [opus]: The tracker follows the page's visibility.** `FaceTrackerService` listens to `visibilitychange`
       (an injected document, as in `wake-lock.ts`): hidden releases the camera and keeps the worker, visible opens
       it again with the same facing and video; a signal tells the pages that a new run began (R1–R3, R5, R8). A stop
       by hand is remembered, so visible does not undo it (R13).
