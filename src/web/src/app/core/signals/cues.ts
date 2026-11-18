@@ -32,9 +32,3 @@ export const maxCues = (a: CueValues, b: CueValues): CueValues => ({
 
 export const downOf = (f: FaceFrame) =>
   Math.max(f.eyes.eyeLookDownLeft ?? 0, f.eyes.eyeLookDownRight ?? 0);
-
-/** Looking to his left moves his left eye out and his right eye in (towards the nose); to his right, the opposite. */
-export const sidesOf = (f: FaceFrame) => ({
-  left: both(f, 'eyeLookOutLeft', 'eyeLookInRight'),
-  right: both(f, 'eyeLookInLeft', 'eyeLookOutRight'),
-});

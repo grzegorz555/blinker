@@ -13,7 +13,7 @@ Branch: `feat/015-hand-by-head`. Gates: `npm run verify -- --quick`; CI runs `np
 next e2e pass (the paths are in the spec's Test plan). Spec 014 also changes the Kalibracja (Calibration) and
 Diagnostyka (Diagnostics) pages; whichever lands second rebases on the other.
 
-- [ ] **T1 [opus]: The hand from the head, in the detector and the profile.** `HAND` from a turn to his left past
+- [x] **T1 [opus]: The hand from the head, in the detector and the profile.** `HAND` from a turn to his left past
       the amplitude and back within the window, after a 300 ms settle; the other side within the settle makes it a
       shake; a sent hand clears the shake sides; a nod with the yaw past half the hand amplitude is not sent; a
       closure during the turn is `atHand`; the eye rule goes (R1–R6). The head-movement report with signed peaks
