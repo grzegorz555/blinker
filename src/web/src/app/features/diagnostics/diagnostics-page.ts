@@ -28,6 +28,8 @@ interface BatteryLike extends EventTarget {
   readonly level: number;
 }
 
+const signWord = (direction: number): string => (direction < 0 ? '-1' : '+1');
+
 /**
  * Diagnostyka (Diagnostics) (spec 010, R4, R5): the camera, analysed on the device by MediaPipe in a worker, with the
  * live eye and head values, the frame rate and the analysis time, so the author can measure on his devices. The
@@ -75,6 +77,12 @@ export class DiagnosticsPage {
   protected readonly lastMove = signal<HeadReport | null>(null);
   private moves: HeadReport[] = [];
   protected readonly handProfile = computed(() => this.profiles.profile().hand);
+  /** The live head angles from his neutral (spec 015, R10), null without a face. */
+  protected readonly fromNeutral = computed(() => {
+    const head = this.frame()?.head;
+    const { neutral } = this.profiles.profile();
+    return head ? { yaw: head.yaw - neutral.yaw, pitch: head.pitch - neutral.pitch } : null;
+  });
   protected readonly blinkProfile = computed(() => this.profiles.profile().blink);
 
   /** Frames analysed and frames with a face, since the camera was turned on. */
@@ -163,6 +171,7 @@ export class DiagnosticsPage {
     const s = this.stats();
     const b = this.battery();
     const minutes = (performance.now() - this.counts().since) / 60000;
+    const profile = this.profiles.profile();
     const lines = [
       `Blinker diagnostics, ${new Date().toISOString()}`,
       `Browser: ${navigator.userAgent}`,
@@ -170,7 +179,9 @@ export class DiagnosticsPage {
       `FPS: ${s.fps.toFixed(1)}; analysis median ${s.medianMs.toFixed(1)} ms, p95 ${s.p95Ms.toFixed(1)} ms`,
       `Frames with a face: ${this.facePercent()}% over ${minutes.toFixed(1)} min`,
       `Battery: ${b ? `${Math.round(b.start * 100)}% -> ${Math.round(b.now * 100)}%` : 'not reported'}`,
-      `Profile: ${this.calibrated() ? 'calibrated' : 'defaults'}; blink ${JSON.stringify(this.blinkProfile())}; hand ${JSON.stringify(this.profiles.profile().hand)}`,
+      `Profile: ${this.calibrated() ? 'calibrated' : 'defaults (not calibrated)'}`,
+      `Profile JSON: ${JSON.stringify(profile)}`,
+      `Sides: his left = yaw ${signWord(profile.hand.direction)}, his right = yaw ${signWord(profile.right.direction)}`,
       'Last closures of the eyes (newest first): ms, closure, eyeSquint, cheekSquint, browDown, down, verdict',
       ...this.closures.map(
         (c) =>

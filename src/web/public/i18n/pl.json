@@ -309,6 +309,7 @@
     "yaw": "Obrót (w lewo / w prawo)",
     "pitch": "Skinienie (w górę / w dół)",
     "roll": "Przechylenie",
+    "fromNeutral": "{{value}}° od jego neutralu",
     "blocked": "Zablokowano wysyłkę do: {{origins}}",
     "copy": "Kopiuj wyniki",
     "copied": "Skopiowano wyniki (bez obrazu).",

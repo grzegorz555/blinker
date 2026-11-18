@@ -73,6 +73,8 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     expect(meter.value).toBeCloseTo(0.9);
     expect(text('head')).toContain('12°');
     expect(text('head')).toContain('-4°');
+    // Also from his neutral (spec 015, R10); the defaults have neutral 0.
+    expect(text('head')).toContain('(12° from his neutral)');
   });
 
   it('runs the detector on the frames and lists his signals, newest first (spec 011, R3)', async () => {
@@ -117,7 +119,7 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     button('Copy the results')!.click();
     await fixture.whenStable();
     const copied = (writeText.mock.calls[0] as unknown as [string])[0];
-    expect(copied).toContain('blink {"threshold":0.5');
+    expect(copied).toContain('"blink":{"threshold":0.5');
     expect(copied).toMatch(
       /\n {2}\d+, 0\.90, 0\.80, 0\.00, 0\.00, 0\.05, blink\n {2}\d+, 0\.90, 0\.30, 0\.00, 0\.00, 0\.05, weak\n/,
     );
@@ -144,6 +146,7 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     await fixture.whenStable();
     const copied = (writeText.mock.calls[0] as unknown as [string])[0];
     expect(copied).toMatch(/\n {2}\d+, -50\.0, 9\.0, HAND, hand\n/);
+    // The whole profile, whether it is calibrated, and his sides in words (spec 015, R10).    expect(copied).toContain('Profile: defaults (not calibrated)');    expect(copied).toContain('"hand":{"amplitude":25,"direction":-1');    expect(copied).toContain('"neutral":{"yaw":0,"pitch":0}');    expect(copied).toContain('Sides: his left = yaw -1, his right = yaw +1');
   });
 
   it('says why the camera stopped, in text', async () => {
