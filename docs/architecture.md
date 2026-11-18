@@ -88,16 +88,23 @@ machine. Stage 4 adds his face signals as one more source of `InputSignal`.
 - `core/boards/`: the board model, the import validator, the built-in and imported boards (localStorage).
 - `core/speech/`: the Speaker interface and the Web Speech implementation (on-device voices only).
 - `core/i18n/`: Transloco (en, pl).
-- `core/settings/`, `core/history/`, `core/storage/`: settings, the sentence history, storage that may fail.
+- `core/settings/`, `core/history/`, `core/storage/`: settings, the sentence history, storage that may fail; `core/storage/device-data.service.ts` is the one erase ("Usuń wszystkie dane" (Delete all data), spec 013).
 - `features/counting`, `features/sentences`, `features/boards`, `features/settings`; `features/calibrate` in stage 4.
 
 # Storage
 
 Everything stays on the device:
 
-- localStorage (spec 007): the settings, the imported boards and the active board, the sentence history, under
-  versioned keys (`blinker.*.v1`); every value is validated when read back, and the app keeps working in memory
-  when the storage is blocked or full;
+- localStorage (spec 007): the settings, the imported boards and the active board, the sentence history, the signal
+  profile (numbers only) and the language choice. Every key starts with the prefix `blinker.` (`STORAGE_PREFIX` in
+  `core/storage/local-store.ts`); most keys carry a version (`blinker.settings.v1`, `blinker.boards.v1`,
+  `blinker.activeBoard.v1`, `blinker.history.v1`, `blinker.profile.v1`), the language key does not
+  (`blinker.language`). Every value is validated when read back, and the app keeps working in memory when the storage
+  is blocked or full;
+- the erase (spec 013): `DeviceDataService.eraseAll()` puts every service back to its defaults in memory, without a
+  reload, and then removes every `blinker.` key from localStorage. It returns `erased` or `unavailable`. It is reached
+  from Ustawienia (Settings), "Dane na tym urządzeniu" (Data on this device), after a confirmation. A new store must
+  use the prefix and have a reset; a unit test fills every store, erases, and fails when a `blinker.` key is left;
 - IndexedDB later, if calibration profiles or many boards outgrow localStorage.
 
 There are no cookies, no server state and no telemetry.
