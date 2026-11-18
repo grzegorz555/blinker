@@ -422,3 +422,133 @@ describe('FaceTrackerService follows the page visibility (spec 014)', () => {
     expect(doc.listeners.size).toBe(0);
   });
 });
+
+describe('FaceTrackerService: the camera turned off by hand (spec 014, R10-R13)', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  it('release: every track stopped, the video cleared, no frame sent, the worker kept and the status idle', async () => {
+    const { service, raw, first, workers, callbacks } = await running();
+    const slipped = callbacks[0];
+    service.release();
+    expect(first.ended()).toBe(true);
+    expect(raw.srcObject).toBeNull();
+    expect(callbacks).toHaveLength(0);
+    slipped();
+    await settle();
+    expect(workers[0].frames()).toBe(0);
+    expect(workers[0].terminated).toBe(false);
+    expect(workers[0].sent).not.toContainEqual({ type: 'close' });
+    expect(service.status()).toBe('idle');
+  });
+
+  it('a camera released by hand stays off after hidden then visible (R13)', async () => {
+    const { service, doc, camera } = await running();
+    service.release();
+    doc.set('hidden');
+    doc.set('visible');
+    expect(camera.open).toHaveBeenCalledTimes(1);
+    expect(service.status()).toBe('idle');
+    expect(service.resumes()).toBe(0);
+  });
+
+  it('a release while hidden is remembered: visible does not reopen it (R13)', async () => {
+    const { service, doc, camera } = await running();
+    doc.set('hidden');
+    service.release();
+    doc.set('visible');
+    expect(camera.open).toHaveBeenCalledTimes(1);
+    expect(service.status()).toBe('idle');
+  });
+
+  it('reopen: opens once with the same facing, reuses the worker, and does not count a return', async () => {
+    const { service, camera, raw, createWorker, workers, nextFrame } = await running('environment');
+    service.release();
+    service.reopen();
+    expect(service.status()).toBe('starting');
+    expect(camera.open).toHaveBeenCalledTimes(2);
+    expect(camera.open).toHaveBeenLastCalledWith(cameraConstraints('environment'));
+    const second = await camera.grant();
+    expect(raw.srcObject).toBe(second.stream);
+    expect(service.status()).toBe('running');
+    expect(createWorker).toHaveBeenCalledTimes(1);
+    expect(workers[0].sent.filter((m) => m.type === 'init')).toHaveLength(1);
+    await nextFrame();
+    expect(workers[0].frames()).toBe(1);
+    expect(service.resumes()).toBe(0);
+  });
+
+  it('hidden after a reopen releases and returns as usual', async () => {
+    const { service, doc, camera } = await running();
+    service.release();
+    service.reopen();
+    await camera.grant();
+    doc.set('hidden');
+    expect(camera.openStreams()).toBe(0);
+    doc.set('visible');
+    await camera.grant();
+    expect(camera.openStreams()).toBe(1);
+    expect(service.resumes()).toBe(1);
+  });
+
+  it('reopen while hidden waits for the page to be visible', async () => {
+    const { service, doc, camera } = await running();
+    service.release();
+    doc.set('hidden');
+    service.reopen();
+    expect(camera.open).toHaveBeenCalledTimes(1);
+    doc.set('visible');
+    expect(camera.open).toHaveBeenCalledTimes(2);
+    await camera.grant();
+    expect(service.status()).toBe('running');
+    expect(service.resumes()).toBe(0);
+  });
+
+  it('release then reopen quickly: a stream that arrives late for the released run is closed (R8)', async () => {
+    const t = setup();
+    const v = fakeVideo();
+    void t.service.start(v.video);
+    t.service.release();
+    t.service.reopen();
+    await t.camera.grant(1);
+    await t.camera.grant(0);
+    expect(t.camera.openStreams()).toBe(1);
+    expect(t.camera.streams[0].ended()).toBe(false);
+    expect(t.camera.streams[1].ended()).toBe(true);
+  });
+
+  it('release twice, or without a run, does nothing', async () => {
+    const idle = setup();
+    idle.service.release();
+    idle.service.reopen();
+    expect(idle.camera.open).not.toHaveBeenCalled();
+    expect(idle.service.status()).toBe('idle');
+    TestBed.resetTestingModule();
+    const { service, camera } = await running();
+    service.release();
+    service.release();
+    service.reopen();
+    service.reopen();
+    expect(camera.open).toHaveBeenCalledTimes(2);
+  });
+
+  it('leaving the page still ends the worker after a release', async () => {
+    const { service, workers } = await running();
+    service.release();
+    service.stop();
+    expect(workers[0].terminated).toBe(true);
+    expect(service.status()).toBe('idle');
+  });
+
+  it('a refusal on reopen gives the error and a second reopen starts again', async () => {
+    const { service, camera } = await running();
+    service.release();
+    service.reopen();
+    await camera.refuse('NotAllowedError');
+    expect(service.status()).toBe('error');
+    expect(service.error()).toBe('denied');
+    service.reopen();
+    expect(camera.open).toHaveBeenCalledTimes(3);
+    await camera.grant();
+    expect(service.error()).toBeNull();
+  });
+});

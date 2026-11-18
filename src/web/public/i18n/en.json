@@ -93,6 +93,8 @@
     "newSentence": "New sentence",
     "kept": "Keeping the sentence",
     "camera": {
+      "toggle": "Camera",
+      "off": "Camera off",
       "starting": "Camera…",
       "face": "Face in view",
       "noFace": "No face",

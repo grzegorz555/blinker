@@ -5,6 +5,7 @@ import {
   DestroyRef,
   computed,
   inject,
+  signal,
   type AfterViewInit,
   type OnDestroy,
   viewChild,
@@ -58,7 +59,13 @@ export class CountingPage implements AfterViewInit, OnDestroy {
   protected readonly cameraOn = computed(() => this.settings().camera);
   protected readonly cameraPreview = computed(() => this.settings().cameraPreview);
   protected readonly cameraMirrored = computed(() => this.settings().cameraFacing === 'user');
+  /**
+   * Spec 014, R10: the camera was turned off by hand with "Kamera" (Camera). Only a press of that button, or opening
+   * this screen again, turns it on; his signals and keys never reach the button (R13). The setting is not changed.
+   */
+  protected readonly cameraOff = signal(false);
   protected readonly cameraStatusKey = computed(() => {
+    if (this.cameraOff()) return 'counting.camera.off';
     const status = this.camera.status();
     if (status === 'error') return `counting.camera.error.${this.camera.error()}`;
     if (status !== 'running') return 'counting.camera.starting';
@@ -67,7 +74,8 @@ export class CountingPage implements AfterViewInit, OnDestroy {
   });
   protected readonly cameraErrorDetail = this.camera.errorDetail;
   protected readonly cameraProblem = computed(
-    () => this.camera.status() === 'error' || this.camera.faceInView() === false,
+    () =>
+      this.cameraOff() || this.camera.status() === 'error' || this.camera.faceInView() === false,
   );
 
   protected readonly state = this.counting.state;
@@ -136,6 +144,7 @@ export class CountingPage implements AfterViewInit, OnDestroy {
 
   /** Spec 012: the chip in the top bar holds the video; the camera starts once it exists. */
   protected startCamera(video: HTMLVideoElement): void {
+    this.cameraOff.set(false);
     // One input path (R2): a face signal goes where a button press goes; a short sound tells him it counted (R3).
     void this.camera.start(video, this.settings().cameraFacing, (signal) => {
       this.counting.send({ type: signal });
@@ -147,6 +156,17 @@ export class CountingPage implements AfterViewInit, OnDestroy {
     this.topBar.clear(this.actions());
     this.camera.stop();
     this.counting.stop();
+  }
+
+  /** Spec 014, R10: turns the camera off (every track stopped, the worker kept) or on again, by touch or keyboard only. */
+  protected toggleCamera(): void {
+    if (this.cameraOff()) {
+      this.cameraOff.set(false);
+      this.camera.reopen();
+    } else {
+      this.cameraOff.set(true);
+      this.camera.release();
+    }
   }
 
   protected send(type: InputSignalType): void {

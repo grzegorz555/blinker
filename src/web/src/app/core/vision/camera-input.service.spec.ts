@@ -18,6 +18,8 @@ function setup() {
     resumes: signal(0),
     start: vi.fn(async () => undefined),
     stop: vi.fn(),
+    release: vi.fn(),
+    reopen: vi.fn(),
   };
   TestBed.configureTestingModule({
     providers: [
@@ -120,5 +122,22 @@ describe('CameraInput (spec 012, R2, R4)', () => {
     expect(input.faceInView()).toBeNull();
     feed(record(300, { face: () => false }, 9000 + FACE_LOST_AFTER_MS));
     expect(input.faceInView()).toBe(false);
+  });
+
+  it('release and reopen go to the tracker and start the detector afresh (spec 014, R10)', async () => {
+    const { input, tracker, feed } = setup();
+    const sent: FaceSignal[] = [];
+    await input.start({} as HTMLVideoElement, 'user', (s) => sent.push(s));
+    feed(record(500));
+    expect(input.faceInView()).toBe(true);
+    input.release();
+    expect(tracker.release).toHaveBeenCalled();
+    expect(input.faceInView()).toBeNull();
+    const all = record(2000, { eyes: closed(300, 1100) });
+    feed(all.filter((f) => f.timestamp < 1000));
+    input.reopen();
+    expect(tracker.reopen).toHaveBeenCalled();
+    feed(all.filter((f) => f.timestamp >= 1000));
+    expect(sent).toEqual([]);
   });
 });

@@ -1,3 +1,21 @@
+<!-- Spec 014, R12: the camera buttons stay in view while the page scrolls, so the camera can always be turned off.
+     Content scrolls under the bar, so every control keeps a scroll margin below it (SC 2.4.11,
+     docs/knowledge/sticky-bar-covers-controls.md). -->
+<div class="camera-bar" data-testid="camera-bar">
+  @if (on()) {
+    <button matButton="filled" type="button" (click)="stop()">
+      {{ 'diagnostics.stop' | transloco }}
+    </button>
+  } @else {
+    <button matButton="filled" type="button" (click)="start()">
+      {{ 'diagnostics.start' | transloco }}
+    </button>
+  }
+  <p class="status" role="status" data-testid="tracker-status" [class.error]="status() === 'error'">
+    {{ statusText() }}
+  </p>
+</div>
+
 <section class="group" aria-labelledby="diag-camera">
   <h2 id="diag-camera" class="group-title">{{ 'diagnostics.camera' | transloco }}</h2>
   <p class="muted" data-testid="privacy">{{ 'diagnostics.privacy' | transloco }}</p>
@@ -13,20 +31,6 @@
     ></video>
   </div>
 
-  <div class="actions">
-    @if (on()) {
-      <button matButton="filled" type="button" (click)="stop()">
-        {{ 'diagnostics.stop' | transloco }}
-      </button>
-    } @else {
-      <button matButton="filled" type="button" (click)="start()">
-        {{ 'diagnostics.start' | transloco }}
-      </button>
-    }
-  </div>
-  <p class="status" role="status" data-testid="tracker-status" [class.error]="status() === 'error'">
-    {{ statusText() }}
-  </p>
   @if (status() === 'error' && errorDetail()) {
     <p class="muted detail" data-testid="error-detail" translate="no">
       {{ 'diagnostics.errorDetail' | transloco: { detail: errorDetail() } }}

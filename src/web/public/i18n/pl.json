@@ -93,6 +93,8 @@
     "newSentence": "Nowe zdanie",
     "kept": "Zostawiam zdanie",
     "camera": {
+      "toggle": "Kamera",
+      "off": "Kamera wyłączona",
       "starting": "Kamera…",
       "face": "Widzę twarz",
       "noFace": "Brak twarzy",

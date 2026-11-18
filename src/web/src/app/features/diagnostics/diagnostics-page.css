@@ -5,6 +5,31 @@
   gap: 1rem;
 }
 
+/* Spec 014, R12: the camera bar stays under the top bar while the page scrolls. */
+.camera-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background-color: var(--bg);
+  padding: 0.5rem 0.75rem;
+}
+
+.camera-bar .status {
+  min-width: 0;
+  flex: 1 1 10rem;
+}
+
+/* A focused control is never left under the bar: the browser keeps this margin when it scrolls to it (SC 2.4.11). */
+:is(button, a, input, select, textarea, summary, [tabindex]) {
+  scroll-margin-top: 6rem;
+}
+
 .group {
   display: grid;
   gap: 0.75rem;

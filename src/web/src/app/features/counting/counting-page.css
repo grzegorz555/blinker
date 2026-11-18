@@ -217,6 +217,25 @@
   vertical-align: middle;
 }
 
+/*
+ * Spec 014, R10: the top bar holds the chip, "Kamera" (Camera) and "Pauza" (Pause) at 360 px. The buttons are tighter
+ * (the label stays, the icon is smaller) and the chip text may wrap to two lines; nothing is hidden.
+ */
+@media (max-width: 599px) {
+  .pause-btn {
+    --mat-button-tonal-horizontal-padding: 0.5rem;
+    --mat-button-tonal-icon-spacing: 0.25rem;
+    min-width: 0;
+    padding-inline: 0.5rem;
+  }
+
+  .pause-btn svg {
+    width: 1rem;
+    height: 1rem;
+    margin-inline-end: 0.25rem;
+  }
+}
+
 /* A narrow phone held upright: the board gets the height; the step label goes, the hint is smaller. */
 @media (max-width: 599px) and (orientation: portrait) {
   .count-question {

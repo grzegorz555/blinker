@@ -110,6 +110,10 @@ export class FaceTrackerService {
   private target: { video: HTMLVideoElement; facing: 'user' | 'environment' } | null = null;
   /** The camera is closed because the page is hidden; 'resume' if a run was released by the hiding. */
   private suspended: 'resume' | 'deferred' | null = null;
+  /** A person turned the camera off by hand (release()): the worker is kept, and a return to the page does not undo it. */
+  private released = false;
+  /** The last start(), kept past stop() so reopen() can try again after an error. */
+  private lastStart: { video: HTMLVideoElement; facing: 'user' | 'environment' } | null = null;
   private samples: FrameSample[] = [];
   private busy = false;
   /** The camera run in which the frame in flight was sent: an answer from an earlier run is dropped. */
@@ -134,8 +138,10 @@ export class FaceTrackerService {
     this.error.set(null);
     this.errorDetail.set(null);
     this.clearFrames();
+    this.released = false;
     if (!this.supported()) return this.fail('unsupported');
     this.target = { video, facing };
+    this.lastStart = { video, facing };
     // A page started while hidden (a background tab) opens the camera only once someone can see it (R1).
     if (this.hidden()) {
       this.suspended = 'deferred';
@@ -144,11 +150,50 @@ export class FaceTrackerService {
     await this.open();
   }
 
+  /**
+   * Turns the camera off by hand (spec 014, R10–R13): exactly like the hiding of the page (every track stopped, the
+   * video cleared) and the worker with its model kept, so reopen() is fast. Unlike the hiding it is remembered: a
+   * return to the page does not reopen it. Without a run (never started, or in error) it does nothing.
+   */
+  release(): void {
+    if (!this.target || this.released) return;
+    this.run++;
+    this.released = true;
+    this.suspended = null;
+    this.cancelLoop();
+    this.releaseCamera();
+    this.clearFrames();
+    this.status.set('idle');
+  }
+
+  /**
+   * Turns the camera on again after release(), with the same facing and video, reusing the worker. It does not change
+   * `resumes`: the page that asked for it restarts its own state, as it does for its own start(). After an error it
+   * starts again as the last start() did.
+   */
+  reopen(): void {
+    if (this.released && this.target) {
+      this.released = false;
+      this.status.set('starting');
+      this.error.set(null);
+      this.errorDetail.set(null);
+      this.clearFrames();
+      if (this.hidden()) {
+        this.suspended = 'deferred';
+        return;
+      }
+      void this.open();
+    } else if (this.status() === 'error' && this.lastStart) {
+      void this.start(this.lastStart.video, this.lastStart.facing);
+    }
+  }
+
   /** Stops the run and forgets it: the camera and the worker end, and a return to the page does not reopen (R13). */
   stop(): void {
     this.run++;
     this.target = null;
     this.suspended = null;
+    this.released = false;
     this.cancelLoop();
     if (this.worker) {
       this.worker.onmessage = null;
@@ -175,7 +220,7 @@ export class FaceTrackerService {
 
   /** R1: release the camera at once, keep the worker (R3). */
   private suspend(): void {
-    if (!this.target || this.suspended) return;
+    if (!this.target || this.suspended || this.released) return;
     this.run++;
     this.suspended = 'resume';
     this.cancelLoop();

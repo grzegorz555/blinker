@@ -41,6 +41,8 @@ describe('CountingPage with the camera (spec 012)', () => {
       resumes: signal(0),
       start: vi.fn(async () => undefined),
       stop: vi.fn(),
+      release: vi.fn(),
+      reopen: vi.fn(),
     };
     const cue = { play: vi.fn() };
     const scheduler: TickScheduler = { every: () => () => undefined };
@@ -70,7 +72,7 @@ describe('CountingPage with the camera (spec 012)', () => {
         await fixture.whenStable();
       }
     };
-    return { fixture, root, tracker, cue, text, feed };
+    return { fixture, root, tracker, cue, text, feed, data };
   }
 
   it('off by default: no camera, no status', async () => {
@@ -106,5 +108,96 @@ describe('CountingPage with the camera (spec 012)', () => {
     const { fixture, tracker } = await render({ camera: true });
     fixture.destroy();
     expect(tracker.stop).toHaveBeenCalled();
+  });
+
+  describe('the "Kamera" (Camera) toggle (spec 014, R10, R13)', () => {
+    const toggle = (root: HTMLElement) =>
+      root.querySelector<HTMLButtonElement>('[data-testid="camera-toggle"]')!;
+
+    it('is not there while the camera setting is off', async () => {
+      const { root } = await render({});
+      expect(toggle(root)).toBeNull();
+    });
+
+    it('has a constant label "Camera", is pressed while the camera is on, and sits between the chip and Pause', async () => {
+      const { root, tracker, fixture } = await render({ camera: true });
+      tracker.status.set('running');
+      await fixture.whenStable();
+      expect(toggle(root).textContent?.trim()).toBe('Camera');
+      expect(toggle(root).getAttribute('aria-pressed')).toBe('true');
+      const children = [...root.querySelectorAll('header > *')];
+      expect(children[0].tagName).toBe('APP-CAMERA-CHIP');
+      expect(children[1]).toBe(toggle(root));
+      expect(children[2].textContent).toContain('Pause');
+      expect(toggle(root).querySelector('svg[aria-hidden="true"]')).not.toBeNull();
+    });
+
+    it('off releases the camera, says "Camera off", keeps the label, and the setting is unchanged', async () => {
+      const { root, tracker, text, fixture, data } = await render({ camera: true });
+      tracker.status.set('running');
+      await fixture.whenStable();
+      toggle(root).click();
+      await fixture.whenStable();
+      expect(tracker.release).toHaveBeenCalledTimes(1);
+      expect(tracker.stop).not.toHaveBeenCalled();
+      expect(text('camera-status')).toBe('Camera off');
+      expect(toggle(root).textContent?.trim()).toBe('Camera');
+      expect(toggle(root).getAttribute('aria-pressed')).toBe('false');
+      expect(JSON.parse(data.get(SETTINGS_KEY)!).camera).toBe(true);
+    });
+
+    it('on opens the camera again, with the status starting at "Camera…"', async () => {
+      const { root, tracker, text, fixture } = await render({ camera: true });
+      tracker.status.set('running');
+      toggle(root).click();
+      await fixture.whenStable();
+      tracker.status.set('idle');
+      toggle(root).click();
+      await fixture.whenStable();
+      expect(tracker.reopen).toHaveBeenCalledTimes(1);
+      expect(toggle(root).getAttribute('aria-pressed')).toBe('true');
+      expect(text('camera-status')).toBe('Camera…');
+    });
+
+    it('the signal buttons and the keyboard keep working while the camera is off', async () => {
+      const { root, tracker, text, fixture } = await render({
+        camera: true,
+        signalButtons: true,
+        keyboard: true,
+      });
+      tracker.status.set('running');
+      toggle(root).click();
+      await fixture.whenStable();
+      const blink = [...root.querySelectorAll<HTMLButtonElement>('.signal-btn')].find((b) =>
+        b.textContent?.includes('Blink'),
+      )!;
+      blink.click();
+      await fixture.whenStable();
+      expect(text('tally')).toContain('= 1');
+      root.ownerDocument.dispatchEvent(new KeyboardEvent('keydown', { key: 'h' }));
+      await fixture.whenStable();
+      expect(text('tally')).toContain('= 6');
+    });
+
+    it('his signals and keys never press the toggle (R13)', async () => {
+      const { root, tracker, feed, fixture } = await render({ camera: true, keyboard: true });
+      tracker.status.set('running');
+      await feed(record(1500, { eyes: closed(200, 1000) }));
+      for (const key of [' ', 'h', 'n', 's', 'r', 'p']) {
+        root.ownerDocument.dispatchEvent(new KeyboardEvent('keydown', { key }));
+      }
+      await fixture.whenStable();
+      expect(tracker.release).not.toHaveBeenCalled();
+      expect(tracker.reopen).not.toHaveBeenCalled();
+      expect(toggle(root).getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('leaving the screen ends the camera after it was turned off', async () => {
+      const { root, tracker, fixture } = await render({ camera: true });
+      toggle(root).click();
+      await fixture.whenStable();
+      fixture.destroy();
+      expect(tracker.stop).toHaveBeenCalled();
+    });
   });
 });

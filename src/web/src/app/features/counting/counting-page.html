@@ -9,6 +9,29 @@
       [mirrored]="cameraMirrored()"
       (ready)="startCamera($event)"
     />
+    <!-- Spec 014, R10: "Kamera" (Camera) is a toggle like "Pauza" (Pause): a constant label, the state in aria-pressed. -->
+    <button
+      matButton="tonal"
+      type="button"
+      class="pause-btn camera-btn"
+      data-testid="camera-toggle"
+      [attr.aria-pressed]="!cameraOff()"
+      (click)="toggleCamera()"
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M3 7h3l2-3h8l2 3h3v13H3z" />
+        <circle cx="12" cy="13" r="4" />
+      </svg>
+      {{ 'counting.camera.toggle' | transloco }}
+    </button>
   }
   <button
     matButton="tonal"

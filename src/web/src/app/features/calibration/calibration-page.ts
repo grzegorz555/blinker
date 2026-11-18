@@ -139,6 +139,33 @@ export class CalibrationPage {
     await this.tracker.start(this.video().nativeElement);
   }
 
+  /** The camera button belongs to the camera step and every step after it, until the result (spec 014, R11). */
+  protected readonly hasCameraButton = computed(() => {
+    const page = this.page();
+    return page === 'camera' || isStep(page);
+  });
+
+  /**
+   * Spec 014, R11: turns the camera off by hand (the worker stays, so turning it on is quick). The step under way is
+   * dropped: its recording is cleared; finished steps keep theirs. Only a press of the button turns it on (R13).
+   */
+  protected turnOff(): void {
+    this.tracker.release();
+    const page = this.page();
+    if (isStep(page)) {
+      this.recordings.update((r) => ({ ...r, [page]: [] }));
+      this.revision.update((n) => n + 1);
+    }
+  }
+
+  /** Turns the camera on again; a step records from its start and says its instruction again, as on a return (R6). */
+  protected turnOn(): void {
+    if (this.status() === 'error') void this.startCamera();
+    else this.tracker.reopen();
+    const page = this.page();
+    if (isStep(page)) this.beginStep(page);
+  }
+
   protected next(): void {
     this.go(this.index() + 1);
   }

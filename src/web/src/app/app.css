@@ -37,6 +37,14 @@
   padding-block: max(0.25rem, env(safe-area-inset-top)) 0.25rem;
 }
 
+/* Spec 014: room for the chip, "Kamera" (Camera) and "Pauza" (Pause) beside the title at 360 px. */
+@media (max-width: 599px) {
+  .shell-fit .shell-top {
+    gap: 0.5rem;
+    padding-inline: max(0.5rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-right));
+  }
+}
+
 /* M3 title large. Focused after navigation (tabindex="-1"), so no focus ring on it. */
 .shell-title {
   font-size: 1.375rem;
