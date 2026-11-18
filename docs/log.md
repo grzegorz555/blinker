@@ -1,5 +1,10 @@
 # Log
 
+## 2026-11-18 (spec 014: the camera in the background)
+- The camera is released when Blinker is hidden (another app, tab or locked screen) and opened again by itself on return; the face worker and its model stay loaded. F2 of the security pass is closed.
+- On return the detector starts clean, Kalibracja (Calibration) records the step under way again and Diagnostyka (Diagnostics) restarts its measurement; a "Kamera" (Camera) toggle, "Wyłącz kamerę" (Turn off the camera) and a sticky bar in Diagnostyka (Diagnostics) let a caregiver turn the camera off by hand. None of them is reachable by his signals.
+- E2E paths and the checks by hand on his phone wait (first-session checklist).
+
 ## 2026-11-18 (spec 013: delete all data)
 - F1 of the security pass is closed: Ustawienia (Settings) has "Dane na tym urządzeniu" (Data on this device) with "Usuń wszystkie dane" (Delete all data) after a confirmation (focus on "Anuluj" (Cancel)). Every service goes back to its defaults and every `blinker.` key is removed; the result is said in text.
 - `DeviceDataService.eraseAll()` resets Settings, Boards, History, Counting, Language (the saved choice) and Profile, then sweeps the `blinker.` prefix; a unit test fills every store and fails on a leftover key or a service not at its defaults. The rule for new stores is in `docs/conventions/security.md`.
