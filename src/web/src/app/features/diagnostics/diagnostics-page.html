@@ -104,11 +104,25 @@
   <dl class="facts" data-testid="head">
     <div>
       <dt>{{ 'diagnostics.yaw' | transloco }}</dt>
-      <dd>{{ frame()?.head ? round(frame()!.head!.yaw) + '°' : '–' }}</dd>
+      <dd>
+        {{ frame()?.head ? round(frame()!.head!.yaw) + '°' : '–' }}
+        @if (fromNeutral(); as n) {
+          <span class="muted"
+            >({{ 'diagnostics.fromNeutral' | transloco: { value: round(n.yaw) } }})</span
+          >
+        }
+      </dd>
     </div>
     <div>
       <dt>{{ 'diagnostics.pitch' | transloco }}</dt>
-      <dd>{{ frame()?.head ? round(frame()!.head!.pitch) + '°' : '–' }}</dd>
+      <dd>
+        {{ frame()?.head ? round(frame()!.head!.pitch) + '°' : '–' }}
+        @if (fromNeutral(); as n) {
+          <span class="muted"
+            >({{ 'diagnostics.fromNeutral' | transloco: { value: round(n.pitch) } }})</span
+          >
+        }
+      </dd>
     </div>
     <div>
       <dt>{{ 'diagnostics.roll' | transloco }}</dt>

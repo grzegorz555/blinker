@@ -30,7 +30,7 @@ Diagnostyka (Diagnostics) pages; whichever lands second rebases on the other.
       said, "Wykryto n z 2" (Detected n of 2) and his last 2 head movements with signed angles and the verdict;
       `handRight` strings go; en and pl (R8). Tests: calibration page unit.
       _To understand:_ nothing new beyond T1 and T2.
-- [ ] **T4 [sonnet]: Diagnostyka (Diagnostics) copies the whole profile and signed angles.** The copy: the profile
+- [x] **T4 [sonnet]: Diagnostyka (Diagnostics) copies the whole profile and signed angles.** The copy: the profile
       JSON, calibrated or not, his left and right in words, the last 10 head movements; the page: the last head
       movement and the hand rule instead of the look down, live yaw and pitch also from neutral (R10). Strings in en
       and pl. Tests: diagnostics page unit (the copied text).

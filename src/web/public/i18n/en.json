@@ -309,6 +309,7 @@
     "yaw": "Turn (left / right)",
     "pitch": "Nod (up / down)",
     "roll": "Tilt",
+    "fromNeutral": "{{value}}° from his neutral",
     "blocked": "Blocked sending to: {{origins}}",
     "copy": "Copy the results",
     "copied": "Results copied (no picture).",
