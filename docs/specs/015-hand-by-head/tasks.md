@@ -21,7 +21,7 @@ Diagnostyka (Diagnostics) pages; whichever lands second rebases on the other.
       and reading his old stored profile (R7). Tests: detector and profile units from his numbers.
       _To understand:_ a gesture as a small state machine (out, back, settle); why a settle time tells a hand from
       the first half of a shake; reading old stored data without a version bump.
-- [ ] **T2 [opus]: Kalibracja (Calibration) learns the hand's head angle.** `fit.ts`: one step `hand` instead of
+- [x] **T2 [opus]: Kalibracja (Calibration) learns the hand's head angle.** `fit.ts`: one step `hand` instead of
       `handLeft`/`handRight`; signed yaw peak → amplitude and direction, signed pitch; not learnt under 6° or on the
       side of head right (R8). Tests: fit units (glances of 44° and 65°, a step too small, a step on the wrong side).
       _To understand:_ a signed peak (size from a percentile, sign from the median); why calibration refuses a side

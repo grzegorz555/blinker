@@ -164,29 +164,92 @@ describe('fitProfile (spec 011, R5)', () => {
     });
   });
 
-  it('the hand steps learn nothing from the eyes; his glances are found by the head (spec 015, R6)', () => {
-    // Two glances at his left hand: the head turns 50° to his left (yaw +, from his neutral 8°) and back.
-    const glances = record(4000, {
-      ...rest,
-      eyes: (t) => ({ ...restEyes, eyeLookDownLeft: t >= 300 && t < 900 ? 0.7 : 0.15 }),
-      yaw: pulses(
-        [
-          [300, 900, 58],
-          [2000, 2600, 58],
-        ],
-        8,
-      ),
-    });
-    // His sides: his left is yaw +1, his right -1.
-    const left = {
+  describe('his glance at his hand (spec 015, R8)', () => {
+    // His sides from his profile of 2026-11-17: his left is yaw +1, his right -1.
+    const his = {
       ...P,
       hand: { ...P.hand, direction: 1 as const },
       right: { ...P.right, direction: -1 as const },
     };
-    const { profile, learnt } = fitProfile({ neutral, handLeft: glances }, left);
-    expect(learnt).toEqual(['neutral']);
-    expect(profile.hand).toEqual(left.hand);
-    expect(countDetected('handLeft', glances, profile)).toBe(2);
+    /** Two quick turns of the head from his neutral (yaw 8, pitch -5), `tilt` degrees of pitch during each. */
+    const glances = (first: number, second: number, tilt = 0) => {
+      const list = [
+        [300, 900],
+        [2000, 2600],
+      ] as const;
+      return record(4000, {
+        yaw: pulses(
+          [
+            [...list[0], 8 + first],
+            [...list[1], 8 + second],
+          ],
+          8,
+        ),
+        pitch: pulses(
+          list.map(([a, b]) => [a, b, -5 + tilt] as const),
+          -5,
+        ),
+      });
+    };
+
+    it('two glances of 44° and 65° to his left learn amplitude ≈ 30°, direction 1 and the signed pitch', () => {
+      const hand = glances(44, 65, 9);
+      const { profile, learnt } = fitProfile({ neutral, hand }, his);
+      expect(learnt).toEqual(['neutral', 'hand']);
+      // Half of the peak (65°), so his smaller glance (44°) still passes it.
+      expect(profile.hand.amplitude).toBe(32.5);
+      expect(profile.hand.direction).toBe(1);
+      expect(profile.hand.pitch).toBe(9);
+      expect(profile.hand.windowMs).toBe(his.hand.windowMs);
+      expect(countDetected('hand', hand, profile)).toBe(2);
+    });
+
+    it('keeps the sign of a glance to the other side and of a pitch up', () => {
+      const left = { ...P, right: { ...P.right, direction: 1 as const } };
+      const { profile } = fitProfile({ neutral, hand: glances(-50, -50, -8) }, left);
+      expect(profile.hand).toEqual({ ...P.hand, amplitude: 25, direction: -1, pitch: -8 });
+    });
+
+    it('a step too small (under 6°) is not learnt and keeps the previous hand', () => {
+      const { profile, learnt } = fitProfile({ neutral, hand: glances(5, 5, 9) }, his);
+      expect(learnt).toEqual(['neutral']);
+      expect(profile.hand).toEqual(his.hand);
+    });
+
+    it('a step on the side of head right is not learnt: the same turn cannot mean both', () => {
+      const { profile, learnt } = fitProfile({ neutral, hand: glances(-50, -50) }, his, true);
+      expect(learnt).toEqual(['neutral']);
+      expect(profile.hand).toEqual(his.hand);
+    });
+
+    it('compares with head right learnt in the same calibration, not the guess of the defaults', () => {
+      const right = record(3000, {
+        pitch: () => -5,
+        yaw: pulses([[300, 1000, -22]], 8),
+      });
+      // The defaults guess his right is +1; he turns his right to -1 and his hand to +1.
+      const fit = fitProfile({ neutral, hand: glances(50, 50), right }, P);
+      expect(fit.learnt).toEqual(['neutral', 'hand', 'right']);
+      expect(fit.profile.hand.direction).toBe(1);
+      expect(fit.profile.right.direction).toBe(-1);
+      // Without the hand step, his hand moves to the other side of his new right.
+      const noHand = fitProfile({ neutral, right }, P);
+      expect(noHand.learnt).toEqual(['neutral', 'right']);
+      expect(noHand.profile.hand).toEqual({ ...P.hand, direction: 1 });
+    });
+
+    it('a head right that is only the guess of the defaults never refuses his glance: the guess moves to the other side', () => {
+      // Head right skipped, no calibration before: the default guess is on the side of his glance.
+      const guess = { ...P, right: { ...P.right, direction: 1 as const } };
+      const { profile, learnt } = fitProfile({ neutral, hand: glances(50, 50) }, guess);
+      expect(learnt).toEqual(['neutral', 'hand']);
+      expect(profile.hand.direction).toBe(1);
+      expect(profile.right.direction).toBe(-1);
+      // From a calibrated profile the same head right is his, and refuses that side.
+      expect(fitProfile({ neutral, hand: glances(50, 50) }, guess, true).learnt).toEqual([
+        'neutral',
+      ]);
+    });
   });
 
   it('a step without a real movement keeps the previous value (not learnt)', () => {

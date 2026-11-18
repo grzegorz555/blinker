@@ -161,9 +161,7 @@
     </p>
   }
 
-  @if (
-    page() === 'result' && (fit().learnt.includes('handLeft') || fit().learnt.includes('handRight'))
-  ) {
+  @if (page() === 'result' && fit().learnt.includes('hand')) {
     <p class="muted" data-testid="hand-profile">
       {{
         'diagnostics.move.profile'
