@@ -26,7 +26,7 @@ Diagnostyka (Diagnostics) pages; whichever lands second rebases on the other.
       side of head right (R8). Tests: fit units (glances of 44° and 65°, a step too small, a step on the wrong side).
       _To understand:_ a signed peak (size from a percentile, sign from the median); why calibration refuses a side
       that another signal already uses.
-- [ ] **T3 [sonnet]: The hand step in the wizard.** One step "Ręka (+5)" (Hand (+5)) with its instruction shown and
+- [x] **T3 [sonnet]: The hand step in the wizard.** One step "Ręka (+5)" (Hand (+5)) with its instruction shown and
       said, "Wykryto n z 2" (Detected n of 2) and his last 2 head movements with signed angles and the verdict;
       `handRight` strings go; en and pl (R8). Tests: calibration page unit.
       _To understand:_ nothing new beyond T1 and T2.

@@ -355,7 +355,7 @@
         "otherSide": "not towards his hand",
         "tooSoon": "a look at his hand, too soon after the last signal (not counted)"
       },
-      "profile": "A look at his hand counts when the head turns {{amplitude}}° to his left (turn sign {{direction}}) and back within {{windowMs}} ms."
+      "profile": "A look at his hand counts when the head turns {{amplitude}}° to his left (turn sign {{direction}}, tilt {{pitch}}°) and back within {{windowMs}} ms."
     }
   },
   "calibration": {
@@ -388,14 +388,9 @@
         "say": "Three strong blinks."
       },
       "hand": {
-        "title": "Look at his left hand (+5)",
-        "do": "Ask him to look down at his left hand and back. Twice.",
-        "say": "Look at your left hand and back. Twice."
-      },
-      "handRight": {
-        "title": "Look at his right hand",
-        "do": "Only if he also looks at his right hand. If not, skip this step: the left is enough.",
-        "say": "Look at your right hand and back. Twice."
+        "title": "Hand (+5)",
+        "do": "Ask him to turn his head quickly to his left hand and back to the screen. Twice.",
+        "say": "Look quickly at your left hand and turn your head back to the screen. Twice."
       },
       "nod": {
         "title": "Nod (yes)",

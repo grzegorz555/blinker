@@ -135,6 +135,41 @@ describe('CalibrationPage (spec 011, R4)', () => {
     expect(TestBed.inject(ProfileService).calibrated()).toBe(true);
   });
 
+  it('learns his hand from two quick glances to his left: the step, the count and the profile in the result', async () => {
+    const { click, tracker, text, feed, listen, heading } = await render();
+    await click('Next');
+    await click('Next');
+    tracker.status.set('running');
+    await click('Next');
+    await click('Next');
+    expect(heading()).toBe('Hand (+5)');
+    expect(text('instruction')).toContain('turn his head quickly to his left hand');
+    expect(listen).toHaveBeenLastCalledWith(
+      'Look quickly at your left hand and turn your head back to the screen. Twice.',
+      'en',
+    );
+    // Two glances: 44° and 65° to his left (negative yaw by the default sign), 400 ms each, back to the screen.
+    await feed(
+      record(3000, {
+        yaw: (t) => (t >= 300 && t < 700 ? -44 : t >= 1800 && t < 2200 ? -65 : 0),
+        pitch: (t) => (t >= 300 && t < 700 ? 10 : t >= 1800 && t < 2200 ? 12 : 0),
+      }),
+      0,
+    );
+    expect(text('detected')).toBe('Detected 2 of 2');
+    // His last 2 movements, newest first, with signed angles and the verdict.
+    const moves = text('hand-moves')!;
+    expect(moves).toContain('turn -65°');
+    expect(moves).toContain('turn -44°');
+    expect(moves.match(/counted as a look at his hand/g)).toHaveLength(2);
+    expect(moves.indexOf('-65')).toBeLessThan(moves.indexOf('-44'));
+    for (let i = 0; i < 4; i++) await click('Next');
+    expect(text('results')).toContain('Detected 2 of 2');
+    expect(text('hand-profile')).toContain('turn sign -1');
+    expect(text('hand-profile')).toContain('tilt ');
+    expect(text('hand-profile')).toMatch(/turns 3\d(\.\d)?° to his left/);
+  });
+
   it('without a face nothing is learnt and saving is off', async () => {
     const { click, tracker, root, text, feed } = await render();
     await click('Next');
