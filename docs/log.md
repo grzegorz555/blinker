@@ -1,5 +1,9 @@
 # Log
 
+## 2026-11-18 (spec 015: the hand from the head)
+- His hand (+5) is a quick turn of the head to his left and straight back, a little down, with no hold: the eye rule goes, a nod with a downward tilt is not a nod, and a shake that starts the same way is a shake (R1–R3, R5, spec 015, T1).
+- Kalibracja (Calibration) has one "Ręka (+5)" (Hand (+5)) step that learns its amplitude, side and tilt; Diagnostyka (Diagnostics) copies the whole profile with signed head angles (T2–T4). Only his left hand for now; the e2e paths wait for the next e2e pass. To try with him (`docs/trial/first-session.md`).
+
 ## 2026-11-18 (spec 014: the camera in the background)
 - The camera is released when Blinker is hidden (another app, tab or locked screen) and opened again by itself on return; the face worker and its model stay loaded. F2 of the security pass is closed.
 - On return the detector starts clean, Kalibracja (Calibration) records the step under way again and Diagnostyka (Diagnostics) restarts its measurement; a "Kamera" (Camera) toggle, "Wyłącz kamerę" (Turn off the camera) and a sticky bar in Diagnostyka (Diagnostics) let a caregiver turn the camera off by hand. None of them is reachable by his signals.

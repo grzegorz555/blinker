@@ -35,8 +35,9 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
 - [ ] Note: "Twarz w kadrze" (Face in view) yes most of the time? FPS, analysis median and p95, engine (GPU or CPU).
 - [ ] Ask for a few strong blinks and watch both meters: "Mrugnięcie" (Blink) and "Zaciśnięcie powiek" (Lids squeezed). Then let him
       blink normally for a while: his ordinary blinks should squeeze clearly less. Note both levels.
-- [ ] Ask for a look at his hand, a nod, a shake, head right; watch the eye meters and the head
-      angles move, and the "Wykryte sygnały" (Detected signals) list.
+- [ ] Ask for a glance at his left hand (a quick turn of the head to his left and back), a nod, a shake, head right;
+      watch the head angles move (signed, from his neutral) and the "Wykryte sygnały" (Detected signals) list. Note the
+      last head movements with their verdicts (`hand`, `small`, `slow`, `shake`, `otherSide`, `tooSoon`).
 - [ ] After 10 minutes: "Kopiuj wyniki" (Copy the results) → paste into the ADR-0006 table (device, browser, light).
 - [ ] Repeat with other light (evening lamp) and, if he wears them, with glasses.
 
@@ -46,12 +47,20 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
       (At rest, facing the screen) let him blink as usual for about 10 s: "Zwykłe mrugnięcia" (Ordinary blinks) at least 2.
 - [ ] Note the result's message on his blink (a guess, or strong and ordinary look alike) and which cue was chosen.
 - [ ] Note per step "Wykryto n z k" (Detected n of k). A step at 0: repeat it once; if still 0, skip it and note why.
+- [ ] Step "Ręka (+5)" (Hand (+5)): two glances at his left hand, as he does them ("turn your head to your left hand and
+      back, twice"). Note "Wykryto n z 2" (Detected n of 2), the signed angles of his last 2 head movements and their
+      verdicts. "Nie zapamiętano" (Not learnt): repeat it once; if still not learnt, note why (under 6°, or the side of
+      his head right).
 - [ ] "Zapisz kalibrację" (Save the calibration); then check in Diagnostyka (Diagnostics) that his signals appear.
 
 # 3. Liczenie (Counting) with the camera
 
 - [ ] Ustawienia (Settings) → Kamera (Camera): "Sterowanie kamerą w Liczeniu" (Camera control in Counting) on.
 - [ ] Let him spell a short word he chooses (for example "TAK"); note how many signals were missed or extra.
+- [ ] The hand (+5) in Liczenie (Counting): a glance at his left hand gives +5; a nod or a shake does not. Count: ten
+      glances → at least eight +5 and no NOD; five nods, five shakes, two head rights → no +5 (spec 015).
+- [ ] If the hand fails: "Kopiuj wyniki" (Copy the results) in Diagnostyka (Diagnostics) and note the head movements
+      with their verdicts; the copy has the whole profile and the signed angles.
 - [ ] Ask (yes/no): do the tones help him count? Is "only the letter" enough, or should Blinker say more (the
       switches "Mów pytania i komunikaty" (Say the questions and notices) and "Potwierdzaj kolumnę i wiersz skinieniem"
       (Confirm the column and the row with a nod))?
@@ -63,7 +72,8 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
 # 4. Still open (from the interaction model)
 
 - [ ] Eyes closed for about 3 s as "pause" (`VERY_LONG_CLOSE`): does he want it?
-- [ ] Which hand does he look at (left, right, both)?
+- [ ] Which hand does he glance at (left, right, both)? Only his left is detected (spec 015); note whether he also
+      turns his head to his right for it, which is head right.
 - [ ] Shortcuts for frequent words: worth designing now?
 
 # After the visit
