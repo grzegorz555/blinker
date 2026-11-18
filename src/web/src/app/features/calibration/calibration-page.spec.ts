@@ -241,7 +241,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
     await click('Next');
     tracker.resumes.set(1);
     await fixture.whenStable();
-    for (let i = 0; i < 5; i++) await click('Skip this step');
+    for (let i = 0; i < 4; i++) await click('Skip this step');
     expect(text('results')).toContain('Detected 3 of 3');
   });
 
