@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'node:test';
-import { findDistProblems, findInlineCode } from './check-dist.mjs';
+import { findDistProblems, findInlineCode, findMissingFiles } from './check-dist.mjs';
 
 describe('findDistProblems', () => {
   let dir;
@@ -15,11 +15,15 @@ describe('findDistProblems', () => {
     writeFileSync(join(dir, 'index.html'), '<!doctype html>');
     writeFileSync(join(dir, 'main-ABC.js'), 'console.log(1);');
     writeFileSync(join(dir, 'styles-XYZ.css'), 'body{}');
+    mkdirSync(join(dir, 'words'));
+    writeFileSync(join(dir, 'words', 'pl.txt'), 'nie');
+    writeFileSync(join(dir, 'words', 'pl.LICENSE.txt'), 'CC BY-SA 4.0');
   });
 
   afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
 
   it('passes a clean build', () => {
+    assert.deepEqual(findMissingFiles(dir), []);
     assert.deepEqual(findDistProblems(dir), []);
   });
 
@@ -40,6 +44,15 @@ describe('findDistProblems', () => {
       findInlineCode('<script src="a.js" type="module"></script><p data-x="1">Go online=yes</p>'),
       [],
     );
+  });
+
+  it('reports a missing word list or license (spec 016, R2)', () => {
+    rmSync(join(dir, 'words'), { recursive: true });
+    assert.deepEqual(findDistProblems(dir), []);
+    assert.deepEqual(findMissingFiles(dir), [
+      'missing file: words/pl.txt',
+      'missing file: words/pl.LICENSE.txt',
+    ]);
   });
 
   it('reports a source map file, also in a subfolder', () => {

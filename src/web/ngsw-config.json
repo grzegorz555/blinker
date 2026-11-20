@@ -18,6 +18,14 @@
       }
     },
     {
+      "name": "words",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/words/**"]
+      }
+    },
+    {
       "name": "vision",
       "installMode": "lazy",
       "updateMode": "lazy",

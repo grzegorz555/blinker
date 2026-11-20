@@ -12,7 +12,7 @@ generated:
 Branch: `feat/016-word-prediction`. Gates: `npm run verify -- --lighthouse`. The author approved the spec and accepted
 ADR-0007 on 2026-11-20.
 
-- [ ] **T1 [sonnet]: The word list, its license and the offline cache.** `scripts/build-word-list.mjs <source file>`
+- [x] **T1 [sonnet]: The word list, its license and the offline cache.** `scripts/build-word-list.mjs <source file>`
       (run by hand on the downloaded `pl_50k.txt`; the path is an argument, the file is untrusted): the filter of R2,
       the exclusion list (the author reviews it), `public/words/pl.txt` and `public/words/pl.LICENSE.txt`; a lazy
       asset group "words" in `ngsw-config.json`; `scripts/check-dist.mjs` accepts the two files. Tests:
