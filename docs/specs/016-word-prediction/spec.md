@@ -51,7 +51,60 @@ text only after his nod, one shake undoes it, and the same prefix always gives t
 - **R3. Loaded from our origin, checked like input, cached for offline.** The list is fetched from `/words/pl.txt`
   only when the switch is on and the board is Polish, and the service worker caches it (a lazy asset group "words", so
   it is not part of the first install). The file is checked before use: at most 256 KB, a strict UTF-8 decode, at most
-  20,000 lines, every line matching `^[a-ząćęłńóśźż]{3,24}$`; any bad line rejects the whole file. Without the list
+  20,000 lines, every line matching `^[a-pr-uwyząćęłńóśźż]{3,24}---
+type: Spec
+title: "016: Word prediction for Polish - Blinker guesses the word, like his caregiver does"
+description: When he pauses inside a word, Blinker says the most likely word as a question and he takes it with a nod, ignores it by going on, or refuses it with a shake; one shake undoes a taken word. A self-hosted list of 20,000 frequent Polish words (OpenSubtitles, CC BY-SA 4.0, ADR-0007) plus the words of his own sentences kept on the device; a plain letter also stands for its Polish letter. Off by default; the offer by ear is a second option, also off.
+tags: [interaction, counting, prediction, privacy, i18n]
+status: draft
+generated:
+  by: agent:claude-opus-5-5
+  at: 2026-11-20
+---
+
+# Goal
+
+Every letter costs him a lot: on his board a letter takes about 4–5 signals (blinks and looks at his hand) and two
+pauses ([his board](../../boards/friend-board.md): the column costs 1–4 signals, the row 1–4). A word of 8 letters is
+some 40 signals. A caregiver at the paper board shortens this today by guessing the word aloud once it is clear
+("Dziękuję?" (Thank you?)), and he nods or goes on. Blinker shows its guesses on the screen for the people around
+him and, as an option, asks about the best one by ear (R6), because he puts words together by ear and does not read
+the screen ([interaction model](../../interaction-model.md), "He listens").
+
+The guess must stay predictable and forgiving (CLAUDE.md rule 13): it costs nothing when he ignores it, it changes the
+text only after his nod, one shake undoes it, and the same prefix always gives the same guess.
+
+# Scope
+
+- A word list for Polish, built once from a published frequency list, filtered, committed and served from our own
+  origin (ADR-0007), loaded only when the feature is on.
+- A pure predictor: the prefix of the word being written → up to 3 candidates, in a fixed order, where a plain letter
+  also stands for its Polish letter (he drops them sometimes).
+- With the option "Pytaj o słowo na głos" (Ask about the word aloud) on, the counting machine offers the first candidate by ear when he pauses inside a word (a new state `word.asking`); a
+  nod takes it, a shake refuses it, a blink or a hand goes on with the next letter.
+- A new step of the sentence, "replace the prefix with the word", undone by one shake.
+- His own words: the words of the sentences read aloud are counted on the device (`blinker.words.v1`) and come before
+  the list's words; erased by "Usuń wszystkie dane" (Delete all data) and by their own button.
+- The screen: a row of up to 3 suggestions above the board for the people around him (a tap takes a word), and the
+  switches in Ustawienia (Settings).
+
+# Rules
+
+- **R1. Off by default, for Polish boards only.** Ustawienia (Settings) gets a group "Podpowiadanie słów" (Word
+  prediction) with a switch "Podpowiadaj słowa" (Suggest words), off by default. It works only when the active board's
+  `locale` is Polish (`pl`, `pl-PL`); with another board the switch is disabled and a text says why. A caregiver turns
+  it on during the trial with him (stage 6), so nothing changes for him until then.
+- **R2. The built-in list.** `public/words/pl.txt`: the 20,000 most frequent word forms of the Polish list of
+  FrequencyWords (OpenSubtitles 2018, `pl_50k.txt`), one lowercase word per line in frequency order, after a filter:
+  only the letters `a–z ą ć ę ł ń ó ś ź ż` (no q, v, x and no foreign forms), 3–24 letters, without a short
+  exclusion list of vulgar and insulting forms in the build script (he can still spell them, and then they are his
+  words, R9). The script (`scripts/build-word-list.mjs <source file>`) is run by hand, the result is committed with
+  `public/words/pl.LICENSE.txt` (source, authors, changes, CC BY-SA 4.0), and "O aplikacji" (About) names the source
+  and the license. Size: about 175 KB, about 77 KB gzipped (measured 2026-11-20 on the 2018 list).
+- **R3. Loaded from our origin, checked like input, cached for offline.** The list is fetched from `/words/pl.txt`
+  only when the switch is on and the board is Polish, and the service worker caches it (a lazy asset group "words", so
+  it is not part of the first install). The file is checked before use: at most 256 KB, a strict UTF-8 decode, at most
+  20,000 lines, every line matching  (the letters of R2: a–z without q, v, x, and the Polish letters); any bad line rejects the whole file. Without the list
   (not loaded yet, offline before the first load, rejected) only his own words are suggested, and Ustawienia
   (Settings) says in text that the list is not available.
 - **R4. The prefix and the match: a plain letter stands for its Polish letter too.** The prefix is the text after the
