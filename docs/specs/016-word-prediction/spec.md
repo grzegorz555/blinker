@@ -51,7 +51,7 @@ text only after his nod, one shake undoes it, and the same prefix always gives t
 - **R3. Loaded from our origin, checked like input, cached for offline.** The list is fetched from `/words/pl.txt`
   only when the switch is on and the board is Polish, and the service worker caches it (a lazy asset group "words", so
   it is not part of the first install). The file is checked before use: at most 256 KB, a strict UTF-8 decode, at most
-  20,000 lines, every line matching `^[a-ząćęłńóśźż]{3,24}$`; any bad line rejects the whole file. Without the list
+  20,000 lines, every line matching `^[a-pr-uwyząćęłńóśźż]{3,24}$` (the letters of R2: a–z without q, v, x, and the Polish letters); any bad line rejects the whole file. Without the list
   (not loaded yet, offline before the first load, rejected) only his own words are suggested, and Ustawienia
   (Settings) says in text that the list is not available.
 - **R4. The prefix and the match: a plain letter stands for its Polish letter too.** The prefix is the text after the
@@ -60,7 +60,7 @@ text only after his nod, one shake undoes it, and the same prefix always gives t
   (`toLocaleUpperCase('pl')`). He drops Polish letters sometimes, even those on his board, and uses them at other times
   (the author, 2026-11-20), so the match is one-way: a plain letter of the prefix matches itself or its Polish letter
   from a fixed table (`A → A Ą`, `C → C Ć`, `E → E Ę`, `L → L Ł`, `N → N Ń`, `O → O Ó`, `S → S Ś`, `Z → Z Ź Ż`), and a
-  Polish letter he did spell matches only itself ("ZOL" and "ŻOL" both give "ŻÓŁW"; "ŻO" does not give "ZOSTAĆ"). The
+  Polish letter he did spell matches only itself ("ZOL" and "ŻOL" both give "ŻÓŁWIE"; "ŻO" gives "ŻÓŁW" but not "ZOSTAĆ"). The
   table is one constant, so the trial can change it.
 - **R5. The candidates, always in the same order.** A candidate starts with the prefix by the match of R4 and is at
   least 2 letters longer than the prefix (a guess must save signals). His own words (R9) come first, by count and then
@@ -146,8 +146,8 @@ text only after his nod, one shake undoes it, and the same prefix always gives t
       `/words/pl.txt`.
 - [ ] Unit: the built `pl.txt` has 20,000 lines in frequency order, each matching the allowlist, none in the exclusion
       list; a file with one bad line, a file over 256 KB or over 20,000 lines is rejected.
-- [ ] Unit: "ZOL", "ŻOL" and "ŻÓŁ" all give "żółw" (a plain letter stands for its Polish letter); "ŻO" does not
-      give "zostać" (a Polish letter he spelled matches only itself); "SZ" is a
+- [ ] Unit: "ZOL", "ŻOL" and "ŻÓŁ" all give "żółwie" (tortoises) (a plain letter stands for its Polish letter); "ŻO" gives
+      "żółw" but not "zostać" (a Polish letter he spelled matches only itself); "SZ" is a
       prefix; a 1-letter prefix gives nothing; a word only 1 letter longer than the prefix is not offered; his words
       come first; the order is the same on every call.
 - [ ] Unit (machine): with "Pytaj o słowo na głos" (Ask about the word aloud) off (the default), no `word.asking`
