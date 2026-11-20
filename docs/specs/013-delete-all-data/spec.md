@@ -85,11 +85,11 @@ goes to someone else, one action must leave nothing of him behind.
       its defaults; a key of another name in the storage is untouched.
 - [ ] Unit: a storage that throws on removal gives the error result, and the services are still at their defaults.
 - [ ] Unit: every exported storage key constant starts with `blinker.`.
-- [ ] e2e (3 device projects): import a board, change a setting, read a sentence aloud; "Usuń wszystkie dane" (Delete
+- [x] e2e (3 device projects): import a board, change a setting, read a sentence aloud; "Usuń wszystkie dane" (Delete
       all data) → the dialog with focus on "Anuluj" (Cancel); "Anuluj" changes nothing; again, "Usuń" (Delete) → the
       status in text; Tablice (Boards) shows only his board, Zdania (Sentences) is empty, the changed setting is
       back at its default; after a reload it is still so; `localStorage` has no `blinker.` key.
-- [ ] axe: no violations on Ustawienia (Settings) with the section, with the dialog open, and with the status shown.
+- [x] axe: no violations on Ustawienia (Settings) with the section, with the dialog open, and with the status shown.
 - [ ] `npm run verify -- --lighthouse` passes.
 
 # Test plan
@@ -99,7 +99,7 @@ goes to someone else, one action must leave nothing of him behind.
   `ProfileService`, `HistoryService`, `CountingService` and `LanguageService`; the settings page spec for R1, R2, R4
   (dialog result true and false, both status variants); the translation-keys test covers the new strings.
 - **e2e (Playwright + axe):** `settings.e2e.ts` gains the path of the acceptance criteria; the storage is read with
-  `page.evaluate`.
+  `page.evaluate`. Written in the e2e pass of 2026-11-20.
 
 # Out of scope
 

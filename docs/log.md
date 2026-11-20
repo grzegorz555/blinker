@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-20 (e2e pass for specs 013–015)
+- The e2e paths of specs 013, 014 and 015 are written: "Usuń wszystkie dane" (Delete all data) on 3 device projects with axe and a reload (`settings.e2e.ts`); the camera released when the page is hidden and opened again on return, and the "Kamera" (Camera) toggle with the top bar at 360 px and in landscape (`counting.e2e.ts`); "Wyłącz kamerę" (Turn off the camera) during a calibration step and the one "Ręka (+5)" (Hand (+5)) step (`calibration.e2e.ts`); the sticky camera bar covering no focused control and the copied profile JSON (`diagnostics.e2e.ts`). A helper fakes the page visibility (`e2e/support/visibility.ts`). The old calibration path still had ten steps and was brought to nine.
+
 ## 2026-11-20 (spec 016: word prediction, approved)
 - Spec 016 approved: up to 3 guesses for the word he is spelling, in a row above the board for the people around him (a tap takes one), and, as a second option off by default, the best one asked aloud after a pause ("Żółw?" (Tortoise?)): a nod takes it in its full spelling with a space, a blink or a hand goes on, a shake refuses it, one shake undoes a taken word. Off by default, Polish boards only.
 - He drops Polish letters sometimes, even those on his board, so a plain letter also stands for its Polish letter ("ZOL" gives "ŻÓŁW"), and a Polish letter he spelled matches only itself. His own words from sentences read aloud are learnt on the device (`blinker.words.v1`, on once prediction is on) and erased with the rest.

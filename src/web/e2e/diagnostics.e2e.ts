@@ -61,6 +61,71 @@ test.describe('Diagnostyka (Diagnostics)', () => {
     expect(thirdParty).toEqual([]);
   });
 
+  // Spec 014, R12: the camera buttons sit in a bar that stays in view, and the bar covers no focused control.
+  test('scrolled to the end, "Wyłącz kamerę" (Turn off the camera) is in view and covers no focused control', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName !== 'chromium', 'only Chromium has a fake camera in tests');
+    test.slow();
+    await page.setViewportSize({ width: 390, height: 664 });
+    await page.context().grantPermissions(['camera']);
+    await page.getByRole('button', { name: 'Włącz kamerę' }).click();
+    await expect(page.getByTestId('tracker-status')).toHaveText(/Działa\. Analiza/, {
+      timeout: 60_000,
+    });
+    const stop = page.getByRole('button', { name: 'Wyłącz kamerę' });
+    await page.locator('main').evaluate((main) => main.scrollTo(0, main.scrollHeight));
+    await expect.poll(() => page.locator('main').evaluate((m) => m.scrollTop)).toBeGreaterThan(0);
+    await expect(stop).toBeInViewport({ ratio: 1 });
+
+    // Every control reached by Tab, from the bar to the end of the page, is not covered by the bar (SC 2.4.11).
+    await stop.focus();
+    const covered: string[] = [];
+    for (let i = 0; i < 40; i++) {
+      await page.keyboard.press('Tab');
+      const result = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        const bar = document.querySelector('[data-testid="camera-bar"]')!;
+        const main = document.querySelector('main')!;
+        if (!el || !main.contains(el)) return { done: true, covered: null };
+        if (bar.contains(el)) return { done: false, covered: null };
+        const a = el.getBoundingClientRect();
+        const b = bar.getBoundingClientRect();
+        const overlap = a.top < b.bottom - 1 && a.bottom > b.top + 1;
+        const name = (el.getAttribute('aria-label') ?? el.textContent ?? el.tagName).trim();
+        return { done: false, covered: overlap ? name.slice(0, 60) : null };
+      });
+      if (result.covered) covered.push(result.covered);
+      if (result.done) break;
+    }
+    expect(covered, 'controls under the camera bar when focused').toEqual([]);
+    await expect(stop).toBeInViewport({ ratio: 1 });
+    await expectNoA11yViolations(page);
+    await stop.click();
+    await expect(page.getByTestId('tracker-status')).toHaveText('Kamera wyłączona.');
+  });
+
+  // Spec 015, R10: "Kopiuj wyniki" (Copy the results) copies the whole profile, his sides in words and the head movements.
+  test('Kopiuj wyniki (Copy the results) puts the profile JSON with the hand on the clipboard', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName !== 'chromium', 'only Chromium has a fake camera in tests');
+    test.slow();
+    await page.context().grantPermissions(['camera', 'clipboard-read', 'clipboard-write']);
+    await page.getByRole('button', { name: 'Włącz kamerę' }).click();
+    const copy = page.getByRole('button', { name: 'Kopiuj wyniki' });
+    await expect(copy).toBeEnabled({ timeout: 60_000 });
+    await copy.click();
+    await expect(page.getByText('Skopiowano')).toBeVisible();
+    const text = await page.evaluate(() => navigator.clipboard.readText());
+    expect(text).toContain('Profile: defaults (not calibrated)');
+    expect(text).toMatch(/Profile JSON: \{.*"hand":\{"amplitude"/);
+    expect(text).toMatch(/Sides: his left = yaw /);
+    expect(text).toContain('Last movements of the head (newest first)');
+  });
+
   test('without a camera the reason is said in text', async ({ page, browserName }) => {
     test.skip(browserName === 'chromium', 'Chromium has the fake camera');
     await page.getByRole('button', { name: 'Włącz kamerę' }).click();

@@ -9,7 +9,8 @@ generated:
   at: 2026-11-16
 ---
 
-Branch: `feat/013-delete-all-data`. Gates: `npm run verify -- --lighthouse`.
+Branch: `feat/013-delete-all-data`. Gates: `npm run verify -- --lighthouse`. The e2e path of T2 was written in the e2e
+pass of 2026-11-20 (`e2e/settings.e2e.ts`).
 
 - [x] **T1 [opus]: The erase in the core.** A `DeviceData` service with `eraseAll()`: every service gets a reset to
       its defaults (`SettingsService`, `BoardsService`, `HistoryService`, `CountingService` for the sentence and its

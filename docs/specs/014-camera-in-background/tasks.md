@@ -9,8 +9,9 @@ generated:
   at: 2026-11-16
 ---
 
-Branch: `feat/014-camera-in-background`. Gates: `npm run verify -- --quick`; CI runs `npm run verify`. E2E waits
-for the next e2e pass (the paths are in the spec's Test plan).
+Branch: `feat/014-camera-in-background`. Gates: `npm run verify -- --quick`; CI runs `npm run verify`. The e2e
+paths of the spec's Test plan were written in the e2e pass of 2026-11-20 (`e2e/counting.e2e.ts`,
+`e2e/calibration.e2e.ts`, `e2e/diagnostics.e2e.ts`, the helper `e2e/support/visibility.ts`).
 
 - [x] **T1 [opus]: The tracker follows the page's visibility.** `FaceTrackerService` listens to `visibilitychange`
       (an injected document, as in `wake-lock.ts`): hidden releases the camera and keeps the worker, visible opens

@@ -1,6 +1,14 @@
 // Spec 007, T4: the Liczenie (Counting) screen on the spec 006 core (R3, R4, R5).
 import { expect, test, type Page } from './support/test';
 import { expectNoA11yViolations } from './support/a11y';
+import { collectThirdPartyRequests } from './support/requests';
+import {
+  keepCameraStream,
+  keptStreamEnded,
+  liveVideos,
+  noVideoSource,
+  setPageVisibility,
+} from './support/visibility';
 
 test.use({ locale: 'pl-PL' });
 
@@ -260,4 +268,150 @@ test.describe('Liczenie (Counting) with the camera', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Ustawienia' })).toBeVisible();
     expect(await live()).toBe(0);
   });
+
+  // Spec 014, R1, R2, R4, R5: the page made hidden releases the camera; made visible, it opens again without a tap.
+  test('hidden releases the camera, visible opens it again without a tap; the buttons work all the time (spec 014)', async ({
+    page,
+    browserName,
+    baseURL,
+  }) => {
+    test.skip(browserName !== 'chromium', 'only Chromium has a fake camera in tests');
+    test.slow();
+    const thirdParty = collectThirdPartyRequests(page, baseURL!);
+    const status = page.getByTestId('camera-status');
+    await expect(status).toHaveText('Brak twarzy', { timeout: 60_000 });
+    await keepCameraStream(page);
+
+    await setPageVisibility(page, 'hidden');
+    await expect.poll(() => keptStreamEnded(page)).toBe(true);
+    expect(await noVideoSource(page)).toBe(true);
+    expect(await liveVideos(page)).toBe(0);
+    await expect(status).toHaveText('Kamera…');
+    await cell(page, 'W').click();
+    await expect(sentence(page)).toHaveText('W');
+
+    await setPageVisibility(page, 'visible');
+    await expect(status).toHaveText('Brak twarzy', { timeout: 20_000 });
+    await expect.poll(() => liveVideos(page)).toBe(1);
+    await cell(page, 'A').click();
+    await expect(sentence(page)).toHaveText('WA');
+    await expectNoA11yViolations(page);
+    expect(thirdParty).toEqual([]);
+  });
+
+  // Spec 014, R10: "Kamera" (Camera) in the top bar, a toggle like "Pauza" (Pause).
+  test('Kamera (Camera) turns the camera off and on by hand; the top bar fits at 360 px portrait and in landscape', async ({
+    page,
+    browserName,
+  }) => {
+    test.slow();
+    const chromium = browserName === 'chromium';
+    const status = page.getByTestId('camera-status');
+    const toggle = page.getByRole('button', { name: 'Kamera', exact: true });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    if (chromium) {
+      await expect(status).toHaveText('Brak twarzy', { timeout: 60_000 });
+      await keepCameraStream(page);
+    }
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(status).toHaveText('Kamera wyłączona');
+    if (chromium) {
+      await expect.poll(() => keptStreamEnded(page)).toBe(true);
+      expect(await noVideoSource(page)).toBe(true);
+    }
+    // The signal buttons keep working with the camera off.
+    await cell(page, 'W').click();
+    await page
+      .getByRole('region', { name: 'Jego sygnały' })
+      .getByRole('button', { name: 'Kręcenie głową: nie' })
+      .click();
+    await expect(sentence(page)).toHaveText('');
+    await expectNoA11yViolations(page);
+
+    for (const viewport of [
+      { name: 'phone portrait 360', width: 360, height: 640 },
+      { name: 'phone landscape', width: 740, height: 360 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await expectFits(page, `${viewport.name} with the camera off`);
+      expect(await topBarProblems(page), viewport.name).toEqual([]);
+    }
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    if (chromium) {
+      await expect(status).toHaveText('Brak twarzy', { timeout: 20_000 });
+      await expect.poll(() => liveVideos(page)).toBe(1);
+    } else {
+      // WebKit in tests has no camera: the reason is said again in text.
+      await expect(status).toHaveText(/Brak twarzy|Bez zgody|Brak kamery|Bez kamery|Błąd kamery/, {
+        timeout: 20_000,
+      });
+    }
+    for (const viewport of [
+      { name: 'phone portrait 360', width: 360, height: 640 },
+      { name: 'phone landscape', width: 740, height: 360 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await expectFits(page, `${viewport.name} with the camera on`);
+      expect(await topBarProblems(page), viewport.name).toEqual([]);
+    }
+    await expectNoA11yViolations(page);
+  });
 });
+
+/**
+ * Spec 014: the camera chip, "Kamera" (Camera) and "Pauza" (Pause) side by side in the top bar: each inside the
+ * viewport, none overlapping another, the two buttons with a touch target at least 44 px high. Returns the problems found.
+ */
+function topBarProblems(page: Page) {
+  return page.evaluate(() => {
+    const vw = document.documentElement.clientWidth;
+    const parts = [
+      ['chip', 'app-camera-chip [data-testid="camera-status"]'],
+      ['camera', '[data-testid="camera-toggle"]'],
+      ['pause', '.pause-btn:not(.camera-btn)'],
+    ].map(([name, selector]) => {
+      const el = document.querySelector(selector);
+      return [name, el?.getBoundingClientRect() ?? null] as const;
+    });
+    const problems: string[] = [];
+    for (const [name, box] of parts) {
+      if (!box) problems.push(`${name} missing`);
+      else if (box.left < 0 || box.right > vw + 0.5) problems.push(`${name} outside`);
+    }
+    for (let i = 0; i < parts.length; i++) {
+      for (let j = i + 1; j < parts.length; j++) {
+        const [an, a] = parts[i];
+        const [bn, b] = parts[j];
+        if (
+          a &&
+          b &&
+          a.left < b.right - 1 &&
+          a.right > b.left + 1 &&
+          a.top < b.bottom - 1 &&
+          a.bottom > b.top + 1
+        )
+          problems.push(`${an} overlaps ${bn}`);
+      }
+    }
+    // An M3 button is drawn 40 px high; its touch target is the invisible 48 px layer Angular Material adds.
+    for (const [name, selector] of [
+      ['camera', '[data-testid="camera-toggle"]'],
+      ['pause', '.pause-btn:not(.camera-btn)'],
+    ]) {
+      const button = document.querySelector(selector);
+      const target = button?.querySelector('.mat-mdc-button-touch-target');
+      const height = Math.max(
+        button?.getBoundingClientRect().height ?? 0,
+        target && getComputedStyle(target).display !== 'none'
+          ? target.getBoundingClientRect().height
+          : 0,
+      );
+      if (height < 44) problems.push(`${name} target ${Math.round(height)} px high`);
+    }
+    return problems;
+  });
+}

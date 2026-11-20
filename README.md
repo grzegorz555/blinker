@@ -31,7 +31,7 @@ them into sentences that are shown on screen and read aloud.
 - **Kalibracja (Calibration)**, in the navigation: a step-by-step wizard (at rest, 3 strong blinks, his hand, a nod, a shake, head right), each step said aloud and showing "Wykryto n z k" (Detected n of k); "Zapisz kalibrację" (Save the calibration) keeps his thresholds on the device (numbers only, never a picture).
 - **Diagnostyka (Diagnostics)** also lists the signals Blinker detects, with his calibration or the defaults.
 
-**Spec 015: his hand is a quick turn of the head** (spec [015](docs/specs/015-hand-by-head/spec.md), built; to try with him; the e2e paths wait for the next e2e pass). His hand signal (+5) is a turn of the head to his left and straight back, a little down, with no hold; it is told apart from a nod, a shake and head right. Kalibracja (Calibration) learns its head angle in one "Ręka (+5)" (Hand (+5)) step; Diagnostyka (Diagnostics) copies the whole profile and the signed head angles. Only his left hand for now.
+**Spec 015: his hand is a quick turn of the head** (spec [015](docs/specs/015-hand-by-head/spec.md), built, e2e tests green; to try with him). His hand signal (+5) is a turn of the head to his left and straight back, a little down, with no hold; it is told apart from a nod, a shake and head right. Kalibracja (Calibration) learns its head angle in one "Ręka (+5)" (Hand (+5)) step; Diagnostyka (Diagnostics) copies the whole profile and the signed head angles. Only his left hand for now.
 
 **Stage 3: face-tracking spike** (spec [010](docs/specs/010-face-spike/spec.md), built; ADR-[0006](docs/adr/0006-face-tracking-mediapipe-worker.md) proposed, waiting for the measurements on his devices):
 

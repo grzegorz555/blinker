@@ -9,8 +9,9 @@ generated:
   at: 2026-11-17
 ---
 
-Branch: `feat/015-hand-by-head`. Gates: `npm run verify -- --quick`; CI runs `npm run verify`. E2E waits for the
-next e2e pass (the paths are in the spec's Test plan). Spec 014 also changes the Kalibracja (Calibration) and
+Branch: `feat/015-hand-by-head`. Gates: `npm run verify -- --quick`; CI runs `npm run verify`. The e2e paths
+of the spec's Test plan were written in the e2e pass of 2026-11-20 (`e2e/calibration.e2e.ts`,
+`e2e/diagnostics.e2e.ts`). Spec 014 also changes the Kalibracja (Calibration) and
 Diagnostyka (Diagnostics) pages; whichever lands second rebases on the other.
 
 - [x] **T1 [opus]: The hand from the head, in the detector and the profile.** `HAND` from a turn to his left past
