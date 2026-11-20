@@ -20,7 +20,7 @@ ADR-0007 on 2026-11-20.
       word) and the build on a small fixture.
       _To understand:_ CC BY-SA 4.0 (attribution, ShareAlike for adapted material); service worker asset groups
       (`installMode` lazy, `updateMode` prefetch).
-- [ ] **T2 [sonnet]: The predictor (pure).** `core/words/word-list.ts` (parse and validate the file, R3) and
+- [x] **T2 [sonnet]: The predictor (pure).** `core/words/word-list.ts` (parse and validate the file, R3) and
       `core/words/predict.ts` (the one-way match: a plain letter also stands for its Polish letter, the prefix, candidates and their order, refused
       words, at most 3; R4, R5). No Angular, no clock. Tests: `word-list.spec.ts`, `predict.spec.ts`.
       _To understand:_ Unicode NFC and locale-aware upper case; why a fixed order matters more than a clever score for
