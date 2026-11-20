@@ -2,7 +2,7 @@
 
 ## 2026-11-20 (spec 016: word prediction, approved)
 - Spec 016 approved: up to 3 guesses for the word he is spelling, in a row above the board for the people around him (a tap takes one), and, as a second option off by default, the best one asked aloud after a pause ("Żółw?" (Tortoise?)): a nod takes it in its full spelling with a space, a blink or a hand goes on, a shake refuses it, one shake undoes a taken word. Off by default, Polish boards only.
-- He drops Polish letters sometimes, even those on his board, so a plain letter also stands for its Polish letter ("ZOL" gives "ŻÓŁW"), and a Polish letter he spelled matches only itself. His own words from sentences read aloud are learnt on the device (`blinker.words.v1`, on once prediction is on) and erased with the rest.
+- He drops Polish letters sometimes, even those on his board, so a plain letter also stands for its Polish letter ("ZO" gives "ŻÓŁW"), and a Polish letter he spelled matches only itself. His own words from sentences read aloud are learnt on the device (`blinker.words.v1`, on once prediction is on) and erased with the rest.
 - ADR-0007 accepted: 20,000 word forms from FrequencyWords (OpenSubtitles 2018, spoken Polish, CC BY-SA 4.0) rather than Leipzig (written Polish), self-hosted in `/words/pl.txt` (about 175 KB, 77 KB gzipped), cached offline, credited in "O aplikacji" (About).
 
 ## 2026-11-18 (spec 015: the hand from the head)
