@@ -4,6 +4,7 @@
 // - (spec 003, R4) inline <script> elements and inline event handlers (on...=) in HTML: the production CSP
 //   (script-src 'self') blocks them, so the app would silently lose behaviour or styles;
 // - (spec 004, R1) a design/ folder: the mock-ups are built separately into dist/design/ and never ship in the app.
+// - (spec 016, R2) the word list words/pl.txt and its license words/pl.LICENSE.txt must be there (CC BY-SA 4.0 attribution).
 // No dependencies on purpose. Usage: node scripts/check-dist.mjs [dir]
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve, sep } from 'node:path';
@@ -11,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 export const DEFAULT_DIST = resolve(import.meta.dirname, '..', 'dist', 'blinker-web', 'browser');
 
+const REQUIRED_FILES = ['words/pl.txt', 'words/pl.LICENSE.txt'];
 const FORBIDDEN_EXTENSIONS = new Set(['.map', '.md']);
 const SCANNED_FOR_COMMENT = new Set(['.js', '.mjs', '.css']);
 const SOURCE_MAP_COMMENT = /[#@]\s*sourceMappingURL=/;
@@ -25,6 +27,11 @@ export function findInlineCode(html) {
   }
   if (INLINE_HANDLER.test(html)) problems.push('inline event handler (on...=)');
   return problems;
+}
+
+/** Files the app build must contain (spec 016, R2). Kept apart from findDistProblems: the mock-up build reuses that one. */
+export function findMissingFiles(dir) {
+  return REQUIRED_FILES.filter((f) => !existsSync(join(dir, f))).map((f) => 'missing file: ' + f);
 }
 
 function walk(dir) {
@@ -61,7 +68,7 @@ export function findDistProblems(dir) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const dir = resolve(process.argv[2] ?? DEFAULT_DIST);
-  const problems = findDistProblems(dir);
+  const problems = [...findDistProblems(dir), ...findMissingFiles(dir)];
   if (problems.length) {
     console.error(`dist check failed (${problems.length}):\n- ${problems.join('\n- ')}`);
     process.exit(1);

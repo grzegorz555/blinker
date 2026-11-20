@@ -1,0 +1,26 @@
+Polish word list for word prediction (pl.txt)
+
+Source
+  FrequencyWords by Hermit Dave, Polish list of 2018 (pl_50k.txt)
+  https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/pl/pl_50k.txt
+  Repository: https://github.com/hermitdave/FrequencyWords
+  The counts come from the OpenSubtitles 2018 corpus (OPUS, https://opus.nlpl.eu/;
+  subtitles from https://www.opensubtitles.org/).
+  Downloaded on 2026-11-20. SHA-256 of the downloaded file: 50bf8d30d1ed4f5cedceb3e40e74d793ec6bec0f16d9f3dd0a2c9e313402e10f
+
+License
+  The source content is licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0):
+  https://creativecommons.org/licenses/by-sa/4.0/
+  Legal code: https://creativecommons.org/licenses/by-sa/4.0/legalcode.en
+
+Changes made (this is adapted material)
+  - Kept only lowercase words of 3 to 24 letters from a-z and the Polish letters ą ć ę ł ń ó ś ź ż
+    (no q, v, x, digits, punctuation or foreign letters).
+  - Removed a short list of vulgar and insulting forms (see scripts/build-word-list.mjs in the repository).
+  - Removed duplicates and kept the first 20,000 words in the original frequency order.
+  - Dropped the counts: the file has one word per line.
+  Built with scripts/build-word-list.mjs.
+
+Sharing
+  This file and pl.txt are shared under CC BY-SA 4.0 (the same license as the source). The rest of the Blinker
+  application is not adapted material and keeps its own license (ADR-0007).
