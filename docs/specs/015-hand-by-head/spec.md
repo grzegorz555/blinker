@@ -123,7 +123,8 @@ Angles are degrees from his neutral (`head − profile.neutral`), with MediaPipe
       (Diagnostics) copies the whole profile, the sides in words and signed head movements (R10).
 - [ ] By hand with him (`docs/trial/first-session.md`): ten glances at his hand → at least eight `HAND` and no `NOD`;
       five nods, five shakes, two head rights → no `HAND`.
-- [ ] `npm run verify` passes. E2E waits for the next e2e pass (`docs/conventions/testing.md`).
+- [ ] `npm run verify` passes.
+- [x] E2E (the paths of the Test plan): written and green in the e2e pass of 2026-11-20.
 
 # Test plan
 
@@ -131,7 +132,7 @@ Angles are degrees from his neutral (`head − profile.neutral`), with MediaPipe
   (neutral 4.9/5.7, glance 44–65° and 8–9°, nod 7.7° direction 1, shake 16°, right 34° direction −1);
   `profile.spec.ts` for R7 (his old stored profile as a fixture); `fit.spec.ts` for R8; `calibration-page.spec.ts`
   and `diagnostics-page.spec.ts` for R8 and R10.
-- **e2e for the next e2e pass (Playwright + axe, fake-camera projects):** Kalibracja (Calibration) walks through
+- **e2e (Playwright + axe, fake-camera projects; written in the e2e pass of 2026-11-20):** Kalibracja (Calibration) walks through
   one hand step (the wizard has no `handRight`), no axe violation; Diagnostyka (Diagnostics) "Kopiuj wyniki" (Copy
   the results) puts a text with `Profile:` JSON containing `"hand":{"amplitude"` on the clipboard.
 

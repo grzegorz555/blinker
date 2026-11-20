@@ -112,15 +112,15 @@ or to rest his eyes. Today Liczenie (Counting) offers only the switch in Ustawie
 - [ ] By hand on a phone (before the first session, noted in `docs/trial/first-session.md`): switching to another
       app turns the camera indicator off; coming back turns the camera on within a moment; "Kamera" (Camera) in
       Liczenie (Counting) turns the indicator off and on.
-- [ ] `npm run verify` passes. E2E waits for the next e2e pass (`docs/conventions/testing.md`): the paths are in the
-      Test plan.
+- [ ] `npm run verify` passes.
+- [x] E2E (the paths of the Test plan): written and green in the e2e pass of 2026-11-20.
 
 # Test plan
 
 - **Unit (Vitest):** `face-tracker.service.spec.ts` for R1–R3, R5, R8 with a document fake like the one of
   `wake-lock.ts` (a `visibilityState` and the listener); `camera-input.service.spec.ts` for R4; the calibration and
   diagnostics page specs for R6 and R7; the counting, calibration and diagnostics page specs for R10–R13.
-- **e2e for the next e2e pass (Playwright + axe, fake-camera projects):**
+- **e2e (Playwright + axe, fake-camera projects; written in the e2e pass of 2026-11-20):**
   - Liczenie (Counting) with the camera on, the page made hidden → the tracks of the stream are ended and the video
     has no source; made visible → the chip goes through "starting" to a face status without a tap, and the signal
     buttons worked all the time; no third-party request, no CSP violation, axe. A test cannot really hide the page,

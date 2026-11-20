@@ -4,7 +4,7 @@
 import { expect, test, type Page } from './support/test';
 import { expectNoA11yViolations } from './support/a11y';
 import { collectThirdPartyRequests } from './support/requests';
-import { fakeSpeech } from './support/speech';
+import { fakeSpeech, spoken } from './support/speech';
 
 test.use({ locale: 'pl-PL' });
 
@@ -164,5 +164,132 @@ test.describe('Ustawienia (Settings) on the device', () => {
     await fakeSpeech(page, []);
     await page.goto('/settings');
     await expect(page.getByTestId('voice-help')).toContainText('Zainstaluj polski głos');
+  });
+});
+
+// Spec 013: "Usuń wszystkie dane" (Delete all data) removes everything Blinker keeps on the device after a confirmation,
+// resets the running app without a reload, and says what it did. The storage is read with page.evaluate.
+test.describe('Dane na tym urządzeniu (Data on this device)', () => {
+  const yesNo = {
+    schemaVersion: 1,
+    id: 'yes-no',
+    name: 'Tak i nie',
+    locale: 'pl',
+    columns: ['1', '2'],
+    rows: ['1'],
+    cells: [
+      [
+        { type: 'word', value: 'TAK' },
+        { type: 'word', value: 'NIE' },
+      ],
+    ],
+  };
+  const blinkerKeys = (page: Page) =>
+    page.evaluate(() =>
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith('blinker.'))
+        .sort(),
+    );
+  const nav = (page: Page, name: string) =>
+    page.getByRole('navigation', { name: 'Menu główne' }).getByRole('link', { name });
+  const deleteAll = (page: Page) => page.getByRole('button', { name: 'Usuń wszystkie dane' });
+
+  test('import a board, change a setting, read a sentence aloud; Anuluj (Cancel) keeps all, Usuń (Delete) removes all, also after a reload', async ({
+    page,
+  }) => {
+    test.slow(); // four screens, three axe scans and a reload
+    await fakeSpeech(page, undefined, 100);
+
+    // An imported board, made the active one.
+    await page.goto('/boards');
+    await expect(page.getByRole('heading', { level: 1, name: 'Tablice' })).toBeVisible();
+    const picker = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Wybierz plik tablicy (.json)' }).click();
+    await (
+      await picker
+    ).setFiles({
+      name: 'tak-nie.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify(yesNo)),
+    });
+    await page.getByRole('radio', { name: /Tak i nie/ }).check();
+
+    // A sentence read aloud on that board, so it is in the history.
+    await nav(page, 'Liczenie').click();
+    await page.getByRole('table').getByRole('button', { name: 'TAK', exact: true }).click();
+    await page.getByRole('button', { name: 'Przeczytaj' }).click();
+    await expect.poll(() => spoken(page)).toContain('TAK');
+
+    // A changed setting.
+    await nav(page, 'Ustawienia').click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Ustawienia' })).toBeVisible();
+    await pauseField(page).fill('2500');
+    await pauseField(page).blur();
+    await expect
+      .poll(() => blinkerKeys(page))
+      .toEqual(
+        expect.arrayContaining([
+          'blinker.activeBoard.v1',
+          'blinker.boards.v1',
+          'blinker.history.v1',
+          'blinker.settings.v1',
+        ]),
+      );
+
+    // The section: a heading, the text of what is kept and what is not, the button; no axe violations.
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Dane na tym urządzeniu' }),
+    ).toBeVisible();
+    await expect(page.getByText(/Zgodę na kamerę cofa się w ustawieniach witryny/)).toBeVisible();
+    await expectNoA11yViolations(page);
+
+    // With the keyboard: Anuluj (Cancel) changes nothing, and focus goes back to the button. (A click does not focus
+    // a button in WebKit, so there the dialog would have no button to give the focus back to.)
+    await deleteAll(page).focus();
+    await page.keyboard.press('Enter');
+    const dialog = page.getByRole('alertdialog', {
+      name: 'Usunąć wszystkie dane z tego urządzenia?',
+    });
+    await expect(dialog).toContainText('Tego nie da się cofnąć');
+    await expect(dialog.getByRole('button', { name: 'Anuluj' })).toBeFocused();
+    await expectNoA11yViolations(page);
+    await page.keyboard.press('Enter');
+    await expect(dialog).toHaveCount(0);
+    await expect(deleteAll(page)).toBeFocused();
+    await expect(page.getByTestId('delete-all-status')).toHaveText('');
+    await expect(pauseField(page)).toHaveValue('2500');
+    expect(await blinkerKeys(page)).toContain('blinker.history.v1');
+
+    // Usuń (Delete): the status in text, the running app back at its defaults without a reload, no blinker. key.
+    await deleteAll(page).click();
+    await dialog.getByRole('button', { name: 'Usuń', exact: true }).click();
+    await expect(page.getByTestId('delete-all-status')).toHaveText(
+      'Usunięto wszystkie dane z tego urządzenia.',
+    );
+    await expect(pauseField(page)).toHaveValue('1200');
+    expect(await blinkerKeys(page)).toEqual([]);
+    await expectNoA11yViolations(page);
+
+    await nav(page, 'Tablice').click();
+    await expect(page.getByRole('radio')).toHaveCount(1);
+    await expect(page.getByRole('radio', { name: /Tablica przyjaciela/ })).toBeChecked();
+    await nav(page, 'Zdania').click();
+    await expect(page.getByTestId('empty')).toBeVisible();
+    await nav(page, 'Liczenie').click();
+    await expect(page.getByTestId('sentence')).toHaveText('');
+    await expect(
+      page.getByRole('table').getByRole('button', { name: 'W', exact: true }),
+    ).toBeVisible();
+
+    // Still so after a reload.
+    await page.reload();
+    await expect(
+      page.getByRole('table').getByRole('button', { name: 'W', exact: true }),
+    ).toBeVisible();
+    await nav(page, 'Zdania').click();
+    await expect(page.getByTestId('empty')).toBeVisible();
+    await nav(page, 'Ustawienia').click();
+    await expect(pauseField(page)).toHaveValue('1200');
+    expect(await blinkerKeys(page)).toEqual([]);
   });
 });
