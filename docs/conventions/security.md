@@ -66,10 +66,12 @@ the local e2e server sends the same headers, so every e2e run fails on a CSP or 
 
 # Build output
 - Production builds have **no source maps** and contain **no `.md`, `.local*` or `.claude` files**. A CI step checks `dist/` (stage 1).
-- Agent instructions (`CLAUDE.md`, `docs/`, `.claude/`) live in the private repo and are never deployed.
+- Agent instructions (`CLAUDE.md`, `docs/`, `.claude/`) live in the repository (public since 2026-11-15) and are never deployed.
 
 # Secrets
-The app has no secrets. If one ever appears (for example a deploy token), it lives only in GitHub Actions secrets.
+The app has no secrets. The only secret is the Azure Static Web Apps deployment token, which can only upload files to
+this one app; it lives only in GitHub Actions secrets (`AZURE_STATIC_WEB_APPS_API_TOKEN`), is never given to
+Dependabot or fork PRs, and is reset in the portal if it ever leaks (spec 003).
 Agents never read `.env*`, the credential manager or `git credential` output.
 
 # Supply chain
@@ -93,5 +95,6 @@ Agents never read `.env*`, the credential manager or `git credential` output.
 
 # How we check
 - The `code-reviewer` agent checks the points above for every change.
-- An e2e test reads the response headers on the preview deploy.
+- The `deployed` e2e project reads the response headers (on `/`, a deep link and a 404), checks HTTPS and runs a smoke
+  + axe test on every preview and production deploy (spec 003, R9).
 - Before the first real use: a pass through the ASVS chapters listed above, plus `/security-review`. The chapter-level pass of 2026-11-16 is in [security-review.md](../security-review.md); its F1 is closed by spec 013 and its F2 by spec 014.

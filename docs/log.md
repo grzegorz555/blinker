@@ -1,5 +1,10 @@
 # Log
 
+## 2026-11-21 (spec 003 done: Blinker on Azure)
+- The author set up Azure Static Web Apps (Free; West Europe took no new customers, so East US 2) and the deploy token. The first production deploy passed every gate, but the `deployed` test found that Azure's built-in 404 page gets no security headers; our static `404.html` through `responseOverrides` fixed it (PR #45), checked on the first PR preview. Production deploys are a GitHub environment.
+- Production: https://mango-rock-0416a080f.3.azurestaticapps.net. The README is short now (the address, the status, one line per tab), with a new [user guide](user-guide.md) for the caregivers; the stage history stays here.
+- The author: the camera in Liczenie (Counting) is on by default (PR #47); the navigation has a hover state and a filled icon for the current page (PR #46).
+
 ## 2026-11-20 (e2e pass for specs 013–015)
 - The e2e paths of specs 013, 014 and 015 are written: "Usuń wszystkie dane" (Delete all data) on 3 device projects with axe and a reload (`settings.e2e.ts`); the camera released when the page is hidden and opened again on return, and the "Kamera" (Camera) toggle with the top bar at 360 px and in landscape (`counting.e2e.ts`); "Wyłącz kamerę" (Turn off the camera) during a calibration step and the one "Ręka (+5)" (Hand (+5)) step (`calibration.e2e.ts`); the sticky camera bar covering no focused control and the copied profile JSON (`diagnostics.e2e.ts`). A helper fakes the page visibility (`e2e/support/visibility.ts`). The old calibration path still had ten steps and was brought to nine.
 

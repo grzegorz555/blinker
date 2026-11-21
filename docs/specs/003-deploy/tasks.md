@@ -3,7 +3,7 @@ type: Task List
 title: "003: Deploy to Azure Static Web Apps tasks"
 description: Five tasks, one commit each. T1–T3 need no Azure account; T4 needs the author's setup.
 tags: [stage-1, deploy, security, ci]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-11
@@ -32,6 +32,6 @@ locally, full gates in CI.
   *To understand:* GitHub Actions events, `needs`, secrets and why Dependabot/forks don't get them, artifacts.
   *Merged before the author's Azure setup: the skip path (R7) is verified in CI; the first real preview and production
   deploy are verified after the secret is added.*
-- [ ] **T5 [haiku]: Docs and compound.** `security.md` (headers now live in the config, the test keeps them equal),
+- [x] **T5 [haiku]: Docs and compound.** `security.md` (headers now live in the config, the test keeps them equal),
   `architecture.md`, README (production URL), specs index, log, Polish copies, summary.
   *To understand:* the compound step.

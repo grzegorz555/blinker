@@ -3,7 +3,7 @@ type: Spec
 title: "003: Deploy to Azure Static Web Apps"
 description: Security headers from one config file, served the same way by the local e2e server and by Azure; a preview deploy per PR with a remote header test; production deploy on main after every gate passes.
 tags: [stage-1, deploy, security, ci]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-11

@@ -9,6 +9,7 @@ file except `index.md` and `log.md` has YAML frontmatter with a `type`. Read the
 only what the task needs.
 
 # Product
+* [User guide](user-guide.md) - How to use Blinker: the tabs, his signals, the first setup, troubleshooting.
 * [Vision](vision.md) - Who Blinker is for, the problem, goals and non-goals.
 * [Interaction model](interaction-model.md) - Signals (blink, head, gaze), input modes (scanning, counting) and their default actions.
 * [Board format](board-format.md) - The JSON format of a swappable letter board (draft).
