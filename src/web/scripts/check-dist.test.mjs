@@ -13,6 +13,7 @@ describe('findDistProblems', () => {
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), 'blinker-dist-'));
     writeFileSync(join(dir, 'index.html'), '<!doctype html>');
+    writeFileSync(join(dir, '404.html'), '<!doctype html>');
     writeFileSync(join(dir, 'main-ABC.js'), 'console.log(1);');
     writeFileSync(join(dir, 'styles-XYZ.css'), 'body{}');
     mkdirSync(join(dir, 'words'));
@@ -44,6 +45,11 @@ describe('findDistProblems', () => {
       findInlineCode('<script src="a.js" type="module"></script><p data-x="1">Go online=yes</p>'),
       [],
     );
+  });
+
+  it('reports a missing 404 page (spec 003, R9)', () => {
+    rmSync(join(dir, '404.html'));
+    assert.deepEqual(findMissingFiles(dir), ['missing file: 404.html']);
   });
 
   it('reports a missing word list or license (spec 016, R2)', () => {

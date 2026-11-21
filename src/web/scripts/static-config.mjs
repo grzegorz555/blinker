@@ -5,7 +5,9 @@
 // - route wildcards only at the end of the path ("/main-*" = starts with "/main-"); first matching route wins;
 // - route headers override global headers with the same name, otherwise both are sent;
 // - route rules are not applied to responses served by navigationFallback;
-// - navigationFallback.exclude globs: paths that match and don't exist return 404 instead of index.html.
+// - navigationFallback.exclude globs: paths that match and don't exist return 404 instead of index.html;
+// - responseOverrides["404"].rewrite: the 404 serves that file (Azure's built-in 404 page has no globalHeaders).
+//   We treat it like the fallback (global headers only), so a missing "/main-x.js" is never cached as immutable.
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -35,6 +37,11 @@ export function globToRegExp(glob) {
 export function isFallbackPath(config, path) {
   const exclude = config.navigationFallback?.exclude ?? [];
   return !exclude.some((glob) => globToRegExp(glob).test(path));
+}
+
+/** The file served with status 404 for a missing file (responseOverrides["404"].rewrite), or null. */
+export function notFoundPage(config) {
+  return config.responseOverrides?.['404']?.rewrite ?? null;
 }
 
 function routeMatches(route, path) {

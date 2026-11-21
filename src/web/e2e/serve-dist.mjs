@@ -4,7 +4,13 @@
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve, sep } from 'node:path';
-import { headersFor, isFallbackPath, loadConfig, mimeTypeFor } from '../scripts/static-config.mjs';
+import {
+  headersFor,
+  isFallbackPath,
+  loadConfig,
+  mimeTypeFor,
+  notFoundPage,
+} from '../scripts/static-config.mjs';
 
 const root = resolve(import.meta.dirname, '..', 'dist', 'blinker-web', 'browser');
 const port = Number(process.env.PORT ?? 4300);
@@ -38,9 +44,13 @@ createServer(async (req, res) => {
   const path = new URL(req.url ?? '/', 'http://localhost').pathname;
   const found = await resolveFile(path);
   if (!found) {
+    // Like Azure with responseOverrides["404"]: the custom page, status 404, global headers only.
     res
-      .writeHead(404, { ...headersFor(config, path), 'Content-Type': 'text/plain' })
-      .end('Not found');
+      .writeHead(404, {
+        ...headersFor(config, path, { fallback: true }),
+        'Content-Type': types['.html'],
+      })
+      .end(await readFile(join(root, notFoundPage(config))));
     return;
   }
   const headers = headersFor(config, path, { fallback: found.fallback });

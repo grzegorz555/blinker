@@ -28,6 +28,9 @@
       "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
     }
   ],
+  "responseOverrides": {
+    "404": { "rewrite": "/404.html" }
+  },
   "globalHeaders": {
     "Content-Security-Policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types angular angular#bundler default",
     "Permissions-Policy": "camera=(self), microphone=(), geolocation=(), usb=(), payment=()",

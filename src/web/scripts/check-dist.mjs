@@ -12,7 +12,8 @@ import { fileURLToPath } from 'node:url';
 
 export const DEFAULT_DIST = resolve(import.meta.dirname, '..', 'dist', 'blinker-web', 'browser');
 
-const REQUIRED_FILES = ['words/pl.txt', 'words/pl.LICENSE.txt'];
+// 404.html: the page Azure serves for a missing file, with the security headers (spec 003, R9).
+const REQUIRED_FILES = ['words/pl.txt', 'words/pl.LICENSE.txt', '404.html'];
 const FORBIDDEN_EXTENSIONS = new Set(['.map', '.md']);
 const SCANNED_FOR_COMMENT = new Set(['.js', '.mjs', '.css']);
 const SOURCE_MAP_COMMENT = /[#@]\s*sourceMappingURL=/;
@@ -29,7 +30,7 @@ export function findInlineCode(html) {
   return problems;
 }
 
-/** Files the app build must contain (spec 016, R2). Kept apart from findDistProblems: the mock-up build reuses that one. */
+/** Files the app build must contain (spec 016, R2; spec 003, R9). Kept apart from findDistProblems: the mock-up build reuses that one. */
 export function findMissingFiles(dir) {
   return REQUIRED_FILES.filter((f) => !existsSync(join(dir, f))).map((f) => 'missing file: ' + f);
 }
