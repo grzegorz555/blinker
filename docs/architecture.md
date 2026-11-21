@@ -135,6 +135,10 @@ There are no cookies, no server state and no telemetry.
 
 # Deployment
 
-- A static build, served over HTTPS (the camera only works over HTTPS).
-- The host must be able to set security headers (see [ADR-0003](adr/0003-static-hosting.md)).
+- A static build, served over HTTPS (the camera only works over HTTPS), on Azure Static Web Apps, Free plan
+  ([ADR-0003](adr/0003-static-hosting.md)). Production: https://mango-rock-0416a080f.3.azurestaticapps.net
+- The headers, the SPA fallback, the 404 page and the MIME types come from `src/web/public/staticwebapp.config.json`;
+  the local e2e server reads the same file (spec 003).
+- CI deploys the build that passed every gate: a preview per PR (its URL commented on the PR, removed when the PR
+  closes) and production on `main` (a GitHub environment `production`), each followed by the `deployed` e2e tests.
 - Installable as a PWA, with a service worker for offline use.
