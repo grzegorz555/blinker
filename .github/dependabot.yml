@@ -8,8 +8,9 @@ updates:
       prefix: ci
   - package-ecosystem: npm
     directory: /src/web
+    # Daily: a fix in a pinned tool (vite in @angular/build) arrives within a day, not up to a week later.
     schedule:
-      interval: weekly
+      interval: daily
     commit-message:
       prefix: chore
       include: scope

@@ -87,7 +87,7 @@ Agents never read `.env*`, the credential manager or `git credential` output.
   - Current exception: `picomatch` 4.0.7 (GHSA-fc5q-39xc-vjpf, a ReDoS through crafted glob patterns), until 2026-12-31. It comes only through Angular CLI, Vite and Vitest. Therefore: **do not add `picomatch` (or another glob matcher) as a direct dependency**, and never pass a glob pattern from outside (a board file, a URL, user input) to any tool. Drop the exception once a fixed picomatch reaches the lockfile.
   - Dependabot alerts and security updates are on: a vulnerable dependency opens a fix PR by itself.
   - When the fix is only in a newer version than the parent package allows, an npm `overrides` entry in `src/web/package.json` pins the patched version, if the full `npm run verify` passes. Current: `basic-ftp` 6.2.6 (GHSA-c475-qrg2-pj4r, via `@lhci/cli`), `minimatch` 11.0.8 (GHSA-g3hv-75wg-m249, via ESLint and Angular tooling). Drop an entry once the parent package ships the fix.
-- Dependabot version updates cover npm and GitHub Actions, weekly. Majors of `@angular/*` and TypeScript are ignored, because they move together through `ng update`.
+- Dependabot version updates cover npm (daily) and GitHub Actions (weekly). Majors of `@angular/*` and TypeScript are ignored, because they move together through `ng update`.
 - Malicious packages (a hijacked maintainer account, typosquatting) are not in any vulnerability database yet when they are published. Socket.dev (a GitHub app the author installs) checks every dependency change in a PR for that.
 - GitHub Actions are pinned to a full commit SHA and use minimal `permissions:` (default `contents: read`).
 - gitleaks scans for committed secrets in CI.
