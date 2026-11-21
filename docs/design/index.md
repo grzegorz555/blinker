@@ -86,6 +86,8 @@ under the navigation bar; the skip link appears in the top app bar over the page
 
 - Below 600 px: an M3 **navigation bar** at the bottom (icons with labels, 44 px targets, safe-area padding).
 - From 600 px: an M3 **navigation rail** on the left, so the board keeps the width.
+- Navigation states (both): the current page has the `subtle` pill, a **filled** icon and a bold label; the others an
+  outline icon. Hover (only on devices that can hover) adds the M3 state layer, the content color at 8% over the pill.
 
 **Spec 008 (he listens, he does not read):** on Liczenie (Counting) the prompt and the counter are a small status line at
 the top, **the sentence is the biggest text, above the board** (beside it in landscape), and the step label is gone.
