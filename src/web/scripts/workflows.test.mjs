@@ -43,6 +43,10 @@ describe('workflows', () => {
     assert.match(production, new RegExp(`needs: \\[${GATES.join(', ')}\\]`));
     assert.match(production, /cancel-in-progress: false/);
     assert.doesNotMatch(production, /pull-requests: write/);
+    assert.match(
+      production,
+      /environment:\n {6}name: production\n {6}url: \$\{\{ steps\.deploy\.outputs\.static_web_app_url \}\}/,
+    );
   });
 
   it('deploy previews only for PRs, after every gate (R7)', () => {

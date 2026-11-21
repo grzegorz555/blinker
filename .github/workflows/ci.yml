@@ -178,6 +178,11 @@ jobs:
     needs: [docs, secrets, vulnerabilities, web, lighthouse]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    # Records each run as a GitHub deployment: "production" with the app URL on the repository page.
+    # https://docs.github.com/actions/how-tos/deploy/configure-and-manage-deployments/control-deployments
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.static_web_app_url }}
     concurrency:
       group: deploy-production
       cancel-in-progress: false
