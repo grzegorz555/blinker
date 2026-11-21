@@ -13,8 +13,8 @@ describe('validateSettings (spec 007, R12)', () => {
     expect(validateSettings({ keyboard: true })).toEqual({ ...DEFAULT_SETTINGS, keyboard: true });
   });
 
-  it('the camera is off by default; its sound is on; the camera faces him (spec 012)', () => {
-    expect(DEFAULT_SETTINGS.camera).toBe(false);
+  it('the camera is on by default (the browser asks first); its sound is on; it faces him (spec 012)', () => {
+    expect(DEFAULT_SETTINGS.camera).toBe(true);
     expect(DEFAULT_SETTINGS.cameraPreview).toBe(false);
     expect(DEFAULT_SETTINGS.signalSound).toBe(true);
     expect(DEFAULT_SETTINGS.cameraFacing).toBe('user');

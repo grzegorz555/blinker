@@ -50,7 +50,7 @@ export const DEFAULT_SETTINGS: Settings = {
   rate: RATE.default,
   theme: 'system',
   history: true,
-  camera: false,
+  camera: true,
   cameraFacing: 'user',
   cameraPreview: false,
   signalSound: true,

@@ -75,8 +75,13 @@ describe('CountingPage with the camera (spec 012)', () => {
     return { fixture, root, tracker, cue, text, feed, data };
   }
 
-  it('off by default: no camera, no status', async () => {
-    const { tracker, text } = await render({});
+  it('on by default: Counting starts the front camera (the browser asks first)', async () => {
+    const { tracker } = await render({});
+    expect(tracker.start).toHaveBeenCalledWith(expect.any(HTMLVideoElement), 'user');
+  });
+
+  it('off when chosen: no camera, no status', async () => {
+    const { tracker, text } = await render({ camera: false });
     expect(tracker.start).not.toHaveBeenCalled();
     expect(text('camera-status')).toBeUndefined();
   });
@@ -115,7 +120,7 @@ describe('CountingPage with the camera (spec 012)', () => {
       root.querySelector<HTMLButtonElement>('[data-testid="camera-toggle"]')!;
 
     it('is not there while the camera setting is off', async () => {
-      const { root } = await render({});
+      const { root } = await render({ camera: false });
       expect(toggle(root)).toBeNull();
     });
 

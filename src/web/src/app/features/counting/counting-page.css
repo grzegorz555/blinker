@@ -236,6 +236,14 @@
   }
 }
 
+/* Below 360 px (down to 320 px, SC 1.4.10) the decorative icons go and the labels stay, so the chip keeps its room
+   and the bar never scrolls sideways. Found once the camera became on by default (spec 012, R1). */
+@media (max-width: 359px) {
+  .pause-btn svg {
+    display: none;
+  }
+}
+
 /* A narrow phone held upright: the board gets the height; the step label goes, the hint is smaller. */
 @media (max-width: 599px) and (orientation: portrait) {
   .count-question {
