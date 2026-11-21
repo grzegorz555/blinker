@@ -16,9 +16,11 @@ alone. Everything else stays as it is: the counting machine of specs 006–009 d
 
 # Rules
 
-- **R1. A switch, off by default.** Ustawienia (Settings): "Sterowanie kamerą w Liczeniu" (Camera control in
-  Counting), off by default (the camera starts only when someone chose it). On: Liczenie (Counting) starts the camera
-  when it opens and stops it when it closes, like the screen wake lock.
+- **R1. A switch, on by default.** Ustawienia (Settings): "Sterowanie kamerą w Liczeniu" (Camera control in
+  Counting), on by default since 2026-11-21 (the author: counting with the eyes is what Blinker is for, so the first
+  visit asks for the camera). The browser's permission prompt is the consent; a refusal is said in text and the
+  buttons keep working. A setting saved earlier keeps its value. On: Liczenie (Counting) starts the camera when it
+  opens and stops it when it closes, like the screen wake lock.
 - **R2. One input path.** Each detected signal goes to `CountingService.send()` exactly like a button or a key. The
   detector uses his calibrated profile (spec 011), or the defaults with a hint to calibrate.
 - **R3. He hears each signal.** A short sound per detected signal (a different tone per kind: blink, hand, nod,
