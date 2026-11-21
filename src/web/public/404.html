@@ -1,0 +1,31 @@
+<!doctype html>
+<!--
+  Spec 003, R9: Azure Static Web Apps serves this file for a missing file (responseOverrides 404), so the 404
+  response gets the globalHeaders like every other response. App routes never get here: they fall back to
+  index.html. Static on purpose (no scripts, no Transloco), so it is bilingual, like the noscript text in index.html.
+-->
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nie znaleziono (Not found) · Blinker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="noindex" />
+    <!-- The default dark-mode link blue fails contrast; the text color with the underline is enough (WCAG 1.4.3, 1.4.1). -->
+    <style>
+      a {
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Nie znaleziono pliku.</h1>
+      <p lang="en">File not found.</p>
+      <p>
+        <a href="/">Wróć do Blinkera</a> ·
+        <a href="/" lang="en">Back to Blinker</a>
+      </p>
+    </main>
+  </body>
+</html>

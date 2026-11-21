@@ -45,6 +45,8 @@ and a CSP mistake breaks a test, not the production app.
   `src`) or an inline event handler attribute (`on…=`).
 - **R5. SPA fallback and caching.**
   - Navigation requests fall back to `/index.html`; files with an extension that don't exist return 404.
+  - The 404 serves our static `404.html` (`responseOverrides`), with the global headers only. The first production
+    deploy showed that Azure's built-in 404 page gets no `globalHeaders`.
   - `index.html`, `ngsw.json`, `ngsw-worker.js` and `manifest.webmanifest`: `Cache-Control: no-cache`, so a new
     version is picked up. Hashed files (`*-[A-Z0-9]{8}.js|css`): long-lived and `immutable`.
 - **R6. The token stays a secret.** The deployment token is only a GitHub Actions secret

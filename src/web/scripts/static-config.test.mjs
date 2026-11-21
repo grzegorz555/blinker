@@ -1,6 +1,6 @@
 // Tests for static-config.mjs (spec 003, R1, R2, R5): npm run test:scripts
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it } from 'node:test';
 import {
@@ -9,8 +9,10 @@ import {
   isFallbackPath,
   loadConfig,
   mimeTypeFor,
+  notFoundPage,
   parseSecurityHeaders,
 } from './static-config.mjs';
+import { findInlineCode } from './check-dist.mjs';
 
 const config = loadConfig();
 const securityMd = readFileSync(
@@ -99,5 +101,34 @@ describe('R2: MIME types', () => {
     assert.equal(mimeTypeFor(config, '.webmanifest', defaults), 'application/manifest+json');
     assert.equal(mimeTypeFor(config, '.js', defaults), 'text/javascript');
     assert.equal(mimeTypeFor(config, '.bin', defaults), 'application/octet-stream');
+  });
+});
+
+describe('R9: the 404 page gets the security headers', () => {
+  const page = notFoundPage(config);
+  const file = resolve(import.meta.dirname, '..', 'public', '.' + page);
+
+  it('the config overrides the built-in 404 with a file from public/', () => {
+    assert.equal(page, '/404.html');
+    assert.equal(existsSync(file), true, file);
+    assert.equal(notFoundPage({}), null);
+  });
+
+  it('the page is CSP-clean, has a language and a title, and links back to the app', () => {
+    const html = readFileSync(file, 'utf8');
+    assert.deepEqual(findInlineCode(html), []);
+    assert.doesNotMatch(html, /<script|style=/i);
+    assert.match(html, /<html lang="pl">/);
+    assert.match(html, /<title>[^<]+<\/title>/);
+    assert.match(html, /<a href="\/"/);
+  });
+
+  it('a 404 gets the global headers only, so a missing bundle is never cached as immutable', () => {
+    const headers = headersFor(config, '/main-MISSING.js', { fallback: true });
+    assert.equal(headers['Cache-Control'], 'no-cache');
+    assert.equal(
+      headers['Content-Security-Policy'],
+      config.globalHeaders['Content-Security-Policy'],
+    );
   });
 });
