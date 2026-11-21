@@ -56,13 +56,17 @@ ul {
   }
 }
 
+/* --pill is the indicator color; the icon cut-outs use it too, so they match the pill in every state. */
 .nav-indicator {
+  --pill: transparent;
   display: flex;
   width: 3.5rem;
   height: 2rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
+  background-color: var(--pill);
+  transition: background-color 150ms ease;
 }
 
 .nav-link[aria-current='page'] {
@@ -71,13 +75,60 @@ ul {
 }
 
 .nav-link[aria-current='page'] .nav-indicator {
-  background-color: var(--subtle);
+  --pill: var(--subtle);
   color: var(--on-secondary-container);
+}
+
+/* Hover: the M3 state layer, the content color at 8% over the pill
+   (https://m3.material.io/foundations/interaction/states/state-layers). Only on devices that can hover, so a tap on a
+   phone never leaves a stuck hover. Never the only cue: the current page keeps its pill, filled icon and bold label. */
+@media (hover: hover) {
+  .nav-link:hover {
+    color: var(--fg);
+  }
+
+  .nav-link:hover .nav-indicator {
+    --pill: color-mix(in oklch, var(--fg) 8%, transparent);
+  }
+
+  .nav-link[aria-current='page']:hover .nav-indicator {
+    --pill: color-mix(in oklch, var(--on-secondary-container) 8%, var(--subtle));
+  }
 }
 
 svg {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+/* The current page has a filled icon, the others an outline (M3 navigation: active icons are filled). */
+.nav-link[aria-current='page'] .fill {
+  fill: currentColor;
+}
+
+.nav-link[aria-current='page'] .cutout {
+  stroke: var(--pill);
+}
+
+.nav-link[aria-current='page'] .cutout-fill {
+  fill: var(--pill);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-indicator {
+    transition: none;
+  }
+}
+
+/* Windows contrast themes drop the pill color: the cut-outs take the page background so the details stay visible. */
+@media (forced-colors: active) {
+  .nav-link[aria-current='page'] .cutout {
+    stroke: Canvas;
+  }
+
+  .nav-link[aria-current='page'] .cutout-fill {
+    fill: Canvas;
+  }
 }
 
 /* A short phone held upright (360 × 640): a lower bar, so Liczenie (Counting) keeps the board; targets stay 44 px+. */

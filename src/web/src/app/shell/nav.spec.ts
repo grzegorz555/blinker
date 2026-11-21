@@ -64,6 +64,20 @@ describe('AppNav (spec 007, R2)', () => {
     ]);
   });
 
+  it('gives every icon a shape to fill on the current page', async () => {
+    const { links } = await render('/');
+    for (const a of links) expect(a.querySelectorAll('svg .fill').length).toBeGreaterThan(0);
+  });
+
+  it('fills the icon of the current page only; the others stay outlines', async () => {
+    const { links } = await render('/calibration');
+    const fills = links.map((a) =>
+      [...a.querySelectorAll('svg .fill')].map((s) => getComputedStyle(s).fill.toLowerCase()),
+    );
+    expect(fills[3].every((f) => f === 'currentcolor')).toBe(true);
+    for (const i of [0, 1, 2, 4]) expect(fills[i].every((f) => f !== 'currentcolor')).toBe(true);
+  });
+
   it('hides the icons from assistive technology', async () => {
     const { root } = await render('/');
     const icons = [...root.querySelectorAll('nav > ul svg')];
