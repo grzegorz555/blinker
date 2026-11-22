@@ -3,7 +3,7 @@ type: Spec
 title: "010: Face-tracking spike - MediaPipe Face Landmarker in a worker and a diagnostic screen"
 description: Stage 3. MediaPipe Face Landmarker runs on the device in a module Web Worker (self-hosted wasm and model, no metrics sent to Google), and a Diagnostyka (Diagnostics) screen shows live eye and head values with frame rate and analysis time, so the author can measure on Android Chrome and iOS Safari. Ends with a proposed ADR filled in from the measurements.
 tags: [stage-3, vision, spike, privacy]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-14

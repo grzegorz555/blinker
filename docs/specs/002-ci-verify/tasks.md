@@ -3,7 +3,7 @@ type: Task List
 title: "002: CI and local verification tasks"
 description: Six tasks, one commit each, each with its own tests.
 tags: [stage-1, ci]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-11

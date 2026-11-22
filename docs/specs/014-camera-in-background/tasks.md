@@ -3,7 +3,7 @@ type: Task List
 title: "014: The camera stops in the background and can be turned off by hand - tasks"
 description: Four tasks - the tracker releases and reopens the camera with the page's visibility, the three pages start cleanly on return, a camera button on each screen, and the docs.
 tags: [security, privacy, vision, camera]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-16

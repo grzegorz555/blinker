@@ -3,7 +3,7 @@ type: Spec
 title: "006: Counting core - board, sentence, the counting state machine and speech, without UI"
 description: Stage 2, part 1. The board format v1 with a validator and his board as the default, the sentence with undo, the counting state machine (every state and signal mapped explicitly, time injected), signal input from buttons and keys that can be turned off, and speech behind an interface with on-device voices only. Plain TypeScript with thin Angular services; the screens come in spec 007.
 tags: [stage-2, counting, state-machine, boards, speech]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-13

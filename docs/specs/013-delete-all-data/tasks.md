@@ -3,7 +3,7 @@ type: Task List
 title: "013: Delete all data from this device - tasks"
 description: Three tasks - the erase in the core (every store and every service), the section in Ustawienia (Settings) with the confirmation and the status, and the docs.
 tags: [security, privacy, settings, storage]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-16

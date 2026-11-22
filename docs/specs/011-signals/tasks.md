@@ -3,7 +3,7 @@ type: Task List
 title: "011: His signals from the camera - tasks"
 description: Four tasks - the pure detector and profile, signals in Diagnostyka (Diagnostics), the Kalibracja (Calibration) wizard with fitting, and the docs.
 tags: [stage-4, signals]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-15

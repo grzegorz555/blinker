@@ -3,7 +3,7 @@ type: Spec
 title: "012: The camera drives Liczenie (Counting) - his face signals as input, a sound for each signal, the rear camera"
 description: Stage 5. With "Sterowanie kamerą" (Camera control) on, Liczenie (Counting) watches his face and sends the detected signals to the counting machine, like the buttons do; a short sound confirms each signal; the screen says when his face is not in view; a caregiver can use the rear camera.
 tags: [stage-5, vision, signals, counting]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-15

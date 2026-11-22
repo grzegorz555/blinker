@@ -1,5 +1,9 @@
 # Log
 
+## 2026-11-22 (housekeeping)
+- Spec 016 (word prediction) is paused after T1 and T2: the word list and the pure predictor are on `main`, but nothing loads the list yet. The author decides on T3-T6 after the first session with him; the question is in the [checklist](trial/first-session.md).
+- Specs 001-015 are done, so their frontmatter says `status: stable` instead of `draft`.
+
 ## 2026-11-21 (spec 003 done: Blinker on Azure)
 - The author set up Azure Static Web Apps (Free; West Europe took no new customers, so East US 2) and the deploy token. The first production deploy passed every gate, but the `deployed` test found that Azure's built-in 404 page gets no security headers; our static `404.html` through `responseOverrides` fixed it (PR #45), checked on the first PR preview. Production deploys are a GitHub environment.
 - Production: https://mango-rock-0416a080f.3.azurestaticapps.net. The README is short now (the address, the status, one line per tab), with a new [user guide](user-guide.md) for the caregivers; the stage history stays here.

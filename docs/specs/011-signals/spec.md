@@ -3,7 +3,7 @@ type: Spec
 title: "011: His signals from the camera - detection, calibration profile, Kalibracja (Calibration)"
 description: Stage 4. A pure detector turns face frames into his signals (long blink, look at his hand, nod, head shake, head right) with a calibrated profile kept on the device; Diagnostyka (Diagnostics) shows the detected signals live; Kalibracja (Calibration) learns his profile in a step-by-step wizard.
 tags: [stage-4, vision, signals, calibration]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-15

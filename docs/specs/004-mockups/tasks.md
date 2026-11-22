@@ -3,7 +3,7 @@ type: Task List
 title: "004: Mock-ups tasks"
 description: Seven tasks, one commit each. Revised after T2 - one shadcn-style visual language, a caregiver dashboard and a full-screen communicate mode; visual polish rounds before the final tokens.
 tags: [stage-1.5, design, mockups]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-12

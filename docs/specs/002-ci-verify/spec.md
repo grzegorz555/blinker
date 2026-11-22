@@ -3,7 +3,7 @@ type: Spec
 title: "002: CI and local verification"
 description: One `npm run verify` command with the same gates as CI, a versioned pre-push hook, a full CI job for the web app, Lighthouse CI (accessibility = 100) and an automated installability check, plus Dependabot for npm.
 tags: [stage-1, ci, testing, tooling, accessibility, pwa]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-11

@@ -3,7 +3,7 @@ type: Task List
 title: "006: Counting core tasks"
 description: Six tasks, one commit each - board format and validator, sentence, the counting machine, signal input, speech, and the Angular service with docs.
 tags: [stage-2, counting, state-machine]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-13

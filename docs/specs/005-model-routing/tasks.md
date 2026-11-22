@@ -3,7 +3,7 @@ type: Task List
 title: "005: Model routing and a faster pre-push tasks"
 description: Three tasks, one commit each.
 tags: [tooling, ai-workflow]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-11

@@ -3,7 +3,7 @@ type: Spec
 title: "008: Liczenie (Counting) for a listener - head shortcuts said aloud, a new sentence after reading, the sentence big"
 description: Stage 2 follow-up after the author's answers on 2026-11-14 - he knows the digits and the letter under each column and row, but builds words by ear, not by reading. Every shortcut is a head signal and is said aloud; after reading aloud Blinker asks "Nowe zdanie?" (New sentence?); the screen shows the sentence big and the prompts small.
 tags: [stage-2, counting, accessibility, interaction]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-14

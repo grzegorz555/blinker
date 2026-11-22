@@ -31,7 +31,8 @@ generated:
 - Board editor; importing a board from a photo.
 - **Shortcuts for frequent words** (author, 2026-11-12: "do rozważenia" (to consider)): a word picked with one number instead of
   letter by letter. To design after the PoC, together with him.
-- Word prediction for Polish: spec [016](specs/016-word-prediction/spec.md) (approved 2026-11-20; ADR-0007 accepted).
+- Word prediction for Polish: spec [016](specs/016-word-prediction/spec.md) (approved 2026-11-20; ADR-0007 accepted;
+  T1-T2 done, paused 2026-11-22 until the author decides after the first session).
 - Favorite phrases; sentence history.
 - Capacitor build for Android and iOS.
 - Better TTS voices. This would need a backend, so it requires a new ADR.
