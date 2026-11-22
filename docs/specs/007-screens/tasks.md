@@ -3,7 +3,7 @@ type: Task List
 title: "007: Screens tasks"
 description: Eight tasks, one commit each - the Angular Material spike, the shell, touch in the machine, the Liczenie (Counting) screen, signal input on the screen, settings, boards and sentences with the docs.
 tags: [stage-2, ui, angular-material]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-14

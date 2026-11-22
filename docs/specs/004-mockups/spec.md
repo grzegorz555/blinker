@@ -3,7 +3,7 @@ type: Spec
 title: "004: Clickable mock-ups and the visual direction"
 description: Static HTML/Tailwind mock-ups viewed on a computer and on a real phone over the home Wi-Fi; Material 3 style; Liczenie (Counting: the board) is the main screen in the M3 supporting-pane layout, with a navigation bar on phones and a navigation rail from 600 px; final tokens and icon after visual polish.
 tags: [stage-1.5, design, accessibility, mockups]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-12

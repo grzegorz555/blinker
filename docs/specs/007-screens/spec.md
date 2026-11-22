@@ -3,7 +3,7 @@ type: Spec
 title: "007: Screens - the shell, Liczenie (Counting), boards, settings and sentences on Angular Material"
 description: Stage 2, part 2. Angular Material (M3) on our tokens, the app shell with a custom navigation bar and rail, the Liczenie (Counting) screen on the spec 006 core with on-screen signal buttons and touch, settings, boards with import, and the sentence history, all kept on the device.
 tags: [stage-2, ui, counting, angular-material, accessibility]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-14

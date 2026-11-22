@@ -3,7 +3,7 @@ type: Spec
 title: "015: The look at his hand is a quick turn of the head to his left and back"
 description: His hand signal (+5) is a head movement, not an eye movement - mainly to his left, a little down, and straight back - so Blinker detects it like a nod (out past the amplitude and back within a window, no hold) and tells it apart from a nod, a shake and head right. Kalibracja (Calibration) learns the head angle of his left hand; the right-hand step goes. Diagnostyka (Diagnostics) copies the whole profile and signed head angles.
 tags: [vision, signals, calibration, interaction]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-17

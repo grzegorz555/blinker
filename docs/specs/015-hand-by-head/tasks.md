@@ -3,7 +3,7 @@ type: Task List
 title: "015: The look at his hand is a quick turn of the head - tasks"
 description: Five tasks - the detector and the profile, the fitting, Kalibracja (Calibration), Diagnostyka (Diagnostics), and the docs with the interaction model.
 tags: [vision, signals, calibration, interaction]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-17

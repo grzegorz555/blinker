@@ -3,7 +3,7 @@ type: Task List
 title: "008: Liczenie (Counting) for a listener - tasks"
 description: Three tasks - the machine (SPOKEN, "Nowe zdanie?" (New sentence?), the word said on a space, undo said), the layout with the sentence big, and the docs.
 tags: [stage-2, counting]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-14

@@ -3,7 +3,7 @@ type: Spec
 title: "013: Delete all data from this device - one action in Ustawienia (Settings)"
 description: Finding F1 of the security pass. One button in Ustawienia (Settings) removes everything Blinker keeps on the device (settings, imported boards, his signal profile, the sentence history, the language choice, the sentence being written) after a confirmation, and says what it did.
 tags: [security, privacy, settings, storage]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-16

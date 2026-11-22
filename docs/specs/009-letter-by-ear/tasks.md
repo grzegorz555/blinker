@@ -3,7 +3,7 @@ type: Task List
 title: "009: The letter by ear - tasks"
 description: Two tasks - the machine and settings (a pause moves on, only the letter is said), and the docs.
 tags: [stage-2, counting]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-14

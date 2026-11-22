@@ -12,6 +12,9 @@ generated:
 Branch: `feat/016-word-prediction`. Gates: `npm run verify -- --lighthouse`. The author approved the spec and accepted
 ADR-0007 on 2026-11-20.
 
+**Paused (2026-11-22):** T1 and T2 are merged; nothing loads the word list yet. T3-T6 wait for the author's
+decision after the first session with him ([checklist](../../trial/first-session.md), section 4).
+
 - [x] **T1 [sonnet]: The word list, its license and the offline cache.** `scripts/build-word-list.mjs <source file>`
       (run by hand on the downloaded `pl_50k.txt`; the path is an argument, the file is untrusted): the filter of R2,
       the exclusion list (the author reviews it), `public/words/pl.txt` and `public/words/pl.LICENSE.txt`; a lazy

@@ -3,7 +3,7 @@ type: Spec
 title: "014: The camera stops in the background, starts again on return, and can be turned off by hand"
 description: Finding F2 of the security pass. When the page is hidden (another app, another tab, a locked screen) the camera is released at once, so the camera indicator goes off; when the page is visible again the camera starts by itself, and the detector, Kalibracja (Calibration) and Diagnostyka (Diagnostics) begin cleanly. A caregiver can also turn the camera off and on with one button on each of the three screens.
 tags: [security, privacy, vision, camera]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-16

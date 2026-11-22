@@ -3,7 +3,7 @@ type: Task List
 title: "012: The camera drives Liczenie (Counting) - tasks"
 description: Four tasks - the settings and the camera input service, the sound for each signal, Liczenie (Counting) with the camera, and the docs.
 tags: [stage-5, vision, counting]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-15

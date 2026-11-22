@@ -3,7 +3,7 @@ type: Spec
 title: "009: The letter by ear - Blinker says only the chosen letter; a pause moves on, a shake starts the letter again"
 description: The author (2026-11-14) after trying spec 008 - the voice says too much. Blinker says only the letter chosen after the column and the row, and the whole sentence when he asks for it. No "Kolumna 7?" (Column 7?) or "Wiersz 3?" (Row 3?) - a pause after the column moves on to the row, a pause after the row adds the letter and says it; blinking again starts the next letter, a shake undoes it.
 tags: [stage-2, counting, interaction, speech]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-14

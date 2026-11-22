@@ -3,7 +3,7 @@ type: Task List
 title: "010: Face-tracking spike - tasks"
 description: Four tasks - the vendored runtime and model, the worker and its pure functions, the Diagnostyka (Diagnostics) screen, and the docs with the proposed ADR.
 tags: [stage-3, vision]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-14

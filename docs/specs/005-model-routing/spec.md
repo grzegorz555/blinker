@@ -3,7 +3,7 @@ type: Spec
 title: "005: Model routing and a faster pre-push"
 description: Each loop step runs on a fixed model chosen for its difficulty, /plan labels every task haiku, sonnet or opus, and /work routes by that label; the pre-push hook runs only the fast gates.
 tags: [tooling, ai-workflow, ci, cost]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-11

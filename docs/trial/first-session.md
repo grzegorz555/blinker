@@ -75,6 +75,8 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
 - [ ] Which hand does he glance at (left, right, both)? Only his left is detected (spec 015); note whether he also
       turns his head to his right for it, which is head right.
 - [ ] Shortcuts for frequent words: worth designing now?
+- [ ] Word prediction (spec 016, paused after T2): would a guessed word help him, or get in his way? Ask him
+      as the caregiver does at the paper board ("Dziękuję?" (Thank you?)) and note how he takes it. Decide on T3-T6.
 
 # After the visit
 
