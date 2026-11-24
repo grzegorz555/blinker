@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-24 (cache for the face worker)
+- The hashed face worker files (`worker-<hash>.js`, `worker-chunk-<hash>.js`) were served with `no-cache`, because the `immutable` routes listed only `main-`, `chunk-`, `polyfills-` and `styles-`. They are `immutable` now; `worker-basic.min.js` (Angular's service worker helper, no hash) stays `no-cache`.
+
 ## 2026-11-22 (housekeeping)
 - Spec 016 (word prediction) is paused after T1 and T2: the word list and the pure predictor are on `main`, but nothing loads the list yet. The author decides on T3-T6 after the first session with him; the question is in the [checklist](trial/first-session.md).
 - Specs 001-015 are done, so their frontmatter says `status: stable` instead of `draft`.

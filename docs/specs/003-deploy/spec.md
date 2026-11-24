@@ -48,7 +48,8 @@ and a CSP mistake breaks a test, not the production app.
   - The 404 serves our static `404.html` (`responseOverrides`), with the global headers only. The first production
     deploy showed that Azure's built-in 404 page gets no `globalHeaders`.
   - `index.html`, `ngsw.json`, `ngsw-worker.js` and `manifest.webmanifest`: `Cache-Control: no-cache`, so a new
-    version is picked up. Hashed files (`*-[A-Z0-9]{8}.js|css`): long-lived and `immutable`.
+    version is picked up. Hashed files (`*-[A-Z0-9]{8}.js|css`): long-lived and `immutable`. This includes the face
+    worker (`worker-<hash>.js`, `worker-chunk-<hash>.js`); `worker-basic.min.js` has no hash and stays `no-cache`.
 - **R6. The token stays a secret.** The deployment token is only a GitHub Actions secret
   (`AZURE_STATIC_WEB_APPS_API_TOKEN`), created by the author. The AI never reads, prints or handles it. Workflow
   `permissions:` are minimal (`contents: read`, plus `pull-requests: write` only on the preview job for the comment).

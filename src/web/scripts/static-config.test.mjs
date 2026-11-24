@@ -90,6 +90,18 @@ describe('R5: caching', () => {
     }
   });
 
+  it('hashed web workers are immutable (the face worker and its chunks)', () => {
+    for (const path of ['/worker-3NMS2X6Y.js', '/worker-chunk-7JKJX3I2.js']) {
+      assert.equal(headersFor(config, path)['Cache-Control'], IMMUTABLE, path);
+    }
+  });
+
+  it('unhashed service worker files are revalidated, even when named worker-*', () => {
+    for (const path of ['/worker-basic.min.js', '/safety-worker.js']) {
+      assert.equal(headersFor(config, path)['Cache-Control'], 'no-cache', path);
+    }
+  });
+
   it('a fallback response gets only the global headers (route rules are not applied)', () => {
     assert.equal(headersFor(config, '/main-x', { fallback: true })['Cache-Control'], 'no-cache');
   });
