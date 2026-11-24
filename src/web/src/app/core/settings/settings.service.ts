@@ -37,6 +37,7 @@ export class SettingsService {
         askAfterMs: s.askAfterMs,
         speakPrompts: s.speakPrompts,
         confirmByNod: s.confirmByNod,
+        rowCue: s.rowCue,
       });
       this.counting.setRate(s.rate);
       // light-dark() in tokens.css follows the used color-scheme; "system" leaves it to the device.

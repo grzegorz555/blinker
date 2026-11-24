@@ -49,7 +49,8 @@ without a face every half-done signal is dropped.
 **From the camera to Liczenie (Counting) (spec 012):** with "Sterowanie kamerą w Liczeniu" (Camera control in
 Counting) on, each detected signal goes to the counting machine exactly like a button press, and a short tone confirms
 it (a high blip for +1, a lower one for +5, rising for yes, falling for no, a long one for finish), so he hears that
-Blinker counted it. The top bar says whether the camera sees his face ("Brak twarzy" (No face) after 1.5 s). A
+Blinker counted it. When the column is taken, a soft rising chime (C-E-G) tells him he can give the row (spec 012, R7;
+"Dźwięk: teraz wiersz" (Sound: now the row), on by default). The top bar says whether the camera sees his face ("Brak twarzy" (No face) after 1.5 s). A
 caregiver holding the phone towards him chooses the rear camera.
 
 Kalibracja (Calibration) learns his thresholds (`core/signals/fit.ts`): halfway between his value at rest and the

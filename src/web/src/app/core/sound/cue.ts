@@ -36,11 +36,16 @@ export const AUDIO = new InjectionToken<() => AudioLike | null>('AUDIO', {
   },
 });
 
+/** A sound for each signal from the camera, and ROW_READY: the column is taken, he can give the row now. */
+export type Cue = FaceSignal | 'ROW_READY';
+
 /**
  * A tone (or two) per signal: a short high blip for +1, a lower one for +5, rising for yes, falling for no, a long
- * tone for finish. Quiet (gain 0.15) and short (under 0.3 s), so it never covers the voice.
+ * tone for finish. Quiet (gain 0.15) and short (each tone under 0.3 s), so it never covers the voice.
+ * ROW_READY is a soft rising chime, C-E-G (a major triad, spec 012, R7): three notes, so it can't be mistaken for
+ * the two-note yes, and its last note rings a little longer, like a bell that says "now".
  */
-export const CUES: Record<FaceSignal, readonly { readonly hz: number; readonly ms: number }[]> = {
+export const CUES: Record<Cue, readonly { readonly hz: number; readonly ms: number }[]> = {
   BLINK: [{ hz: 880, ms: 90 }],
   HAND: [{ hz: 523, ms: 140 }],
   NOD: [
@@ -52,6 +57,11 @@ export const CUES: Record<FaceSignal, readonly { readonly hz: number; readonly m
     { hz: 440, ms: 110 },
   ],
   RIGHT: [{ hz: 587, ms: 260 }],
+  ROW_READY: [
+    { hz: 523, ms: 90 },
+    { hz: 659, ms: 90 },
+    { hz: 784, ms: 220 },
+  ],
 };
 
 export const CUE_GAIN = 0.15;
@@ -61,8 +71,8 @@ export class SignalCue {
   private readonly create = inject(AUDIO);
   private context: AudioLike | null | undefined;
 
-  /** Plays the signal's sound. Never throws: no sound is better than a broken screen. */
-  play(signal: FaceSignal): void {
+  /** Plays the sound. Never throws: no sound is better than a broken screen. */
+  play(cue: Cue): void {
     try {
       this.context ??= this.create();
       const ctx = this.context;
@@ -70,7 +80,7 @@ export class SignalCue {
       // A browser may keep audio suspended until a tap (autoplay policy); try, and play if it runs.
       if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
       let at = ctx.currentTime;
-      for (const { hz, ms } of CUES[signal]) {
+      for (const { hz, ms } of CUES[cue]) {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';

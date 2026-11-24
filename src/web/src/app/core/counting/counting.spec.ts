@@ -33,6 +33,7 @@ const config: CountingConfig = {
   askAfterMs: ASK_AFTER.default,
   speakPrompts: true,
   confirmByNod: true,
+  rowCue: false,
 };
 
 /** TOUCH in the table: a tap on the first cell of his board, "A" (spec 007, R3). */
@@ -243,6 +244,49 @@ describe('counting paths (R5)', () => {
     const { state } = run([X], fixture('row.waiting'));
     expect(state.name).toBe('column.waiting');
     expect(state.column).toBeNull();
+  });
+});
+
+describe('the row cue: a tune when the column is taken (spec 012, R7)', () => {
+  const cues = (effects: Effect[]) => effects.filter((e) => e.type === 'cue');
+  const ROW_READY = { type: 'cue', cue: 'rowReady' };
+
+  it('the pause takes the column: one tune, then he gives the row', () => {
+    const { state, effects } = run([T(0), B, T(100), B, T(1500)], initialState(), {
+      ...quiet,
+      rowCue: true,
+    });
+    expect(state.name).toBe('row.waiting');
+    expect(state.column).toBe(2);
+    expect(cues(effects)).toEqual([ROW_READY]);
+  });
+
+  it('a nod on "Kolumna 2?" (Column 2?) takes the column: the tune comes after the nod, not with the question', () => {
+    const cfg = { ...config, rowCue: true };
+    const asked = run([T(0), B, T(100), B, T(1500)], initialState(), cfg);
+    expect(asked.state.name).toBe('column.asking');
+    expect(cues(asked.effects)).toEqual([]);
+    const { state, effects } = run([N], asked.state, cfg);
+    expect(state.name).toBe('row.waiting');
+    expect(cues(effects)).toEqual([ROW_READY]);
+  });
+
+  it('no tune after the row (the letter is said instead), for a rejected column, or for a tap', () => {
+    const cfg = { ...quiet, rowCue: true };
+    const column = run([T(0), B, T(1500)], initialState(), cfg);
+    const row = run([T(2000), B, T(3500)], column.state, cfg);
+    expect(row.state.sentence.text).not.toBe('');
+    expect(cues(row.effects)).toEqual([]);
+    const tooMany = run([T(0), H, T(100), H, T(1500)], initialState(), cfg);
+    expect(tooMany.state.name).not.toBe('row.waiting');
+    expect(cues(tooMany.effects)).toEqual([]);
+    expect(cues(run([signal('TOUCH')], initialState(), cfg).effects)).toEqual([]);
+  });
+
+  it('off: the column is taken without a tune', () => {
+    const { state, effects } = run([T(0), B, T(1500)], initialState(), quiet);
+    expect(state.name).toBe('row.waiting');
+    expect(cues(effects)).toEqual([]);
   });
 });
 

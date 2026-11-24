@@ -214,6 +214,8 @@
       "askAfterError": "Error: enter a whole number from {{min}} to {{max}} ms.",
       "confirmByNod": "Confirm the column and the row with a nod",
       "confirmByNodHint": "Blinker asks “Column 7?” and waits for a nod. Off: the pause after blinking moves on, and a shake undoes the letter.",
+      "rowCue": "Sound: now the row",
+      "rowCueHint": "A short chime when the column is taken: he can give the row now.",
       "speakPrompts": "Say the questions and notices",
       "speakPromptsHint": "Off: Blinker says only the chosen letter, and the whole sentence when he asks for it.",
       "signalButtons": "Signal buttons",

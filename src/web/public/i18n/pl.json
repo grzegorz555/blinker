@@ -214,6 +214,8 @@
       "askAfterError": "Błąd: wpisz liczbę całkowitą od {{min}} do {{max}} ms.",
       "confirmByNod": "Potwierdzaj kolumnę i wiersz skinieniem",
       "confirmByNodHint": "Blinker pyta „Kolumna 7?” i czeka na skinienie. Wyłączone: przerwa po mruganiu przechodzi dalej, a kręcenie głową cofa literę.",
+      "rowCue": "Dźwięk: teraz wiersz",
+      "rowCueHint": "Krótka melodyjka, gdy kolumna jest przyjęta: można podawać wiersz.",
       "speakPrompts": "Mów pytania i komunikaty",
       "speakPromptsHint": "Wyłączone: Blinker mówi tylko wybraną literę i całe zdanie, gdy on o to poprosi.",
       "signalButtons": "Przyciski sygnałów",

@@ -47,7 +47,18 @@ describe('SignalCue (spec 012, R3)', () => {
     expect(tones.map((t) => t.hz)).toEqual(CUES.NOD.map((c) => c.hz));
     expect(tones[1].start).toBeGreaterThan(tones[0].stop);
     expect(tones.every((t) => t.stop - t.start < 0.3)).toBe(true);
-    expect(new Set(Object.values(CUES).map((c) => JSON.stringify(c))).size).toBe(5);
+    expect(new Set(Object.values(CUES).map((c) => JSON.stringify(c))).size).toBe(6);
+  });
+
+  it('ROW_READY (spec 012, R7): a rising three-note chime, unlike the two-note yes', () => {
+    const { ctx, tones } = fakeAudio();
+    setup(() => ctx).cue.play('ROW_READY');
+    const hz = tones.map((t) => t.hz);
+    expect(hz).toHaveLength(3);
+    expect(hz[0]).toBeLessThan(hz[1]);
+    expect(hz[1]).toBeLessThan(hz[2]);
+    expect(tones.every((t) => t.stop - t.start < 0.3)).toBe(true);
+    expect(tones[2].stop - tones[0].start).toBeLessThan(0.5);
   });
 
   it('creates the audio context once, on first use', () => {
