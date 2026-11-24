@@ -8,6 +8,7 @@ import type { Board } from '../boards/board';
 import { validateBoardData } from '../boards/validate-board';
 import type { InputSignal } from '../input/signals';
 import { createSentence } from '../sentence/sentence';
+import { SignalCue } from '../sound/cue';
 import { RATE, type SpeakResult, type Speaker } from '../speech/speaker';
 import { createWebSpeaker } from '../speech/web-speaker';
 import {
@@ -61,6 +62,7 @@ export class CountingService {
   private readonly transloco = inject(TranslocoService);
   private readonly speaker = inject(SPEAKER);
   private readonly scheduler = inject(TICK_SCHEDULER);
+  private readonly cue = inject(SignalCue);
   private stopTicks: (() => void) | null = null;
   /** True while his sentence is being read aloud; a cancel clears it first, so only a natural end sends SPOKEN. */
   private reading = false;
@@ -72,6 +74,7 @@ export class CountingService {
     askAfterMs: ASK_AFTER.default,
     speakPrompts: false,
     confirmByNod: false,
+    rowCue: true,
   });
 
   /** The machine state (spec 007 renders it). */
@@ -220,6 +223,10 @@ export class CountingService {
       case 'stopSpeaking':
         this.reading = false;
         this.speaker.cancel();
+        return;
+      case 'cue':
+        // The column is taken: a short chime, so he knows he can give the row (spec 012, R7).
+        this.cue.play('ROW_READY');
         return;
     }
   }

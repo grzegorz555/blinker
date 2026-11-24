@@ -23,6 +23,12 @@ describe('validateSettings (spec 007, R12)', () => {
     expect(validateSettings({ camera: 'yes' })).toBeNull();
   });
 
+  it('the chime before the row is on by default and must be a boolean (spec 012, R7)', () => {
+    expect(DEFAULT_SETTINGS.rowCue).toBe(true);
+    expect(validateSettings({ rowCue: false })?.rowCue).toBe(false);
+    expect(validateSettings({ rowCue: 'yes' })).toBeNull();
+  });
+
   it('drops unknown fields (a newer version may add some)', () => {
     expect(validateSettings({ ...DEFAULT_SETTINGS, future: 1 })).toEqual(DEFAULT_SETTINGS);
   });

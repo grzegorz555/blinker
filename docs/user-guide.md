@@ -44,7 +44,8 @@ visit, and no picture of him is ever sent or kept.
 
 A pause after his blinks takes the column; a pause after the row adds the letter, and only that letter is said.
 Blinking again starts the next letter. After reading aloud Blinker asks "Nowe zdanie?" (New sentence?): a nod clears
-the sentence, a shake keeps it. A short tone confirms each signal the camera saw.
+the sentence, a shake keeps it. A short tone confirms each signal the camera saw. A rising three-note chime means the column is taken: he can
+give the row now.
 
 # The tabs
 
@@ -54,7 +55,7 @@ the sentence, a shake keeps it. A short tone confirms each signal the camera saw
 | **Zdania (Sentences)** | Every sentence read aloud, grouped by day. "Powiedz jeszcze raz" (Say again) repeats one; you can delete one or all. The history can be turned off in the settings. |
 | **Tablice (Boards)** | His built-in board, or a board imported from a `.json` file (checked on the device; errors are shown in text). Preview and delete. |
 | **Kalibracja (Calibration)** | A step-by-step wizard that learns his signals: at rest, strong blinks, his hand, a nod, a shake, head right. Each step is said aloud and shows "Wykryto n z k" (Detected n of k). Only numbers are saved, never a picture. |
-| **Ustawienia (Settings)** | The pause before the next step, the nod confirmation, spoken questions, signal buttons and keyboard shortcuts, hints, speech rate and voice, the camera (on or off, preview, a tone per signal, front or rear), language and theme, the sentence history, and "Usuń wszystkie dane" (Delete all data). Diagnostyka (Diagnostics) is linked from here. |
+| **Ustawienia (Settings)** | The pause before the next step, the nod confirmation, the chime before the row, spoken questions, signal buttons and keyboard shortcuts, hints, speech rate and voice, the camera (on or off, preview, a tone per signal, front or rear), language and theme, the sentence history, and "Usuń wszystkie dane" (Delete all data). Diagnostyka (Diagnostics) is linked from here. |
 | **Diagnostyka (Diagnostics)** | For checking and tuning: live eye values and head angles, frames per second, the signals Blinker detects. "Kopiuj wyniki" (Copy the results) copies a text summary (numbers only). |
 
 On a phone the tabs are at the bottom; on a wider screen they are on the left. The current tab has a filled icon and a bold label.

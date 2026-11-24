@@ -17,7 +17,7 @@ tablet and add it to the home screen. How to use it: the [user guide](docs/user-
 
 ## Status
 
-**Works today:** spelling with his board by buttons, taps or the camera (on by default: the first visit to Liczenie (Counting) asks for it); the letter and the sentence said aloud; his
+**Works today:** spelling with his board by buttons, taps or the camera (on by default: the first visit to Liczenie (Counting) asks for it); the letter and the sentence said aloud; a chime when the column is taken, so he knows to give the row; his
 calibration; the sentence history; imported boards; English and Polish; offline after the first visit.
 **Next:** the first session with him ([checklist](docs/trial/first-session.md)) to measure the camera on his device
 and tune his thresholds (ADR-[0006](docs/adr/0006-face-tracking-mediapipe-worker.md) waits for these numbers); then a decision on

@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-24 (a chime before the row)
+- The author: he needs to know when the pause has taken the column and he can start blinking the row. A soft rising chime (C-E-G) plays when the column is taken, after the pause or after a nod (spec 012, R7). It is a `cue` effect of the counting machine, so it works with every input; "Dźwięk: teraz wiersz" (Sound: now the row), on by default.
+
 ## 2026-11-24 (cache for the face worker)
 - The hashed face worker files (`worker-<hash>.js`, `worker-chunk-<hash>.js`) were served with `no-cache`, because the `immutable` routes listed only `main-`, `chunk-`, `polyfills-` and `styles-`. They are `immutable` now; `worker-basic.min.js` (Angular's service worker helper, no hash) stays `no-cache`.
 

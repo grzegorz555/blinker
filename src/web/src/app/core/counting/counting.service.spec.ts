@@ -1,6 +1,8 @@
 // Spec 006, T6: CountingService with a fake scheduler and a fake speaker (R9). A full path: 7, then 3, gives "W".
 import { TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { translocoTesting } from '../../../testing/transloco';
+import { SignalCue } from '../sound/cue';
 import { FakeSpeaker } from '../speech/fake-speaker';
 import { ASK_AFTER } from './counting';
 import {
@@ -80,6 +82,24 @@ describe('CountingService', () => {
     expect(service.sentence()).toBe('W');
     expect(service.announcement()).toBe('Dodano W');
     expect(speaker.said.at(-1)?.text).toBe('W');
+  });
+
+  it('plays the row chime when the pause takes the column, once, and not when it is off (spec 012, R7)', () => {
+    const play = vi.fn();
+    TestBed.overrideProvider(SignalCue, { useValue: { play } });
+    const { service, scheduler } = setup();
+    scheduler.at(0);
+    service.send({ type: 'BLINK' });
+    scheduler.at(ASK_AFTER.default);
+    expect(service.pointer()).toEqual({ column: 1, row: null });
+    expect(play).toHaveBeenCalledExactlyOnceWith('ROW_READY');
+
+    service.configure({ rowCue: false });
+    service.send({ type: 'SHAKE' }); // back to the columns
+    service.send({ type: 'BLINK' });
+    scheduler.at(ASK_AFTER.default * 3);
+    expect(service.state().name).toBe('row.waiting'); // the column was taken again, silently
+    expect(play).toHaveBeenCalledOnce();
   });
 
   it('does not offer an empty sentence for reading; a pause in the middle of a number discards it', () => {

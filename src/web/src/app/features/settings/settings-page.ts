@@ -16,7 +16,7 @@ import { SettingsService } from '../../core/settings/settings.service';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 import { LanguageSwitch } from '../../shared/language-switch/language-switch';
 
-type Toggle = 'confirmByNod' | 'speakPrompts' | 'signalButtons' | 'keyboard' | 'hints';
+type Toggle = 'confirmByNod' | 'rowCue' | 'speakPrompts' | 'signalButtons' | 'keyboard' | 'hints';
 
 /**
  * Ustawienia (Settings) (spec 007, R9): Angular Material form controls with visible labels; every change applies at
@@ -66,6 +66,7 @@ export class SettingsPage {
   protected readonly cameraToggles = ['camera', 'cameraPreview', 'signalSound'] as const;
   protected readonly toggles: readonly Toggle[] = [
     'confirmByNod',
+    'rowCue',
     'speakPrompts',
     'signalButtons',
     'keyboard',

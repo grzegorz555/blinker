@@ -33,6 +33,11 @@ alone. Everything else stays as it is: the counting machine of specs 006–009 d
 - **R5. Rear camera.** "Kamera" (Camera): "przednia" (front) or "tylna" (rear), for a caregiver holding the phone
   towards him (setup 2 of the vision); the preview is mirrored only for the front camera.
 - **R6. Privacy.** As in specs 010–011: the picture stays in the worker, nothing is saved or sent.
+- **R7. He hears when to give the row** (author, 2026-11-24). When the column is taken (the pause after his blinks,
+  or a nod on "Kolumna 4?" (Column 4?)), a soft rising chime (C-E-G, three notes, about 0.45 s) tells him he can
+  start the row. It is a `cue` effect of the counting machine, so it plays for the camera, the buttons and the keys
+  alike; not after a rejected column, a tap or the row (the letter is said then). "Dźwięk: teraz wiersz" (Sound: now
+  the row) in the Liczenie (Counting) group of Ustawienia (Settings), on by default.
 
 # Acceptance criteria
 
@@ -42,6 +47,9 @@ alone. Everything else stays as it is: the counting machine of specs 006–009 d
       the test pattern), the buttons still work, no third-party request, no CSP violation, axe; the board
       still fits at 360 × 640 with the camera status; the camera stops when leaving.
 - [x] `npm run verify -- --lighthouse` passes.
+- [x] R7, unit: the chime after the pause and after the nod, none for a rejected column, a tap or the row, none when
+      off; three rising notes unlike the two-note yes; the setting validated.
+- [ ] R7, e2e: the next e2e pass checks the switch in Ustawienia (Settings).
 
 # Out of scope
 

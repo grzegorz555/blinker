@@ -20,6 +20,8 @@ export interface Settings {
   readonly speakPrompts: boolean;
   /** Ask "Kolumna 7?" (Column 7?) and wait for a nod; off: a pause moves on (spec 009, R1). */
   readonly confirmByNod: boolean;
+  /** A short chime when the column is taken, so he knows when to give the row (spec 012, R7). */
+  readonly rowCue: boolean;
   /** The buttons for his signals on Liczenie (Counting): on in stage 2, there is no camera yet (R6). */
   readonly signalButtons: boolean;
   /** Single-key shortcuts for his signals: off by default (SC 2.1.4). */
@@ -44,6 +46,7 @@ export const DEFAULT_SETTINGS: Settings = {
   askAfterMs: ASK_AFTER.default,
   speakPrompts: false,
   confirmByNod: false,
+  rowCue: true,
   signalButtons: true,
   keyboard: false,
   hints: true,
@@ -69,6 +72,7 @@ const CHECKS: { readonly [K in keyof Settings]: (value: unknown) => boolean } = 
   askAfterMs: validAskAfter,
   speakPrompts: (v) => typeof v === 'boolean',
   confirmByNod: (v) => typeof v === 'boolean',
+  rowCue: (v) => typeof v === 'boolean',
   signalButtons: (v) => typeof v === 'boolean',
   keyboard: (v) => typeof v === 'boolean',
   hints: (v) => typeof v === 'boolean',

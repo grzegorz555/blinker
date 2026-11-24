@@ -84,7 +84,9 @@ export type Effect =
   /** Read the sentence aloud: only after a nod on "Przeczytać na głos?" (Read it aloud?). */
   | { readonly type: 'speak'; readonly text: string }
   /** Stop reading aloud. */
-  | { readonly type: 'stopSpeaking' };
+  | { readonly type: 'stopSpeaking' }
+  /** A short tune: the column is taken and he can give the row now (rowCue on). */
+  | { readonly type: 'cue'; readonly cue: 'rowReady' };
 
 export interface CountingConfig {
   readonly board: Board;
@@ -94,6 +96,8 @@ export interface CountingConfig {
   readonly speakPrompts: boolean;
   /** Ask "Kolumna 7?" (Column 7?) and wait for a nod; off: the pause after a number moves on (spec 009, R1). */
   readonly confirmByNod: boolean;
+  /** Play a short tune when the column is taken, so he knows when to start the row. */
+  readonly rowCue: boolean;
 }
 
 export const ASK_AFTER = { min: 500, max: 5000, default: 1200 } as const;
@@ -333,11 +337,12 @@ const askRowWhenReady: Handler = (state, config, signal) => {
   return go(state, { name: 'row.asking' }, ask(config, msg('counting.askRow', { n })));
 };
 
-const confirmColumn: Handler = (state) => {
+const confirmColumn: Handler = (state, config) => {
   const column = total(state);
   const notice = msg('counting.giveRow', { column });
   return go(state, { name: 'row.waiting', column, parts: [], lastCountAt: null, notice }, [
     { type: 'announce', message: notice },
+    ...(config.rowCue ? [{ type: 'cue', cue: 'rowReady' } as const] : []),
   ]);
 };
 
