@@ -6,6 +6,12 @@ updates:
       interval: weekly
     commit-message:
       prefix: ci
+    # Every step of github/codeql-action must run the same version: init and analyze bumped in two PRs fail CodeQL
+    # ("Loaded a configuration file for version X, but running version Y"; PRs #53, #54).
+    # https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#groups--
+    groups:
+      codeql-action:
+        patterns: ['github/codeql-action*']
   - package-ecosystem: npm
     directory: /src/web
     # Daily: a fix in a pinned tool (vite in @angular/build) arrives within a day, not up to a week later.
