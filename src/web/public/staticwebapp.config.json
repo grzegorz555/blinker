@@ -26,6 +26,14 @@
     {
       "route": "/styles-*",
       "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
+    },
+    {
+      "route": "/worker-basic.min.js",
+      "headers": { "Cache-Control": "no-cache" }
+    },
+    {
+      "route": "/worker-*",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
     }
   ],
   "responseOverrides": {
