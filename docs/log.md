@@ -1,5 +1,8 @@
 # Log
 
+## 2026-11-25 (e2e for the chime before the row)
+- E2E for spec 012, R7: a fake `AudioContext` records the tones, so the test hears the C-E-G chime once after the pause takes the column, none after the row and none with "Dźwięk: teraz wiersz" (Sound: now the row) off. The full local run passed after a rerun of six unrelated tests that timed out under load.
+
 ## 2026-11-24 (a chime before the row)
 - The author: he needs to know when the pause has taken the column and he can start blinking the row. A soft rising chime (C-E-G) plays when the column is taken, after the pause or after a nod (spec 012, R7). It is a `cue` effect of the counting machine, so it works with every input; "Dźwięk: teraz wiersz" (Sound: now the row), on by default.
 

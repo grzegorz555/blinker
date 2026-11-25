@@ -362,6 +362,77 @@ test.describe('Liczenie (Counting) with the camera', () => {
   });
 });
 
+// Spec 012, R7: a chime when the column is taken, so he knows when to give the row. A fake AudioContext records the
+// frequency of every tone, so the test hears what he would hear. The camera is off, so the +1 button gives the blink.
+test.describe('Liczenie (Counting): the chime before the row', () => {
+  const ROW_READY_HZ = [523, 659, 784];
+
+  async function recordTones(page: Page, settings: Record<string, unknown>) {
+    await page.addInitScript((stored) => {
+      localStorage.setItem('blinker.settings.v1', JSON.stringify(stored));
+      const tones: number[] = [];
+      (window as unknown as { __tones: number[] }).__tones = tones;
+      class FakeAudioContext {
+        currentTime = 0;
+        state = 'running';
+        destination = {};
+        resume() {
+          return Promise.resolve();
+        }
+        createOscillator() {
+          return {
+            type: 'sine',
+            frequency: { setValueAtTime: (hz: number) => void tones.push(hz) },
+            connect: () => undefined,
+            start: () => undefined,
+            stop: () => undefined,
+          };
+        }
+        createGain() {
+          return {
+            gain: {
+              setValueAtTime: () => undefined,
+              exponentialRampToValueAtTime: () => undefined,
+            },
+            connect: () => undefined,
+          };
+        }
+      }
+      Object.defineProperty(window, 'AudioContext', { value: FakeAudioContext });
+    }, settings);
+    await page.goto('/');
+    await expect(page.getByRole('heading', { level: 1, name: 'Liczenie' })).toBeVisible();
+  }
+  const tones = (page: Page) =>
+    page.evaluate(() => (window as unknown as { __tones: number[] }).__tones);
+  const blink = (page: Page) =>
+    page.getByRole('region', { name: 'Jego sygnały' }).getByRole('button', { name: /Mrugnięcie/ });
+
+  test('on by default: the pause takes the column, then C-E-G plays once', async ({ page }) => {
+    await recordTones(page, { camera: false });
+    await blink(page).click();
+    await expect(page.getByTestId('question')).toHaveText('Kolumna 1. Podaj wiersz', {
+      timeout: 5000,
+    });
+    await expect.poll(() => tones(page)).toEqual(ROW_READY_HZ);
+    // The row and the letter: no second chime (the letter is said instead).
+    await blink(page).click();
+    await expect(sentence(page)).not.toHaveText('', { timeout: 5000 });
+    expect(await tones(page)).toEqual(ROW_READY_HZ);
+  });
+
+  test('"Dźwięk: teraz wiersz" (Sound: now the row) off: the column is taken in silence', async ({
+    page,
+  }) => {
+    await recordTones(page, { camera: false, rowCue: false });
+    await blink(page).click();
+    await expect(page.getByTestId('question')).toHaveText('Kolumna 1. Podaj wiersz', {
+      timeout: 5000,
+    });
+    expect(await tones(page)).toEqual([]);
+  });
+});
+
 /**
  * Spec 014: the camera chip, "Kamera" (Camera) and "Pauza" (Pause) side by side in the top bar: each inside the
  * viewport, none overlapping another, the two buttons with a touch target at least 44 px high. Returns the problems found.

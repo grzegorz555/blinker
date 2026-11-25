@@ -49,7 +49,8 @@ alone. Everything else stays as it is: the counting machine of specs 006–009 d
 - [x] `npm run verify -- --lighthouse` passes.
 - [x] R7, unit: the chime after the pause and after the nod, none for a rejected column, a tap or the row, none when
       off; three rising notes unlike the two-note yes; the setting validated.
-- [ ] R7, e2e: the next e2e pass checks the switch in Ustawienia (Settings).
+- [x] R7, e2e (three device projects): a fake AudioContext hears C-E-G once after the pause takes the column,
+      nothing after the row, nothing with the switch off; the switch is on by default in Ustawienia (Settings).
 
 # Out of scope
 
