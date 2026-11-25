@@ -113,6 +113,27 @@ export class BoardsService {
     return { ok: true, board, replaced };
   }
 
+  /**
+   * Cofnij (Undo) after deleting a board (spec 018, R6): it goes back to its place in the list and, if it was the
+   * active board, becomes active again. Once: false when a board with that id is there again, or for his board.
+   */
+  restore(board: Board, index: number, wasActive: boolean): boolean {
+    if (board.id === this.builtIn.id || this.imported().some((b) => b.id === board.id))
+      return false;
+    this.imported.update((list) => {
+      const at = Math.max(0, Math.min(index, list.length));
+      return [...list.slice(0, at), board, ...list.slice(at)];
+    });
+    this.save(BOARDS_KEY, this.imported());
+    if (wasActive) this.select(board.id);
+    return true;
+  }
+
+  /** Where an imported board is in the list, for Cofnij (Undo); -1 for his board or an unknown id. */
+  indexOf(id: string): number {
+    return this.imported().findIndex((b) => b.id === id);
+  }
+
   /** Deletes an imported board (after the page's confirmation); his board stays. */
   remove(id: string): void {
     if (id === this.builtIn.id) return;

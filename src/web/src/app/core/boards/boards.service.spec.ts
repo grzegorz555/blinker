@@ -57,6 +57,51 @@ describe('BoardsService (spec 007, R10, R12)', () => {
     expect(counting.config().board.id).toBe(service.builtIn.id);
   });
 
+  it('Cofnij (Undo) puts a deleted board back in its place, active again if it was, once (spec 018, R6)', async () => {
+    const { service, data, counting } = setup();
+    const kitchen = { ...yesNo, id: 'kitchen', name: 'Kuchnia' };
+    const garden = { ...yesNo, id: 'garden', name: 'Ogród' };
+    await service.import(file(yesNo));
+    await service.import(file(kitchen));
+    await service.import(file(garden));
+    service.select('kitchen');
+    TestBed.tick();
+
+    const index = service.indexOf('kitchen');
+    expect(index).toBe(1);
+    service.remove('kitchen');
+    TestBed.tick();
+    expect(service.active().id).toBe(service.builtIn.id);
+
+    expect(service.restore(kitchen, index, true)).toBe(true);
+    TestBed.tick();
+    expect(service.boards().map((b) => b.id)).toEqual([
+      service.builtIn.id,
+      'yes-no',
+      'kitchen',
+      'garden',
+    ]);
+    expect(service.active().id).toBe('kitchen');
+    expect(counting.config().board.id).toBe('kitchen');
+    expect(JSON.parse(data.get(BOARDS_KEY)!).map((b: Board) => b.id)).toEqual([
+      'yes-no',
+      'kitchen',
+      'garden',
+    ]);
+    expect(data.get(ACTIVE_BOARD_KEY)).toBe('"kitchen"');
+    expect(service.restore(kitchen, index, true)).toBe(false);
+  });
+
+  it('Cofnij (Undo) of a board that was not active leaves the active board as it is; never his board', async () => {
+    const { service } = setup();
+    await service.import(file(yesNo));
+    service.remove('yes-no');
+    expect(service.restore(yesNo, 0, false)).toBe(true);
+    expect(service.active().id).toBe(service.builtIn.id);
+    expect(service.restore(service.builtIn, 0, true)).toBe(false);
+    expect(service.indexOf(service.builtIn.id)).toBe(-1);
+  });
+
   it('imports a valid file, keeps it on the device and makes it selectable', async () => {
     const { service, data, counting } = setup();
     const result = await service.import(file(yesNo));

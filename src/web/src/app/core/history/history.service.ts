@@ -65,6 +65,16 @@ export class HistoryService {
     this.save(this.list().filter((e) => e.id !== id));
   }
 
+  /**
+   * Cofnij (Undo) after deleting one sentence (spec 018, R6): it goes back to its place (the list is ordered by time)
+   * and is saved again. Once: false when it is already there, or when the history is off (nothing is kept then).
+   */
+  restore(entry: HistoryEntry): boolean {
+    if (!this.settings().history || this.list().some((e) => e.id === entry.id)) return false;
+    this.save(prune([...this.list(), entry], this.now()));
+    return this.list().some((e) => e.id === entry.id);
+  }
+
   /** "Usuń historię" (Delete history), after the page's confirmation. */
   clear(): void {
     this.list.set([]);
