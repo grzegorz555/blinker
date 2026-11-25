@@ -47,10 +47,11 @@ Decided by the author (2026-11-25):
   the focus is in the toast closes it. With `prefers-reduced-motion: reduce` it appears and disappears without the
   slide.
   **The time left is visible** (author, 2026-11-25): a ring in `inverse-primary` runs around the edge of the toast and
-  shrinks to nothing as the toast goes. While the toast is held (pointer or focus), the ring stops, grows thicker and
-  a pause mark shows, so it is plain that it will not go away. The ring and the mark are decorative (`aria-hidden`):
-  the live region does not change while the toast is shown. The ring moves in steps of 250 ms smoothed by a CSS
-  transition, once a second without one with `prefers-reduced-motion`, and not at all while held.
+  shrinks to nothing as the toast goes. While the toast is held (pointer or focus), the ring stands still, so it is
+  plain that the time does not run; nothing else in the toast changes (no mark, no change of size: the author,
+  2026-11-25). The ring is decorative (`aria-hidden`): the live region does not change while the toast is shown. A CSS
+  animation as long as the toast's time draws it smoothly and is paused while held; with `prefers-reduced-motion` it
+  moves in steps of a second.
 - **R4. Words, not only color.** The text says what happened in full ("Usunięto tablicę „Kuchnia”." (Deleted the
   board "Kuchnia".)); an icon is decorative (`aria-hidden`). Contrast of the text and the action on the M3
   inverse-surface colors of our tokens at least 4.5:1, checked by the token contrast test.
@@ -102,7 +103,7 @@ Decided by the author (2026-11-25):
 # Acceptance criteria
 
 - [x] Unit (`ToastService`): the durations (6 s, 10 s), the pause and restart on pointer and focus, Esc, one toast at
-      a time, the action called once, the polite announcement; the ring of time left, stopped and marked while held.
+      a time, the action called once, the polite announcement; the ring of time left, standing still while held.
 - [x] Unit (services): `HistoryService` and `BoardsService` put a deleted sentence or board back (place, active board,
       storage), once.
 - [x] Unit (pages): each operation of R5 opens its toast and no longer shows the inline success text; errors still

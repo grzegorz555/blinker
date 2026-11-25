@@ -159,44 +159,30 @@ describe('ToastService (spec 018)', () => {
     button.remove();
   });
 
-  /** The ring's stroke-dashoffset: 0 = full ring (all the time left), 100 = no ring (the toast goes). */
-  const ring = () =>
-    Number(
-      document.querySelector('[data-testid="toast-ring"] rect')!.getAttribute('stroke-dashoffset'),
-    );
-  const paused = () => document.querySelector('[data-testid="toast-paused"]');
+  const ring = () => document.querySelector<SVGRectElement>('[data-testid="toast-ring"] rect')!;
 
-  it('a ring around the toast shows the time left and shrinks as it goes (R3)', async () => {
+  it('a ring around the toast runs for as long as the toast stays, decorative (R3)', async () => {
     await show('toast.dataDeleted', undefined, { label: 'toast.undo', run: vi.fn() });
-    expect(ring()).toBeCloseTo(0, 0);
-    await advance(5000);
-    expect(ring()).toBeGreaterThan(45);
-    expect(ring()).toBeLessThan(55);
-    await advance(4000);
-    expect(ring()).toBeGreaterThan(85);
+    expect(ring().style.animationDuration).toBe('10000ms');
+    expect(ring().style.animationTimingFunction).toBe('linear');
     // Decorative: the live region must not change while the toast is shown.
     expect(document.querySelector('[data-testid="toast-ring"]')!.getAttribute('aria-hidden')).toBe(
       'true',
     );
+    await show('toast.dataDeleted');
+    expect(ring().style.animationDuration).toBe('6000ms');
   });
 
-  it('held, the ring stops and grows thicker and a pause mark shows; let go, it goes on (R3)', async () => {
+  it('held, the ring stands still and nothing else in the toast changes; let go, it goes on (R3)', async () => {
     await show('toast.dataDeleted');
-    await advance(3000);
-    expect(paused()).toBeNull();
     host().dispatchEvent(new Event('pointerenter'));
     await advance(200);
-    const stopped = ring();
-    expect(paused()).not.toBeNull();
-    expect(paused()!.getAttribute('aria-hidden')).toBe('true');
-    expect(document.querySelector('[data-testid="toast-ring"] rect')!.classList).toContain('held');
-    await advance(20_000);
-    expect(ring()).toBe(stopped);
+    expect(ring().classList).toContain('held');
+    expect(host().querySelectorAll('svg')).toHaveLength(1);
 
     host().dispatchEvent(new Event('pointerleave'));
-    await advance(500); // the ring moves in steps of 250 ms
-    expect(paused()).toBeNull();
-    expect(ring()).toBeGreaterThan(stopped);
+    await advance(200);
+    expect(ring().classList).not.toContain('held');
   });
 
   it('a rail at the side (600 px and wider) needs no offset', async () => {

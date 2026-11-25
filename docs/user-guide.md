@@ -62,7 +62,7 @@ On a phone the tabs are at the bottom; on a wider screen they are on the left. T
 
 After an operation (an imported board, a deleted sentence, a saved backup) a short message at the bottom confirms
 it. After deleting one sentence or one board it offers "Cofnij" (Undo) for 10 seconds. A line around the message
-shows the time left; touching or focusing the message stops it, and a pause mark shows that it will not go away. Errors stay on the page under the button until you try again.
+shows the time left; touching or focusing the message stops it, and the message stays until you let go. Errors stay on the page under the button until you try again.
 
 # When something goes wrong
 
