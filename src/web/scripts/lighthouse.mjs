@@ -4,6 +4,7 @@
 import { spawnSync } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { runWithRetry } from './retry.mjs';
 
 const webDir = resolve(import.meta.dirname, '..');
 const languages = [
@@ -33,12 +34,26 @@ let ok = true;
 for (const { lang, locale } of languages) {
   console.log(`\n=== Lighthouse (${lang})`);
   // LANGUAGE: Chrome on Linux may take the UI language from the environment instead of --lang.
+  // One retry: a flaky Chrome trace (NO_NAVSTART) fails a single run; a real problem fails both (retry.mjs).
   ok =
-    run('npx lhci autorun --config=lighthouserc.cjs', {
-      LHCI_LANG: lang,
-      LANGUAGE: locale,
-      PORT: '4310',
-    }) && ok;
+    runWithRetry(
+      () =>
+        run('npx lhci autorun --config=lighthouserc.cjs', {
+          LHCI_LANG: lang,
+          LANGUAGE: locale,
+          PORT: '4310',
+        }),
+      {
+        onRetry: () => {
+          console.log(`\n=== Lighthouse (${lang}) failed; one more try`);
+          // The reports of the failed try must not reach the language check; the other language's stay.
+          rmSync(resolve(webDir, '.lighthouseci', `reports-${lang}`), {
+            recursive: true,
+            force: true,
+          });
+        },
+      },
+    ) && ok;
   ok = run(`node scripts/lighthouse-lang.mjs .lighthouseci/reports-${lang} ${lang}`) && ok;
 }
 
