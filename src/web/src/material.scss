@@ -52,6 +52,9 @@ html {
       outline: var(--border),
       outline-variant: var(--line),
       error: var(--error),
+      inverse-surface: var(--inverse-surface),
+      inverse-on-surface: var(--inverse-on-surface),
+      inverse-primary: var(--inverse-primary),
     )
   );
 }

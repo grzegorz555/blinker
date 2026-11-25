@@ -18,3 +18,11 @@
     color: var(--fg);
   }
 }
+
+/*
+ * Spec 018, R1: the toast sits above the navigation bar below 600 px, and above a focused control near the bottom.
+ * ToastService sets --toast-offset before it opens a toast; 8 px is Material's own margin.
+ */
+.mat-mdc-snack-bar-container.app-toast {
+  margin-bottom: calc(8px + var(--toast-offset, 0px));
+}

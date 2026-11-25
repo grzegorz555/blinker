@@ -99,6 +99,9 @@ describe('checkTokenSets', () => {
     error: 'oklch(45% 0.18 27)',
     'secondary-container': 'oklch(92% 0.02 260)',
     'on-secondary-container': 'oklch(20% 0.03 260)',
+    'inverse-surface': 'oklch(30% 0 0)',
+    'inverse-on-surface': 'oklch(96% 0 0)',
+    'inverse-primary': 'oklch(82% 0.06 260)',
   };
 
   it('passes a set where every pair meets its threshold', () => {
