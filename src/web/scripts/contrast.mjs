@@ -37,6 +37,8 @@ export const PAIRS = [
   ['error', 'bg', 4.5, 'form error text'],
   ['error', 'surface', 4.5, 'form error text on a card'],
   ['error', 'bg', 3, 'invalid field border'],
+  ['inverse-on-surface', 'inverse-surface', 4.5, 'toast text (spec 018)'],
+  ['inverse-primary', 'inverse-surface', 4.5, 'toast action, Cofnij (Undo)'],
 ];
 export const TOKENS = [...new Set(PAIRS.flatMap(([a, b]) => [a, b]))];
 

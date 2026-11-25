@@ -10,7 +10,8 @@
  * - secondary-container / on-secondary-container: tonal buttons and the current navigation item;
  * - border = outline (3:1, SC 1.4.11, identifies controls); line = outline-variant (decorative dividers);
  * - highlight = the active outline and the focus ring; subtle = the navigation active indicator;
- * - error: form errors, always with an icon and text, never color alone (SC 1.4.1, 3.3.1).
+ * - error: form errors, always with an icon and text, never color alone (SC 1.4.1, 3.3.1);
+ * - inverse-surface / inverse-on-surface / inverse-primary: the toast (spec 018), dark on a light page and light on a dark one.
  * One hue (indigo) on near-neutral surfaces: color marks what is active or important, not decoration.
  *
  * Values are light-dark(light, dark) pairs in OKLCH. light-dark() follows the used color-scheme, so the system setting
@@ -38,6 +39,9 @@
   --line: light-dark(oklch(86% 0.012 265), oklch(33% 0.015 265));
   --subtle: light-dark(oklch(89.5% 0.03 265), oklch(34% 0.035 265));
   --error: light-dark(oklch(48% 0.18 27), oklch(82% 0.09 25));
+  --inverse-surface: light-dark(oklch(31% 0.02 265), oklch(90% 0.012 265));
+  --inverse-on-surface: light-dark(oklch(95.5% 0.008 265), oklch(25% 0.02 265));
+  --inverse-primary: light-dark(oklch(82% 0.075 268), oklch(42% 0.17 268));
   --radius-card: 1rem;
 }
 
@@ -58,4 +62,7 @@
   --color-line: var(--line);
   --color-subtle: var(--subtle);
   --color-error: var(--error);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-inverse-primary: var(--inverse-primary);
 }
