@@ -66,6 +66,10 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
       (Confirm the column and the row with a nod))?
 - [ ] Is a pause of 1.2 s before the next step right, or too short or long ("Pauza przed pytaniem" (The pause before
       the question))?
+- [ ] The chime before the row (spec 012, R7): when the pause takes the column, does he hear the rising three notes,
+      and does he start the row after it? Is it loud enough, too long, pleasant? Note whether he started the row
+      before the chime (the pause too long) or waited long after it. If it is in the way: "Dźwięk: teraz wiersz"
+      (Sound: now the row) in Ustawienia (Settings).
 - [ ] After reading aloud: is "Nowe zdanie?" (New sentence?) welcome or in the way?
 - [ ] Rear camera: a caregiver holds the phone towards him; does it work as well?
 
