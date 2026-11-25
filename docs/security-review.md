@@ -41,10 +41,20 @@ State of the code: `main` at `e7f1d26` plus the stricter board import (PR #30).
   and on by hand on each of the three screens; his signals cannot. The clean start of the detector on return is in
   the same spec (R4, R6, R7). The checks by hand on his phone wait in [first-session](trial/first-session.md).
 
-# Not checked here
+# Live headers (checked 2026-11-24)
 
-- The response headers and TLS of the **live** deployment (the header e2e test for the deployed site covers the
-  headers in CD; nothing was measured by hand in this pass).
+The production response (`curl -sI` on the home page, 2026-11-24) carries all six headers from
+`staticwebapp.config.json` unchanged. Azure Static Web Apps adds two of its own:
+
+- `X-XSS-Protection: 1; mode=block`: deprecated, and ignored by current Chrome, Firefox and Safari. Old browsers that
+  still read it are not supported by Blinker. It is harmless here, because the CSP and Trusted Types do the real work.
+  OWASP suggests `0` or not sending it at all. Overriding it would mean a seventh header in
+  [security.md](conventions/security.md), which is not worth it for now.
+- `X-DNS-Prefetch-Control: off`: harmless; the app makes no request to another origin anyway.
+
+
+- The TLS settings of the **live** deployment (the headers: see above; the header e2e test for the deployed site
+  covers them in CD).
 - `/security-review` on the whole codebase: that tool reviews the pending changes of a branch, so it runs per PR.
 - The numbered ASVS requirements one by one.
 
@@ -53,3 +63,5 @@ State of the code: `main` at `e7f1d26` plus the stricter board import (PR #30).
 - OWASP ASVS https://owasp.org/www-project-application-security-verification-standard/
 - Angular security guide https://angular.dev/best-practices/security
 - Page Visibility API https://developer.mozilla.org/docs/Web/API/Page_Visibility_API
+- MDN `X-XSS-Protection` https://developer.mozilla.org/docs/Web/HTTP/Reference/Headers/X-XSS-Protection
+- OWASP HTTP Headers Cheat Sheet https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
