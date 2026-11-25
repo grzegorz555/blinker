@@ -94,6 +94,25 @@ svg {
   white-space: normal;
 }
 
+/* "Kopia w pliku" (Backup file, spec 017): text buttons at least 44 px high that wrap on a narrow phone. */
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.backup-actions button {
+  min-height: 2.75rem;
+  max-width: 100%;
+  height: auto;
+  white-space: normal;
+}
+
+#settings-backup {
+  margin: 0.5rem 0 0;
+  font-size: inherit;
+}
+
 .data-done {
   font-weight: 600;
 }

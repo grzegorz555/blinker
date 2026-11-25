@@ -258,6 +258,56 @@
       "facing": "Która kamera",
       "facingUser": "Przednia (telefon przed nim)",
       "facingEnvironment": "Tylna (opiekun trzyma telefon)"
+    },
+    "backup": {
+      "title": "Kopia w pliku",
+      "help": "Kopia w pliku przenosi jego kalibrację, ustawienia i tablice na inny telefon albo przeglądarkę. Zapisz ją po każdej kalibracji.",
+      "includeHistory": "Dołącz historię zdań",
+      "save": "Zapisz kopię",
+      "restore": "Wczytaj kopię",
+      "saved": "Zapisano plik {{file}}. Jest w nim jego kalibracja; trzymaj go tylko u siebie.",
+      "savedWithHistory": "Zapisano plik {{file}}. Są w nim jego kalibracja i jego zdania; trzymaj go tylko u siebie.",
+      "confirmTitle": "Wczytać kopię z {{date}}?",
+      "confirmMessage": "W pliku: {{contents}}. Zastąpi to te dane na tym urządzeniu. {{history}}",
+      "confirmAction": "Wczytaj",
+      "historyReplaced": "Historia zdań na tym urządzeniu zostanie zastąpiona.",
+      "historyKept": "W pliku nie ma historii zdań, więc historia na tym urządzeniu zostaje.",
+      "restored": "Wczytano kopię z {{date}}.",
+      "failed": "Nie udało się zapisać danych w pamięci przeglądarki, więc nic się nie zmieniło. Zwolnij miejsce albo sprawdź ustawienia witryny w przeglądarce.",
+      "contents": {
+        "settings": "ustawienia",
+        "boards": "tablice: {{n}}",
+        "profile": "jego kalibracja",
+        "noProfile": "bez kalibracji",
+        "language": "język",
+        "history": "zdania: {{n}}",
+        "empty": "nic (pusta kopia)"
+      },
+      "part": {
+        "settings": "Ustawienia",
+        "boards": "Tablice",
+        "activeBoard": "Wybrana tablica",
+        "profile": "Kalibracja",
+        "language": "Język",
+        "history": "Historia zdań"
+      },
+      "error": {
+        "not-json-file": "To nie jest plik kopii: wybierz plik z rozszerzeniem .json.",
+        "too-large": "Plik jest za duży na kopię Blinkera (najwyżej 4 MB).",
+        "not-text": "Nie da się odczytać pliku jako tekstu UTF-8. Wybierz plik zapisany przez „Zapisz kopię”.",
+        "not-json": "Plik nie jest poprawnym plikiem JSON.",
+        "too-deep": "Plik ma budowę, jakiej kopia Blinkera nie ma. Nic nie zostało zmienione.",
+        "forbidden-key": "Plik zawiera niedozwolone pola. Nic nie zostało zmienione.",
+        "not-backup": "To nie jest kopia Blinkera (na przykład plik tablicy). Tablice wczytuje się w zakładce Tablice.",
+        "newer-version": "Ta kopia pochodzi z nowszej wersji Blinkera. Zaktualizuj aplikację i spróbuj ponownie.",
+        "bad-date": "Data kopii w pliku jest nieprawidłowa.",
+        "unknown-field": "Plik zawiera pola, których kopia Blinkera nie ma. Nic nie zostało zmienione.",
+        "invalid": "{{part}} w pliku: dane są nieprawidłowe. Nic nie zostało zmienione.",
+        "too-many-boards": "W pliku jest więcej niż 50 tablic.",
+        "reserved-id": "W pliku jest jego wbudowana tablica; tej tablicy nie wczytuje się z pliku.",
+        "duplicate-board": "W pliku ta sama tablica występuje dwa razy.",
+        "missing-board": "Wybranej tablicy nie ma w pliku."
+      }
     }
   },
   "diagnostics": {
