@@ -66,6 +66,8 @@ token maps to an M3 color role. The ratios below come from `node scripts/contras
 | `highlight` on `bg` | active column or row outline, focus ring | 3:1 | 7.5:1 | 10.2:1 |
 | `highlight` on `surface` | active outline next to a cell | 3:1 | 6.6:1 | 9.1:1 |
 | `highlight` on `primary-container` | active outline inside the active cell | 3:1 | 6.0:1 | 6.1:1 |
+| `inverse-on-surface` on `inverse-surface` | toast text (spec 018) | 4.5:1 | 11.5:1 | 11.9:1 |
+| `inverse-primary` on `inverse-surface` | toast action, Cofnij (Undo) | 4.5:1 | 7.5:1 | 6.6:1 |
 
 `line` (decorative dividers) and `subtle` (the navigation indicator) are not text and carry no meaning, so they
 have no threshold. `theme-color` is `--bg` (`#f9fafe` light, `#0c0e14` dark), the color of the top app bar, checked by

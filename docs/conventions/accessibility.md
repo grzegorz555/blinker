@@ -34,6 +34,10 @@ Accessibility is part of "done". Angular guide: https://angular.dev/best-practic
 - **Labels:** icon-only buttons get an `aria-label`; decorative icons get `aria-hidden="true"`.
 - **Language:** `lang` on `<html>` follows the UI language (SC 3.1.1). Each route has a translated title (SC 2.4.2).
 - **Status messages:** use `aria-live="polite"` (SC 4.1.3); a new letter is announced politely.
+- **Success and error (spec 018):** a success outside Liczenie (Counting) is a toast (`ToastService`); an error is
+  persistent text under its control, never a toast (SC 3.3.1). A toast stays 6 s (10 s with Cofnij (Undo)), pauses
+  while the pointer or the focus is in it (SC 2.2.1), sits above the navigation bar and the focused control (SC
+  2.4.11), and is announced once by the snack bar's own live region (do not add an inline text for the same success).
 - **Forms:** visible labels, errors shown in text and linked with `aria-describedby` (SC 3.3.1, 3.3.2).
 - **Native elements first**, then Angular Material components and the CDK a11y helpers, which implement the WAI-ARIA patterns (dialog, select, switch). Our own components (navigation, board) follow the APG patterns directly.
 

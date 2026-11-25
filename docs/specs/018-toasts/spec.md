@@ -3,7 +3,7 @@ type: Spec
 title: "018: Toasts that confirm what happened, with Cofnij (Undo) after a delete"
 description: A short message at the bottom of the screen (an M3 snackbar) confirms each operation in Tablice (Boards), Zdania (Sentences), Ustawienia (Settings), Kalibracja (Calibration) and Diagnostyka (Diagnostics); after deleting a sentence or a board it offers Cofnij (Undo). Errors stay as text under their control. Not in Liczenie (Counting), not for each switch.
 tags: [ui, accessibility, feedback]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-25
@@ -96,16 +96,16 @@ Decided by the author (2026-11-25):
 
 # Acceptance criteria
 
-- [ ] Unit (`ToastService`): the durations (6 s, 10 s), the pause and restart on pointer and focus, Esc, one toast at
+- [x] Unit (`ToastService`): the durations (6 s, 10 s), the pause and restart on pointer and focus, Esc, one toast at
       a time, the action called once, the polite announcement.
-- [ ] Unit (services): `HistoryService` and `BoardsService` put a deleted sentence or board back (place, active board,
+- [x] Unit (services): `HistoryService` and `BoardsService` put a deleted sentence or board back (place, active board,
       storage), once.
-- [ ] Unit (pages): each operation of R5 opens its toast and no longer shows the inline success text; errors still
+- [x] Unit (pages): each operation of R5 opens its toast and no longer shows the inline success text; errors still
       show inline; Cofnij (Undo) restores and says so.
-- [ ] e2e (3 device projects): delete a board → toast with Cofnij (Undo) above the navigation bar at 360 × 640 →
+- [x] e2e (3 device projects): delete a board → toast with Cofnij (Undo) above the navigation bar at 360 × 640 →
       Cofnij (Undo) brings it back and active; delete a sentence → Cofnij (Undo); restore a backup → toast; the timer
       pauses with the focus in the toast; axe with a toast shown; no toast in Liczenie (Counting).
-- [ ] `npm run verify -- --lighthouse` passes.
+- [x] `npm run verify -- --lighthouse` passes.
 
 # Test plan
 

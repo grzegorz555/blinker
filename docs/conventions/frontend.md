@@ -30,6 +30,10 @@ Source: the Angular Style Guide (https://angular.dev/style-guide) and the best p
   styled with the tokens in a component CSS file; Tailwind utilities for page layout.
 - No icon font and no `MatIconRegistry`: icons are inline SVG with `aria-hidden="true"` next to a visible label.
 - A destructive action goes through `ConfirmService` (`shared/confirm-dialog`): "Anuluj" (Cancel) first.
+- A success is confirmed with `ToastService.show(key, params, action?)` (`shared/toast`, an M3 snack bar, spec 018),
+  never with a bare `MatSnackBar`: our service owns the timing, the placement and the single announcement. Deleting
+  one item offers `{ label: 'toast.undo', run }`, where `run` puts back exactly what was deleted. No toasts in
+  Liczenie (Counting) or for a switch.
 
 # i18n (Transloco)
 - No hardcoded UI strings. Keys follow `feature.element` (for example `communicate.scanningColumns`), and every key is added to both `public/i18n/en.json` and `public/i18n/pl.json`.

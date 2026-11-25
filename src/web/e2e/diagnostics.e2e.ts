@@ -2,6 +2,7 @@
 // Types (the cspGuard fixture fails the test on any violation). Chromium gets a fake camera (a moving test pattern,
 // no face) from the launch flags in playwright.config.ts; WebKit in tests has no camera, so it checks the error text.
 import { expect, test } from './support/test';
+import { toast } from './support/toast';
 import { expectNoA11yViolations } from './support/a11y';
 import { collectThirdPartyRequests } from './support/requests';
 
@@ -118,7 +119,7 @@ test.describe('Diagnostyka (Diagnostics)', () => {
     const copy = page.getByRole('button', { name: 'Kopiuj wyniki' });
     await expect(copy).toBeEnabled({ timeout: 60_000 });
     await copy.click();
-    await expect(page.getByText('Skopiowano')).toBeVisible();
+    await expect(toast(page)).toHaveText('Skopiowano wyniki (bez obrazu).');
     const text = await page.evaluate(() => navigator.clipboard.readText());
     expect(text).toContain('Profile: defaults (not calibrated)');
     expect(text).toMatch(/Profile JSON: \{.*"hand":\{"amplitude"/);

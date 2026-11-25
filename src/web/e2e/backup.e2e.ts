@@ -3,6 +3,7 @@
 // https://playwright.dev/docs/downloads, https://playwright.dev/docs/input#upload-files
 import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from './support/test';
+import { toast } from './support/toast';
 import { expectNoA11yViolations } from './support/a11y';
 import { fakeSpeech, spoken } from './support/speech';
 
@@ -69,9 +70,7 @@ async function deleteAll(page: Page) {
     .getByRole('alertdialog', { name: 'Usunąć wszystkie dane z tego urządzenia?' })
     .getByRole('button', { name: 'Usuń', exact: true })
     .click();
-  await expect(page.getByTestId('delete-all-status')).toHaveText(
-    'Usunięto wszystkie dane z tego urządzenia.',
-  );
+  await expect(toast(page)).toHaveText('Usunięto wszystkie dane z tego urządzenia.');
 }
 
 /** "Wczytaj kopię" (Restore a backup) with a file; returns the dialog (when the file was valid). */
@@ -106,7 +105,7 @@ test.describe('Kopia w pliku (Backup file)', () => {
     expect(Object.keys(file.data).sort()).toEqual(['activeBoard', 'boards', 'settings']);
     expect(file.data.settings.askAfterMs).toBe(2500);
     expect(file.data.history).toBeUndefined();
-    await expect(status(page)).toContainText('Jest w nim jego kalibracja');
+    await expect(toast(page)).toContainText('Jest w nim jego kalibracja');
 
     await deleteAll(page);
     await expect(pauseField(page)).toHaveValue('1200');
@@ -118,7 +117,8 @@ test.describe('Kopia w pliku (Backup file)', () => {
     await expect(dialog.getByRole('button', { name: 'Anuluj' })).toBeFocused();
     await expectNoA11yViolations(page);
     await dialog.getByRole('button', { name: 'Wczytaj', exact: true }).click();
-    await expect(status(page)).toContainText(/Wczytano kopię z \d{1,2}\.\d{1,2}\.\d{4}\./);
+    await expect(toast(page)).toContainText(/Wczytano kopię z \d{1,2}\.\d{1,2}\.\d{4}\./);
+    await expect(status(page)).toHaveText('');
     await expectNoA11yViolations(page);
 
     // The running app has the data at once, without a reload.
@@ -144,14 +144,14 @@ test.describe('Kopia w pliku (Backup file)', () => {
     await page.getByRole('checkbox', { name: 'Dołącz historię zdań' }).check();
     const saved = await save(page);
     expect(JSON.parse(saved.text).data.history).toHaveLength(1);
-    await expect(status(page)).toContainText('jego kalibracja i jego zdania');
+    await expect(toast(page)).toContainText('jego kalibracja i jego zdania');
 
     await deleteAll(page);
     const dialog = await choose(page, saved.name, saved.text);
     await expect(dialog).toContainText('zdania: 1');
     await expect(dialog).toContainText('zostanie zastąpiona');
     await dialog.getByRole('button', { name: 'Wczytaj', exact: true }).click();
-    await expect(status(page)).toContainText('Wczytano kopię');
+    await expect(toast(page)).toContainText('Wczytano kopię');
 
     await nav(page, 'Zdania').click();
     await expect(page.getByText('TAK')).toBeVisible();

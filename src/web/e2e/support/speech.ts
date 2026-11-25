@@ -25,12 +25,12 @@ export async function fakeSpeech(
 ): Promise<void> {
   await page.addInitScript(
     ({ voices, autoEndMs }) => {
-      type U = {
+      interface U {
         text: string;
         lang: string;
         onend: (() => void) | null;
         onerror: (() => void) | null;
-      };
+      }
       const w = window as unknown as {
         __spoken: string[];
         __endSpeech: () => void;
