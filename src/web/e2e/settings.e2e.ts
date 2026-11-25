@@ -91,6 +91,8 @@ test.describe('Ustawienia (Settings)', () => {
       'false',
     );
     await expect(toggle(page, /Mów pytania i komunikaty/)).toHaveAttribute('aria-checked', 'false');
+    // Spec 012, R7: the chime before the row is on by default.
+    await expect(toggle(page, /Dźwięk: teraz wiersz/)).toHaveAttribute('aria-checked', 'true');
     // Spec 012: the camera is on by default (the browser asks first); its sound is on; the front camera.
     await expect(toggle(page, /Sterowanie kamerą w Liczeniu/)).toHaveAttribute(
       'aria-checked',
