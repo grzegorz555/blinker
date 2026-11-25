@@ -58,6 +58,7 @@ export const BACKUP_PARTS = [
 export type BackupPart = (typeof BACKUP_PARTS)[number];
 
 export type BackupErrorCode =
+  | 'not-json-file'
   | 'too-large'
   | 'not-text'
   | 'not-json'

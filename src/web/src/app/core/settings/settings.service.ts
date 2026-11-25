@@ -27,9 +27,7 @@ export class SettingsService {
   readonly problem = signal<StoreProblem | null>(null);
 
   constructor() {
-    const stored = readStored(this.storage, SETTINGS_KEY, validateSettings);
-    if (stored.value) this.current.set(stored.value);
-    this.problem.set(stored.problem);
+    this.reload();
 
     effect(() => {
       const s = this.current();
@@ -51,6 +49,13 @@ export class SettingsService {
     this.current.set(next);
     if (!writeStored(this.storage, SETTINGS_KEY, next)) this.problem.set('unavailable');
     else if (this.problem() === 'corrupted') this.problem.set(null);
+  }
+
+  /** Reads the stored settings again, or the defaults when none are stored (a restored backup, spec 017, R7). */
+  reload(): void {
+    const stored = readStored(this.storage, SETTINGS_KEY, validateSettings);
+    this.current.set(stored.value ?? DEFAULT_SETTINGS);
+    this.problem.set(stored.problem);
   }
 
   /** Back to the defaults, and the stored settings deleted ("Usuń wszystkie dane" (Delete all data), spec 013). */
