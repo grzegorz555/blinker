@@ -58,3 +58,13 @@ generated:
   ```
 - A dev server in a second worktree uses a different port (`npx ng serve --port 4201`). Agents start dev servers only when the author asks.
 - Remove a worktree (`git worktree remove`) only after its PR is merged, and with the author's consent.
+- Before pushing, rebase on `origin/main`. After a sibling PR is merged, check the open ones
+  (`gh pr view N --json mergeable`) and rebase those that conflict.
+
+# The log in batches (author, 2026-11-25)
+- **Task PRs don't touch `docs/log.md`.** Every PR prepended its entry at the top of the same file, so with
+  several PRs open, the second one always conflicted once the first was merged (#55, #58, #59).
+- The PR description is the record until then. After a series of merges, one small `docs(log): …` PR adds an
+  entry for each merged PR (newest on top, with the PR numbers). One file in one PR cannot conflict with itself.
+- Other shared files (README, `docs/index.md`, the indexes) still change in the PR that needs them; when two open
+  PRs touch the same lines, the second is rebased.

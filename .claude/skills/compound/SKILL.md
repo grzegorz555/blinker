@@ -15,6 +15,6 @@ effort: low
    - 2–3 quiz questions.
 2. **Learnings (only when there is something reusable).** Look for mistakes, surprises, review findings, or facts about devices and libraries. For each one, create `docs/knowledge/<slug>.md` with the frontmatter from `docs/knowledge/index.md` (`type: Learning`, `status: draft`, `generated`, and `stale_after` for facts that age). Keep the body short: Context, Lesson, How to apply. Add it to `docs/knowledge/index.md`.
 3. **Improve the system.** If a learning means a rule should change, propose a concrete edit to `CLAUDE.md`, a convention or a skill. Don't apply it without approval.
-4. Add a line to `docs/log.md` (`## YYYY-MM-DD`, newest first) and update the Polish `.local.md` copies of the docs you changed.
+4. Don't edit `docs/log.md` in a task PR: write the entry (`## YYYY-MM-DD`, newest first, with the PR number) into the next batch `docs(log)` PR after the merges (`docs/conventions/git.md`, "The log in batches"). Update the Polish `.local.md` copies of the docs you changed.
 5. Show the author the learnings and the proposed edits. **After approval**, set `status: stable` and add `verified: [{by: human:Grzegorz Roczniak, at: <date>}]`, then commit (`docs(knowledge): …`).
 6. Run `node scripts/check-okf.mjs`. Suggest `/clear` before the next task.
