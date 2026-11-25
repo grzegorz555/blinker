@@ -26,3 +26,8 @@
 .mat-mdc-snack-bar-container.app-toast {
   margin-bottom: calc(8px + var(--toast-offset, 0px));
 }
+
+/* Spec 018, R3: the ring of time left in the toast follows the edge of the snack bar surface. */
+.app-toast .mat-mdc-snackbar-surface {
+  position: relative;
+}

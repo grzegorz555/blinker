@@ -159,6 +159,46 @@ describe('ToastService (spec 018)', () => {
     button.remove();
   });
 
+  /** The ring's stroke-dashoffset: 0 = full ring (all the time left), 100 = no ring (the toast goes). */
+  const ring = () =>
+    Number(
+      document.querySelector('[data-testid="toast-ring"] rect')!.getAttribute('stroke-dashoffset'),
+    );
+  const paused = () => document.querySelector('[data-testid="toast-paused"]');
+
+  it('a ring around the toast shows the time left and shrinks as it goes (R3)', async () => {
+    await show('toast.dataDeleted', undefined, { label: 'toast.undo', run: vi.fn() });
+    expect(ring()).toBeCloseTo(0, 0);
+    await advance(5000);
+    expect(ring()).toBeGreaterThan(45);
+    expect(ring()).toBeLessThan(55);
+    await advance(4000);
+    expect(ring()).toBeGreaterThan(85);
+    // Decorative: the live region must not change while the toast is shown.
+    expect(document.querySelector('[data-testid="toast-ring"]')!.getAttribute('aria-hidden')).toBe(
+      'true',
+    );
+  });
+
+  it('held, the ring stops and grows thicker and a pause mark shows; let go, it goes on (R3)', async () => {
+    await show('toast.dataDeleted');
+    await advance(3000);
+    expect(paused()).toBeNull();
+    host().dispatchEvent(new Event('pointerenter'));
+    await advance(200);
+    const stopped = ring();
+    expect(paused()).not.toBeNull();
+    expect(paused()!.getAttribute('aria-hidden')).toBe('true');
+    expect(document.querySelector('[data-testid="toast-ring"] rect')!.classList).toContain('held');
+    await advance(20_000);
+    expect(ring()).toBe(stopped);
+
+    host().dispatchEvent(new Event('pointerleave'));
+    await advance(500); // the ring moves in steps of 250 ms
+    expect(paused()).toBeNull();
+    expect(ring()).toBeGreaterThan(stopped);
+  });
+
   it('a rail at the side (600 px and wider) needs no offset', async () => {
     vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(800);
     const bar = document.createElement('app-nav');

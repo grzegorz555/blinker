@@ -61,8 +61,8 @@ give the row now.
 On a phone the tabs are at the bottom; on a wider screen they are on the left. The current tab has a filled icon and a bold label.
 
 After an operation (an imported board, a deleted sentence, a saved backup) a short message at the bottom confirms
-it. After deleting one sentence or one board it offers "Cofnij" (Undo) for 10 seconds; touching or focusing the message
-stops the countdown. Errors stay on the page under the button until you try again.
+it. After deleting one sentence or one board it offers "Cofnij" (Undo) for 10 seconds. A line around the message
+shows the time left; touching or focusing the message stops it, and a pause mark shows that it will not go away. Errors stay on the page under the button until you try again.
 
 # When something goes wrong
 
