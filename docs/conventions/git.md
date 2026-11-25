@@ -68,3 +68,10 @@ generated:
   entry for each merged PR (newest on top, with the PR numbers). One file in one PR cannot conflict with itself.
 - Other shared files (README, `docs/index.md`, the indexes) still change in the PR that needs them; when two open
   PRs touch the same lines, the second is rebased.
+
+# Shared lists (author, 2026-11-25)
+- A list that many PRs touch holds **no state**. `docs/specs/index.md` has one line per spec (number, title, one
+  sentence), written once when the spec is created. Marking a spec done changed its line in the index, right next to
+  the line a new spec added, so the two PRs conflicted (#63 and #64).
+- The state of a spec lives in its own files: `status:` in `spec.md` (`draft` while open or paused, `stable`
+  when done) and the boxes in `tasks.md`. Its PR changes only those.

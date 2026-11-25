@@ -3,7 +3,7 @@ type: Task List
 title: "017: A backup of his data in a file - tasks"
 description: Four tasks - the pure format (build and check), the restore in the core with a reload per service, the section in Ustawienia (Settings), and e2e with the docs.
 tags: [settings, storage, privacy, security]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-25
