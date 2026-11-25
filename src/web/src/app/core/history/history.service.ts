@@ -32,9 +32,7 @@ export class HistoryService {
   readonly problem = signal<StoreProblem | null>(null);
 
   constructor() {
-    const stored = readStored(this.storage, HISTORY_KEY, validateHistory);
-    this.problem.set(stored.problem);
-    if (stored.value) this.list.set(prune(stored.value, this.now()));
+    this.reload();
 
     // A sentence read aloud: keep it, when the history is on.
     effect(() => {
@@ -49,6 +47,13 @@ export class HistoryService {
     effect(() => {
       if (!this.settings().history) untracked(() => this.clear());
     });
+  }
+
+  /** Reads the stored history again (a restored backup that holds one, spec 017, R7). */
+  reload(): void {
+    const stored = readStored(this.storage, HISTORY_KEY, validateHistory);
+    this.list.set(stored.value ? prune(stored.value, this.now()) : []);
+    this.problem.set(stored.problem);
   }
 
   /** "Powiedz jeszcze raz" (Say again): reads it aloud again; a repeat is not stored twice. */

@@ -21,11 +21,14 @@ export class ProfileService {
   readonly problem = signal<StoreProblem | null>(null);
 
   constructor() {
+    this.reload();
+  }
+
+  /** Reads the stored profile again; nothing stored: the defaults, not calibrated (a restored backup, spec 017). */
+  reload(): void {
     const stored = readStored(this.storage, PROFILE_KEY, validateProfile);
-    if (stored.value) {
-      this.current.set(stored.value);
-      this.calibrated.set(true);
-    }
+    this.current.set(stored.value ?? DEFAULT_PROFILE);
+    this.calibrated.set(stored.value !== null);
     this.problem.set(stored.problem);
   }
 

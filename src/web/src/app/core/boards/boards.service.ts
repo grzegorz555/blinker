@@ -22,7 +22,7 @@ export type ImportResult =
 const JSON_FILE = /\.json$/i;
 
 /** Imported boards read back from the device: each is validated again, like a new import. */
-function validateStoredBoards(data: unknown): Board[] | null {
+export function validateStoredBoards(data: unknown): Board[] | null {
   if (!Array.isArray(data)) return null;
   const boards: Board[] = [];
   for (const item of data) {
@@ -58,13 +58,17 @@ export class BoardsService {
   readonly problem = signal<StoreProblem | null>(null);
 
   constructor() {
+    this.reload();
+    effect(() => this.counting.useBoard(this.active()));
+  }
+
+  /** Reads the stored boards again; nothing stored: only his board (a restored backup, spec 017, R7). */
+  reload(): void {
     const boards = readStored(this.storage, BOARDS_KEY, validateStoredBoards);
     const active = readStored(this.storage, ACTIVE_BOARD_KEY, validateId);
-    if (boards.value) this.imported.set(boards.value);
-    if (active.value) this.activeId.set(active.value);
+    this.imported.set(boards.value ?? []);
+    this.activeId.set(active.value ?? this.builtIn.id);
     this.problem.set(boards.problem ?? active.problem);
-
-    effect(() => this.counting.useBoard(this.active()));
   }
 
   isBuiltIn(board: Board): boolean {

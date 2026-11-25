@@ -51,6 +51,15 @@ export class LanguageService {
     return removeStored(this.storage, LANGUAGE_STORAGE_KEY);
   }
 
+  /**
+   * A restored backup (spec 017, R7): its language choice is applied and saved; a backup without one forgets the
+   * saved choice, and the screen keeps its language, as after "Usuń wszystkie dane" (Delete all data).
+   */
+  async restoreChoice(lang: LanguageCode | null): Promise<void> {
+    if (lang) await this.setLanguage(lang);
+    else this.forgetChoice();
+  }
+
   private apply(lang: LanguageCode): void {
     this.transloco.setActiveLang(lang);
     this.document.documentElement.lang = lang;
