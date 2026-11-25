@@ -33,7 +33,7 @@ generated:
   letter by letter. To design after the PoC, together with him.
 - Word prediction for Polish: spec [016](specs/016-word-prediction/spec.md) (approved 2026-11-20; ADR-0007 accepted;
   T1-T2 done, paused 2026-11-22 until the author decides after the first session).
-- A backup of his data in a file, before the first session: spec [017](specs/017-backup/spec.md) (draft, 2026-11-25).
+- A backup of his data in a file, before the first session: spec [017](specs/017-backup/spec.md) (done, 2026-11-25).
 - Favorite phrases; sentence history.
 - Capacitor build for Android and iOS.
 - Better TTS voices. This would need a backend, so it requires a new ADR.

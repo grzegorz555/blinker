@@ -55,7 +55,7 @@ give the row now.
 | **Zdania (Sentences)** | Every sentence read aloud, grouped by day. "Powiedz jeszcze raz" (Say again) repeats one; you can delete one or all. The history can be turned off in the settings. |
 | **Tablice (Boards)** | His built-in board, or a board imported from a `.json` file (checked on the device; errors are shown in text). Preview and delete. |
 | **Kalibracja (Calibration)** | A step-by-step wizard that learns his signals: at rest, strong blinks, his hand, a nod, a shake, head right. Each step is said aloud and shows "Wykryto n z k" (Detected n of k). Only numbers are saved, never a picture. |
-| **Ustawienia (Settings)** | The pause before the next step, the nod confirmation, the chime before the row, spoken questions, signal buttons and keyboard shortcuts, hints, speech rate and voice, the camera (on or off, preview, a tone per signal, front or rear), language and theme, the sentence history, and "Usuń wszystkie dane" (Delete all data). Diagnostyka (Diagnostics) is linked from here. |
+| **Ustawienia (Settings)** | The pause before the next step, the nod confirmation, the chime before the row, spoken questions, signal buttons and keyboard shortcuts, hints, speech rate and voice, the camera (on or off, preview, a tone per signal, front or rear), language and theme, the sentence history, "Kopia w pliku" (Backup file), and "Usuń wszystkie dane" (Delete all data). Diagnostyka (Diagnostics) is linked from here. |
 | **Diagnostyka (Diagnostics)** | For checking and tuning: live eye values and head angles, frames per second, the signals Blinker detects. "Kopiuj wyniki" (Copy the results) copies a text summary (numbers only). |
 
 On a phone the tabs are at the bottom; on a wider screen they are on the left. The current tab has a filled icon and a bold label.
@@ -70,6 +70,7 @@ On a phone the tabs are at the bottom; on a wider screen they are on the left. T
 | The camera does not start | Allow the camera for this site in the browser settings; close other apps that use the camera. "Kamera" (Camera) in Liczenie (Counting) starts it again. |
 | A wrong letter | A shake removes it; "Cofnij literę" (Undo letter) does the same by tap. Nothing is said aloud without his confirmation. |
 | Start over on this device | Ustawienia (Settings) → "Usuń wszystkie dane" (Delete all data), after a confirmation. |
+| A new phone, or the browser data was cleared | On the old device: Ustawienia (Settings) → "Zapisz kopię" (Save a backup). On the new one: "Wczytaj kopię" (Restore a backup) with that file. Save a backup after each calibration. |
 
 The camera is used only while Blinker is on screen: it stops when you switch apps or lock the phone and starts again
 when you come back.
@@ -77,4 +78,6 @@ when you come back.
 # Privacy
 
 Camera frames are analysed on the device and never leave it. Settings, boards, his calibration (numbers only) and
-the sentence history are kept only in this browser on this device. See [security conventions](conventions/security.md).
+the sentence history are kept only in this browser on this device. A backup file ("Zapisz kopię" (Save a backup))
+holds his calibration, and his sentences only when "Dołącz historię zdań" (Include the sentence history) is ticked;
+keep it to yourself. See [security conventions](conventions/security.md).

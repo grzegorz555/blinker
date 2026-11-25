@@ -129,6 +129,11 @@ Everything stays on the device:
   reload, and then removes every `blinker.` key from localStorage. It returns `erased` or `unavailable`. It is reached
   from Ustawienia (Settings), "Dane na tym urządzeniu" (Data on this device), after a confirmation. A new store must
   use the prefix and have a reset; a unit test fills every store, erases, and fails when a `blinker.` key is left;
+- the backup (spec 017): `core/storage/backup.ts` builds and checks the file (a versioned envelope; size, strict
+  UTF-8, JSON, no prototype key at any depth, a depth cap, then each part through the validator its store uses);
+  `BackupService` saves what the stores hold (the history only when asked) and restores all or nothing: every key is
+  written with its old value kept and put back on the first refusal, then each service reads its store again
+  (`reload()`). A file without a history leaves the device's history as it is;
 - IndexedDB later, if calibration profiles or many boards outgrow localStorage.
 
 There are no cookies, no server state and no telemetry.

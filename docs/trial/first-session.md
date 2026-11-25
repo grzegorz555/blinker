@@ -52,6 +52,8 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
       verdicts. "Nie zapamiętano" (Not learnt): repeat it once; if still not learnt, note why (under 6°, or the side of
       his head right).
 - [ ] "Zapisz kalibrację" (Save the calibration); then check in Diagnostyka (Diagnostics) that his signals appear.
+- [ ] Ustawienia (Settings) → "Zapisz kopię" (Save a backup) right after the calibration (spec 017), and keep the file
+      off his phone (your phone or computer); it brings his calibration back on a new phone or after cleared data.
 
 # 3. Liczenie (Counting) with the camera
 
