@@ -258,6 +258,56 @@
       "facing": "Which camera",
       "facingUser": "Front (the phone in front of him)",
       "facingEnvironment": "Rear (a caregiver holds the phone)"
+    },
+    "backup": {
+      "title": "Backup file",
+      "help": "A backup file moves his calibration, settings and boards to another phone or browser. Save one after each calibration.",
+      "includeHistory": "Include the sentence history",
+      "save": "Save a backup",
+      "restore": "Restore a backup",
+      "saved": "Saved {{file}}. It holds his calibration; keep it to yourself.",
+      "savedWithHistory": "Saved {{file}}. It holds his calibration and his sentences; keep it to yourself.",
+      "confirmTitle": "Restore the backup from {{date}}?",
+      "confirmMessage": "In the file: {{contents}}. It replaces this data on this device. {{history}}",
+      "confirmAction": "Restore",
+      "historyReplaced": "The sentence history on this device will be replaced.",
+      "historyKept": "The file has no sentence history, so the history on this device stays.",
+      "restored": "Restored the backup from {{date}}.",
+      "failed": "The data could not be saved in the browser’s storage, so nothing changed. Free some space or check the site settings in the browser.",
+      "contents": {
+        "settings": "the settings",
+        "boards": "boards: {{n}}",
+        "profile": "his calibration",
+        "noProfile": "no calibration",
+        "language": "the language",
+        "history": "sentences: {{n}}",
+        "empty": "nothing (an empty backup)"
+      },
+      "part": {
+        "settings": "The settings",
+        "boards": "The boards",
+        "activeBoard": "The chosen board",
+        "profile": "The calibration",
+        "language": "The language",
+        "history": "The sentence history"
+      },
+      "error": {
+        "not-json-file": "This is not a backup file: choose a file ending in .json.",
+        "too-large": "The file is too large for a Blinker backup (4 MB at most).",
+        "not-text": "The file can’t be read as UTF-8 text. Choose a file made by “Save a backup”.",
+        "not-json": "The file is not valid JSON.",
+        "too-deep": "The file is built in a way a Blinker backup never is. Nothing was changed.",
+        "forbidden-key": "The file contains fields that are not allowed. Nothing was changed.",
+        "not-backup": "This is not a Blinker backup (a board file, for example). Boards are imported in Boards.",
+        "newer-version": "This backup comes from a newer version of Blinker. Update the app and try again.",
+        "bad-date": "The date of the backup in the file is invalid.",
+        "unknown-field": "The file contains fields a Blinker backup doesn’t have. Nothing was changed.",
+        "invalid": "{{part}} in the file: the data is invalid. Nothing was changed.",
+        "too-many-boards": "The file has more than 50 boards.",
+        "reserved-id": "The file holds his built-in board; that board is not restored from a file.",
+        "duplicate-board": "The same board is in the file twice.",
+        "missing-board": "The chosen board is not in the file."
+      }
     }
   },
   "diagnostics": {

@@ -152,6 +152,89 @@
 <section class="group" aria-labelledby="settings-data">
   <h2 id="settings-data" class="group-title">{{ 'settings.data.title' | transloco }}</h2>
   <p class="muted">{{ 'settings.data.help' | transloco }}</p>
+
+  <!-- Kopia w pliku (Backup file), spec 017 -->
+  <h3 class="field-label" id="settings-backup">{{ 'settings.backup.title' | transloco }}</h3>
+  <p class="muted">{{ 'settings.backup.help' | transloco }}</p>
+  <mat-checkbox
+    data-testid="backup-history"
+    [checked]="includeHistory()"
+    (change)="includeHistory.set($event.checked)"
+  >
+    {{ 'settings.backup.includeHistory' | transloco }}
+  </mat-checkbox>
+  <div class="backup-actions">
+    <button
+      matButton="outlined"
+      type="button"
+      data-testid="backup-save"
+      aria-describedby="backup-status"
+      (click)="saveBackup()"
+    >
+      {{ 'settings.backup.save' | transloco }}
+    </button>
+    <!-- A Material button opens the system file picker; the native input stays hidden, as in Tablice (Boards). -->
+    <input
+      #backupInput
+      hidden
+      type="file"
+      accept=".json,application/json"
+      data-testid="backup-file"
+      (change)="onBackupFile($event)"
+    />
+    <button
+      matButton="outlined"
+      type="button"
+      data-testid="backup-restore"
+      aria-describedby="backup-status"
+      (click)="backupInput.click()"
+    >
+      {{ 'settings.backup.restore' | transloco }}
+    </button>
+  </div>
+  <!-- The live region stays in the page, so the text added into it is announced (SC 4.1.3). -->
+  <div id="backup-status" role="status" data-testid="backup-status">
+    @if (backupStatus(); as status) {
+      @switch (status.kind) {
+        @case ('saved') {
+          <p class="data-done">
+            {{
+              (status.withHistory ? 'settings.backup.savedWithHistory' : 'settings.backup.saved')
+                | transloco: { file: status.file }
+            }}
+          </p>
+        }
+        @case ('restored') {
+          <p class="data-done">
+            {{ 'settings.backup.restored' | transloco: { date: status.date } }}
+          </p>
+        }
+        @default {
+          <p class="voice-error">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v6M12 16.5v.5" />
+            </svg>
+            @if (status.kind === 'error') {
+              @let message = backupError(status.error);
+              <span>{{ message.key | transloco: message.params }}</span>
+            } @else {
+              <span>{{ 'settings.backup.failed' | transloco }}</span>
+            }
+          </p>
+        }
+      }
+    }
+  </div>
+
   <button
     matButton="outlined"
     class="danger"
