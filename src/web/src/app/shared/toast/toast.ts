@@ -9,18 +9,17 @@
 //   (SC 2.4.11), through the CSS variable --toast-offset (styles.css).
 // - Material turns its animations off by itself with prefers-reduced-motion.
 // - The time left is a ring around the toast that shrinks to nothing as the toast goes; while the toast is held the
-//   ring stops, grows thicker and a pause mark shows (spec 018, R3). Both are decorative (aria-hidden): the live
-//   region must not change while the toast is shown, or it would be announced again. The ring moves in steps of
-//   250 ms smoothed by a transition, and once a second without one with prefers-reduced-motion.
+//   ring stands still (spec 018, R3). It is decorative (aria-hidden): the live region must not change while the
+//   toast is shown, or it would be announced again. A CSS animation as long as the toast's time draws it, paused
+//   with animation-play-state while the toast is held, so no script runs for it and it moves smoothly; with
+//   prefers-reduced-motion it moves in steps of a second.
 import { DOCUMENT } from '@angular/common';
 import {
   Component,
   DestroyRef,
   Injectable,
-  effect,
   inject,
   signal,
-  untracked,
   type Signal,
   type WritableSignal,
 } from '@angular/core';
@@ -51,8 +50,8 @@ export interface ToastData {
   act(): void;
   hold(holder: Holder, on: boolean): void;
   close(): void;
-  /** The share of the time still left, 1 when shown, 0 when it goes. */
-  left(): number;
+  /** How long the toast stays when nothing holds it, in ms; the ring runs for as long. */
+  readonly total: number;
   /** True while the pointer or the focus holds the toast: the time stands still. */
   readonly held: Signal<boolean>;
 }
@@ -75,16 +74,11 @@ export interface ToastAction {
         rx="4"
         pathLength="100"
         stroke-dasharray="100 100"
-        [attr.stroke-dashoffset]="100 - left() * 100"
+        [style.animation-duration.ms]="data.total"
+        [style.animation-timing-function]="timing"
         [class.held]="data.held()"
       />
     </svg>
-    @if (data.held()) {
-      <svg class="toast-paused" aria-hidden="true" viewBox="0 0 24 24" data-testid="toast-paused">
-        <rect x="6" y="5" width="4" height="14" rx="1" />
-        <rect x="14" y="5" width="4" height="14" rx="1" />
-      </svg>
-    }
     <span matSnackBarLabel data-testid="toast-text">{{ data.text }}</span>
     @if (data.action) {
       <div matSnackBarActions>
@@ -126,21 +120,19 @@ export interface ToastAction {
       stroke: var(--inverse-primary);
       stroke-width: 3;
       stroke-linecap: round;
-      transition: stroke-dashoffset 250ms linear;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .toast-ring rect {
-        transition: none;
-      }
+      animation-name: toast-ring;
+      animation-fill-mode: forwards;
     }
     .toast-ring rect.held {
-      stroke-width: 5;
+      animation-play-state: paused;
     }
-    .toast-paused {
-      flex: none;
-      width: 1.25rem;
-      height: 1.25rem;
-      fill: var(--inverse-primary);
+    @keyframes toast-ring {
+      from {
+        stroke-dashoffset: 0;
+      }
+      to {
+        stroke-dashoffset: 100;
+      }
     }
   `,
   host: {
@@ -153,29 +145,12 @@ export interface ToastAction {
 })
 export class Toast {
   protected readonly data = inject<ToastData>(MAT_SNACK_BAR_DATA);
-  protected readonly left = signal(1);
-
-  constructor() {
-    const view = inject(DOCUMENT).defaultView;
-    const reduced = view?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    // A step every 250 ms, smoothed by a CSS transition of the same length; once a second with reduced motion. While
-    // the toast is held nothing runs: the ring stands still, and a slow phone spends nothing on it.
-    const step = reduced ? 1000 : 250;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const tick = () => {
-      this.left.set(this.data.left());
-      timer = setTimeout(tick, step);
-    };
-    effect(() => {
-      const held = this.data.held();
-      clearTimeout(timer);
-      untracked(() => {
-        this.left.set(this.data.left());
-        if (!held) timer = setTimeout(tick, step);
-      });
-    });
-    inject(DestroyRef).onDestroy(() => clearTimeout(timer));
-  }
+  /** Smooth, or one step a second with prefers-reduced-motion. */
+  protected readonly timing = inject(DOCUMENT).defaultView?.matchMedia?.(
+    '(prefers-reduced-motion: reduce)',
+  ).matches
+    ? `steps(${Math.round(this.data.total / 1000)}, end)`
+    : 'linear';
 }
 
 interface Shown {
@@ -213,7 +188,7 @@ export class ToastService {
     let acted = false;
     const total = action ? TOAST_MS.action : TOAST_MS.plain;
     const held = signal(false);
-    // Assigned below; the toast reads left() already while it is being created.
+    // Assigned below, once the snack bar has created the toast.
     const created: { ref?: MatSnackBarRef<Toast> } = {};
     const data: ToastData = {
       text: this.transloco.translate(key, params ?? {}),
@@ -226,12 +201,7 @@ export class ToastService {
       },
       hold: (holder, on) => this.hold(holder, on),
       close: () => this.dismiss(),
-      left: () => {
-        if (!created.ref) return 1;
-        if (this.shown?.ref !== created.ref) return 0;
-        const running = this.shown.timer ? Date.now() - this.shown.startedAt : 0;
-        return Math.max(0, Math.min(1, (this.shown.remaining - running) / total));
-      },
+      total,
       held: held.asReadonly(),
     };
     this.placeAboveNavigation();

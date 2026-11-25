@@ -108,7 +108,7 @@ test.describe('Toasts (spec 018)', () => {
     await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);
   });
 
-  test('a ring shows the time left; held by the pointer it stops and a pause mark shows (R3)', async ({
+  test('a ring shows the time left; held by the pointer it stands still and the toast keeps its size (R3)', async ({
     page,
   }) => {
     await page.clock.install();
@@ -119,25 +119,30 @@ test.describe('Toasts (spec 018)', () => {
     const ring = page.locator(
       '.mat-mdc-snack-bar-container:not([mat-exit]) [data-testid="toast-ring"] rect',
     );
-    const offset = async () => Number(await ring.getAttribute('stroke-dashoffset'));
+    // A CSS animation draws the ring; Playwright's clock does not drive it, so the test reads its state.
+    const animation = () =>
+      ring.evaluate((el) => {
+        const style = getComputedStyle(el);
+        return { duration: style.animationDuration, state: style.animationPlayState };
+      });
     await expect(ring).toBeVisible();
-
-    await page.clock.runFor(5_000);
-    await expect.poll(offset).toBeGreaterThan(40);
-    expect(await offset()).toBeLessThan(60);
+    expect(await animation()).toEqual({ duration: '10s', state: 'running' });
+    const surface = page.locator('.app-toast:not([mat-exit]) .mat-mdc-snackbar-surface');
+    // Measured once the snack bar's own entrance (a scale from 0.8) is over; the ring's animation is not on it.
+    await page
+      .locator('.app-toast:not([mat-exit])')
+      .evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+    const box = await surface.boundingBox();
 
     await toast(page).hover();
-    await expect(page.getByTestId('toast-paused')).toBeVisible();
-    const stopped = await offset();
+    await expect.poll(async () => (await animation()).state).toBe('paused');
+    expect(await surface.boundingBox()).toEqual(box);
     await page.clock.runFor(30_000);
-    expect(await offset()).toBe(stopped);
     await expect(toast(page)).toBeVisible();
     await expectNoA11yViolations(page);
 
     await page.mouse.move(0, 0);
-    await expect(page.getByTestId('toast-paused')).toHaveCount(0);
-    await page.clock.runFor(1_000);
-    await expect.poll(offset).toBeGreaterThan(stopped);
+    await expect.poll(async () => (await animation()).state).toBe('running');
   });
 
   test('a toast without an action goes after 6 s; Esc with the focus on Cofnij (Undo) closes it without undoing', async ({
