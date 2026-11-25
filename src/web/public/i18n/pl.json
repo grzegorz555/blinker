@@ -149,8 +149,6 @@
     "import": "Import tablicy z pliku",
     "importHelp": "Plik JSON w formacie tablicy v1 (docs/board-format.md): najwyżej {{size}} kolumn i {{size}} wierszy, do {{kb}} KB. Plik jest sprawdzany na tym urządzeniu i nigdzie nie jest wysyłany.",
     "file": "Wybierz plik tablicy (.json)",
-    "imported": "Zaimportowano tablicę „{{name}}”. Wybierz ją powyżej, żeby jej używać.",
-    "replaced": "Tablica „{{name}}” została zastąpiona nowym plikiem.",
     "errorsTitle": "Błąd: plik nie został zaimportowany (problemów: {{count}}).",
     "delete": "Usuń",
     "deleteNamed": "Usuń tablicę {{name}}",
@@ -187,7 +185,8 @@
       "title": "Przykładowy plik",
       "help": "Kolumny i wiersze to etykiety, które on liczy; cells[wiersz][kolumna] to litera (char), słowo (word) albo akcja (action: space, delete, speak, clear, undo); null to puste pole. Pobierz go, zmień i zaimportuj.",
       "download": "Pobierz przykład"
-    }
+    },
+    "importedHint": "Wybierz ją powyżej, żeby jej używać."
   },
   "settings": {
     "appearance": "Wygląd",
@@ -199,7 +198,6 @@
       "confirmTitle": "Usunąć wszystkie dane z tego urządzenia?",
       "confirmMessage": "Ustawienia, zaimportowane tablice, jego kalibracja, przeczytane zdania i język zostaną usunięte. Tego nie da się cofnąć. Jego wbudowana tablica zostaje.",
       "confirmAction": "Usuń",
-      "done": "Usunięto wszystkie dane z tego urządzenia.",
       "failed": "Nie udało się usunąć danych z pamięci przeglądarki. Wyczyść dane witryny Blinker w ustawieniach przeglądarki."
     },
     "privacy": "Wszystko zostaje na tym urządzeniu: ustawienia, tablice i zdania nigdy nie są nigdzie wysyłane.",
@@ -265,14 +263,11 @@
       "includeHistory": "Dołącz historię zdań",
       "save": "Zapisz kopię",
       "restore": "Wczytaj kopię",
-      "saved": "Zapisano plik {{file}}. Jest w nim jego kalibracja; trzymaj go tylko u siebie.",
-      "savedWithHistory": "Zapisano plik {{file}}. Są w nim jego kalibracja i jego zdania; trzymaj go tylko u siebie.",
       "confirmTitle": "Wczytać kopię z {{date}}?",
       "confirmMessage": "W pliku: {{contents}}. Zastąpi to te dane na tym urządzeniu. {{history}}",
       "confirmAction": "Wczytaj",
       "historyReplaced": "Historia zdań na tym urządzeniu zostanie zastąpiona.",
       "historyKept": "W pliku nie ma historii zdań, więc historia na tym urządzeniu zostaje.",
-      "restored": "Wczytano kopię z {{date}}.",
       "failed": "Nie udało się zapisać danych w pamięci przeglądarki, więc nic się nie zmieniło. Zwolnij miejsce albo sprawdź ustawienia witryny w przeglądarce.",
       "contents": {
         "settings": "ustawienia",
@@ -364,7 +359,6 @@
     "fromNeutral": "{{value}}° od jego neutralu",
     "blocked": "Zablokowano wysyłkę do: {{origins}}",
     "copy": "Kopiuj wyniki",
-    "copied": "Skopiowano wyniki (bez obrazu).",
     "signals": {
       "title": "Wykryte sygnały",
       "calibrated": "Według jego kalibracji.",
@@ -468,7 +462,6 @@
     "notLearnt": "Nie zapamiętano",
     "skipped": "Pominięto",
     "nothingLearnt": "Nie rozpoznano żadnego ruchu. Sprawdź, czy twarz jest w kadrze, i powtórz.",
-    "saved": "Zapisano kalibrację. Blinker używa jej od teraz.",
     "tryIt": "Sprawdź sygnały w diagnostyce",
     "back": "Wstecz",
     "skip": "Pomiń ten krok",
@@ -482,5 +475,24 @@
       "overlap": "Jego mocne i zwykłe mrugnięcia wyglądają dla kamery podobnie, więc liczą się tylko długie mrugnięcia. Powtórz krok mrugnięcia: mocniej zaciśnięte powieki."
     },
     "moves": "Jego ostatnie ruchy głowy (od najnowszego), oceniane progami z tej kalibracji:"
+  },
+  "toast": {
+    "undo": "Cofnij",
+    "boardImported": "Zaimportowano tablicę „{{name}}”.",
+    "boardReplaced": "Zastąpiono tablicę „{{name}}” nowym plikiem.",
+    "boardSelected": "Wybrana tablica: {{name}}.",
+    "boardDeleted": "Usunięto tablicę „{{name}}”.",
+    "boardRestored": "Przywrócono tablicę „{{name}}”.",
+    "sentenceDeleted": "Usunięto zdanie.",
+    "sentenceRestored": "Przywrócono zdanie.",
+    "historyCleared": "Usunięto historię zdań.",
+    "historyOff": "Historia zdań wyłączona i usunięta.",
+    "historyOn": "Historia zdań włączona.",
+    "backupSaved": "Zapisano plik {{file}}. Jest w nim jego kalibracja; trzymaj go tylko u siebie.",
+    "backupSavedWithHistory": "Zapisano plik {{file}}. Są w nim jego kalibracja i jego zdania; trzymaj go tylko u siebie.",
+    "backupRestored": "Wczytano kopię z {{date}}.",
+    "dataDeleted": "Usunięto wszystkie dane z tego urządzenia.",
+    "calibrationSaved": "Zapisano kalibrację. Blinker używa jej od teraz.",
+    "copied": "Skopiowano wyniki (bez obrazu)."
   }
 }

@@ -5,6 +5,7 @@ import { translocoTesting } from '../../../testing/transloco';
 import type { Backup, BackupResult } from '../../core/storage/backup';
 import { BackupService, type RestoreResult } from '../../core/storage/backup.service';
 import { ConfirmService, type ConfirmData } from '../../shared/confirm-dialog/confirm-dialog';
+import { ToastService } from '../../shared/toast/toast';
 import { SettingsPage } from './settings-page';
 
 const CREATED = Date.UTC(2026, 10, 25, 10, 0, 0);
@@ -39,6 +40,7 @@ describe('SettingsPage, "Kopia w pliku" (Backup file) (spec 017)', () => {
     const confirm = vi.fn<(data: ConfirmData) => Promise<boolean>>(
       async () => options.answer ?? false,
     );
+    const show = vi.fn();
     const backup = {
       save: vi.fn((history: boolean) => ({
         fileName: 'blinker-backup-2026-11-25.json',
@@ -55,6 +57,7 @@ describe('SettingsPage, "Kopia w pliku" (Backup file) (spec 017)', () => {
         provideRouter([]),
         { provide: ConfirmService, useValue: { confirm } },
         { provide: BackupService, useValue: backup },
+        { provide: ToastService, useValue: { show } },
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(SettingsPage);
@@ -74,7 +77,7 @@ describe('SettingsPage, "Kopia w pliku" (Backup file) (spec 017)', () => {
       await vi.waitFor(() => expect(backup.check).toHaveBeenCalled());
       await fixture.whenStable();
     };
-    return { fixture, root, $, status, choose, confirm, backup };
+    return { fixture, root, $, status, choose, confirm, backup, show };
   }
 
   it('shows the text, the history checkbox (off) and two labelled buttons in "Data on this device"', async () => {
@@ -89,25 +92,26 @@ describe('SettingsPage, "Kopia w pliku" (Backup file) (spec 017)', () => {
     expect($('backup-status').getAttribute('role')).toBe('status');
   });
 
-  it('saves without the history by default, downloads the file and says that it holds his calibration', async () => {
-    const { fixture, $, status, backup } = await render();
+  it('saves without the history by default, downloads the file and says so in a toast (spec 018)', async () => {
+    const { fixture, $, status, backup, show } = await render();
     $('backup-save').click();
     await fixture.whenStable();
     expect(backup.save).toHaveBeenCalledWith(false);
     expect(click).toHaveBeenCalledTimes(1);
-    expect(status()).toBe(
-      'Saved blinker-backup-2026-11-25.json. It holds his calibration; keep it to yourself.',
-    );
+    expect(show).toHaveBeenCalledWith('toast.backupSaved', {
+      file: 'blinker-backup-2026-11-25.json',
+    });
+    expect(status()).toBe('');
   });
 
   it('with the checkbox ticked, the history is included and the status says so', async () => {
-    const { fixture, $, status, backup } = await render();
+    const { fixture, $, backup, show } = await render();
     $('backup-history').querySelector<HTMLInputElement>('input')!.click();
     await fixture.whenStable();
     $('backup-save').click();
     await fixture.whenStable();
     expect(backup.save).toHaveBeenCalledWith(true);
-    expect(status()).toContain('his calibration and his sentences');
+    expect(show).toHaveBeenCalledWith('toast.backupSavedWithHistory', expect.anything());
   });
 
   it('a refused file shows the error naming the part, and nothing is asked or restored', async () => {
@@ -145,14 +149,17 @@ describe('SettingsPage, "Kopia w pliku" (Backup file) (spec 017)', () => {
   });
 
   it('a file without a history says the history stays; "Wczytaj" (Restore) restores and says so', async () => {
-    const { choose, confirm, backup, status } = await render({ answer: true });
+    const { choose, confirm, backup, status, show } = await render({ answer: true });
     await choose();
     expect(confirm.mock.calls[0][0].params?.['history']).toBe(
       'The file has no sentence history, so the history on this device stays.',
     );
     expect(confirm.mock.calls[0][0].params?.['contents']).toBe('no calibration');
     await vi.waitFor(() => expect(backup.restore).toHaveBeenCalledWith(withoutHistory));
-    await vi.waitFor(() => expect(status()).toBe('Restored the backup from 11/25/2026.'));
+    await vi.waitFor(() =>
+      expect(show).toHaveBeenCalledWith('toast.backupRestored', { date: '11/25/2026' }),
+    );
+    expect(status()).toBe('');
   });
 
   it('a storage that refuses gives the error in text', async () => {

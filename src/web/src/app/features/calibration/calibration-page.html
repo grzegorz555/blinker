@@ -176,10 +176,6 @@
     </p>
   }
 
-  @if (page() === 'result' && saved()) {
-    <p role="status" class="saved" data-testid="saved">{{ 'calibration.saved' | transloco }}</p>
-  }
-
   <div class="actions">
     <!-- Spec 014, R11: an ordinary button whose text says the action; on the camera step the button above starts it. -->
     @if (hasCameraButton()) {

@@ -48,7 +48,7 @@ describe('ToastService (spec 018)', () => {
   const gone = () => document.querySelector('app-toast') === null;
 
   it('shows the text and announces it once, politely, through the snack bar live region', async () => {
-    await show('settings.data.done');
+    await show('toast.dataDeleted');
     expect(text()).toBe('All data was deleted from this device.');
     await advance(200); // the snack bar moves its content into the live region after a short delay
     const live = document.querySelector('.mat-mdc-snack-bar-label [aria-live]')!;
@@ -59,7 +59,7 @@ describe('ToastService (spec 018)', () => {
   });
 
   it('a toast without an action stays 6 s', async () => {
-    await show('settings.data.done');
+    await show('toast.dataDeleted');
     await advance(TOAST_MS.plain - 1);
     expect(host()).not.toBeNull();
     await advance(1);
@@ -68,7 +68,7 @@ describe('ToastService (spec 018)', () => {
 
   it('a toast with an action stays 10 s; the action runs once and closes the toast', async () => {
     const run = vi.fn();
-    await show('settings.data.done', undefined, { label: 'common.cancel', run });
+    await show('toast.dataDeleted', undefined, { label: 'common.cancel', run });
     expect(action()?.textContent?.trim()).toBe('Cancel');
     await advance(TOAST_MS.plain);
     expect(host()).not.toBeNull();
@@ -80,7 +80,7 @@ describe('ToastService (spec 018)', () => {
   });
 
   it('pauses while the pointer is over it, and goes on with the time that was left (R3)', async () => {
-    await show('settings.data.done');
+    await show('toast.dataDeleted');
     await advance(5000);
     host().dispatchEvent(new Event('pointerenter'));
     await advance(60_000);
@@ -94,7 +94,7 @@ describe('ToastService (spec 018)', () => {
 
   it('pauses while the keyboard focus is in it, also when the pointer leaves meanwhile', async () => {
     const run = vi.fn();
-    await show('settings.data.done', undefined, { label: 'common.cancel', run });
+    await show('toast.dataDeleted', undefined, { label: 'common.cancel', run });
     await advance(9000);
     host().dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
     host().dispatchEvent(new Event('pointerenter'));
@@ -109,7 +109,7 @@ describe('ToastService (spec 018)', () => {
 
   it('Esc in the toast closes it, without running the action', async () => {
     const run = vi.fn();
-    await show('settings.data.done', undefined, { label: 'common.cancel', run });
+    await show('toast.dataDeleted', undefined, { label: 'common.cancel', run });
     host().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     await settle();
     expect(gone()).toBe(true);
@@ -118,7 +118,7 @@ describe('ToastService (spec 018)', () => {
 
   it('a new toast replaces the old one, and the old action can no longer run (R1, R6)', async () => {
     const run = vi.fn();
-    await show('settings.data.done', undefined, { label: 'common.cancel', run });
+    await show('toast.dataDeleted', undefined, { label: 'common.cancel', run });
     const oldAction = action()!;
     await show('settings.data.failed');
     oldAction.click();
@@ -129,12 +129,12 @@ describe('ToastService (spec 018)', () => {
   });
 
   it('leaving the screen ends a toast with Cofnij (Undo), but not a plain one (R6)', async () => {
-    await show('settings.data.done', undefined, { label: 'common.cancel', run: vi.fn() });
+    await show('toast.dataDeleted', undefined, { label: 'common.cancel', run: vi.fn() });
     await TestBed.inject(Router).navigateByUrl('/other');
     await settle();
     expect(gone()).toBe(true);
 
-    await show('settings.data.done');
+    await show('toast.dataDeleted');
     await TestBed.inject(Router).navigateByUrl('/');
     await settle();
     expect(host()).not.toBeNull();
@@ -147,14 +147,14 @@ describe('ToastService (spec 018)', () => {
     bar.append(nav);
     document.body.append(bar);
     vi.spyOn(nav, 'getBoundingClientRect').mockReturnValue({ top: 560 } as DOMRect);
-    await show('settings.data.done');
+    await show('toast.dataDeleted');
     expect(document.documentElement.style.getPropertyValue('--toast-offset')).toBe('80px');
 
     const button = document.createElement('button');
     document.body.append(button);
     button.focus();
     vi.spyOn(button, 'getBoundingClientRect').mockReturnValue({ top: 500, bottom: 544 } as DOMRect);
-    await show('settings.data.done');
+    await show('toast.dataDeleted');
     expect(document.documentElement.style.getPropertyValue('--toast-offset')).toBe('148px');
     button.remove();
   });
@@ -166,7 +166,7 @@ describe('ToastService (spec 018)', () => {
     bar.append(nav);
     document.body.append(bar);
     vi.spyOn(nav, 'getBoundingClientRect').mockReturnValue({ top: 0 } as DOMRect);
-    await show('settings.data.done');
+    await show('toast.dataDeleted');
     expect(document.documentElement.style.getPropertyValue('--toast-offset')).toBe('0px');
   });
 });

@@ -6,6 +6,7 @@ import { byDay, HISTORY_LIMITS, type HistoryEntry } from '../../core/history/his
 import { HistoryService } from '../../core/history/history.service';
 import { SettingsService } from '../../core/settings/settings.service';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
+import { ToastService } from '../../shared/toast/toast';
 
 /**
  * Zdania (Sentences) (spec 007, R11): the sentences read aloud, by day, newest first, each with "Powiedz jeszcze raz"
@@ -22,6 +23,7 @@ export class SentencesPage {
   private readonly history = inject(HistoryService);
   private readonly settingsService = inject(SettingsService);
   private readonly confirmService = inject(ConfirmService);
+  private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
 
   protected readonly limits = HISTORY_LIMITS;
@@ -55,7 +57,15 @@ export class SentencesPage {
       confirm: 'sentences.delete',
       params: { text: entry.text },
     });
-    if (yes) this.history.remove(entry.id);
+    if (!yes) return;
+    this.history.remove(entry.id);
+    // The toast never shows his words (spec 018, privacy); Cofnij (Undo) puts the sentence back (R6).
+    this.toast.show('toast.sentenceDeleted', undefined, {
+      label: 'toast.undo',
+      run: () => {
+        if (this.history.restore(entry)) this.toast.show('toast.sentenceRestored');
+      },
+    });
   }
 
   protected async clearAll(): Promise<void> {
@@ -64,13 +74,16 @@ export class SentencesPage {
       message: 'sentences.clearMessage',
       confirm: 'sentences.clear',
     });
-    if (yes) this.history.clear();
+    if (!yes) return;
+    this.history.clear();
+    this.toast.show('toast.historyCleared');
   }
 
   /** Turning the history off deletes it, so it asks first; turning it on needs no question. */
   protected async toggle(on: boolean, source: { checked: boolean }): Promise<void> {
     if (on) {
       this.settingsService.update({ history: true });
+      this.toast.show('toast.historyOn');
       return;
     }
     const yes =
@@ -80,7 +93,9 @@ export class SentencesPage {
         message: 'sentences.offMessage',
         confirm: 'sentences.off',
       }));
-    if (yes) this.settingsService.update({ history: false });
-    else source.checked = true;
+    if (yes) {
+      this.settingsService.update({ history: false });
+      this.toast.show('toast.historyOff');
+    } else source.checked = true;
   }
 }

@@ -6,6 +6,7 @@ import { FaceTrackerService, type TrackerStatus } from '../../core/vision/face-t
 import { frameStats } from '../../core/vision/frame-stats';
 import { record, closed, squeezed } from '../../core/signals/synthetic';
 import { DiagnosticsPage } from './diagnostics-page';
+import { ToastService } from '../../shared/toast/toast';
 
 /** A tracker the test drives by hand (no camera, no worker). */
 function fakeTracker() {
@@ -30,7 +31,11 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
 
   async function render() {
     const tracker = fakeTracker();
-    await TestBed.configureTestingModule({ imports: [DiagnosticsPage, translocoTesting()] })
+    const show = vi.fn();
+    await TestBed.configureTestingModule({
+      imports: [DiagnosticsPage, translocoTesting()],
+      providers: [{ provide: ToastService, useValue: { show } }],
+    })
       .overrideComponent(DiagnosticsPage, {
         set: { providers: [{ provide: FaceTrackerService, useValue: tracker }] },
       })
@@ -41,7 +46,7 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     const text = (id: string) => root.querySelector(`[data-testid="${id}"]`)?.textContent?.trim();
     const button = (name: string) =>
       [...root.querySelectorAll('button')].find((b) => b.textContent?.trim() === name);
-    return { fixture, root, tracker, text, button };
+    return { fixture, root, tracker, text, button, show };
   }
 
   it('starts with the camera off and turns it on only on the button', async () => {
@@ -97,7 +102,7 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
   });
 
   it('says why the last closure of his eyes was or was not a blink, with the thresholds', async () => {
-    const { fixture, tracker, text, button } = await render();
+    const { fixture, tracker, text, button, show } = await render();
     expect(text('last-closure')).toBe('None yet.');
     expect(text('blink-profile')).toContain('0.5');
     const feed = async (frames: FaceFrame[]) => {
@@ -120,6 +125,8 @@ describe('DiagnosticsPage (spec 010, R4)', () => {
     await fixture.whenStable();
     const copied = (writeText.mock.calls[0] as unknown as [string])[0];
     expect(copied).toContain('"blink":{"threshold":0.5');
+    // Spec 018: the copy is confirmed in a toast.
+    expect(show).toHaveBeenCalledWith('toast.copied');
     expect(copied).toMatch(
       /\n {2}\d+, 0\.90, 0\.80, 0\.00, 0\.00, 0\.05, blink\n {2}\d+, 0\.90, 0\.30, 0\.00, 0\.00, 0\.05, weak\n/,
     );

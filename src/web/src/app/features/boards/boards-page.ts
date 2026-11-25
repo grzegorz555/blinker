@@ -18,6 +18,7 @@ import { exampleBoardJson } from '../../core/boards/example-board';
 import { LanguageService } from '../../core/i18n/language.service';
 import type { BoardError } from '../../core/boards/validate-board';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
+import { ToastService } from '../../shared/toast/toast';
 
 /**
  * Tablice (Boards) (spec 007, R10): the active board as a radio group, a preview, an import from a file with every
@@ -33,6 +34,7 @@ import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 export class BoardsPage {
   private readonly service = inject(BoardsService);
   private readonly confirmService = inject(ConfirmService);
+  private readonly toast = inject(ToastService);
   private readonly injector = inject(Injector);
   private readonly document = inject(DOCUMENT);
   private readonly language = inject(LanguageService).language;
@@ -66,6 +68,7 @@ export class BoardsPage {
 
   protected select(id: string): void {
     this.service.select(id);
+    this.toast.show('toast.boardSelected', { name: this.active().name });
   }
 
   protected async onFile(event: Event): Promise<void> {
@@ -78,6 +81,9 @@ export class BoardsPage {
     input.value = ''; // the same file can be chosen again after fixing it
     if (result.ok) {
       this.imported.set({ name: result.board.name, replaced: result.replaced });
+      this.toast.show(result.replaced ? 'toast.boardReplaced' : 'toast.boardImported', {
+        name: result.board.name,
+      });
       return;
     }
     this.errors.set(result.errors);
@@ -91,7 +97,23 @@ export class BoardsPage {
       confirm: 'boards.delete',
       params: { name: board.name },
     });
-    if (yes) this.service.remove(board.id);
+    if (!yes) return;
+    // What Cofnij (Undo) needs, kept only while its toast is shown (spec 018, R6).
+    const index = this.service.indexOf(board.id);
+    const wasActive = this.active().id === board.id;
+    this.service.remove(board.id);
+    this.toast.show(
+      'toast.boardDeleted',
+      { name: board.name },
+      {
+        label: 'toast.undo',
+        run: () => {
+          if (this.service.restore(board, index, wasActive)) {
+            this.toast.show('toast.boardRestored', { name: board.name });
+          }
+        },
+      },
+    );
   }
 
   /** What a preview cell shows: the value, or the key of an action label. */

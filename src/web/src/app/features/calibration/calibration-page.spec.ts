@@ -11,6 +11,7 @@ import type { FaceFrame } from '../../core/vision/face-frame';
 import { FaceTrackerService, type TrackerStatus } from '../../core/vision/face-tracker.service';
 import { CalibrationPage } from './calibration-page';
 import { memoryStorage } from '../../../testing/memory-storage';
+import { ToastService } from '../../shared/toast/toast';
 
 function fakeTracker() {
   return {
@@ -34,12 +35,14 @@ describe('CalibrationPage (spec 011, R4)', () => {
     const data = new Map<string, string>();
     const storage = memoryStorage(data);
     const listen = vi.fn();
+    const show = vi.fn();
     await TestBed.configureTestingModule({
       imports: [CalibrationPage, translocoTesting()],
       providers: [
         provideRouter([]),
         { provide: STORAGE, useValue: storage },
         { provide: CountingService, useValue: { listen } },
+        { provide: ToastService, useValue: { show } },
       ],
     })
       .overrideComponent(CalibrationPage, {
@@ -65,7 +68,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
         await fixture.whenStable();
       }
     };
-    return { fixture, root, tracker, text, heading, click, feed, data, listen };
+    return { fixture, root, tracker, text, heading, click, feed, data, listen, show };
   }
 
   it('walks the steps; the camera starts when its page opens; each step is said aloud', async () => {
@@ -86,7 +89,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
   });
 
   it('learns from his movements, shows "Detected 3 of 3", and saves only on the button', async () => {
-    const { click, tracker, text, feed, data } = await render();
+    const { click, tracker, text, feed, data, show } = await render();
     await click('Next');
     await click('Next');
     tracker.status.set('running');
@@ -129,7 +132,7 @@ describe('CalibrationPage (spec 011, R4)', () => {
     expect(text('blink-profile')).toContain('The strong blink is off');
     expect(data.has(PROFILE_KEY)).toBe(false);
     await click('Save the calibration');
-    expect(text('saved')).toBe('Calibration saved. Blinker uses it from now on.');
+    expect(show).toHaveBeenCalledWith('toast.calibrationSaved');
     const saved = JSON.parse(data.get(PROFILE_KEY)!);
     expect(saved.blink.threshold).toBeCloseTo(0.45, 2);
     expect(TestBed.inject(ProfileService).calibrated()).toBe(true);

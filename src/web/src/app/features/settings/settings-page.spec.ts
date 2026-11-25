@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { translocoTesting } from '../../../testing/transloco';
 import { DeviceDataService, type EraseResult } from '../../core/storage/device-data.service';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
+import { ToastService } from '../../shared/toast/toast';
 import { SettingsPage } from './settings-page';
 
 describe('SettingsPage, "Dane na tym urządzeniu" (Data on this device) (spec 013, R1, R2, R4)', () => {
@@ -11,12 +12,14 @@ describe('SettingsPage, "Dane na tym urządzeniu" (Data on this device) (spec 01
   async function render(answer: boolean, result: EraseResult = 'erased') {
     const confirm = vi.fn(async () => answer);
     const eraseAll = vi.fn(() => result);
+    const show = vi.fn();
     await TestBed.configureTestingModule({
       imports: [SettingsPage, translocoTesting()],
       providers: [
         provideRouter([]),
         { provide: ConfirmService, useValue: { confirm } },
         { provide: DeviceDataService, useValue: { eraseAll } },
+        { provide: ToastService, useValue: { show } },
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(SettingsPage);
@@ -24,7 +27,7 @@ describe('SettingsPage, "Dane na tym urządzeniu" (Data on this device) (spec 01
     const root = fixture.nativeElement as HTMLElement;
     const button = root.querySelector<HTMLButtonElement>('[data-testid="delete-all-data"]')!;
     const status = root.querySelector<HTMLElement>('[data-testid="delete-all-status"]')!;
-    return { fixture, root, button, status, confirm, eraseAll };
+    return { fixture, root, button, status, confirm, eraseAll, show };
   }
 
   it('shows the section before "O aplikacji" (About), with the text and a labelled button', async () => {
@@ -48,13 +51,14 @@ describe('SettingsPage, "Dane na tym urządzeniu" (Data on this device) (spec 01
     expect(status.textContent?.trim()).toBe('');
   });
 
-  it('erases and says so in text when the answer is "Usuń" (Delete)', async () => {
-    const { fixture, button, status, eraseAll } = await render(true);
+  it('erases and says so in a toast when the answer is "Usuń" (Delete) (spec 018, R2)', async () => {
+    const { fixture, button, status, eraseAll, show } = await render(true);
     button.click();
     await fixture.whenStable();
     expect(eraseAll).toHaveBeenCalledTimes(1);
+    expect(show).toHaveBeenCalledWith('toast.dataDeleted');
     expect(status.getAttribute('role')).toBe('status');
-    expect(status.textContent?.trim()).toBe('All data was deleted from this device.');
+    expect(status.textContent?.trim()).toBe('');
   });
 
   it('shows an error in text, with what to do, when the storage refuses', async () => {
