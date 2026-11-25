@@ -119,18 +119,18 @@ Decided by the author (2026-11-25):
 
 # Acceptance criteria
 
-- [ ] Unit (`BackupService`): build with and without the history; a round trip (build, check, apply) gives the same
+- [x] Unit (`BackupService`): build with and without the history; a round trip (build, check, apply) gives the same
       stores; every R5 refusal (too large, not UTF-8, not JSON, wrong format, newer version, future date, unknown
       field, prototype key, each invalid part, too many boards, an active board that is not there) changes nothing;
       R7 with and without a history in the file; a storage that throws part way puts the old values back.
-- [ ] Unit (Ustawienia (Settings) page): the checkbox off on each visit; the file name; the dialog text for both
+- [x] Unit (Ustawienia (Settings) page): the checkbox off on each visit; the file name; the dialog text for both
       history cases; the statuses.
-- [ ] e2e (3 device projects): calibrate nothing, change a setting, import a board, read a sentence; save a backup
+- [x] e2e (3 device projects): calibrate nothing, change a setting, import a board, read a sentence; save a backup
       (the download's name and content); "Usuń wszystkie dane" (Delete all data); restore the file → the setting and
       the board are back, the history stays empty (the default backup has none); with the checkbox ticked the
       history comes back too; an invalid file shows the error and changes nothing; axe on the section, the dialog
       and the statuses.
-- [ ] `npm run verify -- --lighthouse` passes.
+- [x] `npm run verify -- --lighthouse` passes.
 
 # Test plan
 
