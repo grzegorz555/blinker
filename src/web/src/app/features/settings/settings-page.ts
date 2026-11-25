@@ -19,13 +19,14 @@ import { RATES, THEMES, validAskAfter, type Settings } from '../../core/settings
 import { SettingsService } from '../../core/settings/settings.service';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 import { LanguageSwitch } from '../../shared/language-switch/language-switch';
+import { ToastService } from '../../shared/toast/toast';
 
-/** What "Kopia w pliku" (Backup file) last did, shown in text under its buttons (spec 017, R3, R8). */
+/**
+ * A problem of "Kopia w pliku" (Backup file), shown in text under its buttons until the next try (spec 017, R5, R7).
+ * A success is a toast (spec 018, R2).
+ */
 export type BackupStatus =
-  | { readonly kind: 'saved'; readonly file: string; readonly withHistory: boolean }
-  | { readonly kind: 'restored'; readonly date: string }
-  | { readonly kind: 'error'; readonly error: BackupError }
-  | { readonly kind: 'failed' };
+  { readonly kind: 'error'; readonly error: BackupError } | { readonly kind: 'failed' };
 
 type Toggle = 'confirmByNod' | 'rowCue' | 'speakPrompts' | 'signalButtons' | 'keyboard' | 'hints';
 
@@ -67,6 +68,7 @@ export class SettingsPage {
   private readonly deviceData = inject(DeviceDataService);
   private readonly backup = inject(BackupService);
   private readonly document = inject(DOCUMENT);
+  private readonly toast = inject(ToastService);
 
   /** "Dołącz historię zdań" (Include the sentence history): off each time the page opens (spec 017, R2). */
   protected readonly includeHistory = signal(false);
@@ -131,7 +133,10 @@ export class SettingsPage {
     link.download = fileName;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url));
-    this.backupStatus.set({ kind: 'saved', file: fileName, withHistory });
+    this.backupStatus.set(null);
+    this.toast.show(withHistory ? 'toast.backupSavedWithHistory' : 'toast.backupSaved', {
+      file: fileName,
+    });
   }
 
   /**
@@ -167,7 +172,8 @@ export class SettingsPage {
     });
     if (!yes) return;
     const result = await this.backup.restore(checked.backup);
-    this.backupStatus.set(result === 'restored' ? { kind: 'restored', date } : { kind: 'failed' });
+    if (result === 'restored') this.toast.show('toast.backupRestored', { date });
+    else this.backupStatus.set({ kind: 'failed' });
     // The form field and the voice follow the restored settings and board.
     this.askAfter.setValue(this.settings().askAfterMs, { emitEvent: false });
     this.hasVoice.set(this.counting.hasVoice());
@@ -212,7 +218,10 @@ export class SettingsPage {
     });
     if (!yes) return;
     this.backupStatus.set(null);
-    this.erased.set(this.deviceData.eraseAll());
+    const result = this.deviceData.eraseAll();
+    // The failure stays as text (spec 013, R4); the success is a toast (spec 018, R2).
+    this.erased.set(result === 'unavailable' ? result : null);
+    if (result === 'erased') this.toast.show('toast.dataDeleted');
     // The form field is rebuilt from the defaults, so it does not show the erased value.
     this.askAfter.setValue(this.settings().askAfterMs, { emitEvent: false });
     this.hasVoice.set(this.counting.hasVoice());

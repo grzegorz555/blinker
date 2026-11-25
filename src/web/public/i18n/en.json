@@ -149,8 +149,6 @@
     "import": "Import a board from a file",
     "importHelp": "A JSON file in the board format v1 (docs/board-format.md): at most {{size}} columns and {{size}} rows, up to {{kb}} KB. The file is checked on this device and never sent anywhere.",
     "file": "Choose a board file (.json)",
-    "imported": "Imported the board \"{{name}}\". Choose it above to use it.",
-    "replaced": "Replaced the board \"{{name}}\" with the new file.",
     "errorsTitle": "Error: the file was not imported ({{count}} problem(s)).",
     "delete": "Delete",
     "deleteNamed": "Delete the board {{name}}",
@@ -187,7 +185,8 @@
       "title": "Example file",
       "help": "Columns and rows are the labels he counts; cells[row][column] holds a letter (char), a word or an action (space, delete, speak, clear, undo); null is an empty cell. Download it, edit it and import it.",
       "download": "Download the example"
-    }
+    },
+    "importedHint": "Choose it above to use it."
   },
   "settings": {
     "appearance": "Appearance",
@@ -199,7 +198,6 @@
       "confirmTitle": "Delete all data from this device?",
       "confirmMessage": "The settings, imported boards, his calibration, the sentences read aloud and the language will be deleted. This cannot be undone. His built-in board stays.",
       "confirmAction": "Delete",
-      "done": "All data was deleted from this device.",
       "failed": "The data could not be deleted from the browser's storage. Clear the site data for Blinker in the browser's settings."
     },
     "privacy": "Everything stays on this device: settings, boards and sentences are never sent anywhere.",
@@ -265,14 +263,11 @@
       "includeHistory": "Include the sentence history",
       "save": "Save a backup",
       "restore": "Restore a backup",
-      "saved": "Saved {{file}}. It holds his calibration; keep it to yourself.",
-      "savedWithHistory": "Saved {{file}}. It holds his calibration and his sentences; keep it to yourself.",
       "confirmTitle": "Restore the backup from {{date}}?",
       "confirmMessage": "In the file: {{contents}}. It replaces this data on this device. {{history}}",
       "confirmAction": "Restore",
       "historyReplaced": "The sentence history on this device will be replaced.",
       "historyKept": "The file has no sentence history, so the history on this device stays.",
-      "restored": "Restored the backup from {{date}}.",
       "failed": "The data could not be saved in the browser’s storage, so nothing changed. Free some space or check the site settings in the browser.",
       "contents": {
         "settings": "the settings",
@@ -364,7 +359,6 @@
     "fromNeutral": "{{value}}° from his neutral",
     "blocked": "Blocked sending to: {{origins}}",
     "copy": "Copy the results",
-    "copied": "Results copied (no picture).",
     "signals": {
       "title": "Detected signals",
       "calibrated": "By his calibration.",
@@ -468,7 +462,6 @@
     "notLearnt": "Not learnt",
     "skipped": "Skipped",
     "nothingLearnt": "No movement was recognized. Check that his face is in view, and try again.",
-    "saved": "Calibration saved. Blinker uses it from now on.",
     "tryIt": "Check the signals in diagnostics",
     "back": "Back",
     "skip": "Skip this step",
@@ -482,5 +475,24 @@
       "overlap": "His strong and ordinary blinks look alike to the camera, so only long blinks count. Repeat the blink step with the lids squeezed harder."
     },
     "moves": "His last movements of the head (newest first), judged by the thresholds of this calibration:"
+  },
+  "toast": {
+    "undo": "Undo",
+    "boardImported": "Imported the board “{{name}}”.",
+    "boardReplaced": "Replaced the board “{{name}}” with the new file.",
+    "boardSelected": "Active board: {{name}}.",
+    "boardDeleted": "Deleted the board “{{name}}”.",
+    "boardRestored": "Restored the board “{{name}}”.",
+    "sentenceDeleted": "Deleted the sentence.",
+    "sentenceRestored": "Restored the sentence.",
+    "historyCleared": "Deleted the sentence history.",
+    "historyOff": "The sentence history is off and deleted.",
+    "historyOn": "The sentence history is on.",
+    "backupSaved": "Saved {{file}}. It holds his calibration; keep it to yourself.",
+    "backupSavedWithHistory": "Saved {{file}}. It holds his calibration and his sentences; keep it to yourself.",
+    "backupRestored": "Restored the backup from {{date}}.",
+    "dataDeleted": "All data was deleted from this device.",
+    "calibrationSaved": "Calibration saved. Blinker uses it from now on.",
+    "copied": "Copied the results (no image)."
   }
 }

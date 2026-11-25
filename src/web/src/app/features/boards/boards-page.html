@@ -145,11 +145,10 @@
   </button>
   <div id="board-file-result">
     @if (imported(); as done) {
-      <p class="success" role="status" data-testid="import-ok">
-        {{
-          (done.replaced ? 'boards.replaced' : 'boards.imported') | transloco: { name: done.name }
-        }}
-      </p>
+      <!-- The success itself is a toast (spec 018, R2); the hint stays on the page. -->
+      @if (!done.replaced) {
+        <p class="muted" data-testid="import-hint">{{ 'boards.importedHint' | transloco }}</p>
+      }
     }
     @if (errors().length) {
       <div

@@ -22,6 +22,7 @@ import { ProfileService } from '../../core/signals/profile.service';
 import { EYE_SHAPES, type EyeShape } from '../../core/vision/face-frame';
 import { FACE_WORKER, FaceTrackerService } from '../../core/vision/face-tracker.service';
 import { createFaceWorker } from '../../core/vision/face-worker';
+import { ToastService } from '../../shared/toast/toast';
 
 /** The part of the Battery Status API we read (Chromium only; not in TypeScript's DOM lib). */
 interface BatteryLike extends EventTarget {
@@ -44,6 +45,7 @@ const signWord = (direction: number): string => (direction < 0 ? '-1' : '+1');
   styleUrl: './diagnostics-page.css',
 })
 export class DiagnosticsPage {
+  private readonly toast = inject(ToastService);
   private readonly tracker = inject(FaceTrackerService);
   private readonly transloco = inject(TranslocoService);
   private readonly profiles = inject(ProfileService);
@@ -61,7 +63,6 @@ export class DiagnosticsPage {
   protected readonly blocked = this.tracker.blocked;
   protected readonly on = computed(() => ['starting', 'running'].includes(this.status()));
   protected readonly battery = signal<{ start: number; now: number } | null>(null);
-  protected readonly copied = signal(false);
   /** Whether his own calibration is used, or the defaults (spec 011, R3). */
   protected readonly calibrated = this.profiles.calibrated;
   /** The last signals the detector found, newest first (spec 011, R3). */
@@ -139,7 +140,6 @@ export class DiagnosticsPage {
 
   /** The counters, lists and detector begin again, so a copied result never mixes two runs. */
   private resetMeasurement(): void {
-    this.copied.set(false);
     this.detector = INITIAL_DETECTOR;
     this.detected.set([]);
     this.lastClosure.set(null);
@@ -200,9 +200,9 @@ export class DiagnosticsPage {
     ];
     try {
       await navigator.clipboard.writeText(lines.join('\n'));
-      this.copied.set(true);
+      this.toast.show('toast.copied');
     } catch {
-      this.copied.set(false);
+      // The clipboard refused (no permission): nothing to confirm.
     }
   }
 

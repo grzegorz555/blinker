@@ -27,6 +27,7 @@ import { ProfileService } from '../../core/signals/profile.service';
 import type { FaceFrame } from '../../core/vision/face-frame';
 import { FACE_WORKER, FaceTrackerService } from '../../core/vision/face-tracker.service';
 import { createFaceWorker } from '../../core/vision/face-worker';
+import { ToastService } from '../../shared/toast/toast';
 
 /** The wizard's pages: an intro, the camera, one page per calibration step, the result (spec 011, R4). */
 export const WIZARD = ['intro', 'camera', ...CALIBRATION_STEPS, 'result'] as const;
@@ -50,6 +51,7 @@ const isStep = (page: WizardPage): page is CalibrationStep =>
   styleUrl: './calibration-page.css',
 })
 export class CalibrationPage {
+  private readonly toast = inject(ToastService);
   private readonly tracker = inject(FaceTrackerService);
   private readonly profiles = inject(ProfileService);
   private readonly counting = inject(CountingService);
@@ -188,6 +190,7 @@ export class CalibrationPage {
 
   protected save(): void {
     this.saved.set(this.profiles.save(this.fit().profile));
+    if (this.saved()) this.toast.show('toast.calibrationSaved');
   }
 
   protected stepTitle(page: WizardPage): string {

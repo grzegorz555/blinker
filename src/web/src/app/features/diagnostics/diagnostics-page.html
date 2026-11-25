@@ -222,10 +222,5 @@
     <button matButton="tonal" type="button" (click)="copy()" [disabled]="!stats().frames">
       {{ 'diagnostics.copy' | transloco }}
     </button>
-    <p role="status" class="muted">
-      @if (copied()) {
-        {{ 'diagnostics.copied' | transloco }}
-      }
-    </p>
   </div>
 </section>
