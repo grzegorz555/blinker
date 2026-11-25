@@ -101,6 +101,34 @@ describe('HistoryService (spec 007, R11, R12)', () => {
     expect(service.entries()).toHaveLength(1);
   });
 
+  it('Cofnij (Undo) puts a deleted sentence back in its place, saved, once (spec 018, R6)', () => {
+    const stored = [entry('C', NOW - 1000), entry('B', NOW - 2000), entry('A', NOW - 3000)];
+    const { service, data } = setup(JSON.stringify(stored));
+    const middle = service.entries()[1]!;
+    service.remove(middle.id);
+    expect(service.entries().map((e) => e.text)).toEqual(['C', 'A']);
+
+    expect(service.restore(middle)).toBe(true);
+    expect(service.entries().map((e) => e.text)).toEqual(['C', 'B', 'A']);
+    expect(JSON.parse(data.get(HISTORY_KEY)!).map((e: HistoryEntry) => e.text)).toEqual([
+      'C',
+      'B',
+      'A',
+    ]);
+    expect(service.restore(middle)).toBe(false);
+    expect(service.entries()).toHaveLength(3);
+  });
+
+  it('Cofnij (Undo) keeps nothing while the history is off', () => {
+    const { service, data, settings } = setup(JSON.stringify([entry('A', NOW - 1000)]));
+    const a = service.entries()[0]!;
+    settings.update({ history: false });
+    TestBed.tick();
+    expect(service.restore(a)).toBe(false);
+    expect(service.entries()).toEqual([]);
+    expect(data.has(HISTORY_KEY)).toBe(false);
+  });
+
   it('deletes one, or all', () => {
     const { service, data, speak } = setup();
     speak('A');
