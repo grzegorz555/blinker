@@ -1,5 +1,11 @@
 # Log
 
+## 2026-11-25 (batch: live headers, Lighthouse retries, the chime in the checklist)
+- PR #58: the [security pass](security-review.md) records the live headers: ours arrive unchanged, and Azure adds `X-XSS-Protection: 1; mode=block` (deprecated, harmless with the CSP) and `X-DNS-Prefetch-Control: off`.
+- PR #59: `npm run lighthouse` gives each language one more try when a run fails (`scripts/retry.mjs`): on PR #56 Chrome lost a trace event (`NO_NAVSTART`). A real accessibility problem fails both tries.
+- This PR: the [first-session checklist](trial/first-session.md) asks about the chime before the row (does he hear it, does he start the row after it, is it pleasant).
+- The first log entries in a batch: task PRs no longer edit this file, because parallel PRs always conflicted at its top (PR #60 records the rule in [git](conventions/git.md)).
+
 ## 2026-11-25 (e2e for the chime before the row)
 - E2E for spec 012, R7: a fake `AudioContext` records the tones, so the test hears the C-E-G chime once after the pause takes the column, none after the row and none with "Dźwięk: teraz wiersz" (Sound: now the row) off. The full local run passed after a rerun of six unrelated tests that timed out under load.
 
