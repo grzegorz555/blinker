@@ -3,7 +3,7 @@ type: Spec
 title: "017: A backup of his data in a file - save and restore in Ustawienia (Settings)"
 description: Before the first session with him, his calibration must survive a new phone, a cleared browser or a new address. Ustawienia (Settings) saves everything Blinker keeps (the sentence history only when asked) to one .json file, and restores such a file after a confirmation, validated like an imported board.
 tags: [settings, storage, privacy, security]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-25

@@ -1,5 +1,12 @@
 # Log
 
+## 2026-11-25 (batch: the log and the index without conflicts; spec 017, a backup in a file; spec 018 approved)
+- PR #60: task PRs leave this log alone; entries come in batch `docs(log)` PRs ([git](conventions/git.md), "The log in batches").
+- PR #61: spec [017](specs/017-backup/spec.md), approved by the author: the sentence history in a backup only when asked, a restore replaces the data and keeps the history when the file has none.
+- PR #63: spec 017 done. Ustawienia (Settings) → "Kopia w pliku" (Backup file) saves his data to a `.json` file and restores it all or nothing; the file is checked like untrusted input (size, strict UTF-8, no prototype key at any depth, each part through its store's validator), and a refused write puts the old values back.
+- PR #64: spec [018](specs/018-toasts/spec.md), approved by the author: a toast confirms each operation outside Liczenie (Counting), errors stay as text, Cofnij (Undo) after deleting one sentence or one board.
+- This PR: [specs index](specs/index.md) lines hold no state any more; the state of a spec lives in its `spec.md` and `tasks.md` ([git](conventions/git.md), "Shared lists"), because marking 017 done conflicted with the new line of 018.
+
 ## 2026-11-25 (batch: live headers, Lighthouse retries, the chime in the checklist)
 - PR #58: the [security pass](security-review.md) records the live headers: ours arrive unchanged, and Azure adds `X-XSS-Protection: 1; mode=block` (deprecated, harmless with the CSP) and `X-DNS-Prefetch-Control: off`.
 - PR #59: `npm run lighthouse` gives each language one more try when a run fails (`scripts/retry.mjs`): on PR #56 Chrome lost a trace event (`NO_NAVSTART`). A real accessibility problem fails both tries.
