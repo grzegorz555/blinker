@@ -8,8 +8,22 @@
 // - Below 600 px it sits above the navigation bar, and above the focused control when that is near the bottom
 //   (SC 2.4.11), through the CSS variable --toast-offset (styles.css).
 // - Material turns its animations off by itself with prefers-reduced-motion.
+// - The time left is a ring around the toast that shrinks to nothing as the toast goes; while the toast is held the
+//   ring stops, grows thicker and a pause mark shows (spec 018, R3). Both are decorative (aria-hidden): the live
+//   region must not change while the toast is shown, or it would be announced again. The ring moves in steps of
+//   250 ms smoothed by a transition, and once a second without one with prefers-reduced-motion.
 import { DOCUMENT } from '@angular/common';
-import { Component, DestroyRef, Injectable, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  Injectable,
+  effect,
+  inject,
+  signal,
+  untracked,
+  type Signal,
+  type WritableSignal,
+} from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import {
   MAT_SNACK_BAR_DATA,
@@ -37,6 +51,10 @@ export interface ToastData {
   act(): void;
   hold(holder: Holder, on: boolean): void;
   close(): void;
+  /** The share of the time still left, 1 when shown, 0 when it goes. */
+  left(): number;
+  /** True while the pointer or the focus holds the toast: the time stands still. */
+  readonly held: Signal<boolean>;
 }
 
 /** A Transloco key and its parameters. */
@@ -50,6 +68,23 @@ export interface ToastAction {
   selector: 'app-toast',
   imports: [MatButton, MatSnackBarAction, MatSnackBarActions, MatSnackBarLabel],
   template: `
+    <svg class="toast-ring" aria-hidden="true" focusable="false" data-testid="toast-ring">
+      <rect
+        x="1.5"
+        y="1.5"
+        rx="4"
+        pathLength="100"
+        stroke-dasharray="100 100"
+        [attr.stroke-dashoffset]="100 - left() * 100"
+        [class.held]="data.held()"
+      />
+    </svg>
+    @if (data.held()) {
+      <svg class="toast-paused" aria-hidden="true" viewBox="0 0 24 24" data-testid="toast-paused">
+        <rect x="6" y="5" width="4" height="14" rx="1" />
+        <rect x="14" y="5" width="4" height="14" rx="1" />
+      </svg>
+    }
     <span matSnackBarLabel data-testid="toast-text">{{ data.text }}</span>
     @if (data.action) {
       <div matSnackBarActions>
@@ -75,6 +110,38 @@ export interface ToastAction {
     .toast-action {
       min-height: 2.75rem;
     }
+    /* The ring follows the edge of the snack bar surface (position: relative in styles.css). */
+    .toast-ring {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+    .toast-ring rect {
+      width: calc(100% - 3px);
+      height: calc(100% - 3px);
+      fill: none;
+      stroke: var(--inverse-primary);
+      stroke-width: 3;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 250ms linear;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .toast-ring rect {
+        transition: none;
+      }
+    }
+    .toast-ring rect.held {
+      stroke-width: 5;
+    }
+    .toast-paused {
+      flex: none;
+      width: 1.25rem;
+      height: 1.25rem;
+      fill: var(--inverse-primary);
+    }
   `,
   host: {
     '(pointerenter)': 'data.hold("pointer", true)',
@@ -86,11 +153,36 @@ export interface ToastAction {
 })
 export class Toast {
   protected readonly data = inject<ToastData>(MAT_SNACK_BAR_DATA);
+  protected readonly left = signal(1);
+
+  constructor() {
+    const view = inject(DOCUMENT).defaultView;
+    const reduced = view?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    // A step every 250 ms, smoothed by a CSS transition of the same length; once a second with reduced motion. While
+    // the toast is held nothing runs: the ring stands still, and a slow phone spends nothing on it.
+    const step = reduced ? 1000 : 250;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const tick = () => {
+      this.left.set(this.data.left());
+      timer = setTimeout(tick, step);
+    };
+    effect(() => {
+      const held = this.data.held();
+      clearTimeout(timer);
+      untracked(() => {
+        this.left.set(this.data.left());
+        if (!held) timer = setTimeout(tick, step);
+      });
+    });
+    inject(DestroyRef).onDestroy(() => clearTimeout(timer));
+  }
 }
 
 interface Shown {
   readonly ref: MatSnackBarRef<Toast>;
   readonly hasAction: boolean;
+  readonly total: number;
+  readonly held: WritableSignal<boolean>;
   remaining: number;
   startedAt: number;
   timer: ReturnType<typeof setTimeout> | null;
@@ -119,17 +211,28 @@ export class ToastService {
   show(key: string, params?: Record<string, unknown>, action?: ToastAction): void {
     this.dismiss();
     let acted = false;
+    const total = action ? TOAST_MS.action : TOAST_MS.plain;
+    const held = signal(false);
+    // Assigned below; the toast reads left() already while it is being created.
+    const created: { ref?: MatSnackBarRef<Toast> } = {};
     const data: ToastData = {
       text: this.transloco.translate(key, params ?? {}),
       action: action ? this.transloco.translate(action.label) : null,
       act: () => {
-        if (acted || this.shown?.ref !== ref) return;
+        if (acted || this.shown?.ref !== created.ref) return;
         acted = true;
         this.dismiss();
         action?.run();
       },
       hold: (holder, on) => this.hold(holder, on),
       close: () => this.dismiss(),
+      left: () => {
+        if (!created.ref) return 1;
+        if (this.shown?.ref !== created.ref) return 0;
+        const running = this.shown.timer ? Date.now() - this.shown.startedAt : 0;
+        return Math.max(0, Math.min(1, (this.shown.remaining - running) / total));
+      },
+      held: held.asReadonly(),
     };
     this.placeAboveNavigation();
     const ref = this.snackBar.openFromComponent(Toast, {
@@ -139,10 +242,13 @@ export class ToastService {
       horizontalPosition: 'center',
       verticalPosition: 'bottom',
     });
+    created.ref = ref;
     const shown: Shown = {
       ref,
       hasAction: !!action,
-      remaining: action ? TOAST_MS.action : TOAST_MS.plain,
+      total,
+      held,
+      remaining: total,
       startedAt: Date.now(),
       timer: null,
       holders: new Set(),
@@ -178,6 +284,7 @@ export class ToastService {
     const held = shown.holders.size > 0;
     if (on) shown.holders.add(holder);
     else shown.holders.delete(holder);
+    shown.held.set(shown.holders.size > 0);
     if (!held && shown.holders.size > 0 && shown.timer) {
       clearTimeout(shown.timer);
       shown.timer = null;

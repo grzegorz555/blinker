@@ -108,6 +108,38 @@ test.describe('Toasts (spec 018)', () => {
     await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);
   });
 
+  test('a ring shows the time left; held by the pointer it stops and a pause mark shows (R3)', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await importBoard(page);
+    await page.getByRole('button', { name: /Usuń tablicę.*Tak i nie/ }).click();
+    await page.getByRole('alertdialog').getByRole('button', { name: 'Usuń', exact: true }).click();
+    await expect(toast(page)).toHaveText('Usunięto tablicę „Tak i nie”.');
+    const ring = page.locator(
+      '.mat-mdc-snack-bar-container:not([mat-exit]) [data-testid="toast-ring"] rect',
+    );
+    const offset = async () => Number(await ring.getAttribute('stroke-dashoffset'));
+    await expect(ring).toBeVisible();
+
+    await page.clock.runFor(5_000);
+    await expect.poll(offset).toBeGreaterThan(40);
+    expect(await offset()).toBeLessThan(60);
+
+    await toast(page).hover();
+    await expect(page.getByTestId('toast-paused')).toBeVisible();
+    const stopped = await offset();
+    await page.clock.runFor(30_000);
+    expect(await offset()).toBe(stopped);
+    await expect(toast(page)).toBeVisible();
+    await expectNoA11yViolations(page);
+
+    await page.mouse.move(0, 0);
+    await expect(page.getByTestId('toast-paused')).toHaveCount(0);
+    await page.clock.runFor(1_000);
+    await expect.poll(offset).toBeGreaterThan(stopped);
+  });
+
   test('a toast without an action goes after 6 s; Esc with the focus on Cofnij (Undo) closes it without undoing', async ({
     page,
   }) => {
