@@ -2,6 +2,7 @@
 // and deleting an imported board after a confirmation.
 import fs from 'node:fs';
 import { expect, test, type Page } from './support/test';
+import { toast } from './support/toast';
 import { expectNoA11yViolations } from './support/a11y';
 
 test.use({ locale: 'pl-PL' });
@@ -58,15 +59,16 @@ test.describe('Tablice (Boards)', () => {
     expect(file.suggestedFilename()).toBe('przyklad-tablicy.json');
     const text = fs.readFileSync((await file.path())!, 'utf8');
     await choose(page, 'przyklad-tablicy.json', text);
-    await expect(page.getByTestId('import-ok')).toContainText('„Przykład”');
+    await expect(toast(page)).toContainText('„Przykład”');
   });
 
   test('imports a valid board, which survives a reload and becomes the board on Liczenie (Counting)', async ({
     page,
   }) => {
     await choose(page, 'tak-nie.json', JSON.stringify(yesNo));
-    await expect(page.getByTestId('import-ok')).toHaveText(
-      'Zaimportowano tablicę „Tak i nie”. Wybierz ją powyżej, żeby jej używać.',
+    await expect(toast(page)).toHaveText('Zaimportowano tablicę „Tak i nie”.');
+    await expect(page.getByTestId('import-hint')).toHaveText(
+      'Wybierz ją powyżej, żeby jej używać.',
     );
     await page.getByRole('radio', { name: /Tak i nie/ }).check();
     await expect(page.getByRole('heading', { level: 2, name: 'Podgląd: Tak i nie' })).toBeVisible();

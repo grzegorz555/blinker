@@ -2,6 +2,7 @@
 // checks the Material controls (form field, slide toggles, select overlay, radio group) under the production CSP and
 // Trusted Types, as the T1 spike did.
 import { expect, test, type Page } from './support/test';
+import { toast } from './support/toast';
 import { expectNoA11yViolations } from './support/a11y';
 import { collectThirdPartyRequests } from './support/requests';
 import { fakeSpeech, spoken } from './support/speech';
@@ -265,9 +266,8 @@ test.describe('Dane na tym urządzeniu (Data on this device)', () => {
     // Usuń (Delete): the status in text, the running app back at its defaults without a reload, no blinker. key.
     await deleteAll(page).click();
     await dialog.getByRole('button', { name: 'Usuń', exact: true }).click();
-    await expect(page.getByTestId('delete-all-status')).toHaveText(
-      'Usunięto wszystkie dane z tego urządzenia.',
-    );
+    await expect(toast(page)).toHaveText('Usunięto wszystkie dane z tego urządzenia.');
+    await expect(page.getByTestId('delete-all-status')).toHaveText('');
     await expect(pauseField(page)).toHaveValue('1200');
     expect(await blinkerKeys(page)).toEqual([]);
     await expectNoA11yViolations(page);
