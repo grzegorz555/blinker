@@ -54,6 +54,43 @@
   </ul>
 </section>
 
+<!-- Ulubione zwroty (Favorite phrases), spec 019, R1: off by default; the list itself is in Zdania (Sentences). -->
+<section class="group" aria-labelledby="settings-phrases">
+  <h2 id="settings-phrases" class="group-title">{{ 'settings.phrases.title' | transloco }}</h2>
+  <ul class="toggles">
+    <li>
+      <mat-slide-toggle
+        [checked]="settings().suggestPhrases"
+        (change)="set('suggestPhrases', $event.checked)"
+        data-testid="toggle-suggestPhrases"
+      >
+        <span class="toggle-label">{{ 'settings.phrases.suggestPhrases' | transloco }}</span>
+        <span class="toggle-hint">{{ 'settings.phrases.suggestPhrasesHint' | transloco }}</span>
+      </mat-slide-toggle>
+    </li>
+  </ul>
+  @if (settings().suggestPhrases) {
+    <mat-form-field class="field" subscriptSizing="dynamic">
+      <mat-label>{{ 'settings.phrases.pause' | transloco }}</mat-label>
+      <input
+        matInput
+        type="number"
+        inputmode="numeric"
+        [min]="pauseLimits.min"
+        [max]="pauseLimits.max"
+        step="500"
+        [formControl]="phrasePause"
+        data-testid="phrase-pause"
+      />
+      <span matTextSuffix>ms</span>
+      <mat-hint>{{ 'settings.phrases.pauseHint' | transloco: pauseLimits }}</mat-hint>
+      @if (phrasePause.invalid) {
+        <mat-error>{{ 'settings.phrases.pauseError' | transloco: pauseLimits }}</mat-error>
+      }
+    </mat-form-field>
+  }
+</section>
+
 <!-- Kamera (Camera), spec 012 -->
 <section class="group" aria-labelledby="settings-camera">
   <h2 id="settings-camera" class="group-title">{{ 'settings.camera.title' | transloco }}</h2>

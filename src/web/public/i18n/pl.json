@@ -68,7 +68,8 @@
       },
       "space": "Spacja",
       "hintColumn": "Kiwnij bez liczby = spacja (koniec słowa) · Pokręć głową = cofnij literę",
-      "hintPause": "Przerwa = dalej · Pokręć głową = od nowa"
+      "hintPause": "Przerwa = dalej · Pokręć głową = od nowa",
+      "phrase": "Zwrot:"
     },
     "signals": {
       "title": "Jego sygnały",
@@ -105,7 +106,10 @@
         "model": "Błąd modelu",
         "failed": "Błąd kamery"
       }
-    }
+    },
+    "askPhrase": "{{phrase}}?",
+    "phraseRefused": "Nie ten zwrot. Pisz dalej.",
+    "undonePhrase": "Cofnięto zwrot"
   },
   "common": {
     "cancel": "Anuluj"
@@ -137,6 +141,32 @@
     "problem": {
       "corrupted": "Nie udało się odczytać zapisanych zdań, więc historia zaczyna się od nowa.",
       "unavailable": "Ta przeglądarka nie pozwala Blinkerowi zapisywać na urządzeniu, więc zdania są tylko do zamknięcia strony."
+    },
+    "phrases": {
+      "title": "Ulubione zwroty",
+      "intro": "Jego częste zwroty, najwyżej {{count}}. Gdy litery od początku zdania pasują do jednego z nich, Blinker pyta o niego na głos, a skinienie go bierze.",
+      "on": "Podpowiadanie jest włączone.",
+      "off": "Podpowiadanie jest wyłączone: włącz je w Ustawieniach.",
+      "empty": "Lista jest pusta. Wpisz zwrot albo dodaj zdanie z historii gwiazdką.",
+      "full": "Lista jest pełna ({{count}} zwrotów). Usuń jakiś zwrot, aby dodać nowy.",
+      "new": "Nowy zwrot",
+      "add": "Dodaj zwrot",
+      "up": "W górę: {{phrase}}",
+      "down": "W dół: {{phrase}}",
+      "delete": "Usuń zwrot: {{phrase}}",
+      "star": "Dodaj do ulubionych: {{text}}",
+      "starred": "W ulubionych: {{text}}",
+      "error": {
+        "too-short": "Błąd: zwrot musi mieć co najmniej 2 znaki.",
+        "too-long": "Błąd: zwrot może mieć najwyżej 60 znaków.",
+        "characters": "Błąd: użyj tylko liter, cyfr, spacji i znaków . , ! ? - '",
+        "duplicate": "Błąd: ten zwrot już jest na liście.",
+        "full": "Błąd: lista jest pełna (20 zwrotów)."
+      },
+      "problem": {
+        "corrupted": "Nie udało się odczytać zapisanych zwrotów, więc lista zaczyna się od nowa.",
+        "unavailable": "Ta przeglądarka nie pozwala Blinkerowi zapisywać na urządzeniu, więc zwroty są tylko do zamknięcia strony."
+      }
     }
   },
   "boards": {
@@ -276,7 +306,8 @@
         "noProfile": "bez kalibracji",
         "language": "język",
         "history": "zdania: {{n}}",
-        "empty": "nic (pusta kopia)"
+        "empty": "nic (pusta kopia)",
+        "phrases": "zwroty: {{n}}"
       },
       "part": {
         "settings": "Ustawienia",
@@ -284,7 +315,8 @@
         "activeBoard": "Wybrana tablica",
         "profile": "Kalibracja",
         "language": "Język",
-        "history": "Historia zdań"
+        "history": "Historia zdań",
+        "phrases": "Ulubione zwroty"
       },
       "error": {
         "not-json-file": "To nie jest plik kopii: wybierz plik z rozszerzeniem .json.",
@@ -303,6 +335,14 @@
         "duplicate-board": "W pliku ta sama tablica występuje dwa razy.",
         "missing-board": "Wybranej tablicy nie ma w pliku."
       }
+    },
+    "phrases": {
+      "title": "Ulubione zwroty",
+      "suggestPhrases": "Podpowiadaj ulubione zwroty",
+      "suggestPhrasesHint": "Gdy litery od początku zdania pasują do jednego zwrotu, Blinker pyta o niego na głos. Listę zwrotów prowadzisz w Zdaniach.",
+      "pause": "Pauza przed podpowiedzią",
+      "pauseHint": "Od {{min}} do {{max}} ms bez sygnału po ostatniej literze.",
+      "pauseError": "Błąd: wpisz liczbę całkowitą od {{min}} do {{max}} ms."
     }
   },
   "diagnostics": {
@@ -493,6 +533,9 @@
     "backupRestored": "Wczytano kopię z {{date}}.",
     "dataDeleted": "Usunięto wszystkie dane z tego urządzenia.",
     "calibrationSaved": "Zapisano kalibrację. Blinker używa jej od teraz.",
-    "copied": "Skopiowano wyniki (bez obrazu)."
+    "copied": "Skopiowano wyniki (bez obrazu).",
+    "phraseAdded": "Dodano ulubiony zwrot.",
+    "phraseDeleted": "Usunięto zwrot.",
+    "phraseRestored": "Przywrócono zwrot."
   }
 }

@@ -3,7 +3,7 @@ type: Spec
 title: "019: Favorite phrases - Blinker recognizes a phrase from its first letters and asks"
 description: A caregiver keeps a short list of his frequent phrases. When the letters he has spelled from the start of a sentence fit exactly one of them, Blinker shows the phrase and asks it aloud after a pause ("Zmień pozycję?" (Change my position?)); a nod takes the whole phrase, a shake refuses it, a blink goes on. Off by default, an empty list.
 tags: [interaction, counting, prediction, privacy]
-status: draft
+status: stable
 generated:
   by: agent:claude-opus-5-5
   at: 2026-11-26
@@ -60,7 +60,8 @@ and his nod.
   Polish board a plain letter of his text also stands for its Polish letter, and a Polish letter he spelled matches
   only itself (the table of spec 016, R4, one shared constant). An offer is made only when **exactly one** phrase
   matches and that phrase is at least 2 letters longer than his text (it must save signals); with two or more matches
-  he goes on spelling until one is left. The same text and list always give the same result.
+  he goes on spelling until one is left. A phrase as short as his text still counts as a match: "PI" fits "Pić" and
+  "Pić herbatę", so nothing is offered until "PIĆ " (with the space). The same text and list always give the same result.
 - **R4. The offer, when he pauses.** With the switch on, while Blinker waits for a column (`column.waiting` or
   `column.rejected`) and R3 gives a phrase, and no signal came for "Pauza przed podpowiedzią" (Pause before a
   suggestion) after the last letter, Blinker offers it: the state is `phrase.asking`, the phrase is shown as the
@@ -123,24 +124,24 @@ and his nod.
 
 # Acceptance criteria
 
-- [ ] With the switch off (the default) Liczenie (Counting) behaves exactly as before: no offer, no row.
-- [ ] Unit (matcher): with "Pić", "Pić herbatę" and "Zmień pozycję": "ZM" gives "Zmień pozycję"; "PI" gives nothing
+- [x] With the switch off (the default) Liczenie (Counting) behaves exactly as before: no offer, no row.
+- [x] Unit (matcher): with "Pić", "Pić herbatę" and "Zmień pozycję": "ZM" gives "Zmień pozycję"; "PI" gives nothing
       (two match); "PIC H" gives "Pić herbatę" (a plain C for Ć); "Z" gives nothing (one letter); "ZMIEŃ POZYCJ" gives
       nothing (not 2 letters shorter); the same call twice gives the same result; an English board does not use the
       Polish table.
-- [ ] Unit (machine): after 2 letters and the pause, `phrase.asking` with a `say` of the phrase; `NOD` replaces the
+- [x] Unit (machine): after 2 letters and the pause, `phrase.asking` with a `say` of the phrase; `NOD` replaces the
       text and asks "Przeczytać na głos?" (Read it aloud?); `SHAKE` keeps the text and a second `SHAKE` changes
       nothing; `BLINK` counts 1 for the column; no second offer without a new letter; a refused phrase is not offered
       again until the sentence is cleared; one shake at the columns after a taken phrase brings back his letters;
       every state × signal pair is in the table.
-- [ ] Unit (list): add, refuse a duplicate, a phrase too long or with a forbidden character, at most 20; delete with
+- [x] Unit (list): add, refuse a duplicate, a phrase too long or with a forbidden character, at most 20; delete with
       Cofnij (Undo); move up and down; the star in the history; a bad store is ignored; the backup round trip and a
       file without phrases; "Usuń wszystkie dane" (Delete all data) leaves no `blinker.phrases.v1`.
-- [ ] e2e (3 device projects, with the signal buttons): the switch on, "Zmień pozycję" on the list; spell "ZM"; after
+- [x] e2e (3 device projects, with the signal buttons): the switch on, "Zmień pozycję" on the list; spell "ZM"; after
       the pause the question and the button show the phrase; "Tak" (Yes) puts it in the sentence and asks to read it;
       a tap on the button takes it; "Nie" (No) keeps "ZM"; axe on Liczenie (Counting) with an offer and on Zdania
       (Sentences) with the list.
-- [ ] `npm run verify -- --lighthouse` passes.
+- [x] `npm run verify -- --lighthouse` passes.
 
 # Test plan
 

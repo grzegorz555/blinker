@@ -7,6 +7,8 @@ import { ACTIVE_BOARD_KEY, BOARDS_KEY, BoardsService } from '../boards/boards.se
 import { CountingService, SPEAKER, TICK_SCHEDULER } from '../counting/counting.service';
 import { HISTORY_KEY } from '../history/history';
 import { CLOCK, HistoryService } from '../history/history.service';
+import { PHRASES_KEY } from '../phrases/phrases';
+import { PhrasesService } from '../phrases/phrases.service';
 import { LanguageService } from '../i18n/language.service';
 import { LANGUAGE_STORAGE_KEY } from '../i18n/languages';
 import { DEFAULT_SETTINGS } from '../settings/settings';
@@ -74,6 +76,7 @@ describe('BackupService (spec 017)', () => {
       history: TestBed.inject(HistoryService),
       profile: TestBed.inject(ProfileService),
       language: TestBed.inject(LanguageService),
+      phrases: TestBed.inject(PhrasesService),
     };
     TestBed.tick();
     return s;
@@ -219,6 +222,31 @@ describe('BackupService (spec 017)', () => {
       expect(await restoreText(s, saved.text)).toBe('restored');
       expect(s.storage.data.get(HISTORY_KEY)).toBe(before);
       expect(s.history.entries()).toHaveLength(1);
+    });
+
+    it('the favorite phrases go into the file and come back (spec 019, R9)', async () => {
+      const s = setup();
+      await fill(s);
+      s.phrases.add('Zmień pozycję');
+      s.phrases.add('Pić');
+      const saved = s.backup.save(false);
+      expect(JSON.parse(saved.text).data.phrases).toEqual(['Zmień pozycję', 'Pić']);
+      s.erase.eraseAll();
+      TestBed.tick();
+      expect(await restoreText(s, saved.text)).toBe('restored');
+      expect(s.phrases.phrases()).toEqual(['Zmień pozycję', 'Pić']);
+    });
+
+    it('a file without phrases (from before spec 019) keeps the phrases of this device', async () => {
+      const s = setup();
+      await fill(s);
+      const saved = s.backup.save(false); // no phrases yet: none in the file
+      expect(JSON.parse(saved.text).data.phrases).toBeUndefined();
+      s.phrases.add('Pić');
+      const before = s.storage.data.get(PHRASES_KEY);
+      expect(await restoreText(s, saved.text)).toBe('restored');
+      expect(s.storage.data.get(PHRASES_KEY)).toBe(before);
+      expect(s.phrases.phrases()).toEqual(['Pić']);
     });
 
     it('a file with a history replaces it', async () => {

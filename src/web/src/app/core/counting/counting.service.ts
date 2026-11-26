@@ -13,6 +13,7 @@ import { RATE, type SpeakResult, type Speaker } from '../speech/speaker';
 import { createWebSpeaker } from '../speech/web-speaker';
 import {
   ASK_AFTER,
+  SUGGEST_PAUSE,
   initialState,
   next,
   pointer,
@@ -75,6 +76,8 @@ export class CountingService {
     speakPrompts: false,
     confirmByNod: false,
     rowCue: true,
+    phrases: [],
+    phrasePauseMs: SUGGEST_PAUSE.default,
   });
 
   /** The machine state (spec 007 renders it). */
@@ -174,13 +177,21 @@ export class CountingService {
     this.speakResult.set(this.speaker.say(text, { lang, rate: this.rate() }));
   }
 
-  /** Changes the settings (the pause before the question within 500–5000 ms, SC 2.2.1; speaking the questions). */
+  /**
+   * Changes the settings (the pause before the question within 500–5000 ms and before a suggestion within 1–10 s,
+   * SC 2.2.1; speaking the questions; the favorite phrases).
+   */
   configure(patch: Partial<Omit<CountingConfig, 'board'>>): void {
-    const askAfterMs =
-      patch.askAfterMs === undefined
-        ? undefined
-        : Math.min(ASK_AFTER.max, Math.max(ASK_AFTER.min, patch.askAfterMs));
-    this.settings.update((c) => ({ ...c, ...patch, ...(askAfterMs ? { askAfterMs } : {}) }));
+    const clamp = (v: number | undefined, range: { min: number; max: number }) =>
+      v === undefined ? undefined : Math.min(range.max, Math.max(range.min, v));
+    const askAfterMs = clamp(patch.askAfterMs, ASK_AFTER);
+    const phrasePauseMs = clamp(patch.phrasePauseMs, SUGGEST_PAUSE);
+    this.settings.update((c) => ({
+      ...c,
+      ...patch,
+      ...(askAfterMs ? { askAfterMs } : {}),
+      ...(phrasePauseMs ? { phrasePauseMs } : {}),
+    }));
   }
 
   private apply(signal: Parameters<typeof next>[1]): void {
@@ -201,10 +212,12 @@ export class CountingService {
         return;
       case 'say':
         this.reading = false; // a short text replaces the reading
-        // A question or a short notice, in the UI language.
+        // A question or a short notice, in the UI language; a favorite phrase in the board's (spec 019, R4).
         this.speakResult.set(
           this.speaker.say(this.text(effect.message), {
-            lang: this.transloco.getActiveLang(),
+            lang: effect.inBoardLanguage
+              ? this.settings().board.locale
+              : this.transloco.getActiveLang(),
             rate: this.rate(),
           }),
         );

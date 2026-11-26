@@ -10,6 +10,7 @@ import {
   COUNTING_KEYS,
   SIGNAL_TYPES,
   STATE_NAMES,
+  SUGGEST_PAUSE,
   TRANSITIONS,
   initialState,
   next,
@@ -34,6 +35,8 @@ const config: CountingConfig = {
   speakPrompts: true,
   confirmByNod: true,
   rowCue: false,
+  phrases: [],
+  phrasePauseMs: SUGGEST_PAUSE.default,
 };
 
 /** TOUCH in the table: a tap on the first cell of his board, "A" (spec 007, R3). */
@@ -59,6 +62,8 @@ function fixture(name: StateName): CountingState {
       return { ...base, column: 7, parts: [1, 1, 1], lastCountAt: 0 };
     case 'paused':
       return { ...base, resume: 'column.waiting' };
+    case 'phrase.asking':
+      return { ...base, offer: 'Abc def', offeredFor: 'AB' };
     default:
       return base;
   }
@@ -73,6 +78,7 @@ const TABLE: Record<StateName, readonly (readonly [StateName, readonly Effect['t
   'column.counting': [['column.counting', []], ['column.counting', []], ['column.counting', []], ['column.rejected', [A, S]], ['column.counting', []], ['paused', [A]], ['column.counting', []], ['column.waiting', [A, S]], ['column.counting', []]],
   'column.asking':   [['column.counting', []], ['column.counting', []], ['row.waiting', [A]], ['column.rejected', [A, S]], ['column.asking', []], ['paused', [A]], ['column.asking', []], ['column.waiting', [A, S]], ['column.asking', []]],
   'column.rejected': [['column.counting', []], ['column.counting', []], ['column.waiting', [A, S]], ['column.rejected', []], ['speak.asking', ['ask', S]], ['paused', [A]], ['column.rejected', []], ['column.waiting', [A, S]], ['column.rejected', []]],
+  'phrase.asking':   [['column.counting', []], ['column.counting', []], ['speak.asking', ['ask', S]], ['column.rejected', [A, S]], ['speak.asking', ['ask', S]], ['paused', [A]], ['phrase.asking', []], ['column.waiting', [A, S]], ['phrase.asking', []]],
   'row.waiting':     [['row.counting', []], ['row.counting', []], ['row.waiting', []], ['column.waiting', [A]], ['speak.asking', ['ask', S]], ['paused', [A]], ['row.waiting', []], ['column.waiting', [A, S]], ['row.waiting', []]],
   'row.counting':    [['row.counting', []], ['row.counting', []], ['row.counting', []], ['row.rejected', [A, S]], ['row.counting', []], ['paused', [A]], ['row.counting', []], ['column.waiting', [A, S]], ['row.counting', []]],
   'row.asking':      [['row.counting', []], ['row.counting', []], ['column.waiting', [A, S]], ['row.rejected', [A, S]], ['row.asking', []], ['paused', [A]], ['row.asking', []], ['column.waiting', [A, S]], ['row.asking', []]],
@@ -89,18 +95,19 @@ const TEXT_CHANGES = new Set([
   'column.waiting SHAKE', // undo
   'column.rejected NOD', // a space
   'row.asking NOD', // the letter W
+  'phrase.asking NOD', // the phrase replaces his text (spec 019, R6)
   'clear.asking NOD', // a new sentence: cleared (spec 008, R3)
   // a tap on "A" adds it in every state but the pause (spec 007, R3)
   ...STATE_NAMES.filter((name) => name !== 'paused').map((name) => `${name} TOUCH`),
 ]);
 
 describe('the transition table (R4)', () => {
-  it('has an entry for every state and every signal: 12 × 9 = 108', () => {
+  it('has an entry for every state and every signal: 13 × 9 = 117', () => {
     expect(Object.keys(TRANSITIONS).sort()).toEqual([...STATE_NAMES].sort());
     for (const name of STATE_NAMES) {
       expect(Object.keys(TRANSITIONS[name]).sort(), name).toEqual([...SIGNAL_TYPES].sort());
     }
-    expect(STATE_NAMES.length * SIGNAL_TYPES.length).toBe(108);
+    expect(STATE_NAMES.length * SIGNAL_TYPES.length).toBe(117);
   });
 
   for (const name of STATE_NAMES) {
@@ -569,5 +576,112 @@ describe('the letter by ear: the defaults (spec 009)', () => {
     expect(state.name).toBe('column.rejected');
     expect(texts(effects, 'announce')).toEqual([{ key: 'counting.noColumn', params: { n: 10 } }]);
     expect(texts(effects, 'say')).toEqual([]);
+  });
+});
+
+describe('favorite phrases (spec 019)', () => {
+  const phrases = ['Pić', 'Pić herbatę', 'Zmień pozycję'];
+  const on: CountingConfig = { ...config, phrases, phrasePauseMs: 2500 };
+  const typed = (text: string) => initialState(append(createSentence(), text));
+  /** TICKs from `from` to `to` in steps of 100 ms, as the service sends them. */
+  const ticks = (from: number, to: number) => {
+    const out: Signal[] = [];
+    for (let t = from; t <= to; t += 100) out.push(T(t));
+    return out;
+  };
+  const say = (effects: Effect[]) => effects.filter((e) => e.type === 'say');
+
+  it('offers the one phrase after the pause, asked aloud in the board language whatever speakPrompts is (R3, R4)', () => {
+    const before = run(ticks(0, 2400), typed('ZM'), { ...on, speakPrompts: false }).state;
+    expect(before.name).toBe('column.waiting'); // not yet
+    const { state, effects } = run(ticks(2500, 2600), before, { ...on, speakPrompts: false });
+    expect(state.name).toBe('phrase.asking');
+    expect(state.offer).toBe('Zmień pozycję');
+    expect(prompt(state)).toEqual({
+      key: 'counting.askPhrase',
+      params: { phrase: 'Zmień pozycję' },
+    });
+    expect(say(effects)).toEqual([
+      {
+        type: 'say',
+        message: { key: 'counting.askPhrase', params: { phrase: 'Zmień pozycję' } },
+        inBoardLanguage: true,
+      },
+    ]);
+    // The offer waits for his answer: no more effects with time.
+    expect(run(ticks(2700, 60_000), state, on).effects).toEqual([]);
+  });
+
+  it('nothing with the switch off, one letter, or two phrases that fit (R1, R3)', () => {
+    expect(run(ticks(0, 10_000), typed('ZM')).state.name).toBe('column.waiting');
+    expect(run(ticks(0, 10_000), typed('Z'), on).state.name).toBe('column.waiting');
+    expect(run(ticks(0, 10_000), typed('PI'), on).state.name).toBe('column.waiting');
+    // "PIC H": a plain C stands for Ć; one phrase is left.
+    expect(run(ticks(0, 3000), typed('PIC H'), on).state.offer).toBe('Pić herbatę');
+  });
+
+  it('any signal restarts the pause (R4)', () => {
+    let { state } = run(ticks(0, 2000), typed('ZM'), on);
+    ({ state } = run([B, T(2100), X, ...ticks(2200, 4600)], state, on)); // a blink, then no: back at the columns
+    expect(state.name).toBe('column.rejected');
+    ({ state } = run(ticks(4700, 4800), state, on));
+    expect(state.name).toBe('phrase.asking');
+  });
+
+  it('a nod takes the phrase in upper case as one step and asks to read it; nothing is read yet (R6)', () => {
+    const asked = run(ticks(0, 2600), typed('ZM'), on).state;
+    const { state, effects } = run([N], asked, on);
+    expect(state.sentence.text).toBe('ZMIEŃ POZYCJĘ');
+    expect(state.name).toBe('speak.asking');
+    expect(effects.some((e) => e.type === 'speak')).toBe(false);
+    // A shake at "Przeczytać na głos?" (Read it aloud?) goes back to the columns with the phrase; one more brings ZM back.
+    const back = run([X], state, on).state;
+    expect(back.sentence.text).toBe('ZMIEŃ POZYCJĘ');
+    const undone = run([X], back, on);
+    expect(undone.state.sentence.text).toBe('ZM');
+    expect(undone.state.notice).toEqual({ key: 'counting.undonePhrase' });
+    // Undone, it is not offered again for this sentence (R5, R8).
+    expect(run(ticks(10_000, 20_000), undone.state, on).state.name).toBe('column.waiting');
+  });
+
+  it('a shake refuses it; a second shake changes nothing; it is not offered again (R5, R6)', () => {
+    const asked = run(ticks(0, 2600), typed('ZM'), on).state;
+    let { state } = run([X], asked, on);
+    expect(state.name).toBe('column.rejected');
+    expect(state.sentence.text).toBe('ZM');
+    ({ state } = run([X], state, on));
+    expect(state.sentence.text).toBe('ZM');
+    expect(run(ticks(3000, 20_000), state, on).state.name).toBe('column.rejected');
+  });
+
+  it('refused phrases are forgotten once the sentence is read aloud (R5)', () => {
+    const asked = run(ticks(0, 2600), typed('ZM'), on).state;
+    const refused = run([X], asked, on).state;
+    const read = run([R, N], refused, on).state;
+    expect(read.refused).toEqual([]);
+  });
+
+  it('a blink goes on: the offer is dropped and the blink counts for the column (R6)', () => {
+    const asked = run(ticks(0, 2600), typed('ZM'), on).state;
+    const { state } = run([B], asked, on);
+    expect(state.name).toBe('column.counting');
+    expect(total(state)).toBe(1);
+    expect(state.offer).toBeNull();
+    expect(state.sentence.text).toBe('ZM');
+  });
+
+  it('no second offer for the same text (R4)', () => {
+    const asked = run(ticks(0, 2600), typed('ZM'), on).state;
+    // He blinks a column, then refuses the number: the same text, no new offer.
+    const { state } = run([B, X, ...ticks(3000, 20_000)], asked, on);
+    expect(state.name).toBe('column.rejected');
+  });
+
+  it('a tap on the offered phrase takes it like a nod (R7)', () => {
+    const asked = run(ticks(0, 2600), typed('ZM'), on).state;
+    const tap: Signal = { type: 'TOUCH', target: { kind: 'phrase', phrase: 'Zmień pozycję' } };
+    const { state } = run([tap], asked, on);
+    expect(state.sentence.text).toBe('ZMIEŃ POZYCJĘ');
+    expect(state.name).toBe('speak.asking');
   });
 });

@@ -13,9 +13,15 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import type { Backup, BackupError } from '../../core/storage/backup';
 import { BackupService } from '../../core/storage/backup.service';
 import { DeviceDataService, type EraseResult } from '../../core/storage/device-data.service';
-import { ASK_AFTER } from '../../core/counting/counting';
+import { ASK_AFTER, SUGGEST_PAUSE } from '../../core/counting/counting';
 import { CountingService } from '../../core/counting/counting.service';
-import { RATES, THEMES, validAskAfter, type Settings } from '../../core/settings/settings';
+import {
+  RATES,
+  THEMES,
+  validAskAfter,
+  validSuggestPause,
+  type Settings,
+} from '../../core/settings/settings';
 import { SettingsService } from '../../core/settings/settings.service';
 import { ConfirmService } from '../../shared/confirm-dialog/confirm-dialog';
 import { LanguageSwitch } from '../../shared/language-switch/language-switch';
@@ -80,6 +86,7 @@ export class SettingsPage {
   protected readonly settings = this.service.settings;
   protected readonly problem = this.service.problem;
   protected readonly limits = ASK_AFTER;
+  protected readonly pauseLimits = SUGGEST_PAUSE;
   protected readonly rates = RATES;
   protected readonly themes = THEMES;
   /** Spec 012: the camera switches, in their own group. */
@@ -107,11 +114,27 @@ export class SettingsPage {
     Validators.pattern(/^\d+$/),
   ]);
 
+  /** "Pauza przed podpowiedzią" (Pause before a suggestion), spec 019, R1: 1000–10000 ms (SC 2.2.1). */
+  protected readonly phrasePause = new FormControl<number | null>(this.settings().phrasePauseMs, [
+    Validators.required,
+    Validators.min(SUGGEST_PAUSE.min),
+    Validators.max(SUGGEST_PAUSE.max),
+    Validators.pattern(/^\d+$/),
+  ]);
+
   constructor() {
     const sub = this.askAfter.valueChanges.subscribe((value) => {
       if (this.askAfter.valid && validAskAfter(value)) this.service.update({ askAfterMs: value });
     });
-    inject(DestroyRef).onDestroy(() => sub.unsubscribe());
+    const pauseSub = this.phrasePause.valueChanges.subscribe((value) => {
+      if (this.phrasePause.valid && validSuggestPause(value)) {
+        this.service.update({ phrasePauseMs: value });
+      }
+    });
+    inject(DestroyRef).onDestroy(() => {
+      sub.unsubscribe();
+      pauseSub.unsubscribe();
+    });
   }
 
   protected set<K extends keyof Settings>(key: K, value: Settings[K]): void {
@@ -176,6 +199,7 @@ export class SettingsPage {
     else this.backupStatus.set({ kind: 'failed' });
     // The form field and the voice follow the restored settings and board.
     this.askAfter.setValue(this.settings().askAfterMs, { emitEvent: false });
+    this.phrasePause.setValue(this.settings().phrasePauseMs, { emitEvent: false });
     this.hasVoice.set(this.counting.hasVoice());
   }
 
@@ -197,6 +221,7 @@ export class SettingsPage {
     parts.push(t(data.profile ? 'profile' : 'noProfile'));
     if (data.language) parts.push(t('language'));
     if (data.history) parts.push(t('history', { n: data.history.length }));
+    if (data.phrases) parts.push(t('phrases', { n: data.phrases.length }));
     return parts.length ? parts.join(', ') : t('empty');
   }
 
@@ -224,6 +249,7 @@ export class SettingsPage {
     if (result === 'erased') this.toast.show('toast.dataDeleted');
     // The form field is rebuilt from the defaults, so it does not show the erased value.
     this.askAfter.setValue(this.settings().askAfterMs, { emitEvent: false });
+    this.phrasePause.setValue(this.settings().phrasePauseMs, { emitEvent: false });
     this.hasVoice.set(this.counting.hasVoice());
   }
 }

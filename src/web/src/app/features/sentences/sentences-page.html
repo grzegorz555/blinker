@@ -16,6 +16,119 @@
   </p>
 }
 
+<!-- Spec 019, R2: the favorite phrases. -->
+<section class="group" aria-labelledby="phrases-title" data-testid="phrases">
+  <h2 id="phrases-title" class="group-title">{{ 'sentences.phrases.title' | transloco }}</h2>
+  <p class="muted">{{ 'sentences.phrases.intro' | transloco: phraseLimits }}</p>
+  <p class="muted" data-testid="phrases-state">
+    {{ (suggesting() ? 'sentences.phrases.on' : 'sentences.phrases.off') | transloco }}
+  </p>
+  @if (phrasesProblem(); as p) {
+    <p class="problem" role="status" data-testid="phrases-problem">
+      <span>{{ 'sentences.phrases.problem.' + p | transloco }}</span>
+    </p>
+  }
+  @if (phrases().length === 0) {
+    <p class="muted" data-testid="phrases-empty">{{ 'sentences.phrases.empty' | transloco }}</p>
+  } @else {
+    <ol class="entries">
+      @for (phrase of phrases(); track phrase; let i = $index, first = $first, last = $last) {
+        <li class="entry" data-testid="phrase" [attr.data-phrase-index]="i">
+          <p class="sentence entry-text">{{ phrase }}</p>
+          <div class="entry-actions">
+            <button
+              matIconButton
+              type="button"
+              data-move="-1"
+              [disabled]="first"
+              [attr.aria-label]="'sentences.phrases.up' | transloco: { phrase }"
+              (click)="movePhrase(i, -1)"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+            </button>
+            <button
+              matIconButton
+              type="button"
+              data-move="1"
+              [disabled]="last"
+              [attr.aria-label]="'sentences.phrases.down' | transloco: { phrase }"
+              (click)="movePhrase(i, 1)"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 5v14M19 12l-7 7-7-7" />
+              </svg>
+            </button>
+            <button
+              matIconButton
+              type="button"
+              [attr.aria-label]="'sentences.phrases.delete' | transloco: { phrase }"
+              (click)="removePhrase(i)"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+              </svg>
+            </button>
+          </div>
+        </li>
+      }
+    </ol>
+  }
+  @if (full()) {
+    <p class="muted" data-testid="phrases-full">
+      {{ 'sentences.phrases.full' | transloco: phraseLimits }}
+    </p>
+  } @else {
+    <form class="phrase-add" (submit)="addPhrase($event)">
+      <mat-form-field class="field" subscriptSizing="dynamic">
+        <mat-label>{{ 'sentences.phrases.new' | transloco }}</mat-label>
+        <input
+          matInput
+          autocomplete="off"
+          [maxlength]="phraseLimits.maxLength"
+          [formControl]="newPhrase"
+          [attr.aria-invalid]="phraseError() ? 'true' : null"
+          [attr.aria-describedby]="phraseError() ? 'phrase-error' : null"
+          data-testid="phrase-input"
+        />
+      </mat-form-field>
+      <button matButton="tonal" type="submit" data-testid="phrase-add">
+        {{ 'sentences.phrases.add' | transloco }}
+      </button>
+    </form>
+    @if (phraseError(); as e) {
+      <p id="phrase-error" class="error" data-testid="phrase-error">
+        {{ 'sentences.phrases.error.' + e | transloco }}
+      </p>
+    }
+  }
+</section>
+
 <section class="group" aria-labelledby="sentences-keep">
   <h2 id="sentences-keep" class="group-title">{{ 'sentences.keepTitle' | transloco }}</h2>
   <mat-slide-toggle
@@ -43,6 +156,57 @@
               <p class="time">{{ time(entry.at) }}</p>
             </div>
             <div class="entry-actions">
+              @switch (star(entry.text)) {
+                @case ('add') {
+                  <button
+                    matIconButton
+                    type="button"
+                    data-testid="star"
+                    [attr.aria-label]="'sentences.phrases.star' | transloco: { text: entry.text }"
+                    (click)="starSentence(entry)"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"
+                      />
+                    </svg>
+                  </button>
+                }
+                @case ('starred') {
+                  <button
+                    matIconButton
+                    type="button"
+                    class="starred"
+                    data-testid="starred"
+                    disabled
+                    [attr.aria-label]="
+                      'sentences.phrases.starred' | transloco: { text: entry.text }
+                    "
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"
+                      />
+                    </svg>
+                  </button>
+                }
+              }
               <button matButton="tonal" type="button" (click)="sayAgain(entry)">
                 {{ 'sentences.sayAgain' | transloco }}
               </button>

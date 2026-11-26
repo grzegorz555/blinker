@@ -8,6 +8,8 @@ import { HISTORY_KEY } from '../history/history';
 import { CLOCK, HistoryService } from '../history/history.service';
 import { LanguageService } from '../i18n/language.service';
 import { LANGUAGE_STORAGE_KEY } from '../i18n/languages';
+import { PHRASES_KEY } from '../phrases/phrases';
+import { PhrasesService } from '../phrases/phrases.service';
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from '../settings/settings';
 import { SettingsService } from '../settings/settings.service';
 import { DEFAULT_PROFILE, PROFILE_KEY } from '../signals/profile';
@@ -24,6 +26,7 @@ const KEYS = [
   PROFILE_KEY,
   HISTORY_KEY,
   LANGUAGE_STORAGE_KEY,
+  PHRASES_KEY,
 ];
 
 const board = (id: string): Board => ({
@@ -79,6 +82,7 @@ describe('DeviceDataService (spec 013, R3, R5)', () => {
       history: TestBed.inject(HistoryService),
       profile: TestBed.inject(ProfileService),
       language: TestBed.inject(LanguageService),
+      phrases: TestBed.inject(PhrasesService),
     };
     TestBed.tick();
     return { storage, speaker, ...services };
@@ -93,6 +97,7 @@ describe('DeviceDataService (spec 013, R3, R5)', () => {
     TestBed.tick();
     s.profile.save({ ...DEFAULT_PROFILE, refractoryMs: DEFAULT_PROFILE.refractoryMs + 100 });
     await s.language.setLanguage('pl');
+    s.phrases.add('Zmień pozycję'); // spec 019, R9
     // "TAK" (Yes) on the board "two", read aloud: kept in the history, and the speech is still going.
     s.counting.touch({ kind: 'cell', column: 1, row: 1 });
     s.counting.touch({ kind: 'speak' });
@@ -108,6 +113,7 @@ describe('DeviceDataService (spec 013, R3, R5)', () => {
     expect(s.profile.profile()).toEqual(DEFAULT_PROFILE);
     expect(s.profile.calibrated()).toBe(false);
     expect(s.history.entries()).toEqual([]);
+    expect(s.phrases.phrases()).toEqual([]);
     expect(s.counting.sentence()).toBe('');
     expect(s.counting.state().sentence.history).toEqual([]);
     expect(s.counting.spoken()).toBeNull();
@@ -133,7 +139,7 @@ describe('DeviceDataService (spec 013, R3, R5)', () => {
     expect(s.storage.data.get('other.app')).toBe('kept');
     expectDefaults(s);
     expect(s.speaker.speaking).toBe(false);
-    for (const service of [s.settings, s.boards, s.history, s.profile]) {
+    for (const service of [s.settings, s.boards, s.history, s.profile, s.phrases]) {
       expect(service.problem()).toBeNull();
     }
   });

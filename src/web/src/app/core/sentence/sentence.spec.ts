@@ -7,6 +7,7 @@ import {
   clear,
   createSentence,
   deleteLast,
+  replaceAll,
   undo,
 } from './sentence';
 
@@ -91,5 +92,21 @@ describe('sentence', () => {
     expect(before.text).toBe('A');
     expect(before.history).toHaveLength(1);
     expect(after.text).toBe('AB');
+  });
+});
+
+describe('replaceAll (spec 019, R6)', () => {
+  it('replaces the whole text as one step; one undo brings back exactly what he spelled', () => {
+    const typed = append(append(createSentence(), 'Z'), 'M');
+    const taken = replaceAll(typed, 'ZMIEŃ POZYCJĘ');
+    expect(taken.text).toBe('ZMIEŃ POZYCJĘ');
+    expect(taken.history).toHaveLength(3);
+    expect(undo(taken).text).toBe('ZM');
+    expect(undo(undo(taken)).text).toBe('Z');
+  });
+
+  it('the same text: no step', () => {
+    const typed = append(createSentence(), 'PIĆ');
+    expect(replaceAll(typed, 'PIĆ')).toBe(typed);
   });
 });

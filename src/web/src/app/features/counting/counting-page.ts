@@ -15,6 +15,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { CountingService } from '../../core/counting/counting.service';
 import { total, type TouchTarget } from '../../core/counting/counting';
 import { listenToKeys } from '../../core/input/keyboard';
+import { PhrasesService } from '../../core/phrases/phrases.service';
 import type { InputSignalType } from '../../core/input/signals';
 import { keepScreenAwake, type WakeLockLike } from '../../core/screen/wake-lock';
 import { SettingsService } from '../../core/settings/settings.service';
@@ -54,6 +55,8 @@ export class CountingPage implements AfterViewInit, OnDestroy {
   private readonly actions = viewChild.required(CdkPortal);
   private readonly camera = inject(CameraInput);
   private readonly cue = inject(SignalCue);
+  /** Spec 019: created with this screen, so the machine gets his phrases while the switch is on. */
+  private readonly phrases = inject(PhrasesService);
 
   /** Spec 012: his face signals drive this screen (a setting, off by default). */
   protected readonly cameraOn = computed(() => this.settings().camera);
@@ -90,6 +93,12 @@ export class CountingPage implements AfterViewInit, OnDestroy {
   /** "Podpowiedzi w Liczeniu" (Hints in Counting). */
   protected readonly showHints = computed(() => this.settings().hints);
   protected readonly showSignals = computed(() => this.settings().signalButtons);
+  /** Spec 019, R7: the row for an offered phrase, kept at its height while the switch is on. */
+  protected readonly phrasesOn = computed(() => this.settings().suggestPhrases);
+  protected readonly offer = computed(() => {
+    const state = this.state();
+    return state.name === 'phrase.asking' ? state.offer : null;
+  });
   /** Speech status in text (R7): reading now, or no on-device voice. */
   protected readonly speaking = this.counting.speaking;
   protected readonly noVoice = computed(() => this.counting.speakResult() === 'no-local-voice');
@@ -186,7 +195,12 @@ export class CountingPage implements AfterViewInit, OnDestroy {
     this.counting.touch({ kind: 'cell', column, row });
   }
 
-  protected touch(kind: Exclude<TouchTarget['kind'], 'cell' | 'clear'>): void {
+  /** A tap on the offered phrase takes it like his nod (spec 019, R6, R7). */
+  protected takePhrase(phrase: string): void {
+    this.counting.touch({ kind: 'phrase', phrase });
+  }
+
+  protected touch(kind: Exclude<TouchTarget['kind'], 'cell' | 'clear' | 'phrase'>): void {
     this.counting.touch({ kind });
   }
 

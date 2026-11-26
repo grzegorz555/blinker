@@ -68,7 +68,8 @@
       },
       "space": "Space",
       "hintColumn": "Nod without a number = space (end of a word) · Shake your head = undo the last letter",
-      "hintPause": "A pause = go on · Shake your head = start over"
+      "hintPause": "A pause = go on · Shake your head = start over",
+      "phrase": "Phrase:"
     },
     "signals": {
       "title": "His signals",
@@ -105,7 +106,10 @@
         "model": "Model error",
         "failed": "Camera error"
       }
-    }
+    },
+    "askPhrase": "{{phrase}}?",
+    "phraseRefused": "Not that phrase. Go on spelling.",
+    "undonePhrase": "Undid the phrase"
   },
   "common": {
     "cancel": "Cancel"
@@ -137,6 +141,32 @@
     "problem": {
       "corrupted": "The saved sentences could not be read, so the history starts again.",
       "unavailable": "This browser does not let Blinker save on the device, so sentences are kept only until the page is closed."
+    },
+    "phrases": {
+      "title": "Favorite phrases",
+      "intro": "His frequent phrases, at most {{count}}. When the letters from the start of a sentence fit one of them, Blinker asks about it aloud, and a nod takes it.",
+      "on": "Suggesting is on.",
+      "off": "Suggesting is off: turn it on in Settings.",
+      "empty": "The list is empty. Type a phrase, or add a sentence from the history with the star.",
+      "full": "The list is full ({{count}} phrases). Delete a phrase to add a new one.",
+      "new": "New phrase",
+      "add": "Add the phrase",
+      "up": "Up: {{phrase}}",
+      "down": "Down: {{phrase}}",
+      "delete": "Delete the phrase: {{phrase}}",
+      "star": "Add to favorites: {{text}}",
+      "starred": "In favorites: {{text}}",
+      "error": {
+        "too-short": "Error: a phrase needs at least 2 characters.",
+        "too-long": "Error: a phrase can have at most 60 characters.",
+        "characters": "Error: use only letters, digits, spaces and . , ! ? - '",
+        "duplicate": "Error: this phrase is already on the list.",
+        "full": "Error: the list is full (20 phrases)."
+      },
+      "problem": {
+        "corrupted": "The saved phrases could not be read, so the list starts again.",
+        "unavailable": "This browser does not let Blinker save on the device, so the phrases last only until the page is closed."
+      }
     }
   },
   "boards": {
@@ -276,7 +306,8 @@
         "noProfile": "no calibration",
         "language": "the language",
         "history": "sentences: {{n}}",
-        "empty": "nothing (an empty backup)"
+        "empty": "nothing (an empty backup)",
+        "phrases": "phrases: {{n}}"
       },
       "part": {
         "settings": "The settings",
@@ -284,7 +315,8 @@
         "activeBoard": "The chosen board",
         "profile": "The calibration",
         "language": "The language",
-        "history": "The sentence history"
+        "history": "The sentence history",
+        "phrases": "Favorite phrases"
       },
       "error": {
         "not-json-file": "This is not a backup file: choose a file ending in .json.",
@@ -303,6 +335,14 @@
         "duplicate-board": "The same board is in the file twice.",
         "missing-board": "The chosen board is not in the file."
       }
+    },
+    "phrases": {
+      "title": "Favorite phrases",
+      "suggestPhrases": "Suggest favorite phrases",
+      "suggestPhrasesHint": "When the letters from the start of a sentence fit one phrase, Blinker asks about it aloud. You keep the list in Sentences.",
+      "pause": "Pause before a suggestion",
+      "pauseHint": "From {{min}} to {{max}} ms with no signal after the last letter.",
+      "pauseError": "Error: enter a whole number from {{min}} to {{max}} ms."
     }
   },
   "diagnostics": {
@@ -493,6 +533,9 @@
     "backupRestored": "Restored the backup from {{date}}.",
     "dataDeleted": "All data was deleted from this device.",
     "calibrationSaved": "Calibration saved. Blinker uses it from now on.",
-    "copied": "Copied the results (no image)."
+    "copied": "Copied the results (no image).",
+    "phraseAdded": "Added a favorite phrase.",
+    "phraseDeleted": "Deleted the phrase.",
+    "phraseRestored": "Restored the phrase."
   }
 }

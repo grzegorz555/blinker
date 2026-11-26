@@ -30,6 +30,7 @@ const full: BackupData = {
   profile: DEFAULT_PROFILE,
   language: 'pl',
   history,
+  phrases: ['Pić', 'Zmień pozycję'],
 };
 
 const bytes = (text: string) => new TextEncoder().encode(text);
@@ -178,6 +179,9 @@ describe('checkBackupData: each part through its own validator (R5)', () => {
     ['profile', { version: 2 }],
     ['language', 'de'],
     ['history', [{ id: '1', text: '', lang: 'pl', at: NOW }]],
+    ['phrases', ['<b>Pić</b>']],
+    ['phrases', ['Pić', 'pić']],
+    ['phrases', 'Pić'],
   ] as const)('an invalid %s refuses the whole file and names the part', (part, value) => {
     const file = envelope();
     file.data[part] = value;

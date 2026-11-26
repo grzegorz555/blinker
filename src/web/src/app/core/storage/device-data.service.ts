@@ -3,6 +3,7 @@ import { BoardsService } from '../boards/boards.service';
 import { CountingService } from '../counting/counting.service';
 import { HistoryService } from '../history/history.service';
 import { LanguageService } from '../i18n/language.service';
+import { PhrasesService } from '../phrases/phrases.service';
 import { SettingsService } from '../settings/settings.service';
 import { ProfileService } from '../signals/profile.service';
 import { STORAGE, STORAGE_PREFIX, removeByPrefix } from './local-store';
@@ -26,6 +27,7 @@ export class DeviceDataService {
   private readonly history = inject(HistoryService);
   private readonly profile = inject(ProfileService);
   private readonly language = inject(LanguageService);
+  private readonly phrases = inject(PhrasesService);
 
   eraseAll(): EraseResult {
     // First the sentence and the speech: nothing read aloud may reach the history after this point.
@@ -34,6 +36,7 @@ export class DeviceDataService {
     this.boards.reset();
     this.history.reset();
     this.profile.reset();
+    this.phrases.reset();
     this.language.forgetChoice();
     return removeByPrefix(this.storage, STORAGE_PREFIX) ? 'erased' : 'unavailable';
   }
