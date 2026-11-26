@@ -1,5 +1,9 @@
 # Log
 
+## 2026-11-26 (batch: toasts with Cofnij (Undo), and the time left around them)
+- PR #66: spec [018](specs/018-toasts/spec.md) done. A toast (an M3 snackbar) confirms each operation in Tablice (Boards), Zdania (Sentences), Ustawienia (Settings), Kalibracja (Calibration) and Diagnostyka (Diagnostics), above the navigation bar on a phone; errors stay as text under their control, and Liczenie (Counting) has none. After deleting one sentence or one board, Cofnij (Undo) puts it back for 10 s. The timer stops while the pointer or the focus is in the toast (SC 2.2.1), and the text is announced once.
+- PR #67: a line around the toast shows the time left and shrinks to nothing as it goes; held, it stands still. The first version moved in script steps and showed a pause mark, which jumped and widened the toast on hover (the author, on the preview); it is one CSS animation now, paused with `animation-play-state`, and nothing else in the toast changes.
+
 ## 2026-11-25 (batch: the log and the index without conflicts; spec 017, a backup in a file; spec 018 approved)
 - PR #60: task PRs leave this log alone; entries come in batch `docs(log)` PRs ([git](conventions/git.md), "The log in batches").
 - PR #61: spec [017](specs/017-backup/spec.md), approved by the author: the sentence history in a backup only when asked, a restore replaces the data and keeps the history when the file has none.
