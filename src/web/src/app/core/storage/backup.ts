@@ -11,6 +11,7 @@ import type { Board } from '../boards/board';
 import { validateBoardData } from '../boards/validate-board';
 import { validateHistory, type HistoryEntry } from '../history/history';
 import { isLanguageCode, type LanguageCode } from '../i18n/languages';
+import { validatePhrases } from '../phrases/phrases';
 import { validateSettings, type Settings } from '../settings/settings';
 import { validateProfile, type SignalProfile } from '../signals/profile';
 import { isPlainObject } from './local-store';
@@ -39,6 +40,8 @@ export interface BackupData {
   readonly language?: LanguageCode;
   /** Only when the person asked for it (R2). */
   readonly history?: readonly HistoryEntry[];
+  /** His favorite phrases (spec 019, R9); a file from before spec 019 has none. */
+  readonly phrases?: readonly string[];
 }
 
 export interface Backup {
@@ -54,6 +57,7 @@ export const BACKUP_PARTS = [
   'profile',
   'language',
   'history',
+  'phrases',
 ] as const;
 export type BackupPart = (typeof BACKUP_PARTS)[number];
 
@@ -213,6 +217,12 @@ export function checkBackupData(data: unknown, now: number, builtInId: string): 
     const history = validateHistory(parts['history']);
     if (!history) return fail('history', 'invalid');
     result.history = history;
+  }
+
+  if (Object.hasOwn(parts, 'phrases')) {
+    const phrases = validatePhrases(parts['phrases']);
+    if (!phrases) return fail('phrases', 'invalid');
+    result.phrases = phrases;
   }
 
   return { ok: true, backup: { createdAt, data: result } };

@@ -48,7 +48,9 @@ describe('SentencesPage toasts (spec 018)', () => {
 
   it('a delete is a toast without his words, with Cofnij (Undo) that puts the sentence back in its place', async () => {
     const { fixture, root, history, show } = await render();
-    root.querySelector<HTMLButtonElement>('button[aria-label*="NIE"]')!.click();
+    root
+      .querySelector<HTMLButtonElement>('button[aria-label*="NIE"]:not([data-testid="star"])')!
+      .click();
     await vi.waitFor(() => expect(history.entries().map((e) => e.text)).toEqual(['TAK']));
     const [key, params, action] = show.mock.lastCall!;
     expect(key).toBe('toast.sentenceDeleted');
@@ -86,7 +88,9 @@ describe('SentencesPage toasts (spec 018)', () => {
 
   it('"Anuluj" (Cancel) in the dialog shows no toast', async () => {
     const { root, history, show, confirm } = await render(false);
-    root.querySelector<HTMLButtonElement>('button[aria-label*="NIE"]')!.click();
+    root
+      .querySelector<HTMLButtonElement>('button[aria-label*="NIE"]:not([data-testid="star"])')!
+      .click();
     await vi.waitFor(() => expect(confirm).toHaveBeenCalled());
     expect(history.entries()).toHaveLength(2);
     expect(show).not.toHaveBeenCalled();

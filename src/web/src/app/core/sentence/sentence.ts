@@ -7,7 +7,9 @@ import type { Cell } from '../boards/board';
 export type SentenceStep =
   | { readonly kind: 'append'; readonly text: string }
   | { readonly kind: 'delete'; readonly removed: string }
-  | { readonly kind: 'clear'; readonly removed: string };
+  | { readonly kind: 'clear'; readonly removed: string }
+  /** The whole text replaced by a favorite phrase (spec 019, R6): `removed` was the text, `text` is the phrase. */
+  | { readonly kind: 'replace'; readonly removed: string; readonly text: string };
 
 export interface Sentence {
   readonly text: string;
@@ -54,6 +56,16 @@ export function clear(sentence: Sentence): Sentence {
   return push(sentence, '', { kind: 'clear', removed: sentence.text });
 }
 
+/**
+ * Replaces the whole text with another (a favorite phrase taken with a nod, spec 019), as one step: one undo brings
+ * back exactly what he had spelled. The same text: no step.
+ */
+export function replaceAll(sentence: Sentence, text: string): Sentence {
+  const clean = text.normalize('NFC');
+  if (clean === sentence.text) return sentence;
+  return push(sentence, clean, { kind: 'replace', removed: sentence.text, text: clean });
+}
+
 /** Reverses the last step of this session. With an empty history it changes nothing. */
 export function undo(sentence: Sentence): Sentence {
   const step = sentence.history.at(-1);
@@ -65,6 +77,7 @@ export function undo(sentence: Sentence): Sentence {
     case 'delete':
       return { text: sentence.text + step.removed, history };
     case 'clear':
+    case 'replace':
       return { text: step.removed, history };
   }
 }

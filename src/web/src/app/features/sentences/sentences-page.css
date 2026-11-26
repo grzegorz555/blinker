@@ -81,6 +81,28 @@
   height: 1.5rem;
 }
 
+/* Spec 019: the field and its button side by side, wrapping on a narrow phone. */
+.phrase-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.phrase-add .field {
+  flex: 1 1 12rem;
+}
+
+.error {
+  color: var(--error);
+  font-weight: 600;
+}
+
+/* A filled star: the sentence is already a favorite phrase. */
+.starred svg {
+  fill: currentColor;
+}
+
 .problem {
   display: flex;
   align-items: flex-start;

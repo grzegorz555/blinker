@@ -1,6 +1,6 @@
 // The settings (spec 007, R9, R12). Plain TypeScript: the defaults, and a validator for what is read back from the
 // device (a hand-edited or old value must never break the app).
-import { ASK_AFTER } from '../counting/counting';
+import { ASK_AFTER, SUGGEST_PAUSE } from '../counting/counting';
 import { RATE } from '../speech/speaker';
 import { isPlainObject } from '../storage/local-store';
 
@@ -40,6 +40,10 @@ export interface Settings {
   readonly cameraPreview: boolean;
   /** A short sound for each signal from the camera (spec 012, R3). */
   readonly signalSound: boolean;
+  /** "Podpowiadaj ulubione zwroty" (Suggest favorite phrases), off by default (spec 019, R1). */
+  readonly suggestPhrases: boolean;
+  /** "Pauza przed podpowiedzią" (Pause before a suggestion), 1000–10000 ms (spec 019, R1; SC 2.2.1). */
+  readonly phrasePauseMs: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -57,6 +61,8 @@ export const DEFAULT_SETTINGS: Settings = {
   cameraFacing: 'user',
   cameraPreview: false,
   signalSound: true,
+  suggestPhrases: false,
+  phrasePauseMs: SUGGEST_PAUSE.default,
 };
 
 export const SETTINGS_KEY = 'blinker.settings.v1';
@@ -67,6 +73,13 @@ export const validAskAfter = (value: unknown): value is number =>
   Number.isInteger(value) &&
   value >= ASK_AFTER.min &&
   value <= ASK_AFTER.max;
+
+/** The pause before a suggestion is a whole number of milliseconds within 1000–10000. */
+export const validSuggestPause = (value: unknown): value is number =>
+  typeof value === 'number' &&
+  Number.isInteger(value) &&
+  value >= SUGGEST_PAUSE.min &&
+  value <= SUGGEST_PAUSE.max;
 
 const CHECKS: { readonly [K in keyof Settings]: (value: unknown) => boolean } = {
   askAfterMs: validAskAfter,
@@ -83,6 +96,8 @@ const CHECKS: { readonly [K in keyof Settings]: (value: unknown) => boolean } = 
   cameraFacing: (v) => (CAMERA_FACINGS as readonly unknown[]).includes(v),
   cameraPreview: (v) => typeof v === 'boolean',
   signalSound: (v) => typeof v === 'boolean',
+  suggestPhrases: (v) => typeof v === 'boolean',
+  phrasePauseMs: validSuggestPause,
 };
 
 /**

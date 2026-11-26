@@ -52,10 +52,10 @@ give the row now.
 | Tab | What it is for |
 | --- | --- |
 | **Liczenie (Counting)** | The main screen: his board, the sentence in big letters above it, a short status line with the prompt and the count. The chip at the top says whether the camera sees his face. "Kamera" (Camera) turns the camera off and on by hand, "Pauza" (Pause) stops counting. Buttons below the board: "Cofnij literę" (Undo letter), "Spacja" (Space), "Wyczyść" (Clear, asks first), "Przeczytaj" (Read aloud). A tap on a letter adds it at once. |
-| **Zdania (Sentences)** | Every sentence read aloud, grouped by day. "Powiedz jeszcze raz" (Say again) repeats one; you can delete one or all. The history can be turned off in the settings. |
+| **Zdania (Sentences)** | Every sentence read aloud, grouped by day. "Powiedz jeszcze raz" (Say again) repeats one; you can delete one or all. The history can be turned off in the settings. "Ulubione zwroty" (Favorite phrases): his frequent phrases, typed or added from the history with the star; move them with "W górę" (Up) and "W dół" (Down). |
 | **Tablice (Boards)** | His built-in board, or a board imported from a `.json` file (checked on the device; errors are shown in text). Preview and delete. |
 | **Kalibracja (Calibration)** | A step-by-step wizard that learns his signals: at rest, strong blinks, his hand, a nod, a shake, head right. Each step is said aloud and shows "Wykryto n z k" (Detected n of k). Only numbers are saved, never a picture. |
-| **Ustawienia (Settings)** | The pause before the next step, the nod confirmation, the chime before the row, spoken questions, signal buttons and keyboard shortcuts, hints, speech rate and voice, the camera (on or off, preview, a tone per signal, front or rear), language and theme, the sentence history, "Kopia w pliku" (Backup file), and "Usuń wszystkie dane" (Delete all data). Diagnostyka (Diagnostics) is linked from here. |
+| **Ustawienia (Settings)** | The pause before the next step, the nod confirmation, the chime before the row, spoken questions, signal buttons and keyboard shortcuts, hints, speech rate and voice, the camera (on or off, preview, a tone per signal, front or rear), language and theme, "Ulubione zwroty" (Favorite phrases, off by default), the sentence history, "Kopia w pliku" (Backup file), and "Usuń wszystkie dane" (Delete all data). Diagnostyka (Diagnostics) is linked from here. |
 | **Diagnostyka (Diagnostics)** | For checking and tuning: live eye values and head angles, frames per second, the signals Blinker detects. "Kopiuj wyniki" (Copy the results) copies a text summary (numbers only). |
 
 On a phone the tabs are at the bottom; on a wider screen they are on the left. The current tab has a filled icon and a bold label.
@@ -63,6 +63,18 @@ On a phone the tabs are at the bottom; on a wider screen they are on the left. T
 After an operation (an imported board, a deleted sentence, a saved backup) a short message at the bottom confirms
 it. After deleting one sentence or one board it offers "Cofnij" (Undo) for 10 seconds. A line around the message
 shows the time left; touching or focusing the message stops it, and the message stays until you let go. Errors stay on the page under the button until you try again.
+
+# Favorite phrases
+
+Off by default. Add his frequent phrases in Zdania (Sentences), then turn on "Podpowiadaj ulubione zwroty" (Suggest
+favorite phrases) in Ustawienia (Settings). When the letters he spelled from the start of a sentence fit exactly one
+phrase (two letters at least), Blinker waits for "Pauza przed podpowiedzią" (Pause before a suggestion, 2.5 s), then
+asks it aloud and shows it above the board: "Zmień pozycję?" (Change my position?).
+
+- A nod takes the whole phrase, and Blinker asks "Przeczytać na głos?" (Read it aloud?). A shake there keeps the
+  phrase to add to it; one more shake brings back his letters.
+- A shake refuses the phrase: his letters stay, and that phrase is not offered again in this sentence.
+- A blink goes on spelling. A tap on the phrase above the board takes it, like his nod.
 
 # When something goes wrong
 

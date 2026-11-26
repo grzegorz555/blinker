@@ -73,6 +73,10 @@ is written as numbers or short notes; no picture of him is taken or kept (`docs/
       before the chime (the pause too long) or waited long after it. If it is in the way: "Dźwięk: teraz wiersz"
       (Sound: now the row) in Ustawienia (Settings).
 - [ ] After reading aloud: is "Nowe zdanie?" (New sentence?) welcome or in the way?
+- [ ] Favorite phrases (spec 019, off by default): with the caregivers, put 3–5 of his frequent phrases on the list
+      in Zdania (Sentences) and turn on "Podpowiadaj ulubione zwroty" (Suggest favorite phrases). Does he take "Zmień
+      pozycję?" (Change my position?) with a nod, or does the question break his rhythm? Is the pause of 2.5 s right?
+      Would a board of phrases chosen by a number suit him better?
 - [ ] Rear camera: a caregiver holds the phone towards him; does it work as well?
 
 # 4. Still open (from the interaction model)

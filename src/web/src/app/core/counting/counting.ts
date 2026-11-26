@@ -17,16 +17,19 @@ import {
   canUndo,
   clear,
   createSentence,
+  replaceAll,
   undo,
   type Sentence,
   type SentenceStep,
 } from '../sentence/sentence';
+import { matchPhrase, phraseForSentence } from '../phrases/phrases';
 
 export const STATE_NAMES = [
   'column.waiting',
   'column.counting',
   'column.asking',
   'column.rejected',
+  'phrase.asking',
   'row.waiting',
   'row.counting',
   'row.asking',
@@ -57,7 +60,9 @@ export type SignalType = (typeof SIGNAL_TYPES)[number];
  */
 export type TouchTarget =
   | { readonly kind: 'cell'; readonly column: number; readonly row: number }
-  | { readonly kind: 'undo' | 'clear' | 'speak' | 'space' };
+  | { readonly kind: 'undo' | 'clear' | 'speak' | 'space' }
+  /** The favorite phrase offered above the board (spec 019, R7): taken like a nod. */
+  | { readonly kind: 'phrase'; readonly phrase: string };
 
 /**
  * His signals (stages 3–4 detect them on the face; until then buttons and keys), TICK for time, and TOUCH for a tap
@@ -78,7 +83,12 @@ export type Effect =
   /** A new question: show it and announce it (polite live region). */
   | { readonly type: 'ask'; readonly message: Message }
   /** Say a short text aloud: the chosen letter always; questions and notices only when speakPrompts is on. */
-  | { readonly type: 'say'; readonly message: Message }
+  | {
+      readonly type: 'say';
+      readonly message: Message;
+      /** In the board's language, not the UI's: a favorite phrase asked aloud (spec 019, R4). */
+      readonly inBoardLanguage?: boolean;
+    }
   /** Announce a change to screen readers, and show it as the notice. */
   | { readonly type: 'announce'; readonly message: Message }
   /** Read the sentence aloud: only after a nod on "Przeczytać na głos?" (Read it aloud?). */
@@ -98,9 +108,14 @@ export interface CountingConfig {
   readonly confirmByNod: boolean;
   /** Play a short tune when the column is taken, so he knows when to start the row. */
   readonly rowCue: boolean;
+  /** His favorite phrases while "Podpowiadaj ulubione zwroty" (Suggest favorite phrases) is on; empty when off (spec 019, R1). */
+  readonly phrases: readonly string[];
+  /** "Pauza przed podpowiedzią" (Pause before a suggestion), 1000–10000 ms (spec 019, R4; SC 2.2.1). */
+  readonly phrasePauseMs: number;
 }
 
 export const ASK_AFTER = { min: 500, max: 5000, default: 1200 } as const;
+export const SUGGEST_PAUSE = { min: 1000, max: 10000, default: 2500 } as const;
 
 export interface CountingState {
   readonly name: StateName;
@@ -117,6 +132,14 @@ export interface CountingState {
   /** Where to go back to when the pause ends. */
   readonly resume: StateName | null;
   readonly sentence: Sentence;
+  /** The favorite phrase being asked about in `phrase.asking` (spec 019, R4). */
+  readonly offer: string | null;
+  /** The text a phrase was last offered for: at most one offer for the same text (R4). */
+  readonly offeredFor: string | null;
+  /** Phrases refused with a shake or undone, until the sentence is cleared or read aloud (R5). */
+  readonly refused: readonly string[];
+  /** Since when no signal but TICK came, for the pause before a suggestion (R4); null right after a signal. */
+  readonly quietSince: number | null;
 }
 
 export interface Transition {
@@ -154,6 +177,9 @@ export const COUNTING_KEYS = [
   'counting.askNewSentence',
   'counting.newSentence',
   'counting.kept',
+  'counting.askPhrase',
+  'counting.phraseRefused',
+  'counting.undonePhrase',
 ] as const;
 type Key = (typeof COUNTING_KEYS)[number];
 
@@ -170,6 +196,10 @@ export function initialState(sentence: Sentence = createSentence(), now = 0): Co
     notice: null,
     resume: null,
     sentence,
+    offer: null,
+    offeredFor: null,
+    refused: [],
+    quietSince: null,
   };
 }
 
@@ -178,8 +208,12 @@ export const total = (state: Pick<CountingState, 'parts'>) =>
 
 /** The one entry point (R4). */
 export function next(state: CountingState, signal: Signal, config: CountingConfig): Transition {
-  const now = signal.type === 'TICK' ? Math.max(state.now, signal.now) : state.now;
-  return TRANSITIONS[state.name][signal.type]({ ...state, now }, config, signal);
+  // Any signal but TICK restarts the pause before a suggestion (spec 019, R4).
+  const base =
+    signal.type === 'TICK'
+      ? { ...state, now: Math.max(state.now, signal.now) }
+      : { ...state, quietSince: null };
+  return TRANSITIONS[state.name][signal.type](base, config, signal);
 }
 
 // ---- helpers ---------------------------------------------------------------------------------------------------
@@ -231,6 +265,7 @@ const count =
 /** What the last step of the sentence did, so undo can say what it removed. */
 function describeUndo(step: SentenceStep | undefined): Message {
   if (!step) return msg('counting.nothingToUndo');
+  if (step.kind === 'replace') return msg('counting.undonePhrase');
   const text = step.kind === 'append' ? step.text : step.removed;
   return step.kind === 'append' && text === ' '
     ? msg('counting.undoneSpace')
@@ -273,13 +308,16 @@ const nodForSpace: Handler = (state, config) => {
 
 /** A shake while waiting for a column: undo the last step this session made (a letter, a space, a deletion). */
 const shakeToUndo: Handler = (state, config) => {
-  const notice = describeUndo(state.sentence.history.at(-1));
+  const last = state.sentence.history.at(-1);
+  const notice = describeUndo(last);
   return go(
     state,
     {
       name: 'column.waiting',
       sentence: canUndo(state.sentence) ? undo(state.sentence) : state.sentence,
       notice,
+      // An undone phrase is not offered again for this sentence (spec 019, R5, R8).
+      refused: last?.kind === 'replace' ? [...state.refused, last.text] : state.refused,
     },
     notify(config, notice), // "Cofnięto A" (Undid A): said only with speakPrompts on (spec 009, R3)
   );
@@ -409,7 +447,7 @@ const backToColumns: Handler = (state) => {
 // ---- speaking ----------------------------------------------------------------------------------------------------
 
 const speakNow: Handler = (state) =>
-  go(state, { name: 'speaking', notice: msg('counting.speaking') }, [
+  go(state, { name: 'speaking', notice: msg('counting.speaking'), refused: [] }, [
     { type: 'speak', text: state.sentence.text.trim() },
   ]);
 
@@ -477,6 +515,10 @@ const touchWhileWriting: Handler = (state, config, signal) => {
     }
     case 'speak':
       return speakIfAny(back, config, signal);
+    case 'phrase':
+      return target.phrase
+        ? takePhrase(back, target.phrase, config, signal)
+        : stay(state, config, signal);
   }
 };
 
@@ -489,6 +531,67 @@ const speakIfAny: Handler = (state, config, signal) => {
   return speakNow(state, config, signal);
 };
 
+// ---- favorite phrases (spec 019) -------------------------------------------------------------------------------
+
+/**
+ * TICK while waiting for a column (R4): after "Pauza przed podpowiedzią" (Pause before a suggestion) with no signal,
+ * offer the one phrase his whole text is the start of. At most one offer for the same text. A sentence with no letters
+ * left forgets the refused phrases (R5).
+ */
+const offerWhenReady: Handler = (state, config, signal) => {
+  const text = state.sentence.text;
+  if (!text.trim()) {
+    return state.refused.length || state.offeredFor !== null
+      ? go(state, { refused: [], offeredFor: null })
+      : stay(state, config, signal);
+  }
+  if (!config.phrases.length || state.offeredFor === text) return stay(state, config, signal);
+  if (state.quietSince === null) return go(state, { quietSince: state.now });
+  if (state.now - state.quietSince < config.phrasePauseMs) return stay(state, config, signal);
+  const phrase = matchPhrase(text, config.phrases, config.board.locale, state.refused);
+  if (!phrase) return stay(state, config, signal);
+  // Said aloud whatever speakPrompts is, in the board's language: he listens (R4).
+  const question = msg('counting.askPhrase', { phrase });
+  return go(state, { name: 'phrase.asking', offer: phrase, offeredFor: text, notice: null }, [
+    { type: 'ask', message: question },
+    { type: 'say', message: question, inBoardLanguage: true },
+  ]);
+};
+
+/**
+ * A nod on the phrase, or a tap on it (R6): his text is replaced by the phrase in upper case, as one step, and Blinker
+ * asks "Przeczytać na głos?" (Read it aloud?) at once; nothing is read without his nod.
+ */
+function takePhrase(
+  state: CountingState,
+  phrase: string,
+  config: CountingConfig,
+  signal: Signal,
+): Transition {
+  const sentence = replaceAll(state.sentence, phraseForSentence(phrase, config.board.locale));
+  return finish({ ...state, ...BACK, sentence, offer: null }, config, signal);
+}
+
+const nodForPhrase: Handler = (state, config, signal) =>
+  state.offer ? takePhrase(state, state.offer, config, signal) : stay(state, config, signal);
+
+/** A shake on the phrase (R6): the text stays, the phrase is refused; a second shake right after changes nothing. */
+const refusePhrase: Handler = (state, config) => {
+  const notice = msg('counting.phraseRefused');
+  const refused = state.offer ? [...state.refused, state.offer] : state.refused;
+  return go(
+    state,
+    { name: 'column.rejected', offer: null, refused, notice },
+    notify(config, notice),
+  );
+};
+
+/** Any other answer drops the offer and does what it does at the columns. */
+const droppingOffer =
+  (handler: Handler): Handler =>
+  (state, config, signal) =>
+    handler({ ...state, offer: null }, config, signal);
+
 // ---- the table: every state × every signal ---------------------------------------------------------------------
 
 export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType, Handler>>>> = {
@@ -499,7 +602,7 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     SHAKE: shakeToUndo,
     RIGHT: finish,
     PAUSE: pause('column.waiting'),
-    TICK: stay,
+    TICK: offerWhenReady, // a favorite phrase after the pause (spec 019, R4)
     TOUCH: touchWhileWriting,
     SPOKEN: stay, // only the end of a reading means something
   },
@@ -532,8 +635,19 @@ export const TRANSITIONS: Readonly<Record<StateName, Readonly<Record<SignalType,
     SHAKE: stay, // a second no right after a rejection changes nothing
     RIGHT: finish,
     PAUSE: pause('column.waiting'),
-    TICK: stay,
+    TICK: offerWhenReady, // a favorite phrase after the pause (spec 019, R4)
     TOUCH: touchWhileWriting,
+    SPOKEN: stay, // only the end of a reading means something
+  },
+  'phrase.asking': {
+    BLINK: droppingOffer(count(1, 'column', false)), // he goes on spelling
+    HAND: droppingOffer(count(5, 'column', false)),
+    NOD: nodForPhrase,
+    SHAKE: refusePhrase,
+    RIGHT: droppingOffer(finish), // read his own text (asks first)
+    PAUSE: droppingOffer(pause('column.waiting')),
+    TICK: stay, // the offer waits for his answer
+    TOUCH: droppingOffer(touchWhileWriting),
     SPOKEN: stay, // only the end of a reading means something
   },
   'row.waiting': {
@@ -641,6 +755,8 @@ export function prompt(state: CountingState): Message {
       return msg('counting.counting', { n });
     case 'column.asking':
       return msg('counting.askColumn', { n });
+    case 'phrase.asking':
+      return msg('counting.askPhrase', { phrase: state.offer ?? '' });
     case 'row.asking':
       return msg('counting.askRow', { n });
     case 'speak.asking':

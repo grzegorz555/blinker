@@ -99,6 +99,22 @@
     @if (showHints()) {
       <p class="count-hint" data-testid="hint">{{ hintKey() | transloco }}</p>
     }
+    <!-- Spec 019, R7: the offered favorite phrase; the row keeps its height, so the board does not jump. -->
+    @if (phrasesOn()) {
+      <div class="phrase-row" data-testid="phrase-row">
+        @if (offer(); as phrase) {
+          <button
+            type="button"
+            class="action action-tonal phrase"
+            data-testid="phrase-offer"
+            (click)="takePhrase(phrase)"
+          >
+            {{ 'counting.page.phrase' | transloco }}
+            <span [attr.lang]="board().locale">{{ phrase }}</span>
+          </button>
+        }
+      </div>
+    }
   </section>
 
   <!-- The sentence he builds, in big letters, with its actions (spec 008, R4). -->

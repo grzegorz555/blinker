@@ -34,6 +34,7 @@ generated:
 - Word prediction for Polish: spec [016](specs/016-word-prediction/spec.md) (approved 2026-11-20; ADR-0007 accepted;
   T1-T2 done, paused 2026-11-22 until the author decides after the first session).
 - A backup of his data in a file, before the first session: spec [017](specs/017-backup/spec.md) (done, 2026-11-25).
-- Favorite phrases; sentence history.
+- ✅ Favorite phrases: spec [019](specs/019-favorite-phrases/spec.md) (done 2026-11-26; off by default, to try in the
+  first session). A board of phrases chosen by a number: to ask him.
 - Capacitor build for Android and iOS.
 - Better TTS voices. This would need a backend, so it requires a new ADR.

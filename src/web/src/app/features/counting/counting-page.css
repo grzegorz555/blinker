@@ -99,6 +99,22 @@
   font-size: 1rem;
 }
 
+/* Spec 019, R7: at least 44 px; a long phrase is cut on the screen, never in speech. */
+.phrase-row {
+  min-height: 2.75rem;
+}
+
+.action.phrase {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  border: 2px solid var(--primary);
+  overflow: hidden;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .count-board {
   grid-area: board;
   /* A size container, so the board sizes its cells from the space it really has. */

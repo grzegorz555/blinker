@@ -10,6 +10,8 @@ import { HISTORY_KEY, validateHistory } from '../history/history';
 import { CLOCK, HistoryService } from '../history/history.service';
 import { LanguageService } from '../i18n/language.service';
 import { LANGUAGE_STORAGE_KEY, isLanguageCode } from '../i18n/languages';
+import { PHRASES_KEY, validatePhrases } from '../phrases/phrases';
+import { PhrasesService } from '../phrases/phrases.service';
 import { SETTINGS_KEY, validateSettings } from '../settings/settings';
 import { SettingsService } from '../settings/settings.service';
 import { PROFILE_KEY, validateProfile } from '../signals/profile';
@@ -33,6 +35,9 @@ export interface SavedBackup {
 
 /** 'restored': the device holds the file's data; 'unavailable': the storage refused and nothing changed (R7). */
 export type RestoreResult = 'restored' | 'unavailable';
+
+/** An empty list is not written: the file then keeps the phrases of the device it is restored on. */
+const phrasesOrNone = (list: string[] | undefined) => (list?.length ? list : undefined);
 
 /** The only kind of file a restore takes; the picker's `accept` is a hint a person can switch off, so we check. */
 const JSON_FILE = /\.json$/i;
@@ -58,6 +63,7 @@ export class BackupService {
   private readonly history = inject(HistoryService);
   private readonly profile = inject(ProfileService);
   private readonly language = inject(LanguageService);
+  private readonly phrases = inject(PhrasesService);
 
   /** R2, R3: every store that has a valid value; the history only when asked. */
   save(includeHistory: boolean): SavedBackup {
@@ -105,6 +111,8 @@ export class BackupService {
       { key: LANGUAGE_STORAGE_KEY, value: data.language ?? null },
     ];
     if (data.history !== undefined) writes.push({ key: HISTORY_KEY, value: json(data.history) });
+    // Like the history: a file without phrases (from before spec 019) keeps the phrases of this device (spec 019, R9).
+    if (data.phrases !== undefined) writes.push({ key: PHRASES_KEY, value: json(data.phrases) });
 
     if (!this.writeAll(writes)) return 'unavailable';
 
@@ -114,6 +122,7 @@ export class BackupService {
     this.boards.reload();
     this.profile.reload();
     if (data.history !== undefined) this.history.reload();
+    if (data.phrases !== undefined) this.phrases.reload();
     await this.language.restoreChoice(data.language ?? null);
     return 'restored';
   }
@@ -141,6 +150,7 @@ export class BackupService {
       profile: value(PROFILE_KEY, validateProfile),
       language: isLanguageCode(language) ? language : undefined,
       history: includeHistory ? value(HISTORY_KEY, validateHistory) : undefined,
+      phrases: phrasesOrNone(value(PHRASES_KEY, validatePhrases)),
     };
   }
 
