@@ -167,6 +167,17 @@ test.describe('Toasts (spec 018)', () => {
       .locator('.mat-mdc-snack-bar-container:not([mat-exit])')
       .getByRole('button', { name: 'Zamknij powiadomienie' });
     await close.hover();
+    // The circle sits in the middle of the toast, with a margin above and below (the author, 2026-11-27).
+    const centered = await close.evaluate((el) => {
+      const circle = el.querySelector('.mat-mdc-button-persistent-ripple')!.getBoundingClientRect();
+      const surface = el.closest('.mat-mdc-snackbar-surface')!.getBoundingClientRect();
+      return {
+        offset: Math.abs(circle.top + circle.height / 2 - (surface.top + surface.height / 2)),
+        margin: Math.min(circle.top - surface.top, surface.bottom - circle.bottom),
+      };
+    });
+    expect(centered.offset).toBeLessThanOrEqual(1);
+    expect(centered.margin).toBeGreaterThanOrEqual(5);
     const layer = () =>
       close.evaluate((el) => {
         const style = getComputedStyle(
@@ -175,7 +186,10 @@ test.describe('Toasts (spec 018)', () => {
         );
         return { opacity: Number(style.opacity), color: style.backgroundColor };
       });
-    await expect.poll(async () => (await layer()).opacity).toBeGreaterThan(0.1);
+    // A phone has no hover (Material shows it only with (hover: hover)).
+    if (await page.evaluate(() => matchMedia('(hover: hover)').matches)) {
+      await expect.poll(async () => (await layer()).opacity).toBeGreaterThan(0.1);
+    }
     await close.click();
     await expect(anyToast(page)).toHaveCount(0);
     await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);

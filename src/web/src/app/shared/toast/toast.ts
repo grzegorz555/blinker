@@ -143,6 +143,9 @@ export interface ToastAction {
       --mat-icon-button-hover-state-layer-opacity: 0.12;
       --mat-icon-button-focus-state-layer-opacity: 0.16;
       --mat-icon-button-pressed-state-layer-opacity: 0.16;
+      /* 36 px, so the circle keeps a visible margin inside the 48 px toast; the touch target stays 48 px. */
+      --mat-icon-button-state-layer-size: 36px;
+      --mat-icon-button-icon-size: 20px;
     }
     .toast-close svg {
       width: 1.25rem;
