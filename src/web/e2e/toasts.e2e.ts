@@ -57,6 +57,8 @@ test.describe('Toasts (spec 018)', () => {
     await page.getByRole('alertdialog').getByRole('button', { name: 'Usuń', exact: true }).click();
     await expect(toast(page)).toHaveText('Usunięto tablicę „Tak i nie”.');
     await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);
+    // Held by the focus (R3), so axe under load cannot outlast the 10 s of Cofnij (Undo).
+    await toastAction(page).focus();
     await expectNoA11yViolations(page);
 
     await toastAction(page).click();
@@ -108,7 +110,7 @@ test.describe('Toasts (spec 018)', () => {
     await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);
   });
 
-  test('a ring shows the time left; held by the pointer it stands still and the toast keeps its size (R3)', async ({
+  test('a bar along the bottom edge shows the time left; held by the pointer it stands still and the toast keeps its size (R3)', async ({
     page,
   }) => {
     await page.clock.install();
@@ -116,23 +118,38 @@ test.describe('Toasts (spec 018)', () => {
     await page.getByRole('button', { name: /Usuń tablicę.*Tak i nie/ }).click();
     await page.getByRole('alertdialog').getByRole('button', { name: 'Usuń', exact: true }).click();
     await expect(toast(page)).toHaveText('Usunięto tablicę „Tak i nie”.');
-    const ring = page.locator(
-      '.mat-mdc-snack-bar-container:not([mat-exit]) [data-testid="toast-ring"] rect',
+    const timer = page.locator(
+      '.mat-mdc-snack-bar-container:not([mat-exit]) [data-testid="toast-bar"]',
     );
-    // A CSS animation draws the ring; Playwright's clock does not drive it, so the test reads its state.
+    // A CSS animation draws the bar; Playwright's clock does not drive it, so the test reads its state.
     const animation = () =>
-      ring.evaluate((el) => {
+      timer.evaluate((el) => {
         const style = getComputedStyle(el);
         return { duration: style.animationDuration, state: style.animationPlayState };
       });
-    await expect(ring).toBeVisible();
+    await expect(timer).toBeVisible();
     expect(await animation()).toEqual({ duration: '10s', state: 'running' });
     const surface = page.locator('.app-toast:not([mat-exit]) .mat-mdc-snackbar-surface');
-    // Measured once the snack bar's own entrance (a scale from 0.8) is over; the ring's animation is not on it.
+    // Measured once the snack bar's own entrance (a scale from 0.8) is over; the bar's animation is not on it.
     await page
       .locator('.app-toast:not([mat-exit])')
       .evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
     const box = await surface.boundingBox();
+    // From edge to edge at the bottom: no gap at the start (the author, 2026-11-27).
+    const bar = await timer.evaluate((el) => {
+      const own = el.getBoundingClientRect();
+      const surfaceBox = el
+        .parentElement!.closest('.mat-mdc-snackbar-surface')!
+        .getBoundingClientRect();
+      return {
+        left: own.left - surfaceBox.left,
+        bottom: surfaceBox.bottom - own.bottom,
+        height: own.height,
+      };
+    });
+    expect(bar.left).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(bar.bottom)).toBeLessThanOrEqual(0.5);
+    expect(bar.height).toBe(3);
 
     await toast(page).hover();
     await expect.poll(async () => (await animation()).state).toBe('paused');
@@ -143,6 +160,14 @@ test.describe('Toasts (spec 018)', () => {
 
     await page.mouse.move(0, 0);
     await expect.poll(async () => (await animation()).state).toBe('running');
+
+    // The close button ends it sooner and does not undo.
+    await page
+      .locator('.mat-mdc-snack-bar-container:not([mat-exit])')
+      .getByRole('button', { name: 'Zamknij powiadomienie' })
+      .click();
+    await expect(anyToast(page)).toHaveCount(0);
+    await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);
   });
 
   test('a toast without an action goes after 6 s; Esc with the focus on Cofnij (Undo) closes it without undoing', async ({
