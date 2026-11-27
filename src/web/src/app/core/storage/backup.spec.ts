@@ -73,6 +73,15 @@ describe('checkBackupBytes: a round trip (R5)', () => {
     expect(check(buildBackup({}, NOW))).toEqual({ ok: true, backup: { createdAt: NOW, data: {} } });
   });
 
+  it('keeps the favorite phrases settings, on or off, like every setting (spec 019)', () => {
+    for (const suggestPhrases of [true, false]) {
+      const settings = { ...DEFAULT_SETTINGS, suggestPhrases, phrasePauseMs: 4000 };
+      const result = check(buildBackup({ ...full, settings }, NOW));
+      expect(result.ok && result.backup.data.settings).toEqual(settings);
+    }
+    expect(DEFAULT_SETTINGS.suggestPhrases).toBe(false);
+  });
+
   it('drops a leading BOM', () => {
     expect(check(String.fromCharCode(0xfeff) + buildBackup(full, NOW)).ok).toBe(true);
   });
