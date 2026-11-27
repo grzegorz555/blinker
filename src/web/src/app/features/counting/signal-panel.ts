@@ -11,8 +11,9 @@ interface SignalButton {
 }
 
 /**
- * His signals as buttons (spec 007, R6): in stage 2 there is no camera yet, so a caregiver, a switch or a tap gives
- * them. Every button sends the same `InputSignal` his face will send in stage 4. "Pauza" (Pause) is in the top bar.
+ * His signals as buttons (spec 007, R6): a caregiver, a switch or a tap gives them, next to the camera (spec 010) or
+ * instead of it. Every button sends the same `InputSignal` his face sends through the camera. "Pauza" (Pause) is in
+ * the top bar.
  * On a phone the label is short ("+1") and the full name stays for screen readers; the accessible name always
  * contains the visible text (SC 2.5.3 Label in Name).
  */

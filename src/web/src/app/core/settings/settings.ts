@@ -22,7 +22,7 @@ export interface Settings {
   readonly confirmByNod: boolean;
   /** A short chime when the column is taken, so he knows when to give the row (spec 012, R7). */
   readonly rowCue: boolean;
-  /** The buttons for his signals on Liczenie (Counting): on in stage 2, there is no camera yet (R6). */
+  /** The buttons for his signals on Liczenie (Counting): on by default, next to the camera or instead of it (R6). */
   readonly signalButtons: boolean;
   /** Single-key shortcuts for his signals: off by default (SC 2.1.4). */
   readonly keyboard: boolean;

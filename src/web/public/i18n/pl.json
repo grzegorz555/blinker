@@ -247,7 +247,7 @@
       "speakPrompts": "Mów pytania i komunikaty",
       "speakPromptsHint": "Wyłączone: Blinker mówi tylko wybraną literę i całe zdanie, gdy on o to poprosi.",
       "signalButtons": "Przyciski sygnałów",
-      "signalButtonsHint": "Przyciski jego sygnałów pod tablicą (kamery jeszcze nie ma).",
+      "signalButtonsHint": "Przyciski jego sygnałów pod tablicą: dla opiekuna, przełącznika albo dotyku, obok kamery lub zamiast niej.",
       "keyboard": "Skróty klawiszowe",
       "keyboardHint": "Spacja = mrugnięcie, H = ręka, N = skinienie, S = kręcenie głową, R = koniec, P = pauza.",
       "hints": "Podpowiedzi w Liczeniu",

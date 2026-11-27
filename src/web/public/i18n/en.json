@@ -247,7 +247,7 @@
       "speakPrompts": "Say the questions and notices",
       "speakPromptsHint": "Off: Blinker says only the chosen letter, and the whole sentence when he asks for it.",
       "signalButtons": "Signal buttons",
-      "signalButtonsHint": "Buttons for his signals under the board (there is no camera yet).",
+      "signalButtonsHint": "Buttons for his signals under the board: for a caregiver, a switch or a tap, next to the camera or instead of it.",
       "keyboard": "Keyboard shortcuts",
       "keyboardHint": "Space = blink, H = hand, N = nod, S = shake, R = finish, P = pause.",
       "hints": "Hints in Counting",

@@ -74,7 +74,8 @@ signal source.
 - **R6. Signal buttons** (stage 2 input): a panel with his six signals as buttons, "Mrugnięcie +1" (Blink +1),
   "Ręka +5" (Hand +5), "Skinienie: tak" (Nod: yes), "Kręcenie głową: nie" (Shake: no), "Głowa w prawo: koniec" (Head right: finish), each sending its `Signal`
   through `CountingService.send()`; "Pauza" (Pause) is the toggle in the top bar, so it is not repeated. On a phone the
-  labels are short ("+1", "tak" (yes)) and the full name stays in the accessible name (SC 2.5.3). Shown by default in stage 2 (there is no camera yet), hidden by a setting. The
+  labels are short ("+1", "tak" (yes)) and the full name stays in the accessible name (SC 2.5.3). Shown by default, hidden by a setting. (In stage 2 there was no camera yet; since spec 010 the buttons stay next to
+  the camera, for a caregiver, a switch or a tap.) The
   keyboard mapping from spec 006 (R7) is attached on this screen only when its setting is on (SC 2.1.4).
 - **R7. Speech on the screen.** The status of the voice is visible in text: while reading, the question says "Czytam na
   głos" (Reading aloud) and "Przeczytaj" (Read aloud) turns into "Zatrzymaj" (Stop); with **no local voice** the
