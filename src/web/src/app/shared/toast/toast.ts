@@ -39,7 +39,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { filter } from 'rxjs';
 
 /** How long a toast stays when nothing holds it (R3). */
-export const TOAST_MS = { plain: 6000, action: 10000 } as const;
+export const TOAST_MS = { plain: 5000, action: 8000 } as const;
 
 /** What a holder of the toast is: the pointer over it, or the keyboard focus in it. */
 type Holder = 'pointer' | 'focus';
@@ -129,8 +129,20 @@ export interface ToastAction {
     .toast-action {
       min-height: 2.75rem;
     }
+    /* Material's state layer is dark by default, unseen on the dark toast: it takes the toast text color, so hover,
+       focus and press show (SC 1.4.11 does not ask for it, but the author did, 2026-11-27). */
     .toast-close {
       color: var(--inverse-on-surface);
+      --mat-icon-button-icon-color: var(--inverse-on-surface);
+      --mat-icon-button-state-layer-color: var(--inverse-on-surface);
+      --mat-icon-button-ripple-color: color-mix(
+        in oklch,
+        var(--inverse-on-surface) 16%,
+        transparent
+      );
+      --mat-icon-button-hover-state-layer-opacity: 0.12;
+      --mat-icon-button-focus-state-layer-opacity: 0.16;
+      --mat-icon-button-pressed-state-layer-opacity: 0.16;
     }
     .toast-close svg {
       width: 1.25rem;

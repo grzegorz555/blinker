@@ -58,7 +58,7 @@ describe('ToastService (spec 018)', () => {
     expect(document.querySelector('.app-toast')).not.toBeNull();
   });
 
-  it('a toast without an action stays 6 s', async () => {
+  it('a toast without an action stays 5 s', async () => {
     await show('toast.dataDeleted');
     await advance(TOAST_MS.plain - 1);
     expect(host()).not.toBeNull();
@@ -66,7 +66,7 @@ describe('ToastService (spec 018)', () => {
     expect(gone()).toBe(true);
   });
 
-  it('a toast with an action stays 10 s; the action runs once and closes the toast', async () => {
+  it('a toast with an action stays 8 s; the action runs once and closes the toast', async () => {
     const run = vi.fn();
     await show('toast.dataDeleted', undefined, { label: 'common.cancel', run });
     expect(action()?.textContent?.trim()).toBe('Cancel');
@@ -81,7 +81,7 @@ describe('ToastService (spec 018)', () => {
 
   it('pauses while the pointer is over it, and goes on with the time that was left (R3)', async () => {
     await show('toast.dataDeleted');
-    await advance(5000);
+    await advance(TOAST_MS.plain - 1000);
     host().dispatchEvent(new Event('pointerenter'));
     await advance(60_000);
     expect(host()).not.toBeNull();
@@ -95,7 +95,7 @@ describe('ToastService (spec 018)', () => {
   it('pauses while the keyboard focus is in it, also when the pointer leaves meanwhile', async () => {
     const run = vi.fn();
     await show('toast.dataDeleted', undefined, { label: 'common.cancel', run });
-    await advance(9000);
+    await advance(TOAST_MS.action - 1000);
     host().dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
     host().dispatchEvent(new Event('pointerenter'));
     host().dispatchEvent(new Event('pointerleave'));
@@ -181,12 +181,12 @@ describe('ToastService (spec 018)', () => {
 
   it('a bar along the bottom edge runs for as long as the toast stays, decorative (R3)', async () => {
     await show('toast.dataDeleted', undefined, { label: 'toast.undo', run: vi.fn() });
-    expect(bar().style.animationDuration).toBe('10000ms');
+    expect(bar().style.animationDuration).toBe('8000ms');
     expect(bar().style.animationTimingFunction).toBe('linear');
     // Decorative: the live region must not change while the toast is shown.
     expect(bar().getAttribute('aria-hidden')).toBe('true');
     await show('toast.dataDeleted');
-    expect(bar().style.animationDuration).toBe('6000ms');
+    expect(bar().style.animationDuration).toBe('5000ms');
   });
 
   it('held, the bar stands still and nothing else in the toast changes; let go, it goes on (R3)', async () => {

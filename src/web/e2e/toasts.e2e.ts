@@ -1,5 +1,5 @@
 // Spec 018, T4: toasts that confirm what happened, with Cofnij (Undo) after a delete (R1–R7).
-// The timer is tested with Playwright's clock, so no test waits 10 s: https://playwright.dev/docs/clock
+// The timer is tested with Playwright's clock, so no test waits 8 s: https://playwright.dev/docs/clock
 import { expect, test, type Page } from './support/test';
 import { expectNoA11yViolations } from './support/a11y';
 import { fakeSpeech, spoken } from './support/speech';
@@ -57,7 +57,7 @@ test.describe('Toasts (spec 018)', () => {
     await page.getByRole('alertdialog').getByRole('button', { name: 'Usuń', exact: true }).click();
     await expect(toast(page)).toHaveText('Usunięto tablicę „Tak i nie”.');
     await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);
-    // Held by the focus (R3), so axe under load cannot outlast the 10 s of Cofnij (Undo).
+    // Held by the focus (R3), so axe under load cannot outlast the 8 s of Cofnij (Undo).
     await toastAction(page).focus();
     await expectNoA11yViolations(page);
 
@@ -102,9 +102,9 @@ test.describe('Toasts (spec 018)', () => {
     await page.clock.runFor(30_000);
     await expect(toast(page)).toBeVisible();
 
-    // The focus leaves the toast: the 10 s go on.
+    // The focus leaves the toast: the 8 s go on.
     await page.getByRole('heading', { level: 1, name: 'Tablice' }).focus();
-    await page.clock.runFor(10_500);
+    await page.clock.runFor(8_500);
     await expect(anyToast(page)).toHaveCount(0);
     // After its toast, Cofnij (Undo) is gone: the board stays deleted.
     await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);
@@ -128,7 +128,7 @@ test.describe('Toasts (spec 018)', () => {
         return { duration: style.animationDuration, state: style.animationPlayState };
       });
     await expect(timer).toBeVisible();
-    expect(await animation()).toEqual({ duration: '10s', state: 'running' });
+    expect(await animation()).toEqual({ duration: '8s', state: 'running' });
     const surface = page.locator('.app-toast:not([mat-exit]) .mat-mdc-snackbar-surface');
     // Measured once the snack bar's own entrance (a scale from 0.8) is over; the bar's animation is not on it.
     await page
@@ -161,21 +161,32 @@ test.describe('Toasts (spec 018)', () => {
     await page.mouse.move(0, 0);
     await expect.poll(async () => (await animation()).state).toBe('running');
 
-    // The close button ends it sooner and does not undo.
-    await page
+    // The close button shows a light state layer on hover (the author, 2026-11-27), then ends the toast sooner and
+    // does not undo.
+    const close = page
       .locator('.mat-mdc-snack-bar-container:not([mat-exit])')
-      .getByRole('button', { name: 'Zamknij powiadomienie' })
-      .click();
+      .getByRole('button', { name: 'Zamknij powiadomienie' });
+    await close.hover();
+    const layer = () =>
+      close.evaluate((el) => {
+        const style = getComputedStyle(
+          el.querySelector('.mat-mdc-button-persistent-ripple')!,
+          '::before',
+        );
+        return { opacity: Number(style.opacity), color: style.backgroundColor };
+      });
+    await expect.poll(async () => (await layer()).opacity).toBeGreaterThan(0.1);
+    await close.click();
     await expect(anyToast(page)).toHaveCount(0);
     await expect(page.getByRole('radio', { name: /Tak i nie/ })).toHaveCount(0);
   });
 
-  test('a toast without an action goes after 6 s; Esc with the focus on Cofnij (Undo) closes it without undoing', async ({
+  test('a toast without an action goes after 5 s; Esc with the focus on Cofnij (Undo) closes it without undoing', async ({
     page,
   }) => {
     await page.clock.install();
     await importBoard(page);
-    await page.clock.runFor(6_500);
+    await page.clock.runFor(5_500);
     await expect(anyToast(page)).toHaveCount(0);
 
     await page.getByRole('button', { name: /Usuń tablicę.*Tak i nie/ }).click();
