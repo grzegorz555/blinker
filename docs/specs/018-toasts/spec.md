@@ -42,7 +42,7 @@ Decided by the author (2026-11-25):
   `LiveAnnouncer`, SC 4.1.3). The inline success texts it replaces are removed, so nothing is announced twice. Errors
   are not toasts: they stay as persistent text under their control, as today (SC 3.3.1), and keep their own
   `role="status"` or `role="alert"`.
-- **R3. Timing that can be read.** A toast without an action stays 6 s; one with Cofnij (Undo) stays 10 s. The timer
+- **R3. Timing that can be read.** A toast without an action stays 5 s; one with Cofnij (Undo) stays 8 s (shorter than the first 6 s and 10 s: the author, 2026-11-27; M3 allows 4–10 s). The timer
   **pauses while the pointer is over the toast or the keyboard focus is in it**, and starts again when it leaves
   (SC 2.2.1: the time can be extended). The action is reachable with Tab, as the last element of the page. Esc while
   the focus is in the toast closes it. With `prefers-reduced-motion: reduce` it appears and disappears without the
@@ -110,7 +110,7 @@ Decided by the author (2026-11-25):
 
 # Acceptance criteria
 
-- [x] Unit (`ToastService`): the durations (6 s, 10 s), the pause and restart on pointer and focus, Esc, one toast at
+- [x] Unit (`ToastService`): the durations (5 s, 8 s), the pause and restart on pointer and focus, Esc, one toast at
       a time, the action called once, the polite announcement; the bar of time left, standing still while held; the close button.
 - [x] Unit (services): `HistoryService` and `BoardsService` put a deleted sentence or board back (place, active board,
       storage), once.
