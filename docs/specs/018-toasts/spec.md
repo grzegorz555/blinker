@@ -17,6 +17,7 @@ to miss on a phone, and some say nothing at all (deleting a board or a sentence,
 visible confirmation for every operation, and a way back after a delete.
 
 Decided by the author (2026-11-25):
+
 - a success is a toast; the success texts under the buttons go; **errors stay as text** under their control;
 - after deleting **one sentence** or **one board**, the toast offers **"Cofnij" (Undo)**; the dialog before the delete
   stays;
@@ -46,34 +47,41 @@ Decided by the author (2026-11-25):
   (SC 2.2.1: the time can be extended). The action is reachable with Tab, as the last element of the page. Esc while
   the focus is in the toast closes it. With `prefers-reduced-motion: reduce` it appears and disappears without the
   slide.
-  **The time left is visible** (author, 2026-11-25): a ring in `inverse-primary` runs around the edge of the toast and
-  shrinks to nothing as the toast goes. While the toast is held (pointer or focus), the ring stands still, so it is
+  **The time left is visible** (author, 2026-11-25; a bar instead of a ring, 2026-11-27): a 3 px bar in
+  `inverse-primary` runs along the bottom edge of the toast, from edge to edge and clipped to its rounded corners, and
+  shrinks towards the start as the toast goes, as in most toasts with a timer. (The first ring around the edge left a
+  gap at the rounded corner and did not look good: the author, 2026-11-27.) While the toast is held (pointer or
+  focus), the bar stands still, so it is
   plain that the time does not run; nothing else in the toast changes (no mark, no change of size: the author,
-  2026-11-25). The ring is decorative (`aria-hidden`): the live region does not change while the toast is shown. A CSS
+  2026-11-25). The bar is decorative (`aria-hidden`): the live region does not change while the toast is shown. A CSS
   animation as long as the toast's time draws it smoothly and is paused while held; with `prefers-reduced-motion` it
   moves in steps of a second.
+  **It can be closed sooner** (author, 2026-11-27): a close button ✕ at the end of the toast, after the action, named
+  "Zamknij powiadomienie" (Close the notification), with a 48 px target. It closes the toast without running the
+  action, as Esc does. M3 allows a close affordance next to the action.
 - **R4. Words, not only color.** The text says what happened in full ("Usunięto tablicę „Kuchnia”." (Deleted the
   board "Kuchnia".)); an icon is decorative (`aria-hidden`). Contrast of the text and the action on the M3
   inverse-surface colors of our tokens at least 4.5:1, checked by the token contrast test.
 - **R5. Which operations, and what they say.**
 
-  | Screen | Operation | Toast |
-  |---|---|---|
-  | Tablice (Boards) | import | "Zaimportowano tablicę „{name}”." (Imported the board "{name}".), or "Zastąpiono tablicę „{name}” nowym plikiem." when an imported board was replaced; the hint "Wybierz ją powyżej…" (Choose it above…) stays as text on the page |
-  | Tablice (Boards) | choose the active board | "Wybrana tablica: {name}." (Active board: {name}.) |
-  | Tablice (Boards) | delete a board (after the dialog) | "Usunięto tablicę „{name}”." + Cofnij (Undo) |
-  | Zdania (Sentences) | delete one sentence (after the dialog) | "Usunięto zdanie." + Cofnij (Undo) |
-  | Zdania (Sentences) | "Usuń historię" (Delete history) (after the dialog) | "Usunięto historię zdań." |
-  | Zdania (Sentences) | the history turned off (after the dialog) or on | "Historia zdań wyłączona i usunięta." / "Historia zdań włączona." |
-  | Ustawienia (Settings) | "Zapisz kopię" (Save a backup) | "Zapisano plik {file}. Trzymaj go tylko u siebie." (Saved {file}. Keep it to yourself.) |
-  | Ustawienia (Settings) | "Wczytaj kopię" (Restore a backup) | "Wczytano kopię z {date}." (Restored the backup from {date}.) |
-  | Ustawienia (Settings) | "Usuń wszystkie dane" (Delete all data) | "Usunięto wszystkie dane z tego urządzenia." |
-  | Kalibracja (Calibration) | "Zapisz kalibrację" (Save the calibration) | "Zapisano kalibrację. Blinker używa jej od teraz." |
-  | Diagnostyka (Diagnostics) | "Kopiuj wyniki" (Copy the results) | "Skopiowano wyniki (bez obrazu)." |
+  | Screen                    | Operation                                           | Toast                                                                                                                                                                                                                              |
+  | ------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | Tablice (Boards)          | import                                              | "Zaimportowano tablicę „{name}”." (Imported the board "{name}".), or "Zastąpiono tablicę „{name}” nowym plikiem." when an imported board was replaced; the hint "Wybierz ją powyżej…" (Choose it above…) stays as text on the page |
+  | Tablice (Boards)          | choose the active board                             | "Wybrana tablica: {name}." (Active board: {name}.)                                                                                                                                                                                 |
+  | Tablice (Boards)          | delete a board (after the dialog)                   | "Usunięto tablicę „{name}”." + Cofnij (Undo)                                                                                                                                                                                       |
+  | Zdania (Sentences)        | delete one sentence (after the dialog)              | "Usunięto zdanie." + Cofnij (Undo)                                                                                                                                                                                                 |
+  | Zdania (Sentences)        | "Usuń historię" (Delete history) (after the dialog) | "Usunięto historię zdań."                                                                                                                                                                                                          |
+  | Zdania (Sentences)        | the history turned off (after the dialog) or on     | "Historia zdań wyłączona i usunięta." / "Historia zdań włączona."                                                                                                                                                                  |
+  | Ustawienia (Settings)     | "Zapisz kopię" (Save a backup)                      | "Zapisano plik {file}. Trzymaj go tylko u siebie." (Saved {file}. Keep it to yourself.)                                                                                                                                            |
+  | Ustawienia (Settings)     | "Wczytaj kopię" (Restore a backup)                  | "Wczytano kopię z {date}." (Restored the backup from {date}.)                                                                                                                                                                      |
+  | Ustawienia (Settings)     | "Usuń wszystkie dane" (Delete all data)             | "Usunięto wszystkie dane z tego urządzenia."                                                                                                                                                                                       |
+  | Kalibracja (Calibration)  | "Zapisz kalibrację" (Save the calibration)          | "Zapisano kalibrację. Blinker używa jej od teraz."                                                                                                                                                                                 |
+  | Diagnostyka (Diagnostics) | "Kopiuj wyniki" (Copy the results)                  | "Skopiowano wyniki (bez obrazu)."                                                                                                                                                                                                  |
 
   Not a toast: Liczenie (Counting) (its notice line and voice stay as they are), each switch, field and radio in
   Ustawienia (Settings) (the control shows its state), "Posłuchaj" (Listen) and "Powiedz jeszcze raz" (Say again)
   (they speak).
+
 - **R6. Cofnij (Undo) after deleting one sentence or one board.** Cofnij (Undo) puts back exactly what was deleted:
   - the sentence returns to its place in the history (same text, language and time), and is saved again;
   - the board returns to the list and, if it was the active board, becomes active again;
@@ -103,14 +111,15 @@ Decided by the author (2026-11-25):
 # Acceptance criteria
 
 - [x] Unit (`ToastService`): the durations (6 s, 10 s), the pause and restart on pointer and focus, Esc, one toast at
-      a time, the action called once, the polite announcement; the ring of time left, standing still while held.
+      a time, the action called once, the polite announcement; the bar of time left, standing still while held; the close button.
 - [x] Unit (services): `HistoryService` and `BoardsService` put a deleted sentence or board back (place, active board,
       storage), once.
 - [x] Unit (pages): each operation of R5 opens its toast and no longer shows the inline success text; errors still
       show inline; Cofnij (Undo) restores and says so.
 - [x] e2e (3 device projects): delete a board → toast with Cofnij (Undo) above the navigation bar at 360 × 640 →
       Cofnij (Undo) brings it back and active; delete a sentence → Cofnij (Undo); restore a backup → toast; the timer
-      pauses with the focus in the toast; axe with a toast shown; no toast in Liczenie (Counting).
+      pauses with the focus in the toast; the bar runs from the very edge; ✕ closes without undoing; axe with a
+      toast shown; no toast in Liczenie (Counting).
 - [x] `npm run verify -- --lighthouse` passes.
 
 # Test plan

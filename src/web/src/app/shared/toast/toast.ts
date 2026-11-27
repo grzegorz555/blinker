@@ -8,11 +8,13 @@
 // - Below 600 px it sits above the navigation bar, and above the focused control when that is near the bottom
 //   (SC 2.4.11), through the CSS variable --toast-offset (styles.css).
 // - Material turns its animations off by itself with prefers-reduced-motion.
-// - The time left is a ring around the toast that shrinks to nothing as the toast goes; while the toast is held the
-//   ring stands still (spec 018, R3). It is decorative (aria-hidden): the live region must not change while the
+// - The time left is a thin bar along the bottom edge that shrinks to nothing as the toast goes; while the toast is
+//   held the bar stands still (spec 018, R3). It is decorative (aria-hidden): the live region must not change while the
 //   toast is shown, or it would be announced again. A CSS animation as long as the toast's time draws it, paused
 //   with animation-play-state while the toast is held, so no script runs for it and it moves smoothly; with
 //   prefers-reduced-motion it moves in steps of a second.
+// - A close button (✕, "Zamknij powiadomienie" (Close the notification)) ends it sooner, as Esc does; it never runs
+//   the action.
 import { DOCUMENT } from '@angular/common';
 import {
   Component,
@@ -23,7 +25,7 @@ import {
   type Signal,
   type WritableSignal,
 } from '@angular/core';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import {
   MAT_SNACK_BAR_DATA,
   MatSnackBar,
@@ -50,7 +52,9 @@ export interface ToastData {
   act(): void;
   hold(holder: Holder, on: boolean): void;
   close(): void;
-  /** How long the toast stays when nothing holds it, in ms; the ring runs for as long. */
+  /** The accessible name of the close button. */
+  readonly closeLabel: string;
+  /** How long the toast stays when nothing holds it, in ms; the bar runs for as long. */
   readonly total: number;
   /** True while the pointer or the focus holds the toast: the time stands still. */
   readonly held: Signal<boolean>;
@@ -65,23 +69,11 @@ export interface ToastAction {
 
 @Component({
   selector: 'app-toast',
-  imports: [MatButton, MatSnackBarAction, MatSnackBarActions, MatSnackBarLabel],
+  imports: [MatButton, MatIconButton, MatSnackBarAction, MatSnackBarActions, MatSnackBarLabel],
   template: `
-    <svg class="toast-ring" aria-hidden="true" focusable="false" data-testid="toast-ring">
-      <rect
-        x="1.5"
-        y="1.5"
-        rx="4"
-        pathLength="100"
-        stroke-dasharray="100 100"
-        [style.animation-duration.ms]="data.total"
-        [style.animation-timing-function]="timing"
-        [class.held]="data.held()"
-      />
-    </svg>
     <span matSnackBarLabel data-testid="toast-text">{{ data.text }}</span>
-    @if (data.action) {
-      <div matSnackBarActions>
+    <div matSnackBarActions class="toast-actions">
+      @if (data.action) {
         <button
           matButton
           matSnackBarAction
@@ -92,46 +84,80 @@ export interface ToastAction {
         >
           {{ data.action }}
         </button>
-      </div>
-    }
+      }
+      <button
+        matIconButton
+        type="button"
+        class="toast-close"
+        data-testid="toast-close"
+        [attr.aria-label]="data.closeLabel"
+        (click)="data.close()"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+    <span
+      class="toast-bar"
+      aria-hidden="true"
+      data-testid="toast-bar"
+      [style.animation-duration.ms]="data.total"
+      [style.animation-timing-function]="timing"
+      [class.held]="data.held()"
+    ></span>
   `,
   styles: `
     :host {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.25rem;
+    }
+    .toast-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
     }
     .toast-action {
       min-height: 2.75rem;
     }
-    /* The ring follows the edge of the snack bar surface (position: relative in styles.css). */
-    .toast-ring {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      pointer-events: none;
+    .toast-close {
+      color: var(--inverse-on-surface);
     }
-    .toast-ring rect {
-      width: calc(100% - 3px);
-      height: calc(100% - 3px);
-      fill: none;
-      stroke: var(--inverse-primary);
-      stroke-width: 3;
-      stroke-linecap: round;
-      animation-name: toast-ring;
+    .toast-close svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+    /* The bar runs along the bottom edge of the snack bar surface, from edge to edge; the surface clips it to its
+       rounded corners (styles.css). It shrinks towards the start, as in most toasts with a timer. */
+    .toast-bar {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      height: 3px;
+      background: var(--inverse-primary);
+      transform-origin: left;
+      pointer-events: none;
+      animation-name: toast-bar;
       animation-fill-mode: forwards;
     }
-    .toast-ring rect.held {
+    .toast-bar.held {
       animation-play-state: paused;
     }
-    @keyframes toast-ring {
+    @keyframes toast-bar {
       from {
-        stroke-dashoffset: 0;
+        transform: scaleX(1);
       }
       to {
-        stroke-dashoffset: 100;
+        transform: scaleX(0);
       }
     }
   `,
@@ -201,6 +227,7 @@ export class ToastService {
       },
       hold: (holder, on) => this.hold(holder, on),
       close: () => this.dismiss(),
+      closeLabel: this.transloco.translate('toast.close'),
       total,
       held: held.asReadonly(),
     };

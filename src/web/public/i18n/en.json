@@ -517,6 +517,7 @@
     "moves": "His last movements of the head (newest first), judged by the thresholds of this calibration:"
   },
   "toast": {
+    "close": "Close the notification",
     "undo": "Undo",
     "boardImported": "Imported the board “{{name}}”.",
     "boardReplaced": "Replaced the board “{{name}}” with the new file.",

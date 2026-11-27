@@ -517,6 +517,7 @@
     "moves": "Jego ostatnie ruchy głowy (od najnowszego), oceniane progami z tej kalibracji:"
   },
   "toast": {
+    "close": "Zamknij powiadomienie",
     "undo": "Cofnij",
     "boardImported": "Zaimportowano tablicę „{{name}}”.",
     "boardReplaced": "Zastąpiono tablicę „{{name}}” nowym plikiem.",

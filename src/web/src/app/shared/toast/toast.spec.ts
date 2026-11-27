@@ -116,6 +116,24 @@ describe('ToastService (spec 018)', () => {
     expect(run).not.toHaveBeenCalled();
   });
 
+  it('the close button (✕) closes it sooner, without running the action; it has a name and comes after the action', async () => {
+    const run = vi.fn();
+    await show('toast.dataDeleted', undefined, { label: 'toast.undo', run });
+    const close = document.querySelector<HTMLButtonElement>('[data-testid="toast-close"]')!;
+    expect(close.getAttribute('aria-label')).toBe('Close the notification');
+    expect(close.querySelector('svg')!.getAttribute('aria-hidden')).toBe('true');
+    expect(
+      action()!.compareDocumentPosition(close) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    close.click();
+    await settle();
+    expect(gone()).toBe(true);
+    expect(run).not.toHaveBeenCalled();
+
+    await show('toast.dataDeleted');
+    expect(document.querySelector('[data-testid="toast-close"]')).not.toBeNull();
+  });
+
   it('a new toast replaces the old one, and the old action can no longer run (R1, R6)', async () => {
     const run = vi.fn();
     await show('toast.dataDeleted', undefined, { label: 'common.cancel', run });
@@ -159,30 +177,28 @@ describe('ToastService (spec 018)', () => {
     button.remove();
   });
 
-  const ring = () => document.querySelector<SVGRectElement>('[data-testid="toast-ring"] rect')!;
+  const bar = () => document.querySelector<HTMLElement>('[data-testid="toast-bar"]')!;
 
-  it('a ring around the toast runs for as long as the toast stays, decorative (R3)', async () => {
+  it('a bar along the bottom edge runs for as long as the toast stays, decorative (R3)', async () => {
     await show('toast.dataDeleted', undefined, { label: 'toast.undo', run: vi.fn() });
-    expect(ring().style.animationDuration).toBe('10000ms');
-    expect(ring().style.animationTimingFunction).toBe('linear');
+    expect(bar().style.animationDuration).toBe('10000ms');
+    expect(bar().style.animationTimingFunction).toBe('linear');
     // Decorative: the live region must not change while the toast is shown.
-    expect(document.querySelector('[data-testid="toast-ring"]')!.getAttribute('aria-hidden')).toBe(
-      'true',
-    );
+    expect(bar().getAttribute('aria-hidden')).toBe('true');
     await show('toast.dataDeleted');
-    expect(ring().style.animationDuration).toBe('6000ms');
+    expect(bar().style.animationDuration).toBe('6000ms');
   });
 
-  it('held, the ring stands still and nothing else in the toast changes; let go, it goes on (R3)', async () => {
+  it('held, the bar stands still and nothing else in the toast changes; let go, it goes on (R3)', async () => {
     await show('toast.dataDeleted');
     host().dispatchEvent(new Event('pointerenter'));
     await advance(200);
-    expect(ring().classList).toContain('held');
-    expect(host().querySelectorAll('svg')).toHaveLength(1);
+    expect(bar().classList).toContain('held');
+    expect(host().querySelectorAll('svg')).toHaveLength(1); // the ✕ only: no pause mark
 
     host().dispatchEvent(new Event('pointerleave'));
     await advance(200);
-    expect(ring().classList).not.toContain('held');
+    expect(bar().classList).not.toContain('held');
   });
 
   it('a rail at the side (600 px and wider) needs no offset', async () => {
