@@ -1,5 +1,12 @@
 # Log
 
+## 2026-11-28 (batch: favorite phrases; a bar of time left and a close button on toasts; the camera hint)
+- PR #69: spec [019](specs/019-favorite-phrases/spec.md), approved by the author: favorite phrases recognized from the first letters of the sentence and asked aloud, off by default, the list empty at first.
+- PR #70: spec 019 done. Zdania (Sentences) keeps up to 20 phrases (typed, or a star in the history; moved with Up and Down, deleted with Cofnij (Undo)). With "Podpowiadaj ulubione zwroty" (Suggest favorite phrases) on, when his letters from the start of the sentence fit exactly one phrase and the pause has passed (2.5 s), Blinker asks "Zmień pozycję?" (Change my position?) aloud: a nod takes it as one undoable step, a shake refuses it for the sentence. A short phrase also counts as a match, so "PI" with "Pić" and "Pić herbatę" offers nothing. The phrases are in a backup and in "Usuń wszystkie dane" (Delete all data).
+- PR #72: the time left on a toast is a 3 px bar along its bottom edge, from edge to edge; the ring left a gap at the rounded corner (the author, on the preview). A close button ✕ ends a toast without undoing, with a visible hover. Toasts are shorter: 5 s, and 8 s with Cofnij (Undo).
+- PR #73: the hint under the signal buttons in Ustawienia (Settings) no longer says there is no camera.
+- This PR: the backlog drops the Capacitor build: Blinker stays a PWA (the author, 2026-11-26).
+
 ## 2026-11-26 (batch: toasts with Cofnij (Undo), and the time left around them)
 - PR #66: spec [018](specs/018-toasts/spec.md) done. A toast (an M3 snackbar) confirms each operation in Tablice (Boards), Zdania (Sentences), Ustawienia (Settings), Kalibracja (Calibration) and Diagnostyka (Diagnostics), above the navigation bar on a phone; errors stay as text under their control, and Liczenie (Counting) has none. After deleting one sentence or one board, Cofnij (Undo) puts it back for 10 s. The timer stops while the pointer or the focus is in the toast (SC 2.2.1), and the text is announced once.
 - PR #67: a line around the toast shows the time left and shrinks to nothing as it goes; held, it stands still. The first version moved in script steps and showed a pause mark, which jumped and widened the toast on hover (the author, on the preview); it is one CSS animation now, paused with `animation-play-state`, and nothing else in the toast changes.
